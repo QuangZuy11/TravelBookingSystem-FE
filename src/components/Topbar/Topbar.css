@@ -1,0 +1,24 @@
+.topbar {
+  background-color: #002f2f; /* màu xanh đậm */
+  color: white;
+  font-size: 14px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 6px 20px;
+}
+
+.topbar-left {
+  display: flex;
+  align-items: center;
+  gap: 12px; /* khoảng cách giữa các item */
+}
+
+.topbar-right {
+  text-align: right;
+  font-weight: 500;
+}
+
+.icon {
+  margin-right: 6px;
+}
