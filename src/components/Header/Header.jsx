@@ -19,7 +19,7 @@ const Header = () => {
       <nav className="header-nav">
         <a href="/">Trang Chủ</a>
         <a href="/tour">Tour Du Lịch</a>
-        <a href="/promo">Khuyến Mãi</a>
+        <a href="/hotel">Khách Sạn</a>
         <a href="/about">Về Chúng Tôi</a>
         <a href="/contact">Liên Hệ</a>
       </nav>

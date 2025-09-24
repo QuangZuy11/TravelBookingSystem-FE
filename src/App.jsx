@@ -1,14 +1,16 @@
 import "./App.css";
-import TopBar from "./components/Topbar/Topbar";
-import Header from "./components/Header/Header";
-import HeroSection from "./components/HeroSection/HeroSection";
+import Homepage from "./pages/traveler/Homepage";
+import HomepageHotel from "./pages/traveler/HomepageHotel";
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+
 function App() {
   return (
-    <>
-      <TopBar />
-      <Header />
-      <HeroSection />
-    </>
+    <Router>
+      <Routes>
+        <Route path="/homepage" element={<Homepage />} />
+        <Route path="/homepage-hotel" element={<HomepageHotel />} />
+      </Routes>
+    </Router>
   );
 }
 
