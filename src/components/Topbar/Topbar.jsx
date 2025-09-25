@@ -1,6 +1,6 @@
 import React from "react";
 import { FaPhoneAlt, FaEnvelope } from "react-icons/fa";
-import "../Topbar/Topbar.css"; 
+import "../Topbar/Topbar.css";
 
 const TopBar = () => {
   return (
@@ -8,6 +8,8 @@ const TopBar = () => {
       <div className="topbar-left">
         <FaPhoneAlt className="icon" />
         <span className="me-4">Hotline: 1900-1234</span>
+      </div>
+      <div className="topbar-center">
         <FaEnvelope className="icon" />
         <span>info@viettravel.com</span>
       </div>

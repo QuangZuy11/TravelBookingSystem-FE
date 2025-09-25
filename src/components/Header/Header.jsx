@@ -1,17 +1,13 @@
 import React from "react";
 import { FaUserCircle } from "react-icons/fa";
 import "./Header.css";
+import Logo from "../assets/logo.png";
 
 const Header = () => {
   return (
     <header className="header">
-      {/* Logo */}
       <div className="header-logo">
-        <img
-          src="/logo.png" // bạn nhớ thêm đường dẫn logo
-          alt="VietTravel Logo"
-          className="logo-img"
-        />
+        <img src={Logo} alt="VietTravel Logo" className="logo-img" />
         <span className="logo-text">VietTravel</span>
       </div>
 
