@@ -1,6 +1,6 @@
 import React from "react";
 import { FaPhoneAlt, FaEnvelope } from "react-icons/fa";
-import "../Topbar/Topbar.css";
+import "./Topbar.css";
 
 const TopBar = () => {
   return (
@@ -14,7 +14,7 @@ const TopBar = () => {
         <span>info@viettravel.com</span>
       </div>
 
-      <div className="topbar-right">Hỗ trợ 24/7 - Đặt tour nhanh chóng</div>
+      <div className="topbar-right">Hỗ trợ 24/7 - Đặt tour nhanh chóng </div>
     </div>
   );
 };
