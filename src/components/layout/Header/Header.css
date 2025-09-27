@@ -67,3 +67,58 @@
 .login-icon {
   font-size: 22px;
 }
+.header-login-link {
+  text-decoration: none;
+  color: inherit;
+}
+.header-auth {
+  position: relative; /* Quan trọng để định vị dropdown */
+}
+
+.header-user-info {
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  padding: 8px;
+  border-radius: 5px;
+  transition: background-color 0.2s;
+}
+
+.header-user-info:hover {
+  background-color: #f0f0f0;
+}
+
+.header-user-info span {
+  margin-left: 8px;
+  font-weight: 500;
+}
+
+.dropdown-menu {
+  position: absolute;
+  top: 120%; /* Vị trí ngay dưới tên người dùng */
+  right: 0;
+  background-color: white;
+  border-radius: 8px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+  width: 150px;
+  z-index: 1000;
+  overflow: hidden;
+  border: 1px solid #eee;
+}
+
+.dropdown-item {
+  display: block;
+  width: 100%;
+  padding: 12px 16px;
+  text-align: left;
+  border: none;
+  background: none;
+  font-size: 15px;
+  color: #333;
+  cursor: pointer;
+  text-decoration: none;
+}
+
+.dropdown-item:hover {
+  background-color: #f5f5f5;
+}

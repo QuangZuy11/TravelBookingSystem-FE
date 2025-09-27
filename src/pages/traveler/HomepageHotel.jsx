@@ -12,7 +12,7 @@ function HomepageHotel() {
             <HotelHighlights />
 
         </>
-    )
+    ) 
 }
 
 export default HomepageHotel
