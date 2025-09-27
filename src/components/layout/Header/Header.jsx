@@ -12,8 +12,8 @@ const Header = () => {
 
   const handleLogout = () => {
     logout();
-    setDropdownVisible(false); // Ẩn dropdown sau khi logout
-    navigate('/'); // Chuyển về trang chủ
+    setDropdownVisible(false);
+    navigate('/');
   };
 
   return (
@@ -30,11 +30,8 @@ const Header = () => {
         <a href="/about">Về Chúng Tôi</a>
         <a href="/contact">Liên Hệ</a>
       </nav>
-
-      {/* Conditional Rendering: Hiển thị tùy theo trạng thái đăng nhập */}
       <div className="header-auth">
         {user ? (
-          // ---- NẾU ĐÃ ĐĂNG NHẬP ----
           <div className="header-user-info" onClick={() => setDropdownVisible(!dropdownVisible)}>
             <FaUserCircle className="login-icon" />
             <span>{user.name}</span>
@@ -46,7 +43,6 @@ const Header = () => {
             )}
           </div>
         ) : (
-          // ---- NẾU CHƯA ĐĂNG NHẬP ----
           <Link to="/auth" className="header-login-link">
             <div className="header-login">
               <FaUserCircle className="login-icon" />
