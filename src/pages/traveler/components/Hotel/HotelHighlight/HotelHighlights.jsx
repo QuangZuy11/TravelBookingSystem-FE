@@ -173,8 +173,8 @@ const CardContentWrapper = styled(CardContent)(() => ({
 }));
 
 const HotelHighlight = ({ hotels = [], loading = false }) => {
-    const [favorites, setFavorites] = useState(new Set());
-    const [visibleCount, setVisibleCount] = useState(6); // 2 hàng × 3 items = 6
+
+    const [visibleCount] = useState(6); // 2 hàng × 3 items = 6
 
     // ✅ Default hotels data
     const defaultHotels = [
@@ -240,132 +240,6 @@ const HotelHighlight = ({ hotels = [], loading = false }) => {
                 { icon: <LocalParking />, name: 'Parking' }
             ],
             isPopular: true
-        },
-        {
-            id: 4,
-            name: 'Mountain View Resort',
-            image: 'https://images.unsplash.com/photo-1566073771259-6a8506099945?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2340&q=80',
-            rating: 4.7,
-            location: 'Sapa',
-            totalBookings: 195,
-            price: 1800000,
-            originalPrice: 2200000,
-            currency: 'VNĐ',
-            priceUnit: 'Đêm',
-            discount: 18,
-            features: ['View núi', 'Trekking tour', 'BBQ'],
-            amenities: [
-                { icon: <Wifi />, name: 'WiFi' },
-                { icon: <Restaurant />, name: 'BBQ' },
-                { icon: <FitnessCenter />, name: 'Trekking' },
-                { icon: <RoomService />, name: 'Room service' }
-            ],
-            isPopular: false
-        },
-        {
-            id: 5,
-            name: 'Beach Paradise Hotel',
-            image: 'https://images.unsplash.com/photo-1520250497591-112f2f40a3f4?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2340&q=80',
-            rating: 4.6,
-            location: 'Nha Trang',
-            totalBookings: 320,
-            price: 2500000,
-            originalPrice: 3000000,
-            currency: 'VNĐ',
-            priceUnit: 'Đêm',
-            discount: 17,
-            features: ['Bãi biển', 'Water sports', 'Kids club'],
-            amenities: [
-                { icon: <Pool />, name: 'Beach' },
-                { icon: <FitnessCenter />, name: 'Sports' },
-                { icon: <Restaurant />, name: 'All-inclusive' },
-                { icon: <Spa />, name: 'Kids club' }
-            ],
-            isPopular: true
-        },
-        {
-            id: 6,
-            name: 'Heritage Boutique Hotel',
-            image: 'https://images.unsplash.com/photo-1564501049412-61c2a3083791?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2340&q=80',
-            rating: 4.8,
-            location: 'Hội An',
-            totalBookings: 265,
-            price: 2200000,
-            originalPrice: 2800000,
-            currency: 'VNĐ',
-            priceUnit: 'Đêm',
-            discount: 21,
-            features: ['Phố cổ', 'Bicycle rental', 'Cooking class'],
-            amenities: [
-                { icon: <Wifi />, name: 'WiFi' },
-                { icon: <Restaurant />, name: 'Cooking' },
-                { icon: <BusinessCenter />, name: 'Culture' },
-                { icon: <RoomService />, name: 'Concierge' }
-            ],
-            isPopular: false
-        },
-        {
-            id: 7,
-            name: 'Golden Bay Resort',
-            image: 'https://images.unsplash.com/photo-1551882547-ff40c63fe5fa?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2340&q=80',
-            rating: 4.9,
-            location: 'Phú Quốc',
-            totalBookings: 385,
-            price: 3800000,
-            originalPrice: 4500000,
-            currency: 'VNĐ',
-            priceUnit: 'Đêm',
-            discount: 16,
-            features: ['All-inclusive', 'Water villa', 'Sunset bar'],
-            amenities: [
-                { icon: <Pool />, name: 'Water villa' },
-                { icon: <Restaurant />, name: 'All-inclusive' },
-                { icon: <Spa />, name: 'Spa' },
-                { icon: <FitnessCenter />, name: 'Diving' }
-            ],
-            isPopular: true
-        },
-        {
-            id: 8,
-            name: 'City Central Hotel',
-            image: 'https://images.unsplash.com/photo-1445019980597-93fa8acb246c?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2340&q=80',
-            rating: 4.5,
-            location: 'Hà Nội',
-            totalBookings: 290,
-            price: 1500000,
-            originalPrice: 1800000,
-            currency: 'VNĐ',
-            priceUnit: 'Đêm',
-            discount: 17,
-            features: ['Trung tâm', 'Rooftop pool', 'Meeting rooms'],
-            amenities: [
-                { icon: <Wifi />, name: 'WiFi' },
-                { icon: <Pool />, name: 'Rooftop pool' },
-                { icon: <BusinessCenter />, name: 'Business' },
-                { icon: <LocalParking />, name: 'Shuttle' }
-            ],
-            isPopular: false
-        },
-        {
-            id: 9,
-            name: 'Eco Lodge Retreat',
-            image: 'https://images.unsplash.com/photo-1587985064135-0366536eab42?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2340&q=80',
-            rating: 4.7,
-            location: 'Đà Lạt',
-            totalBookings: 155,
-            price: 2100000,
-            originalPrice: 2600000,
-            currency: 'VNĐ',
-            priceUnit: 'Đêm',
-            discount: 19,
-            features: ['Eco-friendly', 'Garden view', 'Organic food'],
-            amenities: [
-                { icon: <Spa />, name: 'Yoga' },
-                { icon: <Restaurant />, name: 'Organic' },
-                { icon: <Wifi />, name: 'WiFi' },
-                { icon: <FitnessCenter />, name: 'Garden' }
-            ],
-            isPopular: false
         }
     ];
 
@@ -375,33 +249,6 @@ const HotelHighlight = ({ hotels = [], loading = false }) => {
         return new Intl.NumberFormat('vi-VN').format(price);
     };
 
-    const toggleFavorite = (hotelId) => {
-        setFavorites(prev => {
-            const newFavorites = new Set(prev);
-            if (newFavorites.has(hotelId)) {
-                newFavorites.delete(hotelId);
-            } else {
-                newFavorites.add(hotelId);
-            }
-            return newFavorites;
-        });
-    };
-
-    const handleShare = (hotel) => {
-        if (navigator.share) {
-            navigator.share({
-                title: hotel.name,
-                text: `Khám phá ${hotel.name} tại ${hotel.location}`,
-                url: window.location.href
-            });
-        } else {
-            navigator.clipboard.writeText(window.location.href);
-        }
-    };
-
-    const loadMore = () => {
-        setVisibleCount(prev => prev + 3); // Load thêm 3 items (1 hàng)
-    };
 
     const visibleHotels = hotelData.slice(0, visibleCount);
 
@@ -443,7 +290,7 @@ const HotelHighlight = ({ hotels = [], loading = false }) => {
                                 sx={{
                                     fontWeight: 'bold',
                                     mb: 2,
-                                    background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                                    background: 'linear-gradient(135deg, #023d3eff 0%, #03373aff 100%)',
                                     WebkitBackgroundClip: 'text',
                                     WebkitTextFillColor: 'transparent',
                                     backgroundClip: 'text',
@@ -464,15 +311,6 @@ const HotelHighlight = ({ hotels = [], loading = false }) => {
                             >
                                 Những lựa chọn tuyệt vời được khách hàng yêu thích nhất
                             </Typography>
-
-                            {/* Filter/Sort Options */}
-                            <Box sx={{ display: 'flex', gap: 2, justifyContent: 'center', flexWrap: 'wrap' }}>
-                                <Chip label="Tất cả" variant="filled" color="primary" />
-                                <Chip label="Khách sạn 5⭐" variant="outlined" />
-                                <Chip label="Resort" variant="outlined" />
-                                <Chip label="Boutique" variant="outlined" />
-                                <Chip label="Giá tốt nhất" variant="outlined" />
-                            </Box>
                         </Box>
                     </Fade>
 
@@ -505,40 +343,7 @@ const HotelHighlight = ({ hotels = [], loading = false }) => {
                                             />
                                         )}
 
-                                        {/* Action Buttons Overlay */}
-                                        <ImageOverlay>
-                                            <Box sx={{ display: 'flex', gap: 1 }}>
-                                                <Tooltip title="Xem chi tiết">
-                                                    <ActionButton size="small">
-                                                        <Visibility sx={{ fontSize: '18px' }} />
-                                                    </ActionButton>
-                                                </Tooltip>
-                                            </Box>
 
-                                            <Box sx={{ display: 'flex', gap: 1 }}>
-                                                <Tooltip title="Chia sẻ">
-                                                    <ActionButton
-                                                        size="small"
-                                                        onClick={() => handleShare(hotel)}
-                                                    >
-                                                        <Share sx={{ fontSize: '18px' }} />
-                                                    </ActionButton>
-                                                </Tooltip>
-
-                                                <Tooltip title={favorites.has(hotel.id) ? "Bỏ yêu thích" : "Yêu thích"}>
-                                                    <ActionButton
-                                                        size="small"
-                                                        onClick={() => toggleFavorite(hotel.id)}
-                                                    >
-                                                        {favorites.has(hotel.id) ? (
-                                                            <Favorite sx={{ fontSize: '18px', color: '#ff4757' }} />
-                                                        ) : (
-                                                            <FavoriteBorder sx={{ fontSize: '18px' }} />
-                                                        )}
-                                                    </ActionButton>
-                                                </Tooltip>
-                                            </Box>
-                                        </ImageOverlay>
                                     </StyledCardMedia>
 
                                     <CardContentWrapper>
@@ -691,44 +496,7 @@ const HotelHighlight = ({ hotels = [], loading = false }) => {
                         ))}
                     </HotelsGrid>
 
-                    {/* ✅ Load More Button */}
-                    {visibleCount < hotelData.length && (
-                        <Fade in timeout={1000}>
-                            <Box sx={{ textAlign: 'center', mt: 6 }}>
-                                <Button
-                                    variant="outlined"
-                                    size="large"
-                                    onClick={loadMore}
-                                    sx={{
-                                        borderColor: '#667eea',
-                                        color: '#667eea',
-                                        fontSize: '16px',
-                                        fontWeight: 600,
-                                        padding: '12px 48px',
-                                        borderRadius: '25px',
-                                        '&:hover': {
-                                            backgroundColor: '#667eea',
-                                            color: 'white',
-                                            transform: 'translateY(-2px)',
-                                            boxShadow: '0 8px 25px rgba(102, 126, 234, 0.3)'
-                                        }
-                                    }}
-                                >
-                                    Xem thêm ({Math.min(3, hotelData.length - visibleCount)} khách sạn)
-                                </Button>
-                            </Box>
-                        </Fade>
-                    )}
 
-                    {/* ✅ Show total count */}
-                    <Box sx={{ textAlign: 'center', mt: 4 }}>
-                        <Typography sx={{
-                            color: '#6c757d',
-                            fontSize: '16px'
-                        }}>
-                            Hiển thị {visibleCount} trên {hotelData.length} khách sạn
-                        </Typography>
-                    </Box>
                 </Container>
             </Box>
         </HotelContainer>

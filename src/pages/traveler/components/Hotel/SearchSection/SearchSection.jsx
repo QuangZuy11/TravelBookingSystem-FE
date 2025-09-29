@@ -23,7 +23,9 @@ import {
     Remove,
     PlayArrow,
     TravelExplore,
-    Star
+    Star,
+    Clear,
+    Refresh
 } from '@mui/icons-material';
 import { styled } from '@mui/material/styles';
 
@@ -47,11 +49,11 @@ const SearchContainer = styled('section')(() => ({
     },
     '& .MuiInputBase-root': {
         fontFamily: '"Segoe UI", Tahoma, Geneva, Verdana, sans-serif !important',
-        fontSize: '16px !important',
+        fontSize: '36px !important',
     },
     '& .MuiInputLabel-root': {
         fontFamily: '"Segoe UI", Tahoma, Geneva, Verdana, sans-serif !important',
-        fontSize: '14px !important',
+        fontSize: '18px !important',
     },
     '& .MuiPopover-paper': {
         fontFamily: '"Segoe UI", Tahoma, Geneva, Verdana, sans-serif !important',
@@ -78,11 +80,13 @@ const StyledSearchForm = styled(Paper)(() => ({
     background: 'rgba(255, 255, 255, 0.95)',
     backdropFilter: 'blur(20px)',
     borderRadius: '16px',
-    padding: '24px',
+    padding: '32px',
     boxShadow: '0 20px 60px rgba(0, 0, 0, 0.1)',
     border: '1px solid rgba(255, 255, 255, 0.2)',
     marginTop: '2rem',
     transition: 'all 0.3s ease',
+    maxWidth: '1400px', // ✅ Tăng width để chứa đủ 6 elements
+    margin: '2rem auto 0',
     '&:hover': {
         transform: 'translateY(-2px)',
         boxShadow: '0 25px 70px rgba(0, 0, 0, 0.15)'
@@ -94,53 +98,89 @@ const StyledTextField = styled(TextField)(() => ({
         backgroundColor: 'white',
         borderRadius: '12px',
         transition: 'all 0.3s ease',
+        height: '56px', // ✅ Fixed height
         '& fieldset': {
             borderColor: '#e0e0e0',
             borderWidth: '2px'
         },
         '&:hover fieldset': {
-            borderColor: '#667eea'
+            borderColor: '#032d27ff'
         },
         '&.Mui-focused fieldset': {
-            borderColor: '#667eea',
-            boxShadow: '0 0 0 3px rgba(102, 126, 234, 0.1)'
+            borderColor: '#032d27ff',
+            boxShadow: '0 0 0 3px rgba(3, 45, 39, 0.1)'
         }
     },
     '& .MuiInputLabel-root': {
-        fontWeight: '500 !important',
+        fontWeight: '600 !important',
         color: '#495057 !important',
         textTransform: 'uppercase',
-        letterSpacing: '0.5px'
+        letterSpacing: '0.5px',
+        fontSize: '12px !important'
+    },
+    '& .MuiInputBase-input': {
+        fontSize: '16px !important'
+    },
+    // ✅ Hide helper text to keep consistent height
+    '& .MuiFormHelperText-root': {
+        position: 'absolute',
+        top: '100%',
+        marginTop: '4px',
+        marginLeft: 0
     }
 }));
 
 const StyledButton = styled(Button)(() => ({
     background: 'linear-gradient(135deg, #032d27ff 0%, #043f36ff 100%) !important',
     borderRadius: '12px !important',
-    padding: '16px 32px !important',
+    padding: '0 20px !important', // ✅ Remove vertical padding
     fontWeight: '600 !important',
     textTransform: 'none !important',
-    boxShadow: '0 4px 15px rgba(102, 126, 234, 0.3) !important',
+    boxShadow: '0 4px 15px rgba(3, 45, 39, 0.3) !important',
     transition: 'all 0.3s ease !important',
-    '&:hover': {
-        transform: 'translateY(-3px)',
-        boxShadow: '0 8px 25px rgba(102, 126, 234, 0.4) !important'
-    }
-}));
-
-const OutlineButton = styled(Button)(() => ({
-    borderRadius: '8px !important',
-    padding: '12px 24px !important',
-    fontWeight: '600 !important',
-    textTransform: 'none !important',
-    transition: 'all 0.3s ease !important',
+    height: '56px !important', // ✅ Fixed height same as inputs
     '&:hover': {
         transform: 'translateY(-2px)',
-        boxShadow: '0 8px 20px rgba(255, 255, 255, 0.2) !important'
+        boxShadow: '0 8px 25px rgba(3, 45, 39, 0.4) !important'
     }
 }));
 
+const ClearButton = styled(Button)(() => ({
+    borderRadius: '12px !important',
+    padding: '0 20px !important', // ✅ Remove vertical padding
+    fontWeight: '600 !important',
+    textTransform: 'none !important',
+    transition: 'all 0.3s ease !important',
+    height: '56px !important', // ✅ Fixed height same as inputs
+    borderColor: '#6c757d !important',
+    color: '#6c757d !important',
+    '&:hover': {
+        borderColor: '#495057 !important',
+        backgroundColor: '#f8f9fa !important',
+        transform: 'translateY(-2px)'
+    }
+}));
 
+// ✅ Custom Grid Container để force single row
+const SingleRowGrid = styled(Box)(() => ({
+    display: 'flex',
+    gap: '16px',
+    alignItems: 'center',
+    flexWrap: 'nowrap', // ✅ Không cho wrap
+    '@media (max-width: 1200px)': {
+        flexWrap: 'wrap',
+        '& > *': {
+            minWidth: 'calc(50% - 8px)'
+        }
+    },
+    '@media (max-width: 768px)': {
+        flexDirection: 'column',
+        '& > *': {
+            width: '100%',
+            minWidth: '100%'
+        }
+    }
+}));
 
 const SearchSection = ({ onSearch }) => {
     const [searchData, setSearchData] = useState({
@@ -186,6 +226,20 @@ const SearchSection = ({ onSearch }) => {
                 [type]: newValue
             };
         });
+    };
+
+    // ✅ Clear function
+    const handleClear = () => {
+        setSearchData({
+            location: '',
+            checkIn: '',
+            checkOut: '',
+            adults: 2,
+            children: 1,
+            rooms: 1
+        });
+        setErrors({});
+        setAnchorEl(null);
     };
 
     const validateForm = () => {
@@ -241,14 +295,10 @@ const SearchSection = ({ onSearch }) => {
 
     const open = Boolean(anchorEl);
 
-
-
-
-
     return (
         <SearchContainer>
             <StyledHeroSection>
-                <Container maxWidth="lg">
+                <Container maxWidth="xl"> {/* ✅ Sử dụng xl container */}
                     {/* Hero Content */}
                     <Fade in timeout={1000}>
                         <Box sx={{ textAlign: 'center', mb: 4 }}>
@@ -282,8 +332,10 @@ const SearchSection = ({ onSearch }) => {
                     {/* Search Form */}
                     <Fade in timeout={1500}>
                         <StyledSearchForm elevation={0}>
-                            <Grid container spacing={2} alignItems="end">
-                                <Grid item xs={12} md={3}>
+                            {/* ✅ Custom Flex Layout - Force single row */}
+                            <SingleRowGrid>
+                                {/* Location */}
+                                <Box sx={{ flex: '2.5', minWidth: '200px' }}>
                                     <StyledTextField
                                         fullWidth
                                         label="VỊ TRÍ"
@@ -300,9 +352,10 @@ const SearchSection = ({ onSearch }) => {
                                             ),
                                         }}
                                     />
-                                </Grid>
+                                </Box>
 
-                                <Grid item xs={12} md={2.5}>
+                                {/* Check-in */}
+                                <Box sx={{ flex: '1.8', minWidth: '150px' }}>
                                     <StyledTextField
                                         fullWidth
                                         label="CHECK-IN"
@@ -320,9 +373,10 @@ const SearchSection = ({ onSearch }) => {
                                             ),
                                         }}
                                     />
-                                </Grid>
+                                </Box>
 
-                                <Grid item xs={12} md={2.5}>
+                                {/* Check-out */}
+                                <Box sx={{ flex: '1.8', minWidth: '150px' }}>
                                     <StyledTextField
                                         fullWidth
                                         label="CHECK-OUT"
@@ -340,9 +394,10 @@ const SearchSection = ({ onSearch }) => {
                                             ),
                                         }}
                                     />
-                                </Grid>
+                                </Box>
 
-                                <Grid item xs={12} md={2.5}>
+                                {/* Guests & Rooms */}
+                                <Box sx={{ flex: '2.2', minWidth: '180px' }}>
                                     <StyledTextField
                                         fullWidth
                                         label="KHÁCH & PHÒNG"
@@ -358,20 +413,32 @@ const SearchSection = ({ onSearch }) => {
                                         }}
                                         sx={{ cursor: 'pointer' }}
                                     />
-                                </Grid>
+                                </Box>
 
-                                <Grid item xs={12} md={1.5}>
+                                {/* ✅ Clear Button */}
+                                <Box sx={{ flex: '0 0 auto', minWidth: '100px' }}>
+                                    <ClearButton
+                                        fullWidth
+                                        variant="outlined"
+                                        startIcon={<Refresh />}
+                                        onClick={handleClear}
+                                    >
+                                        Xóa
+                                    </ClearButton>
+                                </Box>
+
+                                {/* ✅ Search Button */}
+                                <Box sx={{ flex: '0 0 auto', minWidth: '120px' }}>
                                     <StyledButton
                                         fullWidth
                                         variant="contained"
-                                        size="large"
-                                        onClick={handleSearch}
                                         startIcon={<Search />}
+                                        onClick={handleSearch}
                                     >
                                         Tìm kiếm
                                     </StyledButton>
-                                </Grid>
-                            </Grid>
+                                </Box>
+                            </SingleRowGrid>
                         </StyledSearchForm>
                     </Fade>
 
@@ -426,12 +493,12 @@ const SearchSection = ({ onSearch }) => {
                                             onClick={() => handleGuestChange(item.key, 'decrease')}
                                             disabled={searchData[item.key] <= item.min}
                                             sx={{
-                                                border: '2px solid #053b3bff',
-                                                color: '#044439ff',
+                                                border: '2px solid #032d27ff',
+                                                color: '#032d27ff',
                                                 width: '36px',
                                                 height: '36px',
                                                 '&:hover': {
-                                                    backgroundColor: '#053828ff',
+                                                    backgroundColor: '#032d27ff',
                                                     color: 'white'
                                                 },
                                                 '&:disabled': {
@@ -455,12 +522,12 @@ const SearchSection = ({ onSearch }) => {
                                             size="small"
                                             onClick={() => handleGuestChange(item.key, 'increase')}
                                             sx={{
-                                                border: '2px solid #667eea',
-                                                color: '#667eea',
+                                                border: '2px solid #032d27ff',
+                                                color: '#032d27ff',
                                                 width: '36px',
                                                 height: '36px',
                                                 '&:hover': {
-                                                    backgroundColor: '#667eea',
+                                                    backgroundColor: '#032d27ff',
                                                     color: 'white'
                                                 }
                                             }}
@@ -473,17 +540,30 @@ const SearchSection = ({ onSearch }) => {
                             </Box>
                         ))}
 
-                        <Box sx={{ mt: 2, pt: 2, borderTop: '1px solid #f0f0f0' }}>
+                        <Box sx={{ mt: 2, pt: 2, borderTop: '1px solid #f0f0f0', display: 'flex', gap: 2 }}>
                             <Button
-                                fullWidth
                                 variant="outlined"
+                                onClick={handleClear}
+                                sx={{
+                                    flex: 1,
+                                    borderColor: '#6c757d',
+                                    color: '#6c757d',
+                                    '&:hover': {
+                                        borderColor: '#495057',
+                                        backgroundColor: '#f8f9fa'
+                                    }
+                                }}
+                            >
+                                Đặt lại
+                            </Button>
+                            <Button
+                                variant="contained"
                                 onClick={handleGuestClose}
                                 sx={{
-                                    borderColor: '#044c3cff',
-                                    color: '#04473fff',
+                                    flex: 1,
+                                    backgroundColor: '#032d27ff',
                                     '&:hover': {
-                                        backgroundColor: '#075241ff',
-                                        color: 'white'
+                                        backgroundColor: '#043f36ff'
                                     }
                                 }}
                             >
