@@ -1,192 +1,500 @@
-import React, { useState, useRef, useEffect } from "react";
-import "../SearchSection/SearchSection.css";
+import React, { useState } from 'react';
+import {
+    Box,
+    Container,
+    Typography,
+    TextField,
+    Button,
+    Paper,
+    InputAdornment,
+    Grid,
+    Popover,
+    IconButton,
+    Divider,
+    Fade,
+    Chip
+} from '@mui/material';
+import {
+    LocationOn,
+    CalendarToday,
+    Person,
+    Search,
+    Add,
+    Remove,
+    PlayArrow,
+    TravelExplore,
+    Star
+} from '@mui/icons-material';
+import { styled } from '@mui/material/styles';
 
-export default function SearchSection({ onSearch }) {
-    const [location, setLocation] = useState("");
-    const [checkIn, setCheckIn] = useState("");
-    const [checkOut, setCheckOut] = useState("");
-    const [adults, setAdults] = useState(2);
-    const [children, setChildren] = useState(0);
-    const [rooms, setRooms] = useState(1);
-    const [openGuests, setOpenGuests] = useState(false);
-    const [suggestions] = useState([
-        "Hà Nội, Việt Nam",
-        "Hồ Chí Minh, Việt Nam",
-        "Đà Nẵng, Việt Nam",
-        "Nha Trang, Việt Nam",
-        "Hạ Long, Việt Nam",
-    ]);
-    const wrapperRef = useRef(null);
+// ✅ Container với CSS isolation
+const SearchContainer = styled('section')(() => ({
+    isolation: 'isolate',
+    contain: 'style',
+    fontFamily: '"Segoe UI", Tahoma, Geneva, Verdana, sans-serif',
+    fontSize: '16px',
 
-    // Close popovers / suggestion on outside click
-    useEffect(() => {
-        function handleClickOutside(e) {
-            if (wrapperRef.current && !wrapperRef.current.contains(e.target)) {
-                setOpenGuests(false);
+    // Override MUI styles chỉ trong component này
+    '& .MuiTypography-root': {
+        fontFamily: '"Segoe UI", Tahoma, Geneva, Verdana, sans-serif !important',
+    },
+    '& .MuiButton-root': {
+        fontFamily: '"Segoe UI", Tahoma, Geneva, Verdana, sans-serif !important',
+        fontSize: '16px !important',
+    },
+    '& .MuiTextField-root': {
+        fontFamily: '"Segoe UI", Tahoma, Geneva, Verdana, sans-serif !important',
+    },
+    '& .MuiInputBase-root': {
+        fontFamily: '"Segoe UI", Tahoma, Geneva, Verdana, sans-serif !important',
+        fontSize: '16px !important',
+    },
+    '& .MuiInputLabel-root': {
+        fontFamily: '"Segoe UI", Tahoma, Geneva, Verdana, sans-serif !important',
+        fontSize: '14px !important',
+    },
+    '& .MuiPopover-paper': {
+        fontFamily: '"Segoe UI", Tahoma, Geneva, Verdana, sans-serif !important',
+    }
+}));
+
+const StyledHeroSection = styled(Box)(() => ({
+    minHeight: '80vh',
+    backgroundImage: `linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.4)), url('https://t4.ftcdn.net/jpg/08/15/78/47/360_F_815784772_RJWNG7S80zkl2j5SARZkHQ2GEX6rk8jw.jpg')`,
+    backgroundSize: 'cover',
+    backgroundPosition: 'center',
+    backgroundAttachment: 'fixed',
+    display: 'flex',
+    alignItems: 'center',
+    position: 'relative',
+    color: 'white',
+    '@media (max-width: 768px)': {
+        minHeight: '60vh',
+        backgroundAttachment: 'scroll'
+    }
+}));
+
+const StyledSearchForm = styled(Paper)(() => ({
+    background: 'rgba(255, 255, 255, 0.95)',
+    backdropFilter: 'blur(20px)',
+    borderRadius: '16px',
+    padding: '24px',
+    boxShadow: '0 20px 60px rgba(0, 0, 0, 0.1)',
+    border: '1px solid rgba(255, 255, 255, 0.2)',
+    marginTop: '2rem',
+    transition: 'all 0.3s ease',
+    '&:hover': {
+        transform: 'translateY(-2px)',
+        boxShadow: '0 25px 70px rgba(0, 0, 0, 0.15)'
+    }
+}));
+
+const StyledTextField = styled(TextField)(() => ({
+    '& .MuiOutlinedInput-root': {
+        backgroundColor: 'white',
+        borderRadius: '12px',
+        transition: 'all 0.3s ease',
+        '& fieldset': {
+            borderColor: '#e0e0e0',
+            borderWidth: '2px'
+        },
+        '&:hover fieldset': {
+            borderColor: '#667eea'
+        },
+        '&.Mui-focused fieldset': {
+            borderColor: '#667eea',
+            boxShadow: '0 0 0 3px rgba(102, 126, 234, 0.1)'
+        }
+    },
+    '& .MuiInputLabel-root': {
+        fontWeight: '500 !important',
+        color: '#495057 !important',
+        textTransform: 'uppercase',
+        letterSpacing: '0.5px'
+    }
+}));
+
+const StyledButton = styled(Button)(() => ({
+    background: 'linear-gradient(135deg, #032d27ff 0%, #043f36ff 100%) !important',
+    borderRadius: '12px !important',
+    padding: '16px 32px !important',
+    fontWeight: '600 !important',
+    textTransform: 'none !important',
+    boxShadow: '0 4px 15px rgba(102, 126, 234, 0.3) !important',
+    transition: 'all 0.3s ease !important',
+    '&:hover': {
+        transform: 'translateY(-3px)',
+        boxShadow: '0 8px 25px rgba(102, 126, 234, 0.4) !important'
+    }
+}));
+
+const OutlineButton = styled(Button)(() => ({
+    borderRadius: '8px !important',
+    padding: '12px 24px !important',
+    fontWeight: '600 !important',
+    textTransform: 'none !important',
+    transition: 'all 0.3s ease !important',
+    '&:hover': {
+        transform: 'translateY(-2px)',
+        boxShadow: '0 8px 20px rgba(255, 255, 255, 0.2) !important'
+    }
+}));
+
+
+
+const SearchSection = ({ onSearch }) => {
+    const [searchData, setSearchData] = useState({
+        location: '',
+        checkIn: '',
+        checkOut: '',
+        adults: 2,
+        children: 1,
+        rooms: 1
+    });
+
+    const [anchorEl, setAnchorEl] = useState(null);
+    const [errors, setErrors] = useState({});
+
+    const handleInputChange = (field) => (event) => {
+        setSearchData({
+            ...searchData,
+            [field]: event.target.value
+        });
+
+        // Clear error when user starts typing
+        if (errors[field]) {
+            setErrors({
+                ...errors,
+                [field]: null
+            });
+        }
+    };
+
+    const handleGuestClick = (event) => {
+        setAnchorEl(event.currentTarget);
+    };
+
+    const handleGuestClose = () => {
+        setAnchorEl(null);
+    };
+
+    const handleGuestChange = (type, operation) => {
+        setSearchData(prev => {
+            const newValue = operation === 'increase' ? prev[type] + 1 : Math.max(type === 'children' ? 0 : 1, prev[type] - 1);
+            return {
+                ...prev,
+                [type]: newValue
+            };
+        });
+    };
+
+    const validateForm = () => {
+        const newErrors = {};
+
+        if (!searchData.location.trim()) {
+            newErrors.location = 'Vui lòng nhập điểm đến';
+        }
+
+        if (!searchData.checkIn) {
+            newErrors.checkIn = 'Vui lòng chọn ngày nhận phòng';
+        }
+
+        if (!searchData.checkOut) {
+            newErrors.checkOut = 'Vui lòng chọn ngày trả phòng';
+        }
+
+        if (searchData.checkIn && searchData.checkOut) {
+            const checkInDate = new Date(searchData.checkIn);
+            const checkOutDate = new Date(searchData.checkOut);
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+
+            if (checkInDate < today) {
+                newErrors.checkIn = 'Ngày nhận phòng không thể là quá khứ';
+            }
+
+            if (checkOutDate <= checkInDate) {
+                newErrors.checkOut = 'Ngày trả phòng phải sau ngày nhận phòng';
             }
         }
-        document.addEventListener("mousedown", handleClickOutside);
-        return () => document.removeEventListener("mousedown", handleClickOutside);
-    }, []);
 
-    function handleSearch(e) {
-        e?.preventDefault();
-        const payload = {
-            location,
-            checkIn,
-            checkOut,
-            adults,
-            children,
-            rooms,
-        };
-        if (onSearch) onSearch(payload);
-        else console.log("Search payload:", payload);
-    }
+        setErrors(newErrors);
+        return Object.keys(newErrors).length === 0;
+    };
 
-    function resetAll() {
-        setLocation("");
-        setCheckIn("");
-        setCheckOut("");
-        setAdults(2);
-        setChildren(0);
-        setRooms(1);
-        setOpenGuests(false);
-    }
+    const handleSearch = () => {
+        if (validateForm()) {
+            if (onSearch) {
+                onSearch(searchData);
+            }
+            console.log('Search data:', searchData);
+        }
+    };
 
-    const guestsLabel = `${adults} người lớn, ${children} trẻ em, ${rooms} phòng`;
+    const formatGuestText = () => {
+        const parts = [];
+        if (searchData.adults > 0) parts.push(`${searchData.adults} người lớn`);
+        if (searchData.children > 0) parts.push(`${searchData.children} trẻ nhỏ`);
+        parts.push(`${searchData.rooms} phòng`);
+        return parts.join(', ');
+    };
+
+    const open = Boolean(anchorEl);
+
+
+
+
 
     return (
-        <section className="ss-hero" aria-label="Search section">
-            <div className="ss-hero-inner">
-                <h2 className="ss-slogan">Thoải mái như ở nhà </h2>
+        <SearchContainer>
+            <StyledHeroSection>
+                <Container maxWidth="lg">
+                    {/* Hero Content */}
+                    <Fade in timeout={1000}>
+                        <Box sx={{ textAlign: 'center', mb: 4 }}>
+                            <Typography
+                                variant="h2"
+                                sx={{
+                                    fontWeight: 'bold',
+                                    mb: 2,
+                                    fontSize: { xs: '2.5rem', md: '3.5rem' },
+                                    textShadow: '2px 2px 4px rgba(0,0,0,0.3)',
+                                    color: 'white'
+                                }}
+                            >
+                                Tìm Kiếm Khách Sạn Tốt Nhất
+                            </Typography>
+                            <Typography
+                                variant="h3"
+                                sx={{
+                                    color: '#90EE90',
+                                    fontWeight: 'bold',
+                                    mb: 3,
+                                    fontSize: { xs: '2rem', md: '3rem' },
+                                    textShadow: '2px 2px 4px rgba(0,0,0,0.3)'
+                                }}
+                            >
+                                Cùng VietTravel
+                            </Typography>
+                        </Box>
+                    </Fade>
 
-                <form className="ss-search-wrap" onSubmit={handleSearch} ref={wrapperRef} role="search">
-                    <div className="ss-field ss-location">
-                        <label className="ss-label">Vị trí</label>
-                        <div className="ss-input-icon">
-                            <svg className="ss-icon" viewBox="0 0 24 24" aria-hidden>
-                                <path fill="currentColor" d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5A2.5 2.5 0 1 1 12 6.5a2.5 2.5 0 0 1 0 5z" />
-                            </svg>
-                            <input
-                                className="ss-input"
-                                list="ss-locs"
-                                value={location}
-                                onChange={(e) => setLocation(e.target.value)}
-                                placeholder="Vị trí (ví dụ: Hà Nội)"
-                                aria-label="Vị trí"
-                                autoComplete="off"
-                            />
-                            <datalist id="ss-locs">
-                                {suggestions.map((s) => (
-                                    <option key={s} value={s} />
-                                ))}
-                            </datalist>
-                        </div>
-                    </div>
+                    {/* Search Form */}
+                    <Fade in timeout={1500}>
+                        <StyledSearchForm elevation={0}>
+                            <Grid container spacing={2} alignItems="end">
+                                <Grid item xs={12} md={3}>
+                                    <StyledTextField
+                                        fullWidth
+                                        label="VỊ TRÍ"
+                                        placeholder="Nhập thành phố, khách sạn..."
+                                        value={searchData.location}
+                                        onChange={handleInputChange('location')}
+                                        error={!!errors.location}
+                                        helperText={errors.location}
+                                        InputProps={{
+                                            startAdornment: (
+                                                <InputAdornment position="start">
+                                                    <LocationOn sx={{ color: '#ff1744', fontSize: '20px' }} />
+                                                </InputAdornment>
+                                            ),
+                                        }}
+                                    />
+                                </Grid>
 
-                    <div className="ss-field ss-date">
-                        <label className="ss-label">Ngày Check-in</label>
-                        <div className="ss-input-icon">
-                            <svg className="ss-icon" viewBox="0 0 24 24" aria-hidden>
-                                <path fill="currentColor" d="M7 10h5v5H7zM19 4h-1V2h-2v2H8V2H6v2H5a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2z" />
-                            </svg>
-                            <input
-                                className="ss-input"
-                                type="date"
-                                value={checkIn}
-                                onChange={(e) => setCheckIn(e.target.value)}
-                                aria-label="Check-in"
-                            />
-                        </div>
-                    </div>
+                                <Grid item xs={12} md={2.5}>
+                                    <StyledTextField
+                                        fullWidth
+                                        label="CHECK-IN"
+                                        type="date"
+                                        value={searchData.checkIn}
+                                        onChange={handleInputChange('checkIn')}
+                                        error={!!errors.checkIn}
+                                        helperText={errors.checkIn}
+                                        InputLabelProps={{ shrink: true }}
+                                        InputProps={{
+                                            startAdornment: (
+                                                <InputAdornment position="start">
+                                                    <CalendarToday sx={{ color: '#2196f3', fontSize: '20px' }} />
+                                                </InputAdornment>
+                                            ),
+                                        }}
+                                    />
+                                </Grid>
 
-                    <div className="ss-field ss-date">
-                        <label className="ss-label">Ngày Check-out</label>
-                        <div className="ss-input-icon">
-                            <svg className="ss-icon" viewBox="0 0 24 24" aria-hidden>
-                                <path fill="currentColor" d="M7 10h5v5H7zM19 4h-1V2h-2v2H8V2H6v2H5a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2z" />
-                            </svg>
-                            <input
-                                className="ss-input"
-                                type="date"
-                                value={checkOut}
-                                onChange={(e) => setCheckOut(e.target.value)}
-                                aria-label="Check-out"
-                            />
-                        </div>
-                    </div>
+                                <Grid item xs={12} md={2.5}>
+                                    <StyledTextField
+                                        fullWidth
+                                        label="CHECK-OUT"
+                                        type="date"
+                                        value={searchData.checkOut}
+                                        onChange={handleInputChange('checkOut')}
+                                        error={!!errors.checkOut}
+                                        helperText={errors.checkOut}
+                                        InputLabelProps={{ shrink: true }}
+                                        InputProps={{
+                                            startAdornment: (
+                                                <InputAdornment position="start">
+                                                    <CalendarToday sx={{ color: '#2196f3', fontSize: '20px' }} />
+                                                </InputAdornment>
+                                            ),
+                                        }}
+                                    />
+                                </Grid>
 
-                    <div className="ss-field ss-guests">
-                        <label className="ss-label">Người / Phòng</label>
-                        <button
-                            type="button"
-                            className="ss-guests-toggle"
-                            aria-haspopup="dialog"
-                            aria-expanded={openGuests}
-                            onClick={() => setOpenGuests((s) => !s)}
-                        >
-                            <span className="ss-guests-text">{guestsLabel}</span>
-                            <svg className="ss-chev" viewBox="0 0 24 24" aria-hidden>
-                                <path fill="currentColor" d="M7 10l5 5 5-5z" />
-                            </svg>
-                        </button>
+                                <Grid item xs={12} md={2.5}>
+                                    <StyledTextField
+                                        fullWidth
+                                        label="KHÁCH & PHÒNG"
+                                        value={formatGuestText()}
+                                        onClick={handleGuestClick}
+                                        InputProps={{
+                                            readOnly: true,
+                                            startAdornment: (
+                                                <InputAdornment position="start">
+                                                    <Person sx={{ color: '#024032ff', fontSize: '20px' }} />
+                                                </InputAdornment>
+                                            ),
+                                        }}
+                                        sx={{ cursor: 'pointer' }}
+                                    />
+                                </Grid>
 
-                        {openGuests && (
-                            <div className="ss-guests-pop" role="dialog" aria-label="Chọn số người và phòng">
-                                <div className="ss-pop-row">
-                                    <div className="ss-pop-item">
-                                        <div className="ss-pop-title">Người lớn</div>
-                                        <div className="ss-counter">
-                                            <button aria-label="Giảm người lớn" onClick={() => setAdults((a) => Math.max(1, a - 1))}>−</button>
-                                            <div className="ss-count">{adults}</div>
-                                            <button aria-label="Tăng người lớn" onClick={() => setAdults((a) => Math.min(20, a + 1))}>+</button>
-                                        </div>
-                                    </div>
+                                <Grid item xs={12} md={1.5}>
+                                    <StyledButton
+                                        fullWidth
+                                        variant="contained"
+                                        size="large"
+                                        onClick={handleSearch}
+                                        startIcon={<Search />}
+                                    >
+                                        Tìm kiếm
+                                    </StyledButton>
+                                </Grid>
+                            </Grid>
+                        </StyledSearchForm>
+                    </Fade>
 
-                                    <div className="ss-pop-item">
-                                        <div className="ss-pop-title">Trẻ em</div>
-                                        <div className="ss-counter">
-                                            <button aria-label="Giảm trẻ em" onClick={() => setChildren((c) => Math.max(0, c - 1))}>−</button>
-                                            <div className="ss-count">{children}</div>
-                                            <button aria-label="Tăng trẻ em" onClick={() => setChildren((c) => Math.min(10, c + 1))}>+</button>
-                                        </div>
-                                    </div>
+                    {/* Guest Picker Popover */}
+                    <Popover
+                        open={open}
+                        anchorEl={anchorEl}
+                        onClose={handleGuestClose}
+                        anchorOrigin={{
+                            vertical: 'bottom',
+                            horizontal: 'left',
+                        }}
+                        transformOrigin={{
+                            vertical: 'top',
+                            horizontal: 'left',
+                        }}
+                        PaperProps={{
+                            sx: {
+                                p: 3,
+                                borderRadius: '12px',
+                                mt: 1,
+                                minWidth: '320px',
+                                boxShadow: '0 10px 40px rgba(0, 0, 0, 0.15)'
+                            }
+                        }}
+                    >
+                        {[
+                            { key: 'adults', label: 'Người lớn', subtitle: '13 tuổi trở lên', min: 1 },
+                            { key: 'children', label: 'Trẻ em', subtitle: '2-12 tuổi', min: 0 },
+                            { key: 'rooms', label: 'Phòng', subtitle: 'Số phòng cần đặt', min: 1 }
+                        ].map((item, index) => (
+                            <Box key={item.key}>
+                                <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', py: 2 }}>
+                                    <Box>
+                                        <Typography sx={{
+                                            fontSize: '16px',
+                                            fontWeight: 600,
+                                            color: '#2c3e50'
+                                        }}>
+                                            {item.label}
+                                        </Typography>
+                                        <Typography sx={{
+                                            fontSize: '14px',
+                                            color: '#6c757d'
+                                        }}>
+                                            {item.subtitle}
+                                        </Typography>
+                                    </Box>
+                                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+                                        <IconButton
+                                            size="small"
+                                            onClick={() => handleGuestChange(item.key, 'decrease')}
+                                            disabled={searchData[item.key] <= item.min}
+                                            sx={{
+                                                border: '2px solid #053b3bff',
+                                                color: '#044439ff',
+                                                width: '36px',
+                                                height: '36px',
+                                                '&:hover': {
+                                                    backgroundColor: '#053828ff',
+                                                    color: 'white'
+                                                },
+                                                '&:disabled': {
+                                                    borderColor: '#e0e0e0',
+                                                    color: '#e0e0e0'
+                                                }
+                                            }}
+                                        >
+                                            <Remove fontSize="small" />
+                                        </IconButton>
+                                        <Typography sx={{
+                                            minWidth: '32px',
+                                            textAlign: 'center',
+                                            fontSize: '18px',
+                                            fontWeight: 600,
+                                            color: '#2c3e50'
+                                        }}>
+                                            {searchData[item.key]}
+                                        </Typography>
+                                        <IconButton
+                                            size="small"
+                                            onClick={() => handleGuestChange(item.key, 'increase')}
+                                            sx={{
+                                                border: '2px solid #667eea',
+                                                color: '#667eea',
+                                                width: '36px',
+                                                height: '36px',
+                                                '&:hover': {
+                                                    backgroundColor: '#667eea',
+                                                    color: 'white'
+                                                }
+                                            }}
+                                        >
+                                            <Add fontSize="small" />
+                                        </IconButton>
+                                    </Box>
+                                </Box>
+                                {index < 2 && <Divider sx={{ my: 1 }} />}
+                            </Box>
+                        ))}
 
-                                    <div className="ss-pop-item">
-                                        <div className="ss-pop-title">Phòng</div>
-                                        <div className="ss-counter">
-                                            <button aria-label="Giảm phòng" onClick={() => setRooms((r) => Math.max(1, r - 1))}>−</button>
-                                            <div className="ss-count">{rooms}</div>
-                                            <button aria-label="Tăng phòng" onClick={() => setRooms((r) => Math.min(8, r + 1))}>+</button>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div className="ss-pop-actions">
-                                    <button type="button" className="ss-btn ss-ghost" onClick={() => { setAdults(2); setChildren(0); setRooms(1); }}>
-                                        Đặt lại
-                                    </button>
-                                    <button type="button" className="ss-btn ss-primary" onClick={() => setOpenGuests(false)}>
-                                        Xong
-                                    </button>
-                                </div>
-                            </div>
-                        )}
-                    </div>
-
-                    <div className="ss-field ss-action">
-                        <button className="ss-search-btn" type="submit" aria-label="Tìm kiếm">
-                            <svg className="ss-search-icon" viewBox="0 0 24 24" aria-hidden>
-                                <path fill="currentColor" d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79L20 21.5 21.5 20l-6-6z" />
-                            </svg>
-                        </button>
-
-                        <button type="button" className="ss-clear" onClick={resetAll} aria-label="Xóa">
-                            Xóa
-                        </button>
-                    </div>
-                </form>
-            </div>
-        </section>
+                        <Box sx={{ mt: 2, pt: 2, borderTop: '1px solid #f0f0f0' }}>
+                            <Button
+                                fullWidth
+                                variant="outlined"
+                                onClick={handleGuestClose}
+                                sx={{
+                                    borderColor: '#044c3cff',
+                                    color: '#04473fff',
+                                    '&:hover': {
+                                        backgroundColor: '#075241ff',
+                                        color: 'white'
+                                    }
+                                }}
+                            >
+                                Xác nhận
+                            </Button>
+                        </Box>
+                    </Popover>
+                </Container>
+            </StyledHeroSection>
+        </SearchContainer>
     );
-}
+};
+
+export default SearchSection;

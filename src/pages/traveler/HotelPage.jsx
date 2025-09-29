@@ -4,7 +4,7 @@ import Header from "../../components/layout/Header/Header"
 import HotelHighlights from "./components/Hotel/HotelHighlight/HotelHighlights"
 import SearchSection from "./components/Hotel/SearchSection/SearchSection"
 
-function HotelList() {
+function HotelPage() {
     return (
         <>
             <TopBar />
@@ -13,7 +13,7 @@ function HotelList() {
             <HotelHighlights />
 
         </>
-    ) 
+    )
 }
 
-export default HotelList
+export default HotelPage
