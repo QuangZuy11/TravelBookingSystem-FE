@@ -3,16 +3,12 @@ import {
     Box,
     Container,
     Typography,
-    TextField,
-    Button,
-    Paper,
     InputAdornment,
-    Grid,
     Popover,
     IconButton,
     Divider,
     Fade,
-    Chip
+    Button
 } from '@mui/material';
 import {
     LocationOn,
@@ -21,166 +17,18 @@ import {
     Search,
     Add,
     Remove,
-    PlayArrow,
-    TravelExplore,
-    Star,
-    Clear,
     Refresh
 } from '@mui/icons-material';
-import { styled } from '@mui/material/styles';
 
-// ✅ Container với CSS isolation
-const SearchContainer = styled('section')(() => ({
-    isolation: 'isolate',
-    contain: 'style',
-    fontFamily: '"Segoe UI", Tahoma, Geneva, Verdana, sans-serif',
-    fontSize: '16px',
-
-    // Override MUI styles chỉ trong component này
-    '& .MuiTypography-root': {
-        fontFamily: '"Segoe UI", Tahoma, Geneva, Verdana, sans-serif !important',
-    },
-    '& .MuiButton-root': {
-        fontFamily: '"Segoe UI", Tahoma, Geneva, Verdana, sans-serif !important',
-        fontSize: '16px !important',
-    },
-    '& .MuiTextField-root': {
-        fontFamily: '"Segoe UI", Tahoma, Geneva, Verdana, sans-serif !important',
-    },
-    '& .MuiInputBase-root': {
-        fontFamily: '"Segoe UI", Tahoma, Geneva, Verdana, sans-serif !important',
-        fontSize: '36px !important',
-    },
-    '& .MuiInputLabel-root': {
-        fontFamily: '"Segoe UI", Tahoma, Geneva, Verdana, sans-serif !important',
-        fontSize: '18px !important',
-    },
-    '& .MuiPopover-paper': {
-        fontFamily: '"Segoe UI", Tahoma, Geneva, Verdana, sans-serif !important',
-    }
-}));
-
-const StyledHeroSection = styled(Box)(() => ({
-    minHeight: '80vh',
-    backgroundImage: `linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.4)), url('https://t4.ftcdn.net/jpg/08/15/78/47/360_F_815784772_RJWNG7S80zkl2j5SARZkHQ2GEX6rk8jw.jpg')`,
-    backgroundSize: 'cover',
-    backgroundPosition: 'center',
-    backgroundAttachment: 'fixed',
-    display: 'flex',
-    alignItems: 'center',
-    position: 'relative',
-    color: 'white',
-    '@media (max-width: 768px)': {
-        minHeight: '60vh',
-        backgroundAttachment: 'scroll'
-    }
-}));
-
-const StyledSearchForm = styled(Paper)(() => ({
-    background: 'rgba(255, 255, 255, 0.95)',
-    backdropFilter: 'blur(20px)',
-    borderRadius: '16px',
-    padding: '32px',
-    boxShadow: '0 20px 60px rgba(0, 0, 0, 0.1)',
-    border: '1px solid rgba(255, 255, 255, 0.2)',
-    marginTop: '2rem',
-    transition: 'all 0.3s ease',
-    maxWidth: '1400px', // ✅ Tăng width để chứa đủ 6 elements
-    margin: '2rem auto 0',
-    '&:hover': {
-        transform: 'translateY(-2px)',
-        boxShadow: '0 25px 70px rgba(0, 0, 0, 0.15)'
-    }
-}));
-
-const StyledTextField = styled(TextField)(() => ({
-    '& .MuiOutlinedInput-root': {
-        backgroundColor: 'white',
-        borderRadius: '12px',
-        transition: 'all 0.3s ease',
-        height: '56px', // ✅ Fixed height
-        '& fieldset': {
-            borderColor: '#e0e0e0',
-            borderWidth: '2px'
-        },
-        '&:hover fieldset': {
-            borderColor: '#032d27ff'
-        },
-        '&.Mui-focused fieldset': {
-            borderColor: '#032d27ff',
-            boxShadow: '0 0 0 3px rgba(3, 45, 39, 0.1)'
-        }
-    },
-    '& .MuiInputLabel-root': {
-        fontWeight: '600 !important',
-        color: '#495057 !important',
-        textTransform: 'uppercase',
-        letterSpacing: '0.5px',
-        fontSize: '12px !important'
-    },
-    '& .MuiInputBase-input': {
-        fontSize: '16px !important'
-    },
-    // ✅ Hide helper text to keep consistent height
-    '& .MuiFormHelperText-root': {
-        position: 'absolute',
-        top: '100%',
-        marginTop: '4px',
-        marginLeft: 0
-    }
-}));
-
-const StyledButton = styled(Button)(() => ({
-    background: 'linear-gradient(135deg, #032d27ff 0%, #043f36ff 100%) !important',
-    borderRadius: '12px !important',
-    padding: '0 20px !important', // ✅ Remove vertical padding
-    fontWeight: '600 !important',
-    textTransform: 'none !important',
-    boxShadow: '0 4px 15px rgba(3, 45, 39, 0.3) !important',
-    transition: 'all 0.3s ease !important',
-    height: '56px !important', // ✅ Fixed height same as inputs
-    '&:hover': {
-        transform: 'translateY(-2px)',
-        boxShadow: '0 8px 25px rgba(3, 45, 39, 0.4) !important'
-    }
-}));
-
-const ClearButton = styled(Button)(() => ({
-    borderRadius: '12px !important',
-    padding: '0 20px !important', // ✅ Remove vertical padding
-    fontWeight: '600 !important',
-    textTransform: 'none !important',
-    transition: 'all 0.3s ease !important',
-    height: '56px !important', // ✅ Fixed height same as inputs
-    borderColor: '#6c757d !important',
-    color: '#6c757d !important',
-    '&:hover': {
-        borderColor: '#495057 !important',
-        backgroundColor: '#f8f9fa !important',
-        transform: 'translateY(-2px)'
-    }
-}));
-
-// ✅ Custom Grid Container để force single row
-const SingleRowGrid = styled(Box)(() => ({
-    display: 'flex',
-    gap: '16px',
-    alignItems: 'center',
-    flexWrap: 'nowrap', // ✅ Không cho wrap
-    '@media (max-width: 1200px)': {
-        flexWrap: 'wrap',
-        '& > *': {
-            minWidth: 'calc(50% - 8px)'
-        }
-    },
-    '@media (max-width: 768px)': {
-        flexDirection: 'column',
-        '& > *': {
-            width: '100%',
-            minWidth: '100%'
-        }
-    }
-}));
+import {
+    SearchContainer,
+    StyledHeroSection,
+    StyledSearchForm,
+    StyledTextField,
+    StyledButton,
+    ClearButton,
+    SingleRowGrid
+} from './search-section.styles';
 
 const SearchSection = ({ onSearch }) => {
     const [searchData, setSearchData] = useState({
@@ -201,7 +49,6 @@ const SearchSection = ({ onSearch }) => {
             [field]: event.target.value
         });
 
-        // Clear error when user starts typing
         if (errors[field]) {
             setErrors({
                 ...errors,
@@ -220,15 +67,13 @@ const SearchSection = ({ onSearch }) => {
 
     const handleGuestChange = (type, operation) => {
         setSearchData(prev => {
-            const newValue = operation === 'increase' ? prev[type] + 1 : Math.max(type === 'children' ? 0 : 1, prev[type] - 1);
-            return {
-                ...prev,
-                [type]: newValue
-            };
+            const newValue = operation === 'increase'
+                ? prev[type] + 1
+                : Math.max(type === 'children' ? 0 : 1, prev[type] - 1);
+            return { ...prev, [type]: newValue };
         });
     };
 
-    // ✅ Clear function
     const handleClear = () => {
         setSearchData({
             location: '',
@@ -278,9 +123,7 @@ const SearchSection = ({ onSearch }) => {
 
     const handleSearch = () => {
         if (validateForm()) {
-            if (onSearch) {
-                onSearch(searchData);
-            }
+            onSearch?.(searchData);
             console.log('Search data:', searchData);
         }
     };
@@ -298,8 +141,7 @@ const SearchSection = ({ onSearch }) => {
     return (
         <SearchContainer>
             <StyledHeroSection>
-                <Container maxWidth="xl"> {/* ✅ Sử dụng xl container */}
-                    {/* Hero Content */}
+                <Container maxWidth="xl">
                     <Fade in timeout={1000}>
                         <Box sx={{ textAlign: 'center', mb: 4 }}>
                             <Typography
@@ -329,12 +171,9 @@ const SearchSection = ({ onSearch }) => {
                         </Box>
                     </Fade>
 
-                    {/* Search Form */}
                     <Fade in timeout={1500}>
                         <StyledSearchForm elevation={0}>
-                            {/* ✅ Custom Flex Layout - Force single row */}
                             <SingleRowGrid>
-                                {/* Location */}
                                 <Box sx={{ flex: '2.5', minWidth: '200px' }}>
                                     <StyledTextField
                                         fullWidth
@@ -354,7 +193,6 @@ const SearchSection = ({ onSearch }) => {
                                     />
                                 </Box>
 
-                                {/* Check-in */}
                                 <Box sx={{ flex: '1.8', minWidth: '150px' }}>
                                     <StyledTextField
                                         fullWidth
@@ -375,7 +213,6 @@ const SearchSection = ({ onSearch }) => {
                                     />
                                 </Box>
 
-                                {/* Check-out */}
                                 <Box sx={{ flex: '1.8', minWidth: '150px' }}>
                                     <StyledTextField
                                         fullWidth
@@ -396,7 +233,6 @@ const SearchSection = ({ onSearch }) => {
                                     />
                                 </Box>
 
-                                {/* Guests & Rooms */}
                                 <Box sx={{ flex: '2.2', minWidth: '180px' }}>
                                     <StyledTextField
                                         fullWidth
@@ -415,7 +251,6 @@ const SearchSection = ({ onSearch }) => {
                                     />
                                 </Box>
 
-                                {/* ✅ Clear Button */}
                                 <Box sx={{ flex: '0 0 auto', minWidth: '100px' }}>
                                     <ClearButton
                                         fullWidth
@@ -427,7 +262,6 @@ const SearchSection = ({ onSearch }) => {
                                     </ClearButton>
                                 </Box>
 
-                                {/* ✅ Search Button */}
                                 <Box sx={{ flex: '0 0 auto', minWidth: '120px' }}>
                                     <StyledButton
                                         fullWidth
@@ -442,19 +276,12 @@ const SearchSection = ({ onSearch }) => {
                         </StyledSearchForm>
                     </Fade>
 
-                    {/* Guest Picker Popover */}
                     <Popover
                         open={open}
                         anchorEl={anchorEl}
                         onClose={handleGuestClose}
-                        anchorOrigin={{
-                            vertical: 'bottom',
-                            horizontal: 'left',
-                        }}
-                        transformOrigin={{
-                            vertical: 'top',
-                            horizontal: 'left',
-                        }}
+                        anchorOrigin={{ vertical: 'bottom', horizontal: 'left' }}
+                        transformOrigin={{ vertical: 'top', horizontal: 'left' }}
                         PaperProps={{
                             sx: {
                                 p: 3,
@@ -473,17 +300,10 @@ const SearchSection = ({ onSearch }) => {
                             <Box key={item.key}>
                                 <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', py: 2 }}>
                                     <Box>
-                                        <Typography sx={{
-                                            fontSize: '16px',
-                                            fontWeight: 600,
-                                            color: '#2c3e50'
-                                        }}>
+                                        <Typography sx={{ fontSize: '16px', fontWeight: 600, color: '#2c3e50' }}>
                                             {item.label}
                                         </Typography>
-                                        <Typography sx={{
-                                            fontSize: '14px',
-                                            color: '#6c757d'
-                                        }}>
+                                        <Typography sx={{ fontSize: '14px', color: '#6c757d' }}>
                                             {item.subtitle}
                                         </Typography>
                                     </Box>
@@ -509,13 +329,7 @@ const SearchSection = ({ onSearch }) => {
                                         >
                                             <Remove fontSize="small" />
                                         </IconButton>
-                                        <Typography sx={{
-                                            minWidth: '32px',
-                                            textAlign: 'center',
-                                            fontSize: '18px',
-                                            fontWeight: 600,
-                                            color: '#2c3e50'
-                                        }}>
+                                        <Typography sx={{ minWidth: '32px', textAlign: 'center', fontSize: '18px', fontWeight: 600, color: '#2c3e50' }}>
                                             {searchData[item.key]}
                                         </Typography>
                                         <IconButton
