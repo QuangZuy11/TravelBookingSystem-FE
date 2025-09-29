@@ -13,7 +13,7 @@ function HotelList() {
             <HotelHighlights />
 
         </>
-    )
+    ) 
 }
 
 export default HotelList
