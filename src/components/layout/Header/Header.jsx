@@ -3,10 +3,10 @@ import { FaUserCircle } from "react-icons/fa";
 import { Link, useNavigate } from "react-router-dom";
 import "./Header.css";
 import Logo from "../../assets/logo.png";
-import { useAuth } from '../../../contexts/AuthContext'; 
+import { useAuth } from '../../../contexts/AuthContext';
 
 const Header = () => {
-  const { user, logout } = useAuth(); 
+  const { user, logout } = useAuth();
   const [dropdownVisible, setDropdownVisible] = useState(false);
   const navigate = useNavigate();
 
@@ -26,7 +26,7 @@ const Header = () => {
       <nav className="header-nav">
         <a href="/">Trang Chủ</a>
         <a href="/tour">Tour Du Lịch</a>
-        <a href="/hotel">Khách Sạn</a>
+        <a href="/hotel-page">Khách Sạn</a>
         <a href="/about">Về Chúng Tôi</a>
         <a href="/contact">Liên Hệ</a>
       </nav>

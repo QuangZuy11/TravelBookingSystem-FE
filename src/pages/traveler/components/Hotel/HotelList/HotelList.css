@@ -1,0 +1,181 @@
+/* Bố cục tổng thể */
+.hotel-search-container {
+  background-color: #f5f7fa;
+  min-height: 100vh;
+  padding: 24px;
+}
+
+/* Sidebar: sticky để bộ lọc luôn hiển thị */
+.search-sidebar {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  position: sticky;
+  top: 16px;
+}
+
+/* Thẻ filter */
+.filter-card {
+  border-radius: 12px !important;
+  overflow: hidden;
+  transition: transform 0.25s ease, box-shadow 0.25s ease !important;
+}
+.filter-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 24px rgba(0,0,0,0.12) !important;
+}
+.filter-title { font-weight: 700 !important; color: #1976d2 !important; }
+.price-slider { color: #1976d2 !important; }
+
+/* Nội dung kết quả */
+.search-content { display: flex; flex-direction: column; gap: 20px; }
+.content-header {
+  padding: 20px 24px !important;
+  border-radius: 12px !important;
+  background: linear-gradient(135deg, #fff 0%, #f8fafc 100%) !important;
+}
+.results-title { font-weight: 700 !important; color: #1e293b !important; }
+
+/* Danh sách thẻ */
+.hotels-list { display: grid; gap: 16px; }
+.hotels-list.list { grid-template-columns: 1fr; }
+.hotels-list.grid { grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); }
+
+/* Thẻ khách sạn */
+.hotel-card {
+  border-radius: 16px !important;
+  overflow: hidden;               /* FIX: ảnh/nút không tràn bo góc */
+  border: 1px solid #e2e8f0 !important;
+  transition: box-shadow 0.25s ease, transform 0.25s ease !important;
+  background: #fff;
+}
+.hotel-card:hover { transform: translateY(-4px); box-shadow: 0 14px 36px rgba(0,0,0,0.12) !important; }
+
+/* Đảm bảo chiều cao cơ bản và 2 cột căng đều */
+.hotel-card .hotel-card-grid { min-height: 200px; align-items: stretch; }
+
+/* Cột ảnh */
+.image-col, .info-col { display: flex; }
+.image-wrap { position: relative; width: 100%; }
+.image-wrap.list .hotel-image { height: 200px !important; }
+.image-wrap.grid .hotel-image { height: 180px !important; }
+.hotel-image {
+  width: 100%;
+  object-fit: cover;
+  display: block;
+  transition: transform 0.35s ease, opacity 0.2s ease;
+}
+.image-wrap:hover .hotel-image { transform: scale(1.02); }
+
+/* Nút yêu thích overlay */
+.favorite-btn {
+  position: absolute !important;
+  top: 10px; right: 10px;
+  min-width: 36px !important; width: 36px; height: 36px;
+  padding: 0 !important; border-radius: 50% !important;
+  background: rgba(255,255,255,0.9) !important;
+  color: #e11d48 !important;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.15) !important;
+}
+
+/* Badge giảm giá */
+.discount-badge .MuiBadge-badge {
+  left: 12px; top: 12px;
+  padding: 6px 8px; border-radius: 8px;
+}
+
+/* Nội dung trong thẻ */
+.hotel-content { height: 100%; padding: 16px !important; }
+
+/* 
+  BỐ CỤC CHÍNH (CHẾ ĐỘ LIST):
+  - 2 cột: 1fr (thông tin) + 260px (giá/CTA cố định).
+  - KHÔNG dùng Divider để tránh lỗi chiều cao và lệch vị trí (đây là nguyên nhân lỗi bạn khoanh đỏ).
+*/
+.hotel-content-grid.list {
+  display: grid;
+  grid-template-columns: 1fr 260px; /* cột giá cố định 260px */
+  column-gap: 16px;
+  align-items: stretch;             /* cả 2 cột cao bằng hàng */
+}
+.hotel-content-grid.grid { display: flex; flex-direction: column; }
+
+/* Cột trái: thông tin */
+.hotel-info {
+  display: flex; flex-direction: column; gap: 6px;
+  min-width: 0; /* tránh tràn chữ */
+}
+.hotel-name {
+  font-weight: 700 !important; color: #1976d2 !important;
+  margin-bottom: 2px !important; line-height: 1.2;
+  display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
+}
+.hotel-name:hover { color: #1565c0 !important; text-decoration: underline; }
+.hotel-location { color: #64748b; }
+.hotel-rating .MuiRating-root { transform: translateY(1px); }
+
+/* Chips tiện nghi */
+.hotel-amenities { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 6px; }
+.amenity-chip {
+  background-color: #e3f2fd !important; border-color: #bbdefb !important;
+  color: #1976d2 !important; font-size: 0.75rem !important;
+}
+.amenity-chip:hover { background: #1976d2 !important; color: #fff !important; }
+
+/* Cột phải: Giá + CTA (CỐ ĐỊNH) */
+.booking-col {
+  display: flex; flex-direction: column;
+  justify-content: space-between; /* nút ở đáy cột phải */
+  align-items: flex-end;
+  padding-left: 16px;
+  border-left: 1px solid #e2e8f0; /* đường phân cách dọc ổn định */
+  width: 260px;   /* FIX: khóa chiều rộng cột giá */
+  flex: none;     /* không cho co lại */
+  align-self: stretch; /* cao bằng hàng hiện tại */
+  height: 100%;
+}
+
+/* Cỡ chữ giá tiền (nhỏ hơn trước một chút) */
+.price-amount {
+  font-weight: 800 !important;
+  font-size: 1.75rem !important;  /* giảm còn ~28px (trước to hơn) */
+  color: #e53e3e !important;
+  background: linear-gradient(135deg, #e53e3e, #fc8181);
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+}
+
+/* Nút CTA */
+.book-button {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+  border-radius: 10px !important;
+  font-weight: 700 !important;
+  text-transform: none !important;
+  padding: 10px 18px !important;
+  box-shadow: 0 6px 20px rgba(102,126,234,.35) !important;
+  transition: transform .2s ease !important;
+  min-width: 140px;               /* đồng bộ bề ngang nút */
+}
+.book-button:hover { transform: translateY(-2px); }
+
+/* Responsive */
+@media (max-width: 900px) {
+  .hotel-search-container { padding: 16px; }
+  .image-wrap.list .hotel-image { height: 180px !important; }
+  /* Màn hẹp: chuyển về 1 cột cho dễ đọc */
+  .hotel-content-grid.list { grid-template-columns: 1fr; }
+  .booking-col {
+    width: 100%; align-items: flex-start;
+    border-left: none; padding-left: 0; margin-top: 12px;
+  }
+}
+@media (max-width: 600px) {
+  .content-header { padding: 16px !important; }
+  .hotels-list.grid { grid-template-columns: 1fr; }
+  .image-wrap.list .hotel-image { height: 160px !important; }
+  .price-amount { font-size: 1.55rem !important; } /* nhỏ hơn chút trên mobile */
+}
+
+/* Skeleton cho ảnh khi loading */
+.MuiSkeleton-root.hotel-image {
+  width: 100%; height: 200px !important; border-radius: 0 !important;
+}
