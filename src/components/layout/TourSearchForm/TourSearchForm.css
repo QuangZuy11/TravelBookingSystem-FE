@@ -1,0 +1,179 @@
+.tour-search-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 24px;
+}
+
+.tour-search-header {
+  text-align: center;
+  margin-bottom: 32px;
+}
+
+.tour-search-title {
+  font-size: 32px;
+  font-weight: bold;
+  margin-bottom: 8px;
+  color: #1f2937;
+}
+
+.tour-search-subtitle {
+  color: #6b7280;
+  font-size: 16px;
+}
+
+.tour-search-form-wrapper {
+  background: #eafdfe;
+  border-radius: 16px;
+  padding: 32px;
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+  max-width: 1000px; /* chỉnh tùy ý, ví dụ 800px, 1000px */
+  margin: 0 auto;
+}
+
+.tour-search-labels-row {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+  margin-bottom: 12px;
+}
+
+.tour-search-label {
+  font-size: 14px;
+  font-weight: 500;
+  color: #374151;
+}
+
+.tour-search-inputs-row {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+}
+
+.tour-search-input-wrapper {
+  position: relative;
+}
+
+/* Icon */
+.tour-search-icon {
+  position: absolute;
+  left: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #9ca3af;
+  width: 20px;
+  height: 20px;
+  pointer-events: none;
+}
+
+/* Input & Select */
+.tour-search-input {
+  width: 60%;
+  padding: 12px 16px 12px 40px;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  font-size: 14px;
+  outline: none;
+  transition: all 0.2s;
+  background-color: white;
+}
+.tour-search-select {
+  width: 80%;
+  padding: 12px 16px 12px 40px;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  font-size: 14px;
+  outline: none;
+  transition: all 0.2s;
+  background-color: white;
+}
+.tour-search-select {
+  appearance: none;
+  cursor: pointer;
+  background-size: 20px;
+  padding-right: 40px;
+}
+
+.tour-search-input:focus,
+.tour-search-select:focus {
+  border-color: #ffffff;
+  box-shadow: 0 0 0 3px rgba(20, 184, 166, 0.1);
+}
+
+/* Button */
+.tour-search-button {
+  width: 54%;
+  background-color: #00282b;
+  color: white;
+  padding: 12px 24px;
+  border-radius: 8px;
+  border: none;
+  font-weight: 500;
+  cursor: pointer;
+  font-size: 14px;
+  transition: background-color 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.tour-search-button:hover {
+  background-color: #0f766e;
+}
+
+.tour-search-button-icon {
+  width: 20px;
+  height: 20px;
+}
+
+/* Quick Search */
+.tour-search-quick-search {
+  background: #eafdfe;
+  margin-top: 24px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.tour-search-quick-label {
+  font-size: 14px;
+  color: #6b7280;
+}
+
+.tour-search-city-button {
+  padding: 8px 16px;
+  border: 1px solid #e5e7eb;
+  border-radius: 20px;
+  font-size: 14px;
+  background-color: white;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.tour-search-city-button:hover {
+  background-color: #f0fdfa;
+  border-color: #14b8a6;
+  color: #0f766e;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .tour-search-labels-row,
+  .tour-search-inputs-row {
+    grid-template-columns: 1fr;
+  }
+
+  .tour-search-form-wrapper {
+    padding: 20px;
+  }
+
+  .tour-search-title {
+    font-size: 24px;
+  }
+  .horizontal-line {
+    height: 1px;
+    background-color: #ccc;
+    width: 100%;
+    margin: 16px 0;
+  }
+}

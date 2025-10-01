@@ -1,6 +1,5 @@
 import "./App.css";
 import Homepage from "./pages/traveler/Homepage";
-
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import HomepageHotel from "./pages/traveler/HomepageHotel";
 
