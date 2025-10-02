@@ -10,7 +10,6 @@ const Header = () => {
         <span className="logo-text">VietTravel</span>
       </div>
 
-      {/* Navigation */}
       <nav className="header-nav">
         <a href="/">Trang Chủ</a>
         <a href="/tour">Tour Du Lịch</a>
@@ -19,7 +18,6 @@ const Header = () => {
         <a href="/contact">Liên Hệ</a>
       </nav>
 
-      {/* Login */}
       <div className="header-login">
         <FaUserCircle className="login-icon" />
         <span>Đăng Nhập</span>

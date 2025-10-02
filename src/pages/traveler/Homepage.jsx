@@ -3,6 +3,8 @@ import Header from "../../components/layout/Header/Header";
 import HeroSection from "../../components/layout/HeroSection/HeroSection";
 import TourSearchForm from "../../components/layout/TourSearchForm/TourSearchForm";
 import Footer from "../../components/layout/Footer/Footer.jsx";
+import AITitle from "../../components/layout/AITitle/AITitle.jsx";
+import WhyVietTravel from "../../components/layout/WhyVietTravel/WhyVietTravel.jsx";
 function Homepage() {
   return (
     <>
@@ -10,6 +12,8 @@ function Homepage() {
       <Header />
       <HeroSection />
       <TourSearchForm />
+      <AITitle />
+      <WhyVietTravel />
       <Footer />
     </>
   );
