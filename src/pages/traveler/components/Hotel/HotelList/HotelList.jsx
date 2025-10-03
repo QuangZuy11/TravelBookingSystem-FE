@@ -21,11 +21,7 @@ import {
     Paper,
     Tooltip,
     Stack,
-    ToggleButton,
-    ToggleButtonGroup,
     Badge,
-    Snackbar,
-    Alert,
     Pagination,
     Skeleton,
 } from '@mui/material';
@@ -38,10 +34,8 @@ import {
     FitnessCenter as GymIcon,
     Wifi as WifiIcon,
     LocalOffer as LocalOfferIcon,
-    VerifiedUser as ShieldIcon, // dùng VerifiedUser để đảm bảo icon sẵn có (tương đương "Shield")
+    VerifiedUser as ShieldIcon,
     Star as StarIcon,
-    ViewList as ViewListIcon,
-    GridView as GridViewIcon,
     RestartAlt as RestartAltIcon,
 } from '@mui/icons-material';
 import '../HotelList/HotelList.css';
@@ -126,7 +120,6 @@ function HotelList() {
     const [selectedAmenities, setSelectedAmenities] = useState([]);
     const [selectedRatings, setSelectedRatings] = useState([]); // [5,4,...]
     const [sortBy, setSortBy] = useState('popular'); // popular | priceAsc | priceDesc | rating
-    const [viewMode, setViewMode] = useState('list'); // list | grid
 
     // Data
     const [hotels] = useState(seedHotels);
@@ -134,16 +127,15 @@ function HotelList() {
     const [page, setPage] = useState(1);
     const [perPage] = useState(5);
 
-    // UX loading + snackbar
+    // UX loading
     const [loading, setLoading] = useState(false);
-    const [snack, setSnack] = useState({ open: false, msg: '', severity: 'success' });
 
-    // Mô phỏng loading khi đổi filter/sort/view/page
+    // Mô phỏng loading khi đổi filter/sort/page
     useEffect(() => {
         setLoading(true);
         const t = setTimeout(() => setLoading(false), 300);
         return () => clearTimeout(t);
-    }, [priceRange, selectedAmenities, selectedRatings, sortBy, viewMode, page]);
+    }, [priceRange, selectedAmenities, selectedRatings, sortBy, page]);
 
     // Lọc theo giá, tiện nghi, đánh giá
     const filtered = useMemo(() => {
@@ -219,18 +211,15 @@ function HotelList() {
     };
 
     const handleBook = (hotel) => {
-        setSnack({
-            open: true,
-            msg: `Đã thêm "${hotel.name}" vào giỏ đặt phòng`,
-            severity: 'success',
-        });
+        console.log(`Đặt: ${hotel.name}`);
     };
 
     return (
         <Box className="hotel-search-container">
             <Grid container spacing={3} alignItems="start">
                 {/* Sidebar bộ lọc */}
-                <Grid item xs={12} md={3}>
+                {/* CHANGED: thu hẹp sidebar trên màn hình md+ từ 3 -> 2 cột */}
+                <Grid item xs={12} md={2}>
                     <Box className="search-sidebar">
                         {/* Khoảng giá */}
                         <Paper className="filter-card" elevation={2}>
@@ -333,7 +322,6 @@ function HotelList() {
                             </CardContent>
                         </Paper>
 
-                        {/* Xóa tất cả bộ lọc */}
                         {(selectedAmenities.length > 0 ||
                             selectedRatings.length > 0 ||
                             priceRange[0] > 0 ||
@@ -346,9 +334,9 @@ function HotelList() {
                 </Grid>
 
                 {/* Vùng danh sách kết quả */}
-                <Grid item xs={12} md={9}>
+                {/* CHANGED: mở rộng vùng kết quả từ md=9 -> md=10 */}
+                <Grid item xs={12} md={10}>
                     <Box className="search-content">
-                        {/* Header kết quả + điều khiển */}
                         <Paper className="content-header" elevation={1}>
                             <Stack
                                 direction={{ xs: 'column', sm: 'row' }}
@@ -380,39 +368,20 @@ function HotelList() {
                                             <MenuItem value="rating">Đánh giá cao</MenuItem>
                                         </Select>
                                     </FormControl>
-
-                                    <ToggleButtonGroup
-                                        size="small"
-                                        value={viewMode}
-                                        exclusive
-                                        onChange={(_, v) => v && setViewMode(v)}
-                                        color="primary"
-                                    >
-                                        <ToggleButton value="list">
-                                            <ViewListIcon fontSize="small" />
-                                        </ToggleButton>
-                                        <ToggleButton value="grid">
-                                            <GridViewIcon fontSize="small" />
-                                        </ToggleButton>
-                                    </ToggleButtonGroup>
                                 </Stack>
                             </Stack>
                         </Paper>
 
-                        {/* Danh sách thẻ khách sạn */}
-                        <Box className={`hotels-list ${viewMode === 'grid' ? 'grid' : 'list'}`}>
+                        {/* Danh sách thẻ khách sạn - CHỈ LIST VIEW */}
+                        <Box className="hotels-list list">
                             {loading
-                                ? Array.from({ length: viewMode === 'grid' ? 6 : 3 }).map((_, i) => (
-                                    <Card
-                                        key={`sk-${i}`}
-                                        className={`hotel-card ${viewMode === 'grid' ? 'hotel-card-grid' : 'hotel-card-list'}`}
-                                        elevation={2}
-                                    >
+                                ? Array.from({ length: 3 }).map((_, i) => (
+                                    <Card key={`sk-${i}`} className="hotel-card hotel-card-list" elevation={2}>
                                         <Grid container spacing={0}>
-                                            <Grid item xs={12} sm={viewMode === 'list' ? 4 : 12}>
+                                            <Grid item xs={12} sm={4}>
                                                 <Skeleton variant="rectangular" className="hotel-image" />
                                             </Grid>
-                                            <Grid item xs={12} sm={viewMode === 'list' ? 8 : 12}>
+                                            <Grid item xs={12} sm={8}>
                                                 <CardContent>
                                                     <Skeleton width="60%" />
                                                     <Skeleton width="40%" />
@@ -427,7 +396,6 @@ function HotelList() {
                                     <HotelCard
                                         key={hotel.id}
                                         hotel={hotel}
-                                        viewMode={viewMode}
                                         isFavorite={favorites.has(hotel.id)}
                                         onToggleFavorite={() => toggleFavorite(hotel.id)}
                                         onBook={() => handleBook(hotel)}
@@ -435,7 +403,6 @@ function HotelList() {
                                 ))}
                         </Box>
 
-                        {/* Phân trang */}
                         {totalPages > 1 && (
                             <Stack alignItems="center" mt={2}>
                                 <Pagination
@@ -449,53 +416,27 @@ function HotelList() {
                     </Box>
                 </Grid>
             </Grid>
-
-            {/* Thông báo khi đặt phòng */}
-            <Snackbar
-                open={snack.open}
-                autoHideDuration={2000}
-                onClose={() => setSnack((s) => ({ ...s, open: false }))}
-                anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
-            >
-                <Alert
-                    severity={snack.severity}
-                    onClose={() => setSnack((s) => ({ ...s, open: false }))}
-                    variant="filled"
-                    sx={{ width: '100%' }}
-                >
-                    {snack.msg}
-                </Alert>
-            </Snackbar>
         </Box>
     );
 }
 
-function HotelCard({ hotel, viewMode, isFavorite, onToggleFavorite, onBook }) {
-    const isList = viewMode === 'list';
+function HotelCard({ hotel, isFavorite, onToggleFavorite, onBook }) {
     const discountPrice =
         hotel.discount > 0 ? Math.round(hotel.price * (1 - hotel.discount / 100)) : hotel.price;
 
     return (
-        <Card
-            className={`hotel-card ${isList ? 'hotel-card-list' : 'hotel-card-grid'}`}
-            elevation={2}
-        >
+        <Card className="hotel-card hotel-card-list" elevation={2}>
             <Grid container spacing={0} alignItems="stretch" className="hotel-card-grid">
-                {/* Cột ảnh (bên trái trong chế độ list) */}
-                <Grid item xs={12} sm={isList ? 4 : 12} className="image-col">
-                    <Box className={`image-wrap ${isList ? 'list' : 'grid'}`}>
+                {/* Cột ảnh (bên trái trong list) */}
+                <Grid item xs={12} sm={4} className="image-col">
+                    <Box className="image-wrap list">
                         <Badge
                             color="error"
                             badgeContent={hotel.discount > 0 ? `-${hotel.discount}%` : null}
                             anchorOrigin={{ vertical: 'top', horizontal: 'left' }}
                             className="discount-badge"
                         >
-                            <CardMedia
-                                component="img"
-                                image={hotel.image}
-                                alt={hotel.name}
-                                className="hotel-image"
-                            />
+                            <CardMedia component="img" image={hotel.image} alt={hotel.name} className="hotel-image" />
                         </Badge>
 
                         {/* Nút yêu thích overlay */}
@@ -514,20 +455,12 @@ function HotelCard({ hotel, viewMode, isFavorite, onToggleFavorite, onBook }) {
                 </Grid>
 
                 {/* Cột nội dung */}
-                <Grid item xs={12} sm={isList ? 8 : 12} className="info-col">
-                    <CardContent className={`hotel-content ${isList ? 'list' : 'grid'}`}>
-                        {/* 
-              DÙNG CSS GRID CHO CHẾ ĐỘ LIST:
-              - 2 cột: 
-                + Cột trái (1fr) chứa thông tin khách sạn.
-                + Cột phải (260px) chứa giá + CTA (cố định).
-              => Đảm bảo phần giá KHÔNG bị ảnh hưởng bởi độ dài tiêu đề.
-            */}
-                        <Box className={`hotel-content-grid ${isList ? 'list' : 'grid'}`}>
+                <Grid item xs={12} sm={8} className="info-col">
+                    <CardContent className="hotel-content list">
+                        <Box className="hotel-content-grid list">
                             {/* Cột trái: Thông tin khách sạn */}
                             <Box className="hotel-info">
                                 <Typography variant="h5" className="hotel-name">
-                                    {/* Tiêu đề có clamp 2 dòng để tránh tăng chiều cao quá mức */}
                                     {hotel.name}
                                 </Typography>
 
@@ -548,8 +481,7 @@ function HotelCard({ hotel, viewMode, isFavorite, onToggleFavorite, onBook }) {
                                 <Box className="hotel-amenities">
                                     {hotel.amenities.map((a) => {
                                         const Icon = amenityIconMap[a] || StarIcon;
-                                        const label =
-                                            amenitiesData.find((x) => x.value === a)?.label || a.toUpperCase();
+                                        const label = amenitiesData.find((x) => x.value === a)?.label || a.toUpperCase();
                                         return (
                                             <Tooltip title={label} key={a}>
                                                 <Chip
@@ -575,20 +507,19 @@ function HotelCard({ hotel, viewMode, isFavorite, onToggleFavorite, onBook }) {
                                 </Box>
                             </Box>
 
-                            {/* Cột phải: Giá + CTA (CỐ ĐỊNH RỘNG) */}
+                            {/* Cột phải: Giá + CTA (cố định) */}
+                            {/* CHANGED: thêm padding-right để số giá không sát/cắt mép phải */}
                             <Stack className="booking-col" spacing={1} alignItems="flex-end">
-                                {/* Giá gốc (nếu có giảm) */}
                                 <Box textAlign="right">
                                     {hotel.discount > 0 && (
-                                        <Typography variant="body2" color="text.secondary" sx={{ textDecoration: 'line-through' }}>
+                                        <Typography
+                                            variant="body2"
+                                            color="text.secondary"
+                                            sx={{ textDecoration: 'line-through' }}
+                                        >
                                             {formatPrice(hotel.price)}
                                         </Typography>
                                     )}
-                                    {/* 
-                    Giá hiện tại:
-                    - Dùng variant="h5" (nhỏ hơn h4 một chút).
-                    - Kết hợp CSS .price-amount để tạo gradient + giảm size thêm nếu muốn.
-                  */}
                                     <Typography variant="h5" className="price-amount">
                                         {formatPrice(discountPrice)}
                                     </Typography>
@@ -597,7 +528,6 @@ function HotelCard({ hotel, viewMode, isFavorite, onToggleFavorite, onBook }) {
                                     </Typography>
                                 </Box>
 
-                                {/* Nhãn ưu đãi */}
                                 <Stack direction="row" spacing={1} alignItems="center">
                                     {hotel.discount > 0 && (
                                         <Chip
@@ -610,13 +540,7 @@ function HotelCard({ hotel, viewMode, isFavorite, onToggleFavorite, onBook }) {
                                     )}
                                 </Stack>
 
-                                {/* CTA đặt ngay */}
-                                <Button
-                                    variant="contained"
-                                    size="large"
-                                    className="book-button"
-                                    onClick={onBook}
-                                >
+                                <Button variant="contained" size="large" className="book-button" onClick={onBook}>
                                     Đặt Ngay
                                 </Button>
                             </Stack>
