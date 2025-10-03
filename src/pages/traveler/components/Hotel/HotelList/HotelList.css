@@ -39,12 +39,11 @@
 /* Danh sách thẻ */
 .hotels-list { display: grid; gap: 16px; }
 .hotels-list.list { grid-template-columns: 1fr; }
-.hotels-list.grid { grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); }
 
 /* Thẻ khách sạn - đảm bảo chiều cao đồng nhất */
 .hotel-card {
   border-radius: 16px !important;
-  overflow: hidden;
+  overflow: hidden; /* giữ bo góc cho ảnh */
   border: 1px solid #e2e8f0 !important;
   transition: box-shadow 0.25s ease, transform 0.25s ease !important;
   background: #fff;
@@ -63,14 +62,25 @@
   flex: 0 0 280px !important;   /* chiều rộng cột ảnh */
   max-width: 280px !important;
   display: flex;
+  align-items: stretch; /* ADDED: bảo đảm con kéo full chiều cao */
 }
 
 /* Khung chứa ảnh */
 .image-wrap {
   position: relative; 
   width: 100%; 
-  height: 200px;   /* 🔥 fix chiều cao cố định */
-  overflow: hidden; /* tránh ảnh dư */
+  /* CHANGED: bỏ height cố định 200px để ảnh kéo full theo cột
+     và thêm min-height để không quá thấp */
+  height: 100%;           /* CHANGED */
+  min-height: 200px;      /* ADDED: giữ tối thiểu như trước */
+  overflow: hidden;       /* tránh ảnh dư */
+}
+
+/* Để Badge (bao bọc ảnh) cũng giãn full khung ảnh */
+.discount-badge {        /* ADDED */
+  display: block;
+  width: 100%;
+  height: 100%;
 }
 
 /* Ảnh */
@@ -100,7 +110,7 @@
   background: rgba(255,255,255,0.9) !important;
   color: #e11d48 !important;
   box-shadow: 0 2px 6px rgba(0,0,0,0.15) !important;
-  z-index: 2;  /* 🔥 đảm bảo nổi trên ảnh */
+  z-index: 2;  /* đảm bảo nổi trên ảnh */
 }
 
 /* Badge giảm giá */
@@ -131,11 +141,6 @@
   align-items: start;
   width: 100%;
   min-height: 200px;
-}
-.hotel-content-grid.grid { 
-  display: flex; 
-  flex-direction: column; 
-  width: 100%;
 }
 
 /* Cột trái: thông tin */
@@ -186,13 +191,14 @@
 .booking-col {
   display: flex; 
   flex-direction: column;
-  justify-content: space-between;
+  justify-content: center;
   align-items: flex-end;
   padding-left: 20px;
   border-left: 1px solid #e2e8f0;
-  width: 240px;
+  width: 200px;
   height: 100%;
-  gap: 16px;
+  gap: 2px;
+  padding-right: 56px;    /* ADDED: chừa đệm bên phải để text giá không bị “dính” mép card */
 }
 
 /* Giá */
@@ -206,22 +212,23 @@
 /* Cỡ chữ giá tiền */
 .price-amount {
   font-weight: 800 !important;
-  font-size: 1.75rem !important;
+  font-size: 1.55rem !important;
   color: #e53e3e !important;
   background: linear-gradient(135deg, #e53e3e, #fc8181);
   -webkit-background-clip: text; 
   -webkit-text-fill-color: transparent;
   line-height: 1.2 !important;
+  white-space: nowrap; /* ADDED: tránh xuống dòng gây tràn bất thường */
 }
 
 /* Nút CTA */
 .book-button {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+  background: linear-gradient(135deg, #037c0f 0%, #033011 100%) !important;
   border-radius: 10px !important;
   font-weight: 700 !important;
   text-transform: none !important;
   padding: 10px 20px !important;
-  box-shadow: 0 6px 20px rgba(102,126,234,.35) !important;
+  box-shadow: 0 6px 20px rgba(0, 36, 10, 0.35) !important;
   transition: transform .2s ease !important;
   min-width: 140px;
   white-space: nowrap;
@@ -238,7 +245,12 @@
     max-width: none !important;
     width: 100% !important;
   }
-  .image-wrap.list .hotel-image { 
+  /* CHANGED: khi về mobile, ảnh ở top giữ cao 200px như cũ */
+  .image-wrap { 
+    height: 200px;    /* CHANGED: override cho mobile */
+    min-height: 200px;
+  }
+  .image-wrap .hotel-image { 
     height: 200px !important; 
     object-fit: cover;
   }
@@ -264,8 +276,7 @@
 
 @media (max-width: 600px) {
   .content-header { padding: 16px !important; }
-  .hotels-list.grid { grid-template-columns: 1fr; }
-  .image-wrap.list .hotel-image { height: 180px !important; }
+  .image-wrap .hotel-image { height: 180px !important; }
   .price-amount { font-size: 1.55rem !important; }
   .hotel-name { font-size: 1.1rem !important; }
 }

@@ -218,8 +218,7 @@ function HotelList() {
         <Box className="hotel-search-container">
             <Grid container spacing={3} alignItems="start">
                 {/* Sidebar bộ lọc */}
-                {/* CHANGED: thu hẹp sidebar trên màn hình md+ từ 3 -> 2 cột */}
-                <Grid item xs={12} md={2}>
+                <Grid item xs={12} sm={4} md={3} lg={2}>
                     <Box className="search-sidebar">
                         {/* Khoảng giá */}
                         <Paper className="filter-card" elevation={2}>
@@ -334,8 +333,7 @@ function HotelList() {
                 </Grid>
 
                 {/* Vùng danh sách kết quả */}
-                {/* CHANGED: mở rộng vùng kết quả từ md=9 -> md=10 */}
-                <Grid item xs={12} md={10}>
+                <Grid item xs={12} sm={8} md={9} lg={10}>
                     <Box className="search-content">
                         <Paper className="content-header" elevation={1}>
                             <Stack
@@ -532,7 +530,7 @@ function HotelCard({ hotel, isFavorite, onToggleFavorite, onBook }) {
                                     {hotel.discount > 0 && (
                                         <Chip
                                             size="small"
-                                            color="secondary"
+                                            color="primary"
                                             icon={<LocalOfferIcon />}
                                             label="Ưu đãi hôm nay"
                                             variant="filled"
