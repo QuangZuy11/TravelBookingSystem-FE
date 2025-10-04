@@ -285,3 +285,51 @@
 .MuiSkeleton-root.hotel-image {
   width: 100%; height: 200px !important; border-radius: 0 !important;
 }
+
+/* ADDED: Ép tỉ lệ 2:10 tại breakpoint md+ (MUI mặc định md = 900px) */
+@media (min-width: 1000px) { /* ADDED: chỉ ép ở lg (>=1200px) để tránh wrap ở md */
+  .sidebar-col {
+    flex: 0 0 16.6667% !important;  /* 2/12 */
+    max-width: 16.6667% !important;
+  }
+  .results-col {
+    flex: 0 0 83.3333% !important;  /* 10/12 */
+    max-width: 83.3333% !important;
+    min-width: 0 !important;        /* ADDED */
+  }
+}
+
+/* ADDED: đảm bảo vùng kết quả không bị nở vì nội dung */
+.search-content { min-width: 0; }
+
+/* ADDED: Tránh nội dung bên trong làm nở rộng vùng kết quả */
+.search-content {
+  min-width: 0; /* ADDED */
+}
+
+/* Nếu có phần tử nào trong sidebar đặt min-width quá lớn, đảm bảo không vượt khung */
+.search-sidebar, 
+.search-sidebar .filter-card {
+  max-width: 100%; /* ADDED: không cho vượt khung 2/12 */
+}
+
+/* (Các rule cho ảnh/giá đã chỉnh ở lần trước) */
+/* Nhắc lại các phần quan trọng để bạn so sánh nhanh: */
+
+/* CHANGED trước đó: .image-wrap cao 100% để ảnh full chiều cao cột trái */
+.image-wrap {
+  position: relative;
+  width: 100%;
+  height: 100%;      /* đảm bảo ảnh giãn theo chiều cao cột */
+  min-height: 200px; /* tối thiểu để thẻ không quá thấp */
+  overflow: hidden;
+}
+.discount-badge { width: 100%; height: 100%; } /* đảm bảo wrapper giãn full */
+
+/* CHANGED trước đó: giá không bị cắt mép phải */
+.booking-col {
+  padding-right: 16px;      /* chừa đệm phải */
+}
+.price-amount {
+  white-space: nowrap;      /* tránh xuống dòng làm tràn */
+}

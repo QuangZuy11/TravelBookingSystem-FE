@@ -288,7 +288,7 @@ function HotelList() {
                                             }
                                             label={
                                                 <Box display="flex" alignItems="center" gap={1}>
-                                                    <Icon fontSize="small" />
+                                                    {Icon && <Icon fontSize="small" />}
                                                     {label}
                                                 </Box>
                                             }
