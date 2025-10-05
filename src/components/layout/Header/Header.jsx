@@ -18,7 +18,8 @@ const Header = () => {
 
   return (
     <header className="header">
-      <div className="header-logo">
+      <div className="header-container">
+        <div className="header-logo">
         <img src={Logo} alt="VietTravel Logo" className="logo-img" />
         <span className="logo-text">VietTravel</span>
       </div>
@@ -50,6 +51,7 @@ const Header = () => {
             </div>
           </Link>
         )}
+      </div>
       </div>
     </header>
   );
