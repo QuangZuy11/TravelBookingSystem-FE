@@ -234,7 +234,7 @@ const HotelDetailsPage = () => {
         fontSize: '1.5rem',
         fontWeight: '700',
         color: '#1f2937',
-        marginBottom: '1rem'
+        // marginBottom: '1rem'
     };
 
     const infoBlockStyle = {
@@ -398,46 +398,6 @@ const HotelDetailsPage = () => {
     return (
         <div style={containerStyle}>
             <Breadcrumb items={breadcrumbItems} />
-            {/* Header */}
-            <div style={headerStyle}>
-                <div>
-                    <h1 style={titleStyle}>{hotel.name}</h1>
-                    <p style={{ color: '#6b7280', marginTop: '0.5rem' }}>
-                        {'⭐'.repeat(hotel.starRating || 3)} {hotel.starRating || 3} Stars
-                    </p>
-                </div>
-                <div style={buttonGroupStyle}>
-                    <button
-                        onClick={handleEditHotel}
-                        style={editButtonStyle}
-                        onMouseEnter={(e) => {
-                            e.currentTarget.style.transform = 'translateY(-2px)';
-                            e.currentTarget.style.boxShadow = '0 6px 20px rgba(245, 158, 11, 0.4)';
-                        }}
-                        onMouseLeave={(e) => {
-                            e.currentTarget.style.transform = 'translateY(0)';
-                            e.currentTarget.style.boxShadow = '0 4px 15px rgba(245, 158, 11, 0.3)';
-                        }}
-                    >
-                        ✏️ Edit Hotel
-                    </button>
-                    <button
-                        onClick={handleDeleteHotel}
-                        style={deleteButtonStyle}
-                        onMouseEnter={(e) => {
-                            e.currentTarget.style.transform = 'translateY(-2px)';
-                            e.currentTarget.style.boxShadow = '0 6px 20px rgba(239, 68, 68, 0.4)';
-                        }}
-                        onMouseLeave={(e) => {
-                            e.currentTarget.style.transform = 'translateY(0)';
-                            e.currentTarget.style.boxShadow = '0 4px 15px rgba(239, 68, 68, 0.3)';
-                        }}
-                    >
-                        🗑️ Delete Hotel
-                    </button>
-                </div>
-            </div>
-
             {/* Hotel Summary */}
             <div style={summaryCardStyle}>
                 <div style={gridStyle}>
@@ -456,16 +416,21 @@ const HotelDetailsPage = () => {
                                 🏨
                             </div>
                         )}
-                        
-                        <h2 style={sectionTitleStyle}>{hotel.name}</h2>
-                        
+                        <div style={{display: 'flex', alignItems: 'center', gap: '1rem'}}>
+                            <h2 style={sectionTitleStyle}>{hotel.name}</h2>
+                            <p style={{ color: '#6b7280', marginTop: '0.5rem' }}>
+                                {'⭐'.repeat(hotel.starRating || 3)} {hotel.starRating || 3} Stars
+                            </p>
+                        </div>
                         <div style={infoBlockStyle}>
                             <p style={labelStyle}>📍 Address</p>
                             <p style={valueStyle}>
                                 {hotel.address.street}, {hotel.address.city}, {hotel.address.state}, {hotel.address.country} {hotel.address.zipCode}
                             </p>
                         </div>
-                        
+                        <div>
+                            
+                        </div>
                         <div style={infoBlockStyle}>
                             <p style={labelStyle}>Description</p>
                             <p style={valueStyle}>{hotel.description}</p>
@@ -473,6 +438,36 @@ const HotelDetailsPage = () => {
                     </div>
                     
                     <div>
+                        <div style={buttonGroupStyle}>
+                            <button
+                                onClick={handleEditHotel}
+                                style={editButtonStyle}
+                                onMouseEnter={(e) => {
+                                    e.currentTarget.style.transform = 'translateY(-2px)';
+                                    e.currentTarget.style.boxShadow = '0 6px 20px rgba(245, 158, 11, 0.4)';
+                                }}
+                                onMouseLeave={(e) => {
+                                    e.currentTarget.style.transform = 'translateY(0)';
+                                    e.currentTarget.style.boxShadow = '0 4px 15px rgba(245, 158, 11, 0.3)';
+                                }}
+                            >
+                                ✏️ Edit Hotel
+                            </button>
+                            <button
+                                onClick={handleDeleteHotel}
+                                style={deleteButtonStyle}
+                                onMouseEnter={(e) => {
+                                    e.currentTarget.style.transform = 'translateY(-2px)';
+                                    e.currentTarget.style.boxShadow = '0 6px 20px rgba(239, 68, 68, 0.4)';
+                                }}
+                                onMouseLeave={(e) => {
+                                    e.currentTarget.style.transform = 'translateY(0)';
+                                    e.currentTarget.style.boxShadow = '0 4px 15px rgba(239, 68, 68, 0.3)';
+                                }}
+                            >
+                                🗑️ Delete Hotel
+                            </button>
+                        </div>
                         <div style={infoBlockStyle}>
                             <p style={labelStyle}>📞 Contact Information</p>
                             <p style={valueStyle}>Email: {hotel.contactInfo.email}</p>

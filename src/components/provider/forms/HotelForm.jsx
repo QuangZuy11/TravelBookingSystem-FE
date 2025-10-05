@@ -146,14 +146,16 @@ export const HotelForm = ({ initialData, onSubmit }) => {
         background: '#f9fafb',
         borderRadius: '16px',
         border: '2px solid transparent',
-        transition: 'all 0.3s ease'
+        transition: 'all 0.3s ease',
+        display: 'block'
     };
 
     const sectionActiveStyle = {
         ...sectionStyle,
         border: '2px solid #667eea',
         background: 'white',
-        boxShadow: '0 4px 15px rgba(102, 126, 234, 0.1)'
+        boxShadow: '0 4px 15px rgba(102, 126, 234, 0.1)',
+        display: 'block'
     };
 
     const sectionTitleStyle = {
@@ -171,7 +173,7 @@ export const HotelForm = ({ initialData, onSubmit }) => {
     };
 
     const inputStyle = {
-        width: '100%',
+        width: '80%',
         padding: '0.875rem 1rem',
         fontSize: '1rem',
         border: '2px solid #e5e7eb',
@@ -193,7 +195,7 @@ export const HotelForm = ({ initialData, onSubmit }) => {
 
     const gridStyle = {
         display: 'grid',
-        gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))',
+        gridTemplateColumns: '1fr',
         gap: '1.5rem',
         marginBottom: '1.5rem'
     };
@@ -300,7 +302,7 @@ export const HotelForm = ({ initialData, onSubmit }) => {
                         <span style={iconStyle}>🏨</span>
                         Basic Information
                     </h2>
-                    <div style={{ marginBottom: '1.5rem' }}>
+                    <div style={{ ...gridStyle, marginBottom: '1.5rem' }}>
                         <label style={labelStyle}>Hotel Name</label>
                         <input
                             type="text"
@@ -314,7 +316,7 @@ export const HotelForm = ({ initialData, onSubmit }) => {
                             placeholder="Enter hotel name"
                         />
                     </div>
-                    <div style={{ marginBottom: '1.5rem' }}>
+                    <div style={{ ...gridStyle, marginBottom: '1.5rem' }}>
                         <label style={labelStyle}>Description</label>
                         <textarea
                             name="description"

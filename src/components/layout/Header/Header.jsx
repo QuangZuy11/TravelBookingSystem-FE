@@ -39,6 +39,9 @@ const Header = () => {
             {dropdownVisible && (
               <div className="dropdown-menu">
                 <Link to="/profile" className="dropdown-item">Profile</Link>
+                {user.role === 'ServiceProvider' && (
+                  <Link to="/provider/hotels" className="dropdown-item">Quản lý dịch vụ</Link>
+                )}
                 <button onClick={handleLogout} className="dropdown-item">Đăng xuất</button>
               </div>
             )}

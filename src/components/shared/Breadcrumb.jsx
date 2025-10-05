@@ -4,7 +4,7 @@ import { IoChevronForward } from "react-icons/io5";
 
 const Breadcrumb = ({ items }) => {
     return (
-        <div className="flex items-center gap-2 mb-6 text-sm">
+        <div style={{ padding: '1rem', marginBottom: '1rem', background: '#f8f9fa', borderRadius: '0.5rem' }} className="flex items-center gap-2 mb-6 text-sm">
             {items.map((item, index) => (
                 <React.Fragment key={index}>
                     {index > 0 && (
