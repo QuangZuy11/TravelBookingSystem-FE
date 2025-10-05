@@ -18,7 +18,8 @@ const Header = () => {
 
   return (
     <header className="header">
-      <div className="header-logo">
+      <div className="header-container">
+        <div className="header-logo">
         <img src={Logo} alt="VietTravel Logo" className="logo-img" />
         <span className="logo-text">VietTravel</span>
       </div>
@@ -38,6 +39,9 @@ const Header = () => {
             {dropdownVisible && (
               <div className="dropdown-menu">
                 <Link to="/profile" className="dropdown-item">Profile</Link>
+                {user.role === 'ServiceProvider' && (
+                  <Link to="/provider/hotels" className="dropdown-item">Quản lý dịch vụ</Link>
+                )}
                 <button onClick={handleLogout} className="dropdown-item">Đăng xuất</button>
               </div>
             )}
@@ -50,6 +54,7 @@ const Header = () => {
             </div>
           </Link>
         )}
+      </div>
       </div>
     </header>
   );

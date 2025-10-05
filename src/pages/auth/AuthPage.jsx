@@ -62,9 +62,20 @@ const AuthPage = () => {
         throw new Error(data.message || "Có lỗi xảy ra, vui lòng thử lại.");
       }
 
-      login(data.data);
+      // Lưu provider_id vào localStorage nếu user có role_id = 2
+      if (data.data.role_id === 2) {
+        localStorage.setItem('providerId', data.data.id);
+      }
 
-      navigate("/");
+      // Login và lấy role_id được trả về
+      const roleId = login(data.data);
+
+      // Điều hướng người dùng dựa vào role
+      if (roleId === 2) {
+        navigate("/provider/hotels");
+      } else {
+        navigate("/");
+      }
     } catch (error) {
       console.error("Lỗi xác thực:", error);
       alert(error.message);
