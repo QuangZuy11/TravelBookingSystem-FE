@@ -118,8 +118,8 @@ function HotelList() {
     // State filter
     const [priceRange, setPriceRange] = useState([0, 49300000]);
     const [selectedAmenities, setSelectedAmenities] = useState([]);
-    const [selectedRatings, setSelectedRatings] = useState([]); // [5,4,...]
-    const [sortBy, setSortBy] = useState('popular'); // popular | priceAsc | priceDesc | rating
+    const [selectedRatings, setSelectedRatings] = useState([]);
+    const [sortBy, setSortBy] = useState('popular');
 
     // Data
     const [hotels] = useState(seedHotels);
@@ -130,14 +130,12 @@ function HotelList() {
     // UX loading
     const [loading, setLoading] = useState(false);
 
-    // Mô phỏng loading khi đổi filter/sort/page
     useEffect(() => {
         setLoading(true);
         const t = setTimeout(() => setLoading(false), 300);
         return () => clearTimeout(t);
     }, [priceRange, selectedAmenities, selectedRatings, sortBy, page]);
 
-    // Lọc theo giá, tiện nghi, đánh giá
     const filtered = useMemo(() => {
         const [minP, maxP] = priceRange;
         return hotels.filter((h) => {
@@ -152,7 +150,6 @@ function HotelList() {
         });
     }, [hotels, priceRange, selectedAmenities, selectedRatings]);
 
-    // Sắp xếp
     const sorted = useMemo(() => {
         const arr = [...filtered];
         switch (sortBy) {
@@ -166,12 +163,11 @@ function HotelList() {
                 arr.sort((a, b) => b.rating - a.rating);
                 break;
             default:
-                arr.sort((a, b) => b.reviews - a.reviews); // Phổ biến = nhiều reviews
+                arr.sort((a, b) => b.reviews - a.reviews);
         }
         return arr;
     }, [filtered, sortBy]);
 
-    // Phân trang
     const total = sorted.length;
     const totalPages = Math.max(1, Math.ceil(total / perPage));
     const paginated = useMemo(() => {
@@ -179,7 +175,6 @@ function HotelList() {
         return sorted.slice(start, start + perPage);
     }, [sorted, page, perPage]);
 
-    // Handlers
     const toggleAmenity = (value) => {
         setPage(1);
         setSelectedAmenities((prev) =>
@@ -216,9 +211,10 @@ function HotelList() {
 
     return (
         <Box className="hotel-search-container">
-            <Grid container spacing={3} alignItems="start">
-                {/* Sidebar bộ lọc */}
-                <Grid item xs={12} sm={4} md={3} lg={2}>
+            {/* Luôn 1 hàng 3:9 */}
+            <Grid container spacing={3} alignItems="flex-start" wrap="nowrap" columns={12}>
+                {/* Sidebar 3/12 */}
+                <Grid item xs={3}>
                     <Box className="search-sidebar">
                         {/* Khoảng giá */}
                         <Paper className="filter-card" elevation={2}>
@@ -332,8 +328,8 @@ function HotelList() {
                     </Box>
                 </Grid>
 
-                {/* Vùng danh sách kết quả */}
-                <Grid item xs={12} sm={8} md={9} lg={10}>
+                {/* Content 9/12 */}
+                <Grid item xs={9} zeroMinWidth>
                     <Box className="search-content">
                         <Paper className="content-header" elevation={1}>
                             <Stack
@@ -370,7 +366,7 @@ function HotelList() {
                             </Stack>
                         </Paper>
 
-                        {/* Danh sách thẻ khách sạn - CHỈ LIST VIEW */}
+                        {/* Danh sách thẻ khách sạn */}
                         <Box className="hotels-list list">
                             {loading
                                 ? Array.from({ length: 3 }).map((_, i) => (
@@ -424,9 +420,10 @@ function HotelCard({ hotel, isFavorite, onToggleFavorite, onBook }) {
 
     return (
         <Card className="hotel-card hotel-card-list" elevation={2}>
-            <Grid container spacing={0} alignItems="stretch" className="hotel-card-grid">
-                {/* Cột ảnh (bên trái trong list) */}
-                <Grid item xs={12} sm={4} className="image-col">
+            {/* Không wrap, cột ảnh co theo CSS, cột phải cố định */}
+            <Grid container spacing={0} alignItems="stretch" className="hotel-card-grid" wrap="nowrap">
+                {/* Cột ảnh */}
+                <Grid item xs="auto" className="image-col">
                     <Box className="image-wrap list">
                         <Badge
                             color="error"
@@ -437,7 +434,6 @@ function HotelCard({ hotel, isFavorite, onToggleFavorite, onBook }) {
                             <CardMedia component="img" image={hotel.image} alt={hotel.name} className="hotel-image" />
                         </Badge>
 
-                        {/* Nút yêu thích overlay */}
                         <Tooltip title={isFavorite ? 'Bỏ yêu thích' : 'Thêm yêu thích'}>
                             <Button
                                 className="favorite-btn"
@@ -453,10 +449,11 @@ function HotelCard({ hotel, isFavorite, onToggleFavorite, onBook }) {
                 </Grid>
 
                 {/* Cột nội dung */}
-                <Grid item xs={12} sm={8} className="info-col">
+                <Grid item xs className="info-col">
                     <CardContent className="hotel-content list">
+                        {/* Cột giữa (info) + cột phải (price) */}
                         <Box className="hotel-content-grid list">
-                            {/* Cột trái: Thông tin khách sạn */}
+                            {/* Thông tin */}
                             <Box className="hotel-info">
                                 <Typography variant="h5" className="hotel-name">
                                     {hotel.name}
@@ -505,8 +502,7 @@ function HotelCard({ hotel, isFavorite, onToggleFavorite, onBook }) {
                                 </Box>
                             </Box>
 
-                            {/* Cột phải: Giá + CTA (cố định) */}
-                            {/* CHANGED: thêm padding-right để số giá không sát/cắt mép phải */}
+                            {/* Giá + CTA */}
                             <Stack className="booking-col" spacing={1} alignItems="flex-end">
                                 <Box textAlign="right">
                                     {hotel.discount > 0 && (
@@ -518,10 +514,10 @@ function HotelCard({ hotel, isFavorite, onToggleFavorite, onBook }) {
                                             {formatPrice(hotel.price)}
                                         </Typography>
                                     )}
-                                    <Typography variant="h5" className="price-amount">
+                                    <Typography variant="h4" className="price-amount">
                                         {formatPrice(discountPrice)}
                                     </Typography>
-                                    <Typography variant="body2" color="text.secondary">
+                                    <Typography variant="caption" color="text.secondary">
                                         /đêm
                                     </Typography>
                                 </Box>
@@ -538,7 +534,7 @@ function HotelCard({ hotel, isFavorite, onToggleFavorite, onBook }) {
                                     )}
                                 </Stack>
 
-                                <Button variant="contained" size="large" className="book-button" onClick={onBook}>
+                                <Button variant="contained" size="medium" className="book-button" onClick={onBook}>
                                     Đặt Ngay
                                 </Button>
                             </Stack>

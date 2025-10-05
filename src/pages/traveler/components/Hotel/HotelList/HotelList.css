@@ -1,335 +1,254 @@
 /* Bố cục tổng thể */
 .hotel-search-container {
-  background-color: #f5f7fa;
-  min-height: 100vh;
-  padding: 24px;
+  background-color: #f5f7fa; /* Nền xám nhạt tổng thể */
+  min-height: 100vh;         /* Chiều cao tối thiểu full màn hình */
+  padding: 24px;             /* Khoảng đệm xung quanh */
 }
 
 /* Sidebar: sticky để bộ lọc luôn hiển thị */
 .search-sidebar {
-  display: flex;
-  flex-direction: column;
-  gap: 24px;
-  position: sticky;
-  top: 16px;
+  display: flex;             /* Dùng flex để xếp dọc các thẻ filter */
+  flex-direction: column;    /* Xếp theo cột */
+  gap: 24px;                 /* Khoảng cách giữa các thẻ */
+  position: sticky;          /* Cố định theo viewport khi cuộn */
+  top: 16px;                 /* Cách đỉnh 16px */
 }
 
 /* Thẻ filter */
 .filter-card {
-  border-radius: 12px !important;
-  overflow: hidden;
-  transition: transform 0.25s ease, box-shadow 0.25s ease !important;
+  border-radius: 12px !important;                          /* Bo tròn thẻ filter */
+  overflow: hidden;                                        /* Ẩn phần dư ra ngoài khi hover */
+  transition: transform 0.25s ease, box-shadow 0.25s ease !important; /* Hiệu ứng hover mượt */
 }
 .filter-card:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 10px 24px rgba(0,0,0,0.12) !important;
+  transform: translateY(-2px);                             /* Nhấc thẻ lên nhẹ khi hover */
+  box-shadow: 0 10px 24px rgba(0,0,0,0.12) !important;     /* Đổ bóng đậm hơn */
 }
-.filter-title { font-weight: 700 !important; color: #1976d2 !important; }
-.price-slider { color: #1976d2 !important; }
+.filter-title { font-weight: 700 !important; color: #1976d2 !important; } /* Tiêu đề filter đậm + màu chủ đạo */
+.price-slider { color: #1976d2 !important; }                               /* Màu slider khớp chủ đạo */
 
 /* Nội dung kết quả */
-.search-content { display: flex; flex-direction: column; gap: 20px; }
+.search-content { display: flex; flex-direction: column; gap: 20px; } /* Vùng danh sách: xếp dọc các phần con */
 .content-header {
-  padding: 20px 24px !important;
-  border-radius: 12px !important;
-  background: linear-gradient(135deg, #fff 0%, #f8fafc 100%) !important;
+  padding: 20px 24px !important;                                     /* Đệm trong header */
+  border-radius: 12px !important;                                     /* Bo tròn header */
+  background: linear-gradient(135deg, #fff 0%, #f8fafc 100%) !important; /* Nền chuyển nhẹ */
 }
-.results-title { font-weight: 700 !important; color: #1e293b !important; }
+.results-title { font-weight: 700 !important; color: #1e293b !important; } /* Tiêu đề kết quả */
 
 /* Danh sách thẻ */
-.hotels-list { display: grid; gap: 16px; }
-.hotels-list.list { grid-template-columns: 1fr; }
+.hotels-list { display: grid; gap: 16px; }        /* Dùng grid để xếp danh sách thẻ, có khoảng cách */
+.hotels-list.list { grid-template-columns: 1fr; } /* 1 cột (list view) */
 
 /* Thẻ khách sạn - đảm bảo chiều cao đồng nhất */
 .hotel-card {
-  border-radius: 16px !important;
-  overflow: hidden; /* giữ bo góc cho ảnh */
-  border: 1px solid #e2e8f0 !important;
-  transition: box-shadow 0.25s ease, transform 0.25s ease !important;
-  background: #fff;
+  border-radius: 16px !important;                           /* Bo góc thẻ card */
+  overflow: hidden;                                         /* Ẩn phần dư (đảm bảo bo góc ảnh) */
+  border: 1px solid #e2e8f0 !important;                     /* Viền nhạt */
+  transition: box-shadow 0.25s ease, transform 0.25s ease !important; /* Hiệu ứng hover */
+  background: #fff;                                         /* Nền trắng */
 }
-.hotel-card:hover { transform: translateY(-4px); box-shadow: 0 14px 36px rgba(0,0,0,0.12) !important; }
+.hotel-card:hover { transform: translateY(-4px); box-shadow: 0 14px 36px rgba(0,0,0,0.12) !important; } /* Hover nhấc + bóng */
 
 /* Container của hàng trong card */
 .hotel-card .hotel-card-grid { 
-  display: flex;
-  flex: 1;
-  align-items: stretch;
+  display: flex;           /* Hàng ngang để chia 3 cột: ảnh | info | giá */
+  flex: 1;                 /* Cho phép container chiếm đầy thẻ */
+  align-items: stretch;    /* 3 cột cao đều nhau */
+  flex-wrap: nowrap;       /* QUAN TRỌNG: không cho xuống dòng gây bể layout */
+  min-height: 220px;       /* Chiều cao tối thiểu thẻ (gần với mẫu) */
 }
 
-/* Cột ảnh trong list view */
+/* Cột ảnh trong list view (ĐÃ THU GỌN ĐỂ NHƯỜNG CHỖ CHO THÔNG TIN) */
 .hotel-card-list .image-col { 
-  flex: 0 0 280px !important;   /* chiều rộng cột ảnh */
-  max-width: 280px !important;
-  display: flex;
-  align-items: stretch; /* ADDED: bảo đảm con kéo full chiều cao */
+  flex: 0 0 320px !important; /* Chiều rộng ảnh cố định: 320px (nhỏ hơn trước để info rộng hơn) */
+  min-width: 320px !important;/* Không cho nhỏ hơn 320px */
+  max-width: 320px !important;/* Không cho lớn hơn 320px */
+  display: flex;              /* Dùng flex để ảnh giãn full chiều cao cột */
+  align-items: stretch;       /* Ảnh kéo full chiều cao */
 }
 
 /* Khung chứa ảnh */
 .image-wrap {
-  position: relative; 
-  width: 100%; 
-  /* CHANGED: bỏ height cố định 200px để ảnh kéo full theo cột
-     và thêm min-height để không quá thấp */
-  height: 100%;           /* CHANGED */
-  min-height: 200px;      /* ADDED: giữ tối thiểu như trước */
-  overflow: hidden;       /* tránh ảnh dư */
+  position: relative;  /* Làm mốc cho nút tim overlay */
+  width: 100%;         /* Rộng 100% cột ảnh */
+  height: 100%;        /* Cao 100% cột ảnh */
+  min-height: 220px;   /* Đảm bảo không quá thấp */
+  overflow: hidden;    /* Ẩn phần ảnh tràn */
+  border-right: 1px solid #eef2f7; /* Đường phân cách nhẹ bên phải ảnh */
 }
 
 /* Để Badge (bao bọc ảnh) cũng giãn full khung ảnh */
-.discount-badge {        /* ADDED */
-  display: block;
-  width: 100%;
-  height: 100%;
+.discount-badge {        /* Thẻ badge bao quanh ảnh */
+  display: block;        /* Cho phép set width/height */
+  width: 100%;           /* Tràn full khung */
+  height: 100%;          /* Tràn full khung */
 }
 
 /* Ảnh */
 .hotel-image {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;  /* luôn fill khung, không méo ảnh */
-  display: block;
-  transition: transform 0.35s ease, opacity 0.2s ease;
+  width: 100%;           /* Ảnh rộng full khung */
+  height: 100%;          /* Ảnh cao full khung */
+  object-fit: cover;     /* Cắt ảnh để phủ kín mà không méo */
+  display: block;        /* Loại bỏ khoảng trắng inline-img */
+  transition: transform 0.35s ease, opacity 0.2s ease; /* Hiệu ứng hover */
 }
 
-/* Hover */
+/* Hover phóng ảnh nhẹ */
 .image-wrap:hover .hotel-image { 
-  transform: scale(1.02); 
+  transform: scale(1.02); /* Phóng nhẹ khi hover */
 }
 
 /* Nút yêu thích overlay */
 .favorite-btn {
-  position: absolute !important;   /* bám theo .image-wrap */
-  top: 10px; 
-  right: 10px;
-  min-width: 36px !important; 
-  width: 36px; 
-  height: 36px;
-  padding: 0 !important; 
-  border-radius: 50% !important;
-  background: rgba(255,255,255,0.9) !important;
-  color: #e11d48 !important;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.15) !important;
-  z-index: 2;  /* đảm bảo nổi trên ảnh */
+  position: absolute !important;   /* Cố định vị trí theo .image-wrap */
+  top: 10px;                       /* Cách đỉnh 10px */
+  right: 10px;                     /* Cách phải 10px */
+  min-width: 36px !important;      /* Kích thước tối thiểu 36px */
+  width: 36px;                     /* Rộng 36px */
+  height: 36px;                    /* Cao 36px */
+  padding: 0 !important;           /* Bỏ padding mặc định */
+  border-radius: 50% !important;   /* Tròn nút */
+  background: rgba(255,255,255,0.9) !important; /* Nền trắng hơi trong */
+  color: #e11d48 !important;       /* Màu icon hồng */
+  box-shadow: 0 2px 6px rgba(0,0,0,0.15) !important; /* Đổ bóng nhẹ */
+  z-index: 2;                      /* Đè lên ảnh */
 }
 
 /* Badge giảm giá */
 .discount-badge .MuiBadge-badge {
-  left: 12px; top: 12px;
-  padding: 6px 8px; border-radius: 8px;
+  left: 12px; top: 12px;           /* Đặt góc trái trên */
+  padding: 6px 8px; border-radius: 8px; /* Đệm + bo góc badge */
 }
 
-/* Cột nội dung - chiếm hết phần còn lại */
+/* Cột nội dung - chiếm hết phần còn lại (CỘT GIỮA) */
 .info-col {
-  display: flex;
-  flex: 1;
-  min-width: 0;
+  display: flex;       /* Dùng flex để nội dung bên trong dễ canh */
+  flex: 1 1 auto;      /* Cho phép cột giữa giãn chiếm phần còn lại */
+  min-width: 0;        /* QUAN TRỌNG: cho phép co lại và cắt text đúng */
 }
 
-/* Nội dung trong thẻ */
+/* Nội dung trong thẻ (bao bọc lưới info + price) */
 .hotel-content { 
-  display: flex;
-  flex: 1;
-  padding: 16px !important; 
+  display: flex;        /* Giữ khối content dạng flex */
+  flex: 1;              /* Chiếm hết chiều ngang còn lại của cột giữa */
+  padding: 16px !important; /* Đệm xung quanh nội dung */
 }
 
-/* Bố cục chính (list view) */
+/* Bố cục chính (list view) – SỬA LẠI ĐỂ CỘT GIÁ KHÔNG CHIẾM CHỖ */
 .hotel-content-grid.list {
-  display: grid;
-  grid-template-columns: 1fr 240px;
-  column-gap: 20px;
-  align-items: start;
-  width: 100%;
-  min-height: 200px;
+  display: grid;                                 /* Dùng grid để chia 2 cột: info | price */
+  grid-template-columns: minmax(0, 1fr) max-content; /* Cột trái đàn hồi; cột phải ôm đúng nội dung (không lấn) */
+  column-gap: 20px;                              /* Khoảng cách giữa 2 cột */
+  align-items: start;                            /* Canh đỉnh các cột */
+  width: 100%;                                   /* Rộng 100% cột giữa */
+  min-height: 220px;                             /* Chiều cao tối thiểu khối nội dung */
 }
 
 /* Cột trái: thông tin */
 .hotel-info {
-  display: flex; 
-  flex-direction: column; 
-  gap: 8px;
-  min-width: 0;
-  height: 100%;
-  justify-content: space-between;
+  display: flex;             /* Dùng flex để xếp dọc các dòng info */
+  flex-direction: column;    /* Xếp theo cột */
+  gap: 8px;                  /* Khoảng cách giữa các block info */
+  min-width: 0;              /* Cho phép thu hẹp và cắt text */
+  height: 100%;              /* Cao bằng cột */
+  justify-content: space-between; /* Chia đều dọc: tên/địa điểm + tiện nghi phía dưới */
 }
 
 /* Tên khách sạn */
 .hotel-name {
-  font-weight: 700 !important; 
-  color: #1976d2 !important;
-  margin-bottom: 4px !important; 
-  line-height: 1.3 !important;
-  display: -webkit-box; 
-  -webkit-line-clamp: 2; 
-  -webkit-box-orient: vertical; 
-  overflow: hidden;
-  min-height: 2.6em;
+  font-weight: 700 !important;  /* Đậm tên */
+  color: #1976d2 !important;    /* Màu chủ đạo */
+  margin-bottom: 4px !important;/* Đệm dưới nhỏ */
+  line-height: 1.3 !important;  /* Chiều cao dòng */
+  display: -webkit-box;         /* Hỗ trợ clamp dòng */
+  -webkit-line-clamp: 2;        /* Tối đa 2 dòng tiêu đề */
+  -webkit-box-orient: vertical; /* Hướng dọc cho clamp */
+  overflow: hidden;             /* Ẩn phần vượt quá 2 dòng */
+  min-height: 2.6em;            /* Giữ chiều cao tối thiểu tương ứng 2 dòng */
 }
-.hotel-name:hover { color: #1565c0 !important }
-.hotel-location { color: #64748b; font-size: 0.9rem; }
-.hotel-rating .MuiRating-root { transform: translateY(1px); }
+.hotel-name:hover { color: #1565c0 !important } /* Đổi màu khi hover */
+.hotel-location { color: #64748b; font-size: 0.9rem; } /* Màu + cỡ chữ địa điểm */
+.hotel-rating .MuiRating-root { transform: translateY(1px); } /* Canh biểu tượng rating */
 
 /* Chips tiện nghi */
 .hotel-amenities { 
-  display: flex; 
-  flex-wrap: wrap; 
-  gap: 8px; 
-  margin-top: 8px;
-  max-height: 60px;
-  overflow: hidden;
+  display: flex;        /* Hàng ngang nhiều chip */
+  flex-wrap: wrap;      /* Cho phép xuống dòng */
+  gap: 8px;             /* Khoảng cách giữa chip */
+  margin-top: 8px;      /* Đệm phía trên các chip */
+  max-height: 60px;     /* Giới hạn chiều cao để gọn */
+  overflow: hidden;     /* Ẩn phần tràn */
 }
 .amenity-chip {
-  background-color: #e3f2fd !important; 
-  border-color: #bbdefb !important;
-  color: #1976d2 !important; 
-  font-size: 0.75rem !important;
-  height: 24px !important;
+  background-color: #e3f2fd !important; /* Nền xanh nhạt */
+  border-color: #bbdefb !important;     /* Viền xanh nhạt */
+  color: #1976d2 !important;            /* Chữ xanh chủ đạo */
+  font-size: 0.75rem !important;        /* Cỡ chữ nhỏ gọn */
+  height: 24px !important;              /* Chiều cao chip */
 }
-.amenity-chip:hover { background: #1976d2 !important; color: #fff !important; }
+.amenity-chip:hover { background: #1976d2 !important; color: #fff !important; } /* Hover đảo màu */
 
-/* Cột phải: Giá + CTA */
+/* Cột phải: Giá + CTA (ĐÃ SỬA ĐỂ KHÔNG CHIẾM CHỖ CỦA INFO) */
 .booking-col {
-  display: flex; 
-  flex-direction: column;
-  justify-content: center;
-  align-items: flex-end;
-  padding-left: 20px;
-  border-left: 1px solid #e2e8f0;
-  width: 200px;
-  height: 100%;
-  gap: 2px;
-  padding-right: 56px;    /* ADDED: chừa đệm bên phải để text giá không bị “dính” mép card */
+  display: flex;                      /* Dùng flex xếp dọc giá + chip + nút */
+  flex-direction: column;             /* Xếp theo cột */
+  justify-content: center;            /* Canh giữa theo chiều dọc */
+  align-items: flex-end;              /* Căn phải nội dung */
+  padding-left: 20px;                 /* Đệm trái để tách khỏi info */
+  border-left: 1px solid #e2e8f0;     /* Đường phân cách dọc giống mẫu */
+  width: auto;                        /* Rộng theo nội dung (không cố định) */
+  min-width: max-content;             /* Bảo đảm không bị bóp nhỏ, ôm vừa nội dung */
+  max-width: 280px;                   /* Giới hạn tối đa để không phình quá lớn */
+  height: 100%;                       /* Cao bằng khối nội dung */
+  gap: 6px;                           /* Khoảng cách giữa các phần tử trong cột giá */
+  padding-right: 12px;                /* Đệm phải nhỏ, tránh “dính” mép */
+  box-sizing: border-box;             /* Tính cả padding vào tổng width */
+  text-align: right;                  /* Canh phải toàn bộ văn bản */
 }
 
 /* Giá */
 .price-section {
-  text-align: right;
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
+  text-align: right;         /* Canh phải giá */
+  display: flex;             /* Dùng flex xếp dọc */
+  flex-direction: column;    /* Xếp theo cột */
+  gap: 4px;                  /* Khoảng cách giữa các dòng giá */
 }
 
 /* Cỡ chữ giá tiền */
 .price-amount {
-  font-weight: 800 !important;
-  font-size: 1.55rem !important;
-  color: #e53e3e !important;
-  background: linear-gradient(135deg, #e53e3e, #fc8181);
-  -webkit-background-clip: text; 
-  -webkit-text-fill-color: transparent;
-  line-height: 1.2 !important;
-  white-space: nowrap; /* ADDED: tránh xuống dòng gây tràn bất thường */
+  font-weight: 800 !important;                 /* Rất đậm cho giá chính */
+  font-size: 1.7rem !important;                /* Giảm nhẹ để cột giá gọn lại */
+  color: #e53e3e !important;                   /* Màu đỏ nổi bật */
+  background: linear-gradient(135deg, #e53e3e, #fc8181); /* Hiệu ứng chuyển sắc trên chữ */
+  -webkit-background-clip: text;               /* Dùng gradient làm màu chữ */
+  -webkit-text-fill-color: transparent;        /* Ẩn fill để lộ gradient */
+  line-height: 1.15 !important;                /* Cao dòng gọn */
+  white-space: nowrap;                          /* Không cho xuống dòng giá */
 }
 
 /* Nút CTA */
 .book-button {
-  background: linear-gradient(135deg, #037c0f 0%, #033011 100%) !important;
-  border-radius: 10px !important;
-  font-weight: 700 !important;
-  text-transform: none !important;
-  padding: 10px 20px !important;
-  box-shadow: 0 6px 20px rgba(0, 36, 10, 0.35) !important;
-  transition: transform .2s ease !important;
-  min-width: 140px;
-  white-space: nowrap;
+  background: linear-gradient(135deg, #037c0f 0%, #033011 100%) !important; /* Nền nút xanh đậm gradient */
+  border-radius: 10px !important;                /* Bo góc nút */
+  font-weight: 700 !important;                   /* Chữ đậm */
+  text-transform: none !important;               /* Giữ nguyên hoa/thường */
+  padding: 10px 20px !important;                 /* Đệm trong nút */
+  box-shadow: 0 6px 20px rgba(0, 36, 10, 0.35) !important; /* Bóng nút */
+  transition: transform .2s ease !important;     /* Hiệu ứng hover */
+  min-width: 140px;                               /* Không nhỏ hơn 140px */
+  white-space: nowrap;                            /* Không xuống dòng */
 }
-.book-button:hover { transform: translateY(-2px); }
-
-/* Responsive */
-@media (max-width: 900px) {
-  .hotel-search-container { padding: 16px; }
-  .hotel-card .hotel-card-grid { flex-direction: column; }
-
-  .hotel-card-list .image-col { 
-    flex: 0 0 auto !important;
-    max-width: none !important;
-    width: 100% !important;
-  }
-  /* CHANGED: khi về mobile, ảnh ở top giữ cao 200px như cũ */
-  .image-wrap { 
-    height: 200px;    /* CHANGED: override cho mobile */
-    min-height: 200px;
-  }
-  .image-wrap .hotel-image { 
-    height: 200px !important; 
-    object-fit: cover;
-  }
-
-  .hotel-content-grid.list { 
-    grid-template-columns: 1fr; 
-    gap: 16px;
-  }
-
-  .booking-col {
-    width: 100%; 
-    flex-direction: row;
-    align-items: center;
-    justify-content: space-between;
-    border-left: none; 
-    border-top: 1px solid #e2e8f0;
-    padding-left: 0; 
-    padding-top: 16px;
-    height: auto;
-  }
-  .price-section { text-align: left; }
-}
+.book-button:hover { transform: translateY(-2px); } /* Hover nhấc nhẹ */
 
 @media (max-width: 600px) {
-  .content-header { padding: 16px !important; }
-  .image-wrap .hotel-image { height: 180px !important; }
-  .price-amount { font-size: 1.55rem !important; }
-  .hotel-name { font-size: 1.1rem !important; }
+  .content-header { padding: 16px !important; }          /* Giảm đệm header trên mobile */
+  .image-wrap .hotel-image { height: 180px !important; } /* Ảnh thấp hơn để gọn */
+  .price-amount { font-size: 1.55rem !important; }       /* Thu nhỏ giá trên mobile */
+  .hotel-name { font-size: 1.1rem !important; }          /* Thu nhỏ tên trên mobile */
 }
 
 /* Skeleton cho ảnh khi loading */
 .MuiSkeleton-root.hotel-image {
-  width: 100%; height: 200px !important; border-radius: 0 !important;
-}
-
-/* ADDED: Ép tỉ lệ 2:10 tại breakpoint md+ (MUI mặc định md = 900px) */
-@media (min-width: 1000px) { /* ADDED: chỉ ép ở lg (>=1200px) để tránh wrap ở md */
-  .sidebar-col {
-    flex: 0 0 16.6667% !important;  /* 2/12 */
-    max-width: 16.6667% !important;
-  }
-  .results-col {
-    flex: 0 0 83.3333% !important;  /* 10/12 */
-    max-width: 83.3333% !important;
-    min-width: 0 !important;        /* ADDED */
-  }
-}
-
-/* ADDED: đảm bảo vùng kết quả không bị nở vì nội dung */
-.search-content { min-width: 0; }
-
-/* ADDED: Tránh nội dung bên trong làm nở rộng vùng kết quả */
-.search-content {
-  min-width: 0; /* ADDED */
-}
-
-/* Nếu có phần tử nào trong sidebar đặt min-width quá lớn, đảm bảo không vượt khung */
-.search-sidebar, 
-.search-sidebar .filter-card {
-  max-width: 100%; /* ADDED: không cho vượt khung 2/12 */
-}
-
-/* (Các rule cho ảnh/giá đã chỉnh ở lần trước) */
-/* Nhắc lại các phần quan trọng để bạn so sánh nhanh: */
-
-/* CHANGED trước đó: .image-wrap cao 100% để ảnh full chiều cao cột trái */
-.image-wrap {
-  position: relative;
-  width: 100%;
-  height: 100%;      /* đảm bảo ảnh giãn theo chiều cao cột */
-  min-height: 200px; /* tối thiểu để thẻ không quá thấp */
-  overflow: hidden;
-}
-.discount-badge { width: 100%; height: 100%; } /* đảm bảo wrapper giãn full */
-
-/* CHANGED trước đó: giá không bị cắt mép phải */
-.booking-col {
-  padding-right: 16px;      /* chừa đệm phải */
-}
-.price-amount {
-  white-space: nowrap;      /* tránh xuống dòng làm tràn */
+  width: 100%; height: 200px !important; border-radius: 0 !important; /* Skeleton ảnh đồng bộ kích thước */
 }
