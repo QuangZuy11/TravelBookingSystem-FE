@@ -8,7 +8,7 @@ import WhyVietTravel from "../../components/layout/WhyVietTravel/WhyVietTravel.j
 function Homepage() {
   return (
     <>
-      {/* <TopBar /> */}
+      <TopBar />
       <Header />
       <HeroSection />
       <TourSearchForm />

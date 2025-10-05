@@ -17,6 +17,8 @@ import EditHotelPage from "./pages/provider/EditHotelPage";
 import RoomFormPage from "./pages/provider/RoomFormPage";
 import BookingManagementPage from "./pages/provider/BookingManagementPage";
 import RoomListPage from "./pages/provider/RoomListPage";
+import HotelPage from "./pages/traveler/HotelPage";
+import HotelListPage from "./pages/traveler/HotelListPage";
 
 function App() {
   return (
@@ -25,6 +27,10 @@ function App() {
         <Routes>
           {/* Trang homepage cho Traveler*/}
           <Route path="/" element={<Homepage />} />
+          {/* Trang Hotel cho Traveler*/}
+          <Route path="/hotel-page" element={<HotelPage />} />
+          {/* Trang List Hotel cho Traveler*/}
+          <Route path="/hotel-list" element={<HotelListPage />} />
 
           {/* Trang login */}
           <Route path="/auth" element={<AuthPage />} />
@@ -35,14 +41,14 @@ function App() {
             <Route element={<DashboardLayout />}>
               <Route index element={<TourDashboard />} />
               <Route path="/provider/bookings" element={<BookingManagementPage />} />
-              
+
               {/* Tour Management */}
               <Route path="tours">
                 <Route index element={<TourDashboard />} />
                 <Route path=":id" element={<TourDetails />} />
                 <Route path="new" element={<TourDetails />} />
               </Route>
-              
+
               {/* Flight Management */}
               <Route path="flights">
                 <Route index element={<FlightDashboard />} />
