@@ -5,7 +5,7 @@
 }
 
 .ai-container {
-  max-width: 1200px;
+  max-width: 1400px;
   margin: 0 auto;
   padding: 0 24px;
 }
@@ -170,6 +170,7 @@
   font-size: 28px;
   font-weight: bold;
   margin-bottom: 8px;
+  margin-top: -18px;
 }
 
 .ai-stats-grid {
