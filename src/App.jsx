@@ -19,6 +19,7 @@ import BookingManagementPage from "./pages/provider/BookingManagementPage";
 import RoomListPage from "./pages/provider/RoomListPage";
 import HotelPage from "./pages/traveler/HotelPage";
 import HotelListPage from "./pages/traveler/HotelListPage";
+import Profile from "./pages/traveler/Profile";
 
 function App() {
   return (
@@ -31,6 +32,9 @@ function App() {
           <Route path="/hotel-page" element={<HotelPage />} />
           {/* Trang List Hotel cho Traveler*/}
           <Route path="/hotel-list" element={<HotelListPage />} />
+
+          {/* Trang List Hotel cho Traveler*/}
+          <Route path="/profile" element={<Profile />} />
 
           {/* Trang login */}
           <Route path="/auth" element={<AuthPage />} />
@@ -71,7 +75,7 @@ function App() {
           </Route>
         </Routes>
       </AuthProvider>
-    </Router>
+    </Router >
   );
 }
 
