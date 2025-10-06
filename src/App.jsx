@@ -37,7 +37,7 @@ function App() {
 
           {/* Provider Routes */}
           <Route path="/provider" element={<ProviderLayout />}>
-            {/* Provider Dashboard Routes */}/provider/bookings
+            {/* Provider Dashboard Routes */}
             <Route element={<DashboardLayout />}>
               <Route index element={<TourDashboard />} />
               <Route path="/provider/bookings" element={<BookingManagementPage />} />
