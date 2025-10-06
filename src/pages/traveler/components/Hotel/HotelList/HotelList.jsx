@@ -212,7 +212,7 @@ function HotelList() {
     return (
         <Box className="hotel-search-container">
             {/* Luôn 1 hàng 3:9 */}
-            <Grid container spacing={3} alignItems="flex-start" wrap="nowrap" columns={12}>
+            <Grid container spacing={2} alignItems="flex-start" wrap="nowrap" columns={12}>
                 {/* Sidebar 3/12 */}
                 <Grid item xs={3}>
                     <Box className="search-sidebar">
