@@ -18,16 +18,12 @@ export const RoomForm = ({ initialData, onSubmit, hotelId }) => {
     const [activeSection, setActiveSection] = useState(null);
 
     useEffect(() => {
-        // Thêm log để kiểm tra dữ liệu truyền vào
-        console.log('RoomForm received props:', { initialData, hotelId });
-        
         if (initialData) {
             const newFormData = {
                 ...formData,
                 ...initialData,
                 hotelId: hotelId || initialData.hotelId
             };
-            console.log('Setting form data to:', newFormData);
             setFormData(newFormData);
         }
     }, [initialData, hotelId]);
