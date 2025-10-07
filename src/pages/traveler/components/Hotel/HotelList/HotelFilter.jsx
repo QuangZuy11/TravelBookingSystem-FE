@@ -21,7 +21,7 @@ import {
 } from '@mui/icons-material';
 import '../HotelList/HotelList.css';
 
-const MAX_PRICE = 49300000;
+const MAX_PRICE = 20000000;
 
 const amenitiesData = [
     { label: 'Bể bơi', value: 'pool', icon: PoolIcon },
@@ -128,7 +128,7 @@ function HotelFilter({
             <Paper className="filter-card" elevation={2}>
                 <CardContent>
                     <Typography variant="h6" className="filter-title">
-                        Đánh giá
+                        Tiêu chuẩn
                     </Typography>
                     <Stack spacing={0.5}>
                         {[5, 4, 3, 2, 1].map((r) => (

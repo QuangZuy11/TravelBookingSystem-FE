@@ -108,7 +108,7 @@ const formatPrice = (price) =>
     new Intl.NumberFormat('vi-VN').format(price) + ' VNĐ';
 
 function HotelResult({
-    priceRange = [0, 49300000],
+    priceRange = [0, 20000000],
     selectedAmenities = [],
     selectedRatings = [],
 }) {
@@ -187,7 +187,7 @@ function HotelResult({
                     alignItems={{ xs: 'flex-start', sm: 'center' }}
                 >
                     <Typography variant="h5" className="results-title">
-                        Kết quả
+                        Vị trí
                         <Typography component="span" color="text.secondary" fontSize="1rem" ml={1}>
                             {total} chỗ nghỉ
                         </Typography>
@@ -310,10 +310,11 @@ function HotelCard({ hotel, isFavorite, onToggleFavorite, onBook }) {
 
                                 <Box display="flex" alignItems="center" gap={1} className="hotel-rating">
                                     <Rating value={hotel.rating} readOnly size="small" precision={0.5} />
-                                    <Typography variant="body2" color="text.secondary">
-                                        {hotel.reviews} lượt book
-                                    </Typography>
+
                                 </Box>
+                                <Typography variant="body2" color="text.secondary">
+                                    {hotel.reviews} lượt book
+                                </Typography>
 
                                 <Box className="hotel-amenities">
                                     {hotel.amenities.map((a) => {
