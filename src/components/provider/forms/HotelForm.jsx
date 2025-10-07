@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import Breadcrumb from '../../shared/Breadcrumb';
 
 export const HotelForm = ({ initialData, onSubmit }) => {
     const [formData, setFormData] = useState({
@@ -282,9 +283,15 @@ export const HotelForm = ({ initialData, onSubmit }) => {
         color: 'white',
         boxShadow: '0 4px 15px rgba(102, 126, 234, 0.4)'
     };
-
+    const breadcrumbItems = [
+        { label: 'Dashboard', path: '/provider' },
+        { label: 'Hotels', path: '/provider/hotels' },
+        { label: 'Add New Hotel' }
+    ];
     return (
         <div style={containerStyle}>
+            <Breadcrumb items={breadcrumbItems} />
+            
             <form onSubmit={handleSubmit} style={formContainerStyle}>
                 <div style={headerStyle}>
                     <h1 style={titleStyle}>
