@@ -3,7 +3,6 @@ import TopBar from "../../components/layout/Topbar/Topbar";
 import Header from "../../components/layout/Header/Header";
 import SearchSection from "./components/Hotel/SearchSection/SearchSection";
 import HotelFilter from "./components/Hotel/HotelList/HotelFilter";
-import { Row, Col } from "react-bootstrap";
 import HotelResult from "./components/Hotel/HotelList/HotelResult";
 import Footer from "../../components/layout/Footer/Footer";
 
@@ -26,13 +25,28 @@ function HotelListPage() {
         setPriceRange([0, 49300000]);
     };
 
+    const containerStyle = {
+        display: 'flex',
+        gap: '20px',
+        padding: '10px'
+    };
+
+    const filterStyle = {
+        flex: '0 0 25%', // Tương đương md={3}
+        minWidth: '250px'
+    };
+
+    const resultStyle = {
+        flex: '1' // Chiếm phần còn lại, tương đương md={9}
+    };
+
     return (
         <>
             <TopBar />
             <Header />
             <SearchSection />
-            <Row style={{ padding: "10px" }}>
-                <Col md={3}>
+            <div style={containerStyle}>
+                <div style={filterStyle}>
                     <HotelFilter
                         priceRange={priceRange}
                         onChangePriceRange={setPriceRange}
@@ -42,15 +56,15 @@ function HotelListPage() {
                         onToggleRating={toggleRating}
                         onClearAll={clearAll}
                     />
-                </Col>
-                <Col md={9}>
+                </div>
+                <div style={resultStyle}>
                     <HotelResult
                         priceRange={priceRange}
                         selectedAmenities={selectedAmenities}
                         selectedRatings={selectedRatings}
                     />
-                </Col>
-            </Row>
+                </div>
+            </div>
             <Footer />
         </>
     );
