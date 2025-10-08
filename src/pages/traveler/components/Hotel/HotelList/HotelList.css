@@ -218,7 +218,7 @@
 /* Cỡ chữ giá tiền */
 .price-amount {
   font-weight: 800 !important;                 /* Rất đậm cho giá chính */
-  font-size: 1.7rem !important;                /* Giảm nhẹ để cột giá gọn lại */
+  font-size: 1.5rem !important;                /* Giảm nhẹ để cột giá gọn lại */
   color: #e53e3e !important;                   /* Màu đỏ nổi bật */
   background: linear-gradient(135deg, #e53e3e, #fc8181); /* Hiệu ứng chuyển sắc trên chữ */
   -webkit-background-clip: text;               /* Dùng gradient làm màu chữ */
@@ -252,3 +252,53 @@
 .MuiSkeleton-root.hotel-image {
   width: 100%; height: 200px !important; border-radius: 0 !important; /* Skeleton ảnh đồng bộ kích thước */
 }
+
+/* Override các kích thước cố định để gọn tổng thể */
+/* Nếu muốn áp dụng có điều kiện, thêm prefix .compact trước các selector */
+/* Ví dụ: .compact .hotel-card .hotel-card-grid { ... } */
+
+.hotel-search-container { padding: 16px; }
+
+/* Sidebar và header */
+.search-sidebar { gap: 16px; }
+.content-header { padding: 14px 16px !important; }
+
+/* Danh sách + card */
+.hotels-list { gap: 12px; }
+.hotel-card .hotel-card-grid { min-height: 180px; }
+.hotel-content { padding: 12px !important; }
+.hotel-content-grid.list { column-gap: 12px; min-height: 180px; }
+
+/* Cột ảnh nhỏ lại (320 -> 260) */
+.hotel-card-list .image-col {
+  flex: 0 0 260px !important;
+  min-width: 260px !important;
+  max-width: 260px !important;
+}
+.image-wrap { min-height: 180px; }
+.favorite-btn { width: 30px; height: 30px; }
+
+/* Bên trái (info) */
+.hotel-info { gap: 6px; }
+.hotel-name { font-size: 1.2rem !important; }
+
+/* Chip tiện nghi nhỏ lại */
+.hotel-amenities { max-height: 48px; gap: 6px; }
+.amenity-chip { font-size: 0.70rem !important; height: 20px !important; }
+
+/* Cột giá + CTA gọn hơn */
+.booking-col {
+  padding-left: 12px;
+  padding-right: 8px;
+  max-width: 220px;
+  gap: 4px;
+}
+.price-amount { font-size: 1.4rem !important; }
+.book-button { padding: 8px 16px !important; min-width: 120px; }
+
+/* Skeleton ảnh khi loading */
+.MuiSkeleton-root.hotel-image { height: 160px !important; }
+
+/* Tùy chọn: Thu nhỏ nhẹ toàn bộ phần Hotel List bằng zoom cục bộ (chỉ Chrome/Edge)
+.hotel-search-container { zoom: 0.9; }
+*/
