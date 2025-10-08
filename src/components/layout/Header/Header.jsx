@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { FaUserCircle } from "react-icons/fa";
 import { Link, useNavigate } from "react-router-dom";
-import "./Header.css";
+import "./Header.module.css";
 import Logo from "../../assets/logo.png";
 import { useAuth } from '../../../contexts/AuthContext';
 

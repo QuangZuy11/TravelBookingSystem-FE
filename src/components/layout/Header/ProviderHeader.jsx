@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
 import { FaUserCircle } from "react-icons/fa";
+import "./ProviderHeader.module.css";
 import { Link, useNavigate } from "react-router-dom";
 import Logo from "../../assets/logo.png";
 import { useAuth } from '../../../contexts/AuthContext';
-import "./ProviderHeader.css";   // ✅ import CSS mới
 
 const ProviderHeader = () => {
   const { user, logout } = useAuth();
