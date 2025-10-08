@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import Breadcrumb from '../../shared/Breadcrumb';
 
 export const HotelForm = ({ initialData, onSubmit }) => {
     const [formData, setFormData] = useState({
@@ -225,7 +224,7 @@ export const HotelForm = ({ initialData, onSubmit }) => {
         ...checkboxLabelStyle,
         background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
         color: 'white',
-        border: '2px solid #667eea'
+        borderColor: '#667eea'
     };
 
     const checkboxStyle = {
@@ -283,15 +282,9 @@ export const HotelForm = ({ initialData, onSubmit }) => {
         color: 'white',
         boxShadow: '0 4px 15px rgba(102, 126, 234, 0.4)'
     };
-    const breadcrumbItems = [
-        { label: 'Dashboard', path: '/provider' },
-        { label: 'Hotels', path: '/provider/hotels' },
-        { label: 'Add New Hotel' }
-    ];
+
     return (
         <div style={containerStyle}>
-            <Breadcrumb items={breadcrumbItems} />
-            
             <form onSubmit={handleSubmit} style={formContainerStyle}>
                 <div style={headerStyle}>
                     <h1 style={titleStyle}>

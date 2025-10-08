@@ -77,7 +77,6 @@ const FlightDashboard = () => {
               <tr>
                 <th>Flight No.</th>
                 <th>Route</th>
-                <th>Trip</th>
                 <th>Departure</th>
                 <th>Arrival</th>
                 <th>Capacity</th>
@@ -86,56 +85,44 @@ const FlightDashboard = () => {
               </tr>
             </thead>
             <tbody>
-              {flightsList.map((flight) => {
-                const totalCapacity = 
-                  flight.capacity.economy.total + 
-                  flight.capacity.business.total + 
-                  flight.capacity.firstClass.total;
-
-                const booked = flight.bookings ? flight.bookings.length : 0;
-                const bookedPercentage = totalCapacity > 0 
-                  ? (booked / totalCapacity) * 100 
-                  : 0;
-
-                return (
-                  <tr key={flight._id}>
-                    <td>{flight.flightNumber}</td>
-                    <td>{flight.departure.city} → {flight.arrival.city}</td>
-                    <td>{flight.departure.airport}</td>
-                    <td>{flight.arrival.airport}</td>
-                    <td>
-                      <div className="capacity-info">
-                        <div className="capacity-bar">
-                          <div 
-                            className="capacity-fill"
-                            style={{width: `${bookedPercentage}%`}}
-                          ></div>
-                        </div>
-                        <span>{booked}/{totalCapacity}</span>
+              {flightsList.map((flight) => (
+                <tr key={flight.id}>
+                  <td>{flight.flightNumber}</td>
+                  <td>{flight.route}</td>
+                  <td>{flight.departure}</td>
+                  <td>{flight.arrival}</td>
+                  <td>
+                    <div className="capacity-info">
+                      <div className="capacity-bar">
+                        <div 
+                          className="capacity-fill"
+                          style={{width: `${(flight.booked/flight.capacity)*100}%`}}
+                        ></div>
                       </div>
-                    </td>
-                    <td>
-                      <span className={`status-badge ${getStatusClass(flight.status)}`}>
-                        {flight.status}
-                      </span>
-                    </td>
-                    <td>
-                      <button 
-                        className="table-action edit"
-                        onClick={() => navigate(`/provider/flights/${flight._id}`)}
-                      >
-                        Edit
-                      </button>
-                      <button 
-                        className="table-action view"
-                        onClick={() => navigate(`/provider/flights/${flight._id}`)}
-                      >
-                        View Details
-                      </button>
-                    </td>
-                  </tr>
-                );
-              })}
+                      <span>{flight.booked}/{flight.capacity}</span>
+                    </div>
+                  </td>
+                  <td>
+                    <span className={`status-badge ${getStatusClass(flight.status)}`}>
+                      {flight.status}
+                    </span>
+                  </td>
+                  <td>
+                    <button 
+                      className="table-action edit"
+                      onClick={() => navigate(`/provider/flights/${flight.id}`)}
+                    >
+                      Edit
+                    </button>
+                    <button 
+                      className="table-action view"
+                      onClick={() => navigate(`/provider/flights/${flight.id}`)}
+                    >
+                      View Details
+                    </button>
+                  </td>
+                </tr>
+              ))}
             </tbody>
           </table>
         </div>
