@@ -12,8 +12,8 @@ function Homepage() {
       <TopBar />
       <Header />
       <HeroSection />
-      <TourSearchForm />
       <FeaturedTours />
+      <TourSearchForm />
       <AITitle />
       <WhyVietTravel />
       <Footer />

@@ -13,10 +13,10 @@ function Homepage() {
       <Header />
       <HeroSection />
       <TourSearchForm />
-      <FeaturedTours />
       <AITitle />
       <WhyVietTravel />
       <Footer />
+
     </>
   );
 }

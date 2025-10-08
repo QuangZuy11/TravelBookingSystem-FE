@@ -12,11 +12,12 @@ function Homepage() {
       <TopBar />
       <Header />
       <HeroSection />
+      ,
       <TourSearchForm />
-      <FeaturedTours />
       <AITitle />
       <WhyVietTravel />
       <Footer />
+
     </>
   );
 }

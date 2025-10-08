@@ -1,0 +1,214 @@
+.featured-section {
+  padding: 4rem 0;
+  background: var(--background, #f9fafb);
+  margin: 0;
+}
+
+.featured-container {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 0;
+}
+
+.featured-header {
+  text-align: center;
+  margin-bottom: 3rem;
+}
+
+.featured-header h2 {
+  font-size: 2rem;
+  font-weight: bold;
+}
+
+.featured-header p {
+  color: #666;
+  font-size: 1rem;
+}
+
+.tour-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 1.5rem;
+}
+
+.tour-card {
+  background: white;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  transition: all 0.3s;
+}
+
+.tour-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.tour-image-wrapper {
+  position: relative;
+}
+
+.tour-image {
+  width: 100%;
+  height: 200px;
+  object-fit: cover;
+  transition: transform 0.3s;
+}
+
+.tour-card:hover .tour-image {
+  transform: scale(1.05);
+}
+
+.badge-discount {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  background: #ef4444;
+  color: white;
+  font-size: 0.875rem;
+  padding: 4px 8px;
+  border-radius: 6px;
+}
+
+.badge-tag {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  background: #f1f5f9;
+  padding: 4px 8px;
+  border-radius: 6px;
+  font-size: 0.875rem;
+}
+
+.btn-heart {
+  position: absolute;
+  bottom: 12px;
+  right: 12px;
+  background: rgba(255, 255, 255, 0.85);
+  border: none;
+  border-radius: 50%;
+  padding: 6px;
+  cursor: pointer;
+}
+
+.icon-heart {
+  color: #ef4444;
+  width: 18px;
+  height: 18px;
+}
+
+.tour-content {
+  padding: 1rem 1.25rem;
+  margin-top: -26px;
+}
+
+.tour-content h3 {
+  color: #000000;
+  font-size: 1.1rem;
+  font-weight: 600;
+  margin-bottom: 0.25rem;
+}
+
+.tour-location {
+  display: flex;
+  align-items: center;
+  color: #000000;
+  font-size: 0.9rem;
+}
+
+.icon-small {
+  width: 16px;
+  height: 16px;
+  margin-right: 4px;
+}
+
+.tour-info {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 0.5rem;
+  font-size: 0.9rem;
+}
+
+.icon-star {
+  color: gold;
+  width: 16px;
+  height: 16px;
+  margin-right: 4px;
+}
+
+.tour-highlights {
+  list-style: none;
+  padding-left: 0;
+  margin: 0.75rem 0;
+  color: #000000;
+  font-size: 0.9rem;
+  list-style-type: disc;
+  padding-left: 20px;
+  list-style-position: outside;
+}
+
+.tour-highlights li {
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 8px;
+  display: list-item;
+}
+
+.tour-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-top: 1px solid #eee;
+  padding-top: 0.75rem;
+}
+
+.price-current {
+  color: #007b7f;
+  font-weight: bold;
+  font-size: 1.25rem;
+}
+
+.price-old {
+  text-decoration: line-through;
+  color: #999;
+  font-size: 0.9rem;
+  margin-left: 8px;
+}
+
+.price-note {
+  font-size: 0.75rem;
+  color: #777;
+}
+
+.btn-book {
+  background: #002f2f;
+  color: white;
+  padding: 6px 14px;
+  border-radius: 6px;
+  text-decoration: none;
+  transition: 0.3s;
+}
+
+.btn-book:hover {
+  background: #007b7f;
+  color: white;
+}
+
+.btn-outline {
+  background: #002f2f;
+  color: #ffffff;
+  padding: 10px 24px;
+  border-radius: 8px;
+  text-decoration: none;
+  transition: 0.3s;
+}
+
+.btn-outline:hover {
+  background: #007b7f;
+  color: rgb(251, 250, 250);
+}
+
+.btn-all {
+  text-align: center;
+  margin-top: 2rem;
+}
