@@ -19,7 +19,8 @@ import BookingManagementPage from "./pages/provider/BookingManagementPage";
 import RoomListPage from "./pages/provider/RoomListPage";
 import HotelPage from "./pages/traveler/HotelPage";
 import HotelListPage from "./pages/traveler/HotelListPage";
-import Profile from "./pages/traveler/Profile";
+// import Profile from "./pages/traveler/Profile";
+import Profile from "./pages/traveler/components/Hotel/Traverler/Profile";
 
 function App() {
   return (
