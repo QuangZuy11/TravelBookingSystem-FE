@@ -101,6 +101,7 @@ const HotelDashboard = () => {
     background: 'white',
     borderRadius: '20px',
     padding: '2rem',
+    height: '200px',
     boxShadow: '0 10px 30px rgba(0,0,0,0.15)',
     transition: 'all 0.3s ease',
     cursor: 'pointer',

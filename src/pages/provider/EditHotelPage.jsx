@@ -58,27 +58,6 @@ const EditHotelPage = () => {
                 maxWidth: '1200px',
                 margin: '0 auto'
             }}>
-                <button
-                    onClick={() => navigate(`/provider/hotels/${hotelId}`)}
-                    style={{
-                        marginBottom: '2rem',
-                        padding: '0.75rem 1.5rem',
-                        background: 'white',
-                        border: 'none',
-                        borderRadius: '12px',
-                        fontSize: '1rem',
-                        fontWeight: '600',
-                        color: '#667eea',
-                        cursor: 'pointer',
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: '0.5rem',
-                        boxShadow: '0 4px 15px rgba(0,0,0,0.1)'
-                    }}
-                >
-                    ← Back to Hotel Details
-                </button>
-
                 {hotel && (
                     <HotelForm
                         initialData={hotel}

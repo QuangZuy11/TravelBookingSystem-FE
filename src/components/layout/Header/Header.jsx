@@ -108,6 +108,9 @@ const Header = () => {
                   <FaSuitcase className="dropdown-icon" />
                   <span>Tour Đã Đặt</span>
                 </a>
+                {user.role === 'ServiceProvider' && (
+                  <a href="/provider/hotels" className="dropdown-item">Quản lý dịch vụ</a>
+                )}
                 <div className="dropdown-divider"></div>
                 <button onClick={handleLogout} className="dropdown-item logout">
                   <FaSignOutAlt className="dropdown-icon" />
