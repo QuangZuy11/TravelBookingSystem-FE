@@ -5,7 +5,6 @@ import TourSearchForm from "../../components/layout/TourSearchForm/TourSearchFor
 import Footer from "../../components/layout/Footer/Footer.jsx";
 import AITitle from "../../components/layout/AITitle/AITitle.jsx";
 import WhyVietTravel from "../../components/layout/WhyVietTravel/WhyVietTravel.jsx";
-import FeaturedTours from "../../components/layout/FeaturedTours/FeaturedTours.jsx";
 function Homepage() {
   return (
     <>
@@ -13,7 +12,6 @@ function Homepage() {
       <Header />
       <HeroSection />
       <TourSearchForm />
-      <FeaturedTours />
       <AITitle />
       <WhyVietTravel />
       <Footer />

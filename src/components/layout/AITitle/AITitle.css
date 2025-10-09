@@ -5,7 +5,7 @@
 }
 
 .ai-container {
-  max-width: 1400px;
+  max-width: 1200px;
   margin: 0 auto;
   padding: 0 24px;
 }
@@ -136,19 +136,19 @@
 }
 
 .ai-btn {
-  padding: 0.5rem 1rem;
-  background-color: #002f2f;
-  color: white;
-  font-weight: 600;
-  border-radius: 0.5rem;
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1),
-    0 2px 4px -1px rgba(0, 0, 0, 0.06);
-  text-decoration: none;
-  transition: background-color 0.3s ease;
+  width: 100%;
+  padding: 10px 16px;
+  border: 1px solid #007b7f;
+  border-radius: 8px;
+  background: transparent;
+  color: #007b7f;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s;
 }
 
 .ai-btn:hover {
-  background-color: #0f766e;
+  background: #007b7f;
   color: white;
 }
 
@@ -170,7 +170,6 @@
   font-size: 28px;
   font-weight: bold;
   margin-bottom: 8px;
-  margin-top: -18px;
 }
 
 .ai-stats-grid {
