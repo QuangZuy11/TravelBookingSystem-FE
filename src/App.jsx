@@ -19,31 +19,26 @@ import BookingManagementPage from "./pages/provider/BookingManagementPage";
 import RoomListPage from "./pages/provider/RoomListPage";
 import HotelPage from "./pages/traveler/HotelPage";
 import HotelListPage from "./pages/traveler/HotelListPage";
-import Profile from "./pages/common/Profile";
+// import Profile from "./pages/traveler/Profile";
+import Profile from "./pages/traveler/components/Hotel/Traverler/Profile";
 
 function App() {
   return (
     <Router>
       <AuthProvider>
         <Routes>
-          {/*Route Common*/}
+          {/* Trang homepage cho Traveler*/}
+          <Route path="/" element={<Homepage />} />
+          {/* Trang Hotel cho Traveler*/}
+          <Route path="/hotel-page" element={<HotelPage />} />
+          {/* Trang List Hotel cho Traveler*/}
+          <Route path="/hotel-list" element={<HotelListPage />} />
+
+          {/* Trang List Hotel cho Traveler*/}
+          <Route path="/profile" element={<Profile />} />
 
           {/* Trang login */}
           <Route path="/auth" element={<AuthPage />} />
-          {/* Trang homepage */}
-          <Route path="/" element={<Homepage />} />
-          {/* Trang Profile*/}
-          <Route path="/profile" element={<Profile />} />
-
-
-          {/* Route Traveler*/}
-
-          {/* Trang Hotel */}
-          <Route path="/hotel-page" element={<HotelPage />} />
-          {/* Trang List Hotel */}
-          <Route path="/hotel-list" element={<HotelListPage />} />
-
-
 
           {/* Provider Routes */}
           <Route path="/provider" element={<ProviderLayout />}>
