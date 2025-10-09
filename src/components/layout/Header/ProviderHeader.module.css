@@ -1,0 +1,99 @@
+/* ProviderHeader.css */
+.header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 99%;
+  height: 70px;
+  background-color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 20px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  z-index: 1000;
+}
+
+.headerLogo {
+  display: flex;
+  align-items: center;
+}
+
+.headerLogo img {
+  height: 40px;
+  margin-right: 10px;
+}
+
+.headerLogo span {
+  font-size: 20px;
+  font-weight: bold;
+  color: #0a3d62;
+}
+
+.headerNav {
+  display: flex;
+  gap: 20px;
+}
+
+.headerNav a {
+  text-decoration: none;
+  color: #0a3d62;
+  transition: color 0.2s;
+}
+
+.headerNav a:hover {
+  color: #2980b9;
+}
+
+.headerAuth {
+  display: flex;
+  align-items: center;
+}
+
+.headerUserInfo {
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  position: relative;
+}
+
+.loginIcon {
+  font-size: 24px;
+  margin-right: 5px;
+}
+
+.dropdownMenu {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  margin-top: 10px;
+  background-color: #fff;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  min-width: 150px;
+  z-index: 1000;
+}
+
+.dropdownItem {
+  display: block;
+  padding: 10px;
+  text-decoration: none;
+  color: #333;
+  transition: background-color 0.2s;
+}
+
+.dropdownItem:hover {
+  background-color: #f2f2f2;
+}
+
+.headerLoginLink {
+  text-decoration: none;
+  color: inherit;
+}
+
+.headerLogin {
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+}
