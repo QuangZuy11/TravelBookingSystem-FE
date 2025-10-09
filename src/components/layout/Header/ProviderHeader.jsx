@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { FaUserCircle } from "react-icons/fa";
-import "./ProviderHeader.module.css";
+import styles from "./ProviderHeader.module.css";
 import { Link, useNavigate } from "react-router-dom";
 import Logo from "../../assets/logo.png";
 import { useAuth } from '../../../contexts/AuthContext';
@@ -17,13 +17,13 @@ const ProviderHeader = () => {
   };
 
   return (
-    <header className="header">
-      <div className="header-logo">
+    <header className={styles.header}>
+      <div className={styles.headerLogo}>
         <img src={Logo} alt="VietTravel Logo" />
         <span>VietTravel</span>
       </div>
 
-      <nav className="header-nav">
+      <nav className={styles.headerNav}>
         <a href="/">Trang Chủ</a>
         <a href="/tour">Tour Du Lịch</a>
         <a href="/hotel-page">Khách Sạn</a>
@@ -31,25 +31,25 @@ const ProviderHeader = () => {
         <a href="/contact">Liên Hệ</a>
       </nav>
 
-      <div className="header-auth">
+      <div className={styles.headerAuth}>
         {user ? (
-          <div className="header-user-info" onClick={() => setDropdownVisible(!dropdownVisible)}>
-            <FaUserCircle className="login-icon" />
+          <div className={styles.headerUserInfo} onClick={() => setDropdownVisible(!dropdownVisible)}>
+            <FaUserCircle className={styles.loginIcon} />
             <span>{user.name}</span>
             {dropdownVisible && (
-              <div className="dropdown-menu">
-                <Link to="/profile" className="dropdown-item">Profile</Link>
+              <div className={styles.dropdownMenu}>
+                <Link to="/profile" className={styles.dropdownItem}>Profile</Link>
                 {user.role === 'ServiceProvider' && (
-                  <Link to="/provider/hotels" className="dropdown-item">Quản lý dịch vụ</Link>
+                  <Link to="/provider/hotels" className={styles.dropdownItem}>Quản lý dịch vụ</Link>
                 )}
-                <button onClick={handleLogout} className="dropdown-item">Đăng xuất</button>
+                <button onClick={handleLogout} className={styles.dropdownItem}>Đăng xuất</button>
               </div>
             )}
           </div>
         ) : (
-          <Link to="/auth" className="header-login-link">
-            <div className="header-login">
-              <FaUserCircle className="login-icon" />
+          <Link to="/auth" className={styles.headerLoginLink}>
+            <div className={styles.headerLogin}>
+              <FaUserCircle className={styles.loginIcon} />
               <span>Đăng Nhập</span>
             </div>
           </Link>

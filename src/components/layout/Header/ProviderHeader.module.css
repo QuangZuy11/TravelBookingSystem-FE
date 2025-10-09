@@ -14,55 +14,55 @@
   z-index: 1000;
 }
 
-.header-logo {
+.headerLogo {
   display: flex;
   align-items: center;
 }
 
-.header-logo img {
+.headerLogo img {
   height: 40px;
   margin-right: 10px;
 }
 
-.header-logo span {
+.headerLogo span {
   font-size: 20px;
   font-weight: bold;
   color: #0a3d62;
 }
 
-.header-nav {
+.headerNav {
   display: flex;
   gap: 20px;
 }
 
-.header-nav a {
+.headerNav a {
   text-decoration: none;
   color: #0a3d62;
   transition: color 0.2s;
 }
 
-.header-nav a:hover {
+.headerNav a:hover {
   color: #2980b9;
 }
 
-.header-auth {
+.headerAuth {
   display: flex;
   align-items: center;
 }
 
-.header-user-info {
+.headerUserInfo {
   display: flex;
   align-items: center;
   cursor: pointer;
   position: relative;
 }
 
-.login-icon {
+.loginIcon {
   font-size: 24px;
   margin-right: 5px;
 }
 
-.dropdown-menu {
+.dropdownMenu {
   position: absolute;
   top: 100%;
   right: 0;
@@ -75,7 +75,7 @@
   z-index: 1000;
 }
 
-.dropdown-item {
+.dropdownItem {
   display: block;
   padding: 10px;
   text-decoration: none;
@@ -83,6 +83,17 @@
   transition: background-color 0.2s;
 }
 
-.dropdown-item:hover {
+.dropdownItem:hover {
   background-color: #f2f2f2;
+}
+
+.headerLoginLink {
+  text-decoration: none;
+  color: inherit;
+}
+
+.headerLogin {
+  display: flex;
+  align-items: center;
+  cursor: pointer;
 }
