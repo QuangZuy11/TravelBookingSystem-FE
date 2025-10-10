@@ -20,6 +20,8 @@ import {
     FitnessCenter as GymIcon,
     Wifi as WifiIcon,
     RestartAlt as RestartAltIcon,
+    Liquor as BarIcon,
+    DirectionsCar as ParkingIcon
 } from '@mui/icons-material';
 import '../HotelList/HotelList.css';
 
@@ -29,6 +31,8 @@ const AMENITY_ICON_MAP = {
     spa: SpaIcon,
     gym: GymIcon,
     wifi: WifiIcon,
+    bar: BarIcon,
+    parking: ParkingIcon,
 };
 
 const AMENITY_LABEL_MAP = {
@@ -36,6 +40,8 @@ const AMENITY_LABEL_MAP = {
     spa: 'Spa',
     gym: 'Phòng Gym',
     wifi: 'Wifi',
+    bar: 'Quầy Bar',
+    parking: 'Chỗ Đậu Xe',
 };
 
 // Cố định khoảng giá filter: 300.000 - 10.000.000

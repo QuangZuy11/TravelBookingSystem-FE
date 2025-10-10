@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState, useEffect as ReactUseEffect } from 'react';
 import {
     Box,
     Card,
@@ -33,7 +33,10 @@ import {
     VerifiedUser as ShieldIcon,
     Star as StarIcon,
     Liquor as BarIcon,
-    BookmarkAdded
+    BookmarkAdded,
+    Hotel as BedIcon, // dùng cho badge phòng trống
+    SearchOff, // NEW: empty state icon
+    DirectionsCar as ParkingIcon
 } from '@mui/icons-material';
 import '../../Hotel/HotelList/HotelList.css';
 
@@ -43,6 +46,7 @@ const amenitiesData = [
     { label: 'Phòng Gym', value: 'gym', icon: GymIcon },
     { label: 'Wifi', value: 'wifi', icon: WifiIcon },
     { label: 'Quầy bar', value: 'bar', icon: BarIcon },
+    { label: 'Chỗ đậu xe', value: 'parking', icon: ParkingIcon },
 ];
 
 const amenityIconMap = {
@@ -51,12 +55,15 @@ const amenityIconMap = {
     gym: GymIcon,
     wifi: WifiIcon,
     bar: BarIcon,
+    parking: ParkingIcon,
 };
 
 const formatPrice = (price) =>
     new Intl.NumberFormat('vi-VN').format(price) + ' VNĐ';
 
 function HotelResult({
+    // NEW: nhận tham số search từ parent (SearchSection)
+    searchParams,
     priceRange = [0, 20000000],
     selectedAmenities = [],
     selectedRatings = [], // FE "rating" = số sao, map từ BE.category
@@ -74,14 +81,14 @@ function HotelResult({
         const locationParts = [
             h?.address?.city,
             h?.address?.state,
-
         ].filter(Boolean);
         const stars = (() => {
             const raw = String(h?.category || '').trim(); // '3_star'
             const n = Number(raw.split('_')[0]);
             return Number.isFinite(n) ? n : 0;
         })();
-        return {
+
+        const normalized = {
             id: h._id,
             name: h.name || 'Khách sạn',
             location: locationParts.join(', ') || '—',
@@ -93,31 +100,103 @@ function HotelResult({
             image: Array.isArray(h.images) && h.images[0]
                 ? h.images[0]
                 : 'https://images.unsplash.com/photo-1566073771259-6a8506099945?w=1200&h=800&fit=crop',
-            amenities: Array.isArray(h.amenities) ? h.amenities : [],
+            amenities: Array.isArray(h.amenities) ? h.amenities.map(a => String(a).toLowerCase()) : [],
+            availableRooms: h?.availableRooms != null ? Number(h.availableRooms) : 0, // map số phòng trống
         };
+
+        // DEBUG: log từng khách sạn sau normalize
+        // Lưu ý: có thể comment console này sau khi kiểm tra xong
+        console.log('Normalized hotel:', {
+            id: normalized.id,
+            name: normalized.name,
+            availableRooms_raw: h?.availableRooms,
+            availableRooms: normalized.availableRooms
+        });
+
+        return normalized;
     };
 
-    // Fetch tất cả khách sạn từ BE (limit lớn để hiển thị hết)
+    // NEW: Gọi API theo search + filter + sort (giữ nguyên các phần còn lại)
     useEffect(() => {
         let aborted = false;
-        async function fetchAllHotels() {
+
+        async function fetchHotels() {
             try {
                 setLoading(true);
                 setError(null);
-                const qs = new URLSearchParams({
-                    page: '1',
-                    limit: '1000',
-                    sortBy: 'newest',
-                    sortOrder: 'desc',
-                });
-                const res = await fetch(`http://localhost:3000/api/traveler/hotels/search?${qs.toString()}`);
+
+                const params = new URLSearchParams();
+
+                // Search params
+                if (searchParams?.location) params.set('location', searchParams.location.trim());
+                if (searchParams?.checkIn) params.set('checkIn', searchParams.checkIn);
+                if (searchParams?.checkOut) params.set('checkOut', searchParams.checkOut);
+                if (searchParams?.rooms) params.set('rooms', String(searchParams.rooms));
+                const guests = (searchParams?.adults || 0) + (searchParams?.children || 0);
+                if (guests) params.set('guests', String(guests));
+
+                // Filter params
+                if (Array.isArray(priceRange) && priceRange.length === 2) {
+                    params.set('priceMin', String(priceRange[0]));
+                    params.set('priceMax', String(priceRange[1]));
+                }
+                if (selectedAmenities.length) {
+                    // đảm bảo amenity là lower-case
+                    params.set('amenities', selectedAmenities.map(a => String(a).toLowerCase()).join(','));
+                }
+                if (selectedRatings.length) {
+                    params.set('category', selectedRatings.map(n => `${n}_star`).join(','));
+                }
+
+                // Sort mapping
+                switch (sortBy) {
+                    case 'priceAsc':
+                        params.set('sortBy', 'price');
+                        params.set('sortOrder', 'asc');
+                        break;
+                    case 'priceDesc':
+                        params.set('sortBy', 'price');
+                        params.set('sortOrder', 'desc');
+                        break;
+                    case 'popular':
+                        params.set('sortBy', 'popularity');
+                        params.set('sortOrder', 'desc');
+                        break;
+                    default:
+                        params.set('sortBy', 'rating');
+                        params.set('sortOrder', 'desc');
+                }
+
+                // Tải "gần như tất cả", phân trang cục bộ giữ nguyên
+                params.set('page', '1');
+                params.set('limit', '1000');
+
+                const url = `http://localhost:3000/api/traveler/hotels/search?${params.toString()}`;
+                console.log('Search URL:', url);
+
+                const res = await fetch(url);
                 if (!res.ok) throw new Error(`HTTP ${res.status}`);
                 const json = await res.json();
+
+                // DEBUG: log raw từ API
+                console.log('API hotels (raw):', (json?.data?.hotels || []).map(h => ({
+                    id: h._id,
+                    name: h.name,
+                    availableRooms: h.availableRooms
+                })));
+
                 const rawHotels = json?.data?.hotels || [];
                 const normalized = rawHotels.map(normalizeHotel);
+
                 if (!aborted) {
                     setHotels(normalized);
                     setPage(1);
+                    // DEBUG: sau set state
+                    console.log('Hotels state set:', normalized.map(h => ({
+                        id: h.id,
+                        name: h.name,
+                        availableRooms: h.availableRooms
+                    })));
                 }
             } catch (e) {
                 if (!aborted) setError(e.message || 'Lỗi tải danh sách khách sạn');
@@ -125,9 +204,11 @@ function HotelResult({
                 if (!aborted) setLoading(false);
             }
         }
-        fetchAllHotels();
+
+        fetchHotels();
         return () => { aborted = true; };
-    }, []);
+        // Gọi lại khi search/filter/sort thay đổi
+    }, [searchParams, priceRange, selectedAmenities, selectedRatings, sortBy]);
 
     // Lọc cục bộ theo price, amenities, "rating" (số sao)
     const filtered = useMemo(() => {
@@ -154,10 +235,6 @@ function HotelResult({
             case 'priceDesc':
                 arr.sort((a, b) => b.price - a.price);
                 break;
-            // case 'rating':
-            //     // "Nhiều lượt book" = nhiều sao hơn trước
-            //     arr.sort((a, b) => b.reviews - a.rating);
-            //     break;
             default:
                 // "Phổ biến" = nhiều lượt book hơn
                 arr.sort((a, b) => b.reviews - a.reviews);
@@ -194,8 +271,8 @@ function HotelResult({
                     justifyContent="space-between"
                     alignItems={{ xs: 'flex-start', sm: 'center' }}
                 >
-                    <Typography variant="h5" className="results-title">
-                        Vị trí
+                    <Typography variant="h6" className="results-title">
+                        Đã tìm thấy
                         <Typography component="span" color="text.secondary" fontSize="1rem" ml={1}>
                             {loading ? 'Đang tải...' : `${total} chỗ nghỉ`}
                         </Typography>
@@ -215,7 +292,6 @@ function HotelResult({
                                 <MenuItem value="popular">Phổ biến</MenuItem>
                                 <MenuItem value="priceAsc">Giá thấp đến cao</MenuItem>
                                 <MenuItem value="priceDesc">Giá cao đến thấp</MenuItem>
-
                             </Select>
                         </FormControl>
                     </Stack>
@@ -228,45 +304,62 @@ function HotelResult({
                 </Box>
             )}
 
-            <Box className="hotels-list list">
-                {loading
-                    ? Array.from({ length: 3 }).map((_, i) => (
-                        <Card key={`sk-${i}`} className="hotel-card hotel-card-list" elevation={2}>
-                            <Grid container spacing={0}>
-                                <Grid item xs={12} sm={4}>
-                                    <Skeleton variant="rectangular" className="hotel-image" />
-                                </Grid>
-                                <Grid item xs={12} sm={8}>
-                                    <CardContent>
-                                        <Skeleton width="60%" />
-                                        <Skeleton width="40%" />
-                                        <Skeleton width="80%" />
-                                        <Skeleton width="50%" />
-                                    </CardContent>
-                                </Grid>
-                            </Grid>
-                        </Card>
-                    ))
-                    : paginated.map((hotel) => (
-                        <HotelCard
-                            key={hotel.id}
-                            hotel={hotel}
-                            isFavorite={favorites.has(hotel.id)}
-                            onToggleFavorite={() => toggleFavorite(hotel.id)}
-                            onBook={() => handleBook(hotel)}
-                        />
-                    ))}
-            </Box>
+            {/* NEW: Hiển thị khi không có kết quả */}
+            {!loading && total === 0 ? (
+                <Paper elevation={0} sx={{ p: 4, textAlign: 'center' }}>
+                    <Stack alignItems="center" spacing={1}>
+                        <SearchOff sx={{ fontSize: 56, color: 'text.disabled' }} />
+                        <Typography variant="h6" sx={{ fontWeight: 700 }}>
+                            Không tìm thấy chỗ nghỉ phù hợp
+                        </Typography>
+                        <Typography variant="body2" color="text.secondary">
+                            Hãy thử thay đổi bộ lọc, điều chỉnh khoảng giá, hoặc chọn địa điểm/ngày khác.
+                        </Typography>
+                    </Stack>
+                </Paper>
+            ) : (
+                <>
+                    <Box className="hotels-list list">
+                        {loading
+                            ? Array.from({ length: 3 }).map((_, i) => (
+                                <Card key={`sk-${i}`} className="hotel-card hotel-card-list" elevation={2}>
+                                    <Grid container spacing={0}>
+                                        <Grid item xs={12} sm={4}>
+                                            <Skeleton variant="rectangular" className="hotel-image" />
+                                        </Grid>
+                                        <Grid item xs={12} sm={8}>
+                                            <CardContent>
+                                                <Skeleton width="60%" />
+                                                <Skeleton width="40%" />
+                                                <Skeleton width="80%" />
+                                                <Skeleton width="50%" />
+                                            </CardContent>
+                                        </Grid>
+                                    </Grid>
+                                </Card>
+                            ))
+                            : paginated.map((hotel) => (
+                                <HotelCard
+                                    key={hotel.id}
+                                    hotel={hotel}
+                                    isFavorite={favorites.has(hotel.id)}
+                                    onToggleFavorite={() => toggleFavorite(hotel.id)}
+                                    onBook={() => handleBook(hotel)}
+                                />
+                            ))}
+                    </Box>
 
-            {!loading && totalPages > 1 && (
-                <Stack alignItems="center" mt={2}>
-                    <Pagination
-                        color="primary"
-                        count={totalPages}
-                        page={page}
-                        onChange={(_, p) => setPage(p)}
-                    />
-                </Stack>
+                    {!loading && totalPages > 1 && (
+                        <Stack alignItems="center" mt={2}>
+                            <Pagination
+                                color="primary"
+                                count={totalPages}
+                                page={page}
+                                onChange={(_, p) => setPage(p)}
+                            />
+                        </Stack>
+                    )}
+                </>
             )}
         </Box>
     );
@@ -275,6 +368,22 @@ function HotelResult({
 function HotelCard({ hotel, isFavorite, onToggleFavorite, onBook }) {
     const discountPrice =
         hotel.discount > 0 ? Math.round(hotel.price * (1 - hotel.discount / 100)) : hotel.price;
+
+    // DEBUG: Log khi hotel/availableRooms thay đổi
+    ReactUseEffect(() => {
+        console.log('HotelCard render:', { id: hotel?.id, name: hotel?.name, availableRooms: hotel?.availableRooms });
+    }, [hotel?.id, hotel?.name, hotel?.availableRooms]);
+
+    // Trạng thái số phòng trống (đẹp + chuyên nghiệp)
+    const rooms = Number(hotel?.availableRooms) || 0;
+    const isNone = rooms <= 0;
+    const isLow = rooms > 0 && rooms <= 3;
+    const availabilityText = isNone
+        ? 'Tạm hết phòng'
+        : isLow
+            ? `Chỉ còn ${rooms} phòng`
+            : `Còn ${rooms} phòng trống`;
+    const availabilityClass = isNone ? 'error' : isLow ? 'warning' : 'success';
 
     return (
         <Card className="hotel-card hotel-card-list" elevation={2}>
@@ -324,7 +433,6 @@ function HotelCard({ hotel, isFavorite, onToggleFavorite, onBook }) {
 
                                 <Box display="flex" alignItems="center" gap={1} className="hotel-rating">
                                     <Rating value={hotel.rating} readOnly size="small" precision={1} />
-
                                 </Box>
 
                                 <Typography variant="body2" color="text.secondary">
@@ -378,6 +486,13 @@ function HotelCard({ hotel, isFavorite, onToggleFavorite, onBook }) {
                                     <Typography variant="caption" color="text.secondary">
                                         /đêm
                                     </Typography>
+                                </Box>
+
+                                {/* Availability pill (đẹp + chuyên nghiệp) */}
+                                <Box className={`availability-pill ${availabilityClass}`}>
+                                    <span className="dot" />
+
+                                    <span className="text">{availabilityText}</span>
                                 </Box>
 
                                 <Stack direction="row" spacing={1} alignItems="center">

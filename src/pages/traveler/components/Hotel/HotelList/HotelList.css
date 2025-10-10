@@ -158,7 +158,7 @@
 /* Tên khách sạn */
 .hotel-name {
   font-weight: 700 !important;  /* Đậm tên */
-  color: #1976d2 !important;    /* Màu chủ đạo */
+  color: #02593e !important;    /* Màu chủ đạo */
   margin-bottom: 4px !important;/* Đệm dưới nhỏ */
   line-height: 1.3 !important;  /* Chiều cao dòng */
   display: -webkit-box;         /* Hỗ trợ clamp dòng */
@@ -183,7 +183,7 @@
 .amenity-chip {
   background-color: #e3f2fd !important; /* Nền xanh nhạt */
   border-color: #bbdefb !important;     /* Viền xanh nhạt */
-  color: #1976d2 !important;            /* Chữ xanh chủ đạo */
+  color: #056b36 !important;            /* Chữ xanh chủ đạo */
   font-size: 0.75rem !important;        /* Cỡ chữ nhỏ gọn */
   height: 24px !important;              /* Chiều cao chip */
 }
@@ -299,6 +299,110 @@
 /* Skeleton ảnh khi loading */
 .MuiSkeleton-root.hotel-image { height: 160px !important; }
 
-/* Tùy chọn: Thu nhỏ nhẹ toàn bộ phần Hotel List bằng zoom cục bộ (chỉ Chrome/Edge)
-.hotel-search-container { zoom: 0.9; }
-*/
+/* ===== Availability Pill (Professional) ===== */
+/* Base */
+.availability-pill {
+  --pill-bg: #f1f5f9;           /* default bg */
+  --pill-fg: #0f172a;           /* default text */
+  --pill-border: #e2e8f0;       /* default border */
+  --pill-shadow: 0 8px 18px rgba(2, 6, 23, 0.08);
+
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 12px;
+  border-radius: 999px;
+  line-height: 1;
+  font-weight: 700;
+  font-size: 0.9rem;
+  letter-spacing: 0.2px;
+  color: var(--pill-fg);
+  background: var(--pill-bg);
+  border: 1px solid var(--pill-border);
+  box-shadow: var(--pill-shadow);
+  user-select: none;
+  white-space: nowrap;
+  transition: transform .15s ease, box-shadow .2s ease, background .2s ease, border-color .2s ease;
+}
+
+/* Inner elements */
+.availability-pill .bed-icon {
+  opacity: .95;
+  transform: translateY(-0.5px);
+}
+
+.availability-pill .text {
+  transform: translateY(0.25px);
+}
+
+/* Status dot */
+.availability-pill .dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  box-shadow: 0 0 0 3px rgba(15, 23, 42, 0.06) inset;
+}
+
+/* Hover (desktop only) */
+@media (hover: hover) and (pointer: fine) {
+  .availability-pill:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 12px 24px rgba(2, 6, 23, 0.12);
+  }
+}
+
+/* Success: plenty of rooms */
+.availability-pill.success {
+  --pill-bg: linear-gradient(180deg, #ecfdf5 0%, #d1fae5 100%);
+  --pill-fg: #065f46;
+  --pill-border: #10b981;
+}
+.availability-pill.success .dot { background: #10b981; }
+
+/* Warning: few rooms (<=3) */
+.availability-pill.warning {
+  --pill-bg: linear-gradient(180deg, #fffbeb 0%, #fef3c7 100%);
+  --pill-fg: #92400e;
+  --pill-border: #f59e0b;
+}
+.availability-pill.warning .dot {
+  background: #f59e0b;
+  animation: availPulse 1.2s ease-in-out infinite;
+}
+
+/* Error: sold out */
+.availability-pill.error {
+  --pill-bg: linear-gradient(180deg, #fef2f2 0%, #fee2e2 100%);
+  --pill-fg: #7f1d1d;
+  --pill-border: #ef4444;
+}
+.availability-pill.error .dot { background: #ef4444; }
+
+/* Compact variant (optional): add `compact` class if you need smaller size */
+.availability-pill.compact {
+  padding: 4px 10px;
+  font-size: 0.82rem;
+  gap: 6px;
+}
+.availability-pill.compact .dot { width: 7px; height: 7px; }
+
+/* Reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  .availability-pill,
+  .availability-pill .dot {
+    transition: none;
+    animation: none;
+  }
+}
+
+/* Subtle pulse animation for warning state */
+@keyframes availPulse {
+  0% { box-shadow: 0 0 0 0 rgba(245, 158, 11, .45); }
+  70% { box-shadow: 0 0 0 8px rgba(245, 158, 11, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(245, 158, 11, 0); }
+}
+
+/* Tighten spacing in the right column */
+.booking-col .availability-pill {
+  margin: 2px 0;
+}
