@@ -33,7 +33,7 @@ import {
     VerifiedUser as ShieldIcon,
     Star as StarIcon,
     Liquor as BarIcon,
-    BookmarkAddedIcon
+    BookmarkAdded
 } from '@mui/icons-material';
 import '../../Hotel/HotelList/HotelList.css';
 
@@ -328,7 +328,7 @@ function HotelCard({ hotel, isFavorite, onToggleFavorite, onBook }) {
                                 </Box>
 
                                 <Typography variant="body2" color="text.secondary">
-                                    <BookmarkAddedIcon /> {hotel.reviews} lượt book
+                                    <BookmarkAdded /> {hotel.reviews} lượt book
                                 </Typography>
 
                                 <Box className="hotel-amenities">
