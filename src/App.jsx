@@ -38,7 +38,7 @@ import FlightBookingDetailsPage from "./pages/provider/FlightBookingDetailsPage"
 import FlightBookingFormPage from "./pages/provider/FlightBookingFormPage";
 import HotelPage from "./pages/traveler/HotelPage";
 import HotelListPage from "./pages/traveler/HotelListPage";
-import Profile from "./pages/traveler/Profile";
+import Profile from "./pages/traveler/components/Hotel/Traverler/Profile";
 
 function App() {
   return (
