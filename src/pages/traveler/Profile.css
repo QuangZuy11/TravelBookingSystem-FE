@@ -3,6 +3,7 @@
   min-height: calc(100vh - 80px);
   background: #f8f9fa;
   padding: 20px;
+  margin-top: 80px;
   gap: 20px;
 }
 
