@@ -4,7 +4,6 @@ import {
     Card,
     CardContent,
     CardMedia,
-    TextField,
     FormControl,
     InputLabel,
     Select,
@@ -20,6 +19,7 @@ import {
     Badge,
     Pagination,
     Skeleton,
+    Alert,
 } from '@mui/material';
 import {
     Favorite as FavoriteIcon,
@@ -39,7 +39,7 @@ const amenitiesData = [
     { label: 'Bể bơi', value: 'pool', icon: PoolIcon },
     { label: 'Spa', value: 'spa', icon: SpaIcon },
     { label: 'Phòng Gym', value: 'gym', icon: GymIcon },
-    { label: 'Wifi miễn phí', value: 'wifi', icon: WifiIcon },
+    { label: 'Wifi', value: 'wifi', icon: WifiIcon },
 ];
 
 const amenityIconMap = {
@@ -49,82 +49,83 @@ const amenityIconMap = {
     wifi: WifiIcon,
 };
 
-const seedHotels = [
-    {
-        id: 1,
-        name: 'Tên khách sạn',
-        location: 'Vị trí',
-        rating: 4,
-        reviews: 200,
-        price: 1000000,
-        discount: 10,
-        freeCancel: true,
-        image:
-            'https://images.unsplash.com/photo-1566073771259-6a8506099945?w=1200&h=800&fit=crop',
-        amenities: ['pool', 'gym', 'wifi'],
-    },
-    {
-        id: 2,
-        name: 'Khách sạn cao cấp',
-        location: 'Trung tâm',
-        rating: 5,
-        reviews: 450,
-        price: 2500000,
-        discount: 0,
-        freeCancel: false,
-        image:
-            'https://images.unsplash.com/photo-1551882547-ff40c63fe5fa?w=1200&h=800&fit=crop',
-        amenities: ['spa', 'wifi', 'pool'],
-    },
-    {
-        id: 3,
-        name: 'Resort biển xanh',
-        location: 'Gần biển',
-        rating: 4.5,
-        reviews: 320,
-        price: 1800000,
-        discount: 15,
-        freeCancel: true,
-        image:
-            'https://images.unsplash.com/photo-1520250497591-112f2f40a3f4?w=1200&h=800&fit=crop',
-        amenities: ['pool', 'gym', 'spa'],
-    },
-    {
-        id: 4,
-        name: 'Mountain View Lodge',
-        location: 'Ngoại ô',
-        rating: 4.2,
-        reviews: 180,
-        price: 1200000,
-        discount: 5,
-        freeCancel: false,
-        image:
-            'https://images.unsplash.com/photo-1528909514045-2fa4ac7a08ba?w=1200&h=800&fit=crop',
-        amenities: ['wifi'],
-    },
-];
-
 const formatPrice = (price) =>
     new Intl.NumberFormat('vi-VN').format(price) + ' VNĐ';
 
 function HotelResult({
     priceRange = [0, 20000000],
     selectedAmenities = [],
-    selectedRatings = [],
+    selectedRatings = [], // FE "rating" = số sao, map từ BE.category
 }) {
-    const [hotels] = useState(seedHotels);
+    const [hotels, setHotels] = useState([]);
     const [favorites, setFavorites] = useState(new Set());
     const [page, setPage] = useState(1);
-    const [perPage] = useState(5);
+    const [perPage] = useState(5);// Số khách sạn mỗi trang 
     const [sortBy, setSortBy] = useState('popular');
     const [loading, setLoading] = useState(false);
+    const [error, setError] = useState(null);
 
+    // Chuẩn hóa dữ liệu từ BE về shape của UI
+    const normalizeHotel = (h) => {
+        const locationParts = [
+            h?.address?.city,
+            h?.address?.state,
+
+        ].filter(Boolean);
+        const stars = (() => {
+            const raw = String(h?.category || '').trim(); // '3_star'
+            const n = Number(raw.split('_')[0]);
+            return Number.isFinite(n) ? n : 0;
+        })();
+        return {
+            id: h._id,
+            name: h.name || 'Khách sạn',
+            location: locationParts.join(', ') || '—',
+            rating: stars, // FE rating = số sao (map từ category)
+            reviews: typeof h.bookingsCount === 'number' ? h.bookingsCount : 0, // dùng cho "Phổ biến"
+            price: typeof h?.priceRange?.min === 'number' ? h.priceRange.min : 0,
+            discount: 0, // chưa có trường discount ở BE
+            freeCancel: false, // có thể map từ policies nếu có quy ước
+            image: Array.isArray(h.images) && h.images[0]
+                ? h.images[0]
+                : 'https://images.unsplash.com/photo-1566073771259-6a8506099945?w=1200&h=800&fit=crop',
+            amenities: Array.isArray(h.amenities) ? h.amenities : [],
+        };
+    };
+
+    // Fetch tất cả khách sạn từ BE (limit lớn để hiển thị hết)
     useEffect(() => {
-        setLoading(true);
-        const t = setTimeout(() => setLoading(false), 300);
-        return () => clearTimeout(t);
-    }, [priceRange, selectedAmenities, selectedRatings, sortBy, page]);
+        let aborted = false;
+        async function fetchAllHotels() {
+            try {
+                setLoading(true);
+                setError(null);
+                const qs = new URLSearchParams({
+                    page: '1',
+                    limit: '1000',
+                    sortBy: 'newest',
+                    sortOrder: 'desc',
+                });
+                const res = await fetch(`http://localhost:3000/api/traveler/hotels/search?${qs.toString()}`);
+                if (!res.ok) throw new Error(`HTTP ${res.status}`);
+                const json = await res.json();
+                const rawHotels = json?.data?.hotels || [];
+                const normalized = rawHotels.map(normalizeHotel);
+                if (!aborted) {
+                    setHotels(normalized);
+                    setPage(1);
+                }
+            } catch (e) {
+                if (!aborted) setError(e.message || 'Lỗi tải danh sách khách sạn');
+            } finally {
+                if (!aborted) setLoading(false);
+            }
+        }
+        fetchAllHotels();
+        return () => { aborted = true; };
+    }, []);
 
+    // Lọc cục bộ theo price, amenities, "rating" (số sao)
     const filtered = useMemo(() => {
         const [minP, maxP] = priceRange;
         return hotels.filter((h) => {
@@ -132,13 +133,14 @@ function HotelResult({
             const inAmenity =
                 selectedAmenities.length === 0 ||
                 selectedAmenities.every((a) => h.amenities.includes(a));
-            const inRating =
+            const inStars =
                 selectedRatings.length === 0 ||
-                selectedRatings.some((r) => Math.floor(h.rating) === r);
-            return inPrice && inAmenity && inRating;
+                selectedRatings.some((r) => Number(h.rating) === Number(r));
+            return inPrice && inAmenity && inStars;
         });
     }, [hotels, priceRange, selectedAmenities, selectedRatings]);
 
+    // Sắp xếp cục bộ
     const sorted = useMemo(() => {
         const arr = [...filtered];
         switch (sortBy) {
@@ -149,9 +151,11 @@ function HotelResult({
                 arr.sort((a, b) => b.price - a.price);
                 break;
             case 'rating':
+                // "Đánh giá cao" = nhiều sao hơn trước
                 arr.sort((a, b) => b.rating - a.rating);
                 break;
             default:
+                // "Phổ biến" = nhiều lượt book hơn
                 arr.sort((a, b) => b.reviews - a.reviews);
         }
         return arr;
@@ -189,7 +193,7 @@ function HotelResult({
                     <Typography variant="h5" className="results-title">
                         Vị trí
                         <Typography component="span" color="text.secondary" fontSize="1rem" ml={1}>
-                            {total} chỗ nghỉ
+                            {loading ? 'Đang tải...' : `${total} chỗ nghỉ`}
                         </Typography>
                     </Typography>
 
@@ -213,6 +217,12 @@ function HotelResult({
                     </Stack>
                 </Stack>
             </Paper>
+
+            {error && (
+                <Box mt={2}>
+                    <Alert severity="error">Không tải được danh sách khách sạn: {error}</Alert>
+                </Box>
+            )}
 
             <Box className="hotels-list list">
                 {loading
@@ -244,7 +254,7 @@ function HotelResult({
                     ))}
             </Box>
 
-            {totalPages > 1 && (
+            {!loading && totalPages > 1 && (
                 <Stack alignItems="center" mt={2}>
                     <Pagination
                         color="primary"
@@ -309,9 +319,10 @@ function HotelCard({ hotel, isFavorite, onToggleFavorite, onBook }) {
                                 </Box>
 
                                 <Box display="flex" alignItems="center" gap={1} className="hotel-rating">
-                                    <Rating value={hotel.rating} readOnly size="small" precision={0.5} />
+                                    <Rating value={hotel.rating} readOnly size="small" precision={1} />
 
                                 </Box>
+
                                 <Typography variant="body2" color="text.secondary">
                                     {hotel.reviews} lượt book
                                 </Typography>
