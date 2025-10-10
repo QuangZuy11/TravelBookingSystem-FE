@@ -38,7 +38,7 @@ import FlightBookingDetailsPage from "./pages/provider/FlightBookingDetailsPage"
 import FlightBookingFormPage from "./pages/provider/FlightBookingFormPage";
 import HotelPage from "./pages/traveler/HotelPage";
 import HotelListPage from "./pages/traveler/HotelListPage";
-import Profile from "./pages/traveler/components/Hotel/Traverler/Profile";
+import Profile from "./pages/traveler/components/Hotel/Profile/Profile";
 
 function App() {
   return (
@@ -51,7 +51,7 @@ function App() {
             <Route path="/hotel-page" element={<HotelPage />} />
             <Route path="/hotel-list" element={<HotelListPage />} />
             <Route path="/auth" element={<AuthPage />} />
-            
+
             {/* Error Pages */}
             <Route path="/unauthorized" element={<UnauthorizedPage />} />
 
@@ -93,14 +93,14 @@ function App() {
                   <Route path="new" element={<FlightFormPage />} />
                   <Route path=":flightId/edit" element={<FlightFormPage />} />
                   <Route path=":flightId" element={<FlightDetailsPageNew />} />
-                  
+
                   {/* Flight Classes (nested in flight details, but also accessible directly) */}
                   <Route path=":flightId/classes" element={<FlightClassesManagementPage />} />
-                  
+
                   {/* Flight Seats */}
                   <Route path=":flightId/seats" element={<SeatsManagementPage />} />
                   <Route path=":flightId/seats/setup" element={<BulkSeatSetupPage />} />
-                  
+
                   {/* Flight Schedules */}
                   <Route path=":flightId/schedules" element={<ScheduleManagementPage />} />
                 </Route>
@@ -128,7 +128,7 @@ function App() {
                 </Route>
               </Route>
             </Route>
-            
+
             {/* 404 - Must be last */}
             <Route path="*" element={<NotFoundPage />} />
           </Routes>
