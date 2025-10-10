@@ -32,6 +32,7 @@ import {
     LocalOffer as LocalOfferIcon,
     VerifiedUser as ShieldIcon,
     Star as StarIcon,
+    Liquor as BarIcon
 } from '@mui/icons-material';
 import '../../Hotel/HotelList/HotelList.css';
 
@@ -40,6 +41,7 @@ const amenitiesData = [
     { label: 'Spa', value: 'spa', icon: SpaIcon },
     { label: 'Phòng Gym', value: 'gym', icon: GymIcon },
     { label: 'Wifi', value: 'wifi', icon: WifiIcon },
+    { label: 'Quầy bar', value: 'bar', icon: BarIcon },
 ];
 
 const amenityIconMap = {
@@ -47,6 +49,7 @@ const amenityIconMap = {
     spa: SpaIcon,
     gym: GymIcon,
     wifi: WifiIcon,
+    bar: BarIcon,
 };
 
 const formatPrice = (price) =>
@@ -150,10 +153,10 @@ function HotelResult({
             case 'priceDesc':
                 arr.sort((a, b) => b.price - a.price);
                 break;
-            case 'rating':
-                // "Đánh giá cao" = nhiều sao hơn trước
-                arr.sort((a, b) => b.rating - a.rating);
-                break;
+            // case 'rating':
+            //     // "Nhiều lượt book" = nhiều sao hơn trước
+            //     arr.sort((a, b) => b.reviews - a.rating);
+            //     break;
             default:
                 // "Phổ biến" = nhiều lượt book hơn
                 arr.sort((a, b) => b.reviews - a.reviews);
@@ -211,7 +214,7 @@ function HotelResult({
                                 <MenuItem value="popular">Phổ biến</MenuItem>
                                 <MenuItem value="priceAsc">Giá thấp đến cao</MenuItem>
                                 <MenuItem value="priceDesc">Giá cao đến thấp</MenuItem>
-                                <MenuItem value="rating">Đánh giá cao</MenuItem>
+
                             </Select>
                         </FormControl>
                     </Stack>
