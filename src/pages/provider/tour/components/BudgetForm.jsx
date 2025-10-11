@@ -99,7 +99,7 @@ const BudgetForm = ({ tourId, itineraries, existingBudgetItems = [], isEditMode,
 
     const handleAddItem = () => {
         console.log('🔍 Adding item with formData:', formData);
-        
+
         if (!formData.itinerary_id) {
             toast.error('Vui lòng chọn ngày trong lịch trình');
             return;
@@ -166,7 +166,7 @@ const BudgetForm = ({ tourId, itineraries, existingBudgetItems = [], isEditMode,
 
     const handleSubmit = async () => {
         console.log('🚀 Submitting budget items:', budgetItems);
-        
+
         if (!Array.isArray(budgetItems) || budgetItems.length === 0) {
             toast.error('Vui lòng thêm ít nhất 1 khoản ngân sách');
             return;
@@ -205,9 +205,9 @@ const BudgetForm = ({ tourId, itineraries, existingBudgetItems = [], isEditMode,
                         is_optional: item.is_optional || false,
                         currency: item.currency || 'VND'
                     };
-                    
+
                     console.log('📤 Sending budget item:', payload);
-                    
+
                     await axios.post('http://localhost:3000/api/budget-breakdowns', payload);
                 }
             }
