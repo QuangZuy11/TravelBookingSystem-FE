@@ -1,12 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
-import Breadcrumb from '../../components/shared/Breadcrumb';
+import Breadcrumb from '../../../components/shared/Breadcrumb';
 import axios from 'axios';
-import LoadingSpinner from '../../components/ui/Spinner';
-import ErrorAlert from '../../components/shared/ErrorAlert';
-import HotelForm from '../../components/provider/forms/HotelForm';
-import RoomForm from '../../components/provider/forms/RoomForm';
-import Modal from '../../components/shared/Modal';
+import LoadingSpinner from '../../../components/ui/Spinner';
+import ErrorAlert from '../../../components/shared/ErrorAlert';
+import HotelForm from '../../../components/provider/forms/HotelForm';
+import RoomForm from '../../../components/provider/forms/RoomForm';
+import Modal from '../../../components/shared/Modal';
 
 const HotelDetailsPage = () => {
     const providerId = localStorage.getItem('providerId');

@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
-import { Spinner } from '../../components/ui/Spinner';
-import { ErrorAlert } from '../../components/shared/ErrorAlert';
-import Breadcrumb from '../../components/shared/Breadcrumb';
+import { Spinner } from '../../../components/ui/Spinner';
+import { ErrorAlert } from '../../../components/shared/ErrorAlert';
+import Breadcrumb from '../../../components/shared/Breadcrumb';
 
 const BookingDetailsPage = () => {
     const { bookingId } = useParams();

@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import axios from 'axios';
-import Breadcrumb from '../../components/shared/Breadcrumb';
-import { Spinner } from '../../components/ui/Spinner';
-import { ErrorAlert } from '../../components/shared/ErrorAlert';
+import Breadcrumb from '../../../components/shared/Breadcrumb';
+import { Spinner } from '../../../components/ui/Spinner';
+import { ErrorAlert } from '../../../components/shared/ErrorAlert';
 
 const FlightFormPage = () => {
     const navigate = useNavigate();

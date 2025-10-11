@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import axios from 'axios';
-import LoadingSpinner from '../../components/shared/LoadingSpinner';
-import ErrorAlert from '../../components/shared/ErrorAlert';
-import HotelForm from '../../components/provider/forms/HotelForm';
-import Modal from '../../components/shared/Modal';
+import LoadingSpinner from '../../../components/shared/LoadingSpinner';
+import ErrorAlert from '../../../components/shared/ErrorAlert';
+import HotelForm from '../../../components/provider/forms/HotelForm';
+import Modal from '../../../components/shared/Modal';
 
 const HotelListPage = () => {
     const { providerId } = useParams();

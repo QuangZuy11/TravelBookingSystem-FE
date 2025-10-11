@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import flightBookingService from '../../services/flightBookingService';
-import Breadcrumb from '../../components/shared/Breadcrumb';
-import { Spinner } from '../../components/ui/Spinner';
-import { ErrorAlert } from '../../components/shared/ErrorAlert';
+import flightBookingService from '../../../services/flightBookingService';
+import Breadcrumb from '../../../components/shared/Breadcrumb';
+import { Spinner } from '../../../components/ui/Spinner';
+import { ErrorAlert } from '../../../components/shared/ErrorAlert';
 
 const FlightBookingDetailsPage = () => {
     const navigate = useNavigate();

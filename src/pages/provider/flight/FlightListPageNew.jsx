@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import flightService from '../../services/flightService';
-import { Spinner } from '../../components/ui/Spinner';
-import { ErrorAlert } from '../../components/shared/ErrorAlert';
-import Breadcrumb from '../../components/shared/Breadcrumb';
+import flightService from '../../../services/flightService';
+import { Spinner } from '../../../components/ui/Spinner';
+import { ErrorAlert } from '../../../components/shared/ErrorAlert';
+import Breadcrumb from '../../../components/shared/Breadcrumb';
 
 const FlightListPageNew = () => {
     const navigate = useNavigate();

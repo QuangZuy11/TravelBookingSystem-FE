@@ -1,8 +1,8 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { HotelForm } from '../../components/provider/forms/HotelForm';
+import { HotelForm } from '../../../components/provider/forms/HotelForm';
 import axios from 'axios';
-import Breadcrumb from '../../components/shared/Breadcrumb';
+import Breadcrumb from '../../../components/shared/Breadcrumb';
 
 const CreateHotelPage = () => {
   const navigate = useNavigate();

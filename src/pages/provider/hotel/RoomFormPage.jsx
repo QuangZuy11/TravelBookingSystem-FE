@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { RoomForm } from '../../components/provider/forms/RoomForm';
+import { RoomForm } from '../../../components/provider/forms/RoomForm';
 import axios from 'axios';
-import { Spinner } from '../../components/ui/Spinner';
-import { ErrorAlert } from '../../components/shared/ErrorAlert';
+import { Spinner } from '../../../components/ui/Spinner';
+import { ErrorAlert } from '../../../components/shared/ErrorAlert';
 
 const RoomFormPage = () => {
   const navigate = useNavigate();

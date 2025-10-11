@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import scheduleService from '../../../services/scheduleService';
+import scheduleService from '../../../../services/scheduleService';
 
 const ScheduleManagementPage = ({ flightIdProp }) => {
     const { flightId: flightIdParam } = useParams();

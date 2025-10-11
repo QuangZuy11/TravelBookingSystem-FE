@@ -1,12 +1,16 @@
 .flight-dashboard {
     padding: 1rem;
+    max-width: 100vw;
+    overflow-x: hidden;
+    box-sizing: border-box;
 }
 
 .dashboard-stats {
     display: grid;
-    grid-template-columns: repeat(4, 1fr);
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
     gap: 1.5rem;
     margin-bottom: 2rem;
+    width: 100%;
 }
 
 .stat-card {
@@ -14,6 +18,7 @@
     padding: 1.5rem;
     border-radius: 8px;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    min-width: 0;
 }
 
 .stat-card h3 {
@@ -34,6 +39,8 @@
     margin-bottom: 2rem;
     display: flex;
     gap: 1rem;
+    flex-wrap: wrap;
+    width: 100%;
 }
 
 .action-button {
@@ -43,6 +50,8 @@
     font-weight: 600;
     cursor: pointer;
     transition: background-color 0.2s;
+    flex: 1 1 auto;
+    min-width: 150px;
 }
 
 .action-button.primary {
@@ -78,11 +87,13 @@
 .flights-table {
     width: 100%;
     overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
 }
 
 .flights-table table {
     width: 100%;
     border-collapse: collapse;
+    min-width: 900px;
 }
 
 .flights-table th,
@@ -91,6 +102,10 @@
     text-align: left;
     border-bottom: 1px solid #e8eaed;
     color: #333;
+    max-width: 150px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 }
 
 .flights-table th {
@@ -174,4 +189,33 @@
 
 .table-action:hover {
     opacity: 0.9;
+}
+
+/* Responsive Media Queries */
+@media (max-width: 768px) {
+    .dashboard-stats {
+        grid-template-columns: 1fr;
+    }
+
+    .dashboard-actions {
+        flex-direction: column;
+    }
+
+    .action-button {
+        width: 100%;
+    }
+
+    .stat-value {
+        font-size: 1.25rem;
+    }
+}
+
+@media (max-width: 1024px) {
+    .dashboard-stats {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+* {
+    box-sizing: border-box;
 }

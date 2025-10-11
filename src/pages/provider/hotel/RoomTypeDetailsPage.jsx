@@ -1,12 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
-import LoadingSpinner from '../../components/ui/Spinner';
-import ErrorAlert from '../../components/shared/ErrorAlert';
-import Modal from '../../components/shared/Modal';
-import RoomForm from '../../components/provider/forms/RoomForm';
-import PricingRuleForm from '../../components/provider/forms/PricingRuleForm';
-import MaintenanceRecordForm from '../../components/provider/forms/MaintenanceRecordForm';
+import LoadingSpinner from '../../../components/ui/Spinner';
+import ErrorAlert from '../../../components/shared/ErrorAlert';
+import Modal from '../../../components/shared/Modal';
+import RoomForm from '../../../components/provider/forms/RoomForm';
+import PricingRuleForm from '../../../components/provider/forms/PricingRuleForm';
+import MaintenanceRecordForm from '../../../components/provider/forms/MaintenanceRecordForm';
 
 const RoomTypeDetailsPage = () => {
     const { providerId, hotelId, roomId } = useParams();

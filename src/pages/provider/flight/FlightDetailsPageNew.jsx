@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
-import { FlightManagementProvider, useFlightManagement } from '../../contexts/FlightManagementContext';
+import { FlightManagementProvider, useFlightManagement } from '../../../contexts/FlightManagementContext';
 import FlightClassesManagementPage from './FlightClassesManagementPage';
 import SeatsManagementPage from './seats/SeatsManagementPage';
 import ScheduleManagementPage from './schedules/ScheduleManagementPage';

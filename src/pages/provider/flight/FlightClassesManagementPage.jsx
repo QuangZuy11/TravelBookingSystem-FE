@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import flightClassService from '../../services/flightClassService';
-import flightService from '../../services/flightService';
-import { Spinner } from '../../components/ui/Spinner';
-import { ErrorAlert } from '../../components/shared/ErrorAlert';
-import Breadcrumb from '../../components/shared/Breadcrumb';
+import flightClassService from '../../../services/flightClassService';
+import flightService from '../../../services/flightService';
+import { Spinner } from '../../../components/ui/Spinner';
+import { ErrorAlert } from '../../../components/shared/ErrorAlert';
+import Breadcrumb from '../../../components/shared/Breadcrumb';
 
 const FlightClassesManagementPage = ({ flightIdProp }) => {
     const navigate = useNavigate();

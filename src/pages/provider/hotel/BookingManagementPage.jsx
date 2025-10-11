@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
-import { Spinner } from '../../components/ui/Spinner';
-import { ErrorAlert } from '../../components/shared/ErrorAlert';
-import Breadcrumb from '../../components/shared/Breadcrumb';
+import { Spinner } from '../../../components/ui/Spinner';
+import { ErrorAlert } from '../../../components/shared/ErrorAlert';
+import Breadcrumb from '../../../components/shared/Breadcrumb';
 
 const BookingManagementPage = () => {
     const navigate = useNavigate();
@@ -85,7 +85,7 @@ const BookingManagementPage = () => {
 
     const filteredBookings = bookings.filter(booking => {
         const matchesFilter = filter === 'all' || booking.status === filter;
-        const matchesSearch = searchTerm === '' || 
+        const matchesSearch = searchTerm === '' ||
             booking.guestName.toLowerCase().includes(searchTerm.toLowerCase()) ||
             booking.bookingId.toLowerCase().includes(searchTerm.toLowerCase());
         return matchesFilter && matchesSearch;
@@ -140,9 +140,8 @@ const BookingManagementPage = () => {
         transition: 'all 0.3s ease'
     };
 
-    const filterButtonStyle = (isActive) => ({
+    const buttonStyle = (isActive) => ({
         padding: '0.75rem 1.5rem',
-        border: 'none',
         borderRadius: '12px',
         background: isActive ? 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)' : 'white',
         color: isActive ? 'white' : '#374151',
@@ -317,19 +316,19 @@ const BookingManagementPage = () => {
                         <table style={tableStyle}>
                             <thead style={theadStyle}>
                                 <tr>
-                                    <th style={{...thStyle, borderTopLeftRadius: '12px', borderBottomLeftRadius: '12px'}}>Booking ID</th>
+                                    <th style={{ ...thStyle, borderTopLeftRadius: '12px', borderBottomLeftRadius: '12px' }}>Booking ID</th>
                                     <th style={thStyle}>Guest Name</th>
                                     <th style={thStyle}>Room</th>
                                     <th style={thStyle}>Check-in</th>
                                     <th style={thStyle}>Check-out</th>
                                     <th style={thStyle}>Total Price</th>
                                     <th style={thStyle}>Status</th>
-                                    <th style={{...thStyle, borderTopRightRadius: '12px', borderBottomRightRadius: '12px'}}>Actions</th>
+                                    <th style={{ ...thStyle, borderTopRightRadius: '12px', borderBottomRightRadius: '12px' }}>Actions</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 {filteredBookings.map((booking, index) => (
-                                    <tr 
+                                    <tr
                                         key={booking._id}
                                         onMouseEnter={() => setHoveredRow(index)}
                                         onMouseLeave={() => setHoveredRow(null)}
@@ -339,12 +338,12 @@ const BookingManagementPage = () => {
                                             boxShadow: hoveredRow === index ? '0 4px 15px rgba(0,0,0,0.1)' : 'none'
                                         }}
                                     >
-                                        <td style={{...tdStyle, fontWeight: '600'}}>#{booking._id.slice(-6)}</td>
+                                        <td style={{ ...tdStyle, fontWeight: '600' }}>#{booking._id.slice(-6)}</td>
                                         <td style={tdStyle}>{booking.guestName}</td>
                                         <td style={tdStyle}>{booking.roomNumber}</td>
                                         <td style={tdStyle}>{new Date(booking.checkInDate).toLocaleDateString()}</td>
                                         <td style={tdStyle}>{new Date(booking.checkOutDate).toLocaleDateString()}</td>
-                                        <td style={{...tdStyle, fontWeight: '600', color: '#10b981'}}>
+                                        <td style={{ ...tdStyle, fontWeight: '600', color: '#10b981' }}>
                                             {booking.totalPrice.toLocaleString()}đ
                                         </td>
                                         <td style={tdStyle}>
@@ -355,7 +354,7 @@ const BookingManagementPage = () => {
                                         <td style={tdStyle}>
                                             <button
                                                 onClick={() => navigate(`/provider/bookings/${booking._id}`)}
-                                                style={{...actionButtonStyle, background: '#667eea', color: 'white'}}
+                                                style={{ ...actionButtonStyle, background: '#667eea', color: 'white' }}
                                             >
                                                 View Details
                                             </button>
@@ -363,13 +362,13 @@ const BookingManagementPage = () => {
                                                 <>
                                                     <button
                                                         onClick={() => handleUpdateStatus(booking._id, 'confirmed')}
-                                                        style={{...actionButtonStyle, background: '#10b981', color: 'white'}}
+                                                        style={{ ...actionButtonStyle, background: '#10b981', color: 'white' }}
                                                     >
                                                         Confirm
                                                     </button>
                                                     <button
                                                         onClick={() => handleUpdateStatus(booking._id, 'cancelled')}
-                                                        style={{...actionButtonStyle, background: '#ef4444', color: 'white'}}
+                                                        style={{ ...actionButtonStyle, background: '#ef4444', color: 'white' }}
                                                     >
                                                         Cancel
                                                     </button>

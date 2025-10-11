@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import flightClassService from '../../../services/flightClassService';
-import seatService from '../../../services/seatService';
+import flightClassService from '../../../../services/flightClassService';
+import seatService from '../../../../services/seatService';
 
 const BulkSeatSetupPage = ({ flightIdProp }) => {
     const { flightId: flightIdParam } = useParams();

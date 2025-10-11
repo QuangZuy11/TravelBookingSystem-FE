@@ -1,24 +1,24 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import flightService from '../../services/flightService';
-import scheduleService from '../../services/scheduleService';
-import flightBookingService from '../../services/flightBookingService';
-import passengerService from '../../services/passengerService';
-import MultiPassengerForm from '../../components/provider/MultiPassengerForm';
-import Spinner from '../../components/ui/Spinner';
-import ErrorAlert from '../../components/shared/ErrorAlert';
+import flightService from '../../../services/flightService';
+import scheduleService from '../../../services/scheduleService';
+import flightBookingService from '../../../services/flightBookingService';
+import passengerService from '../../../services/passengerService';
+import MultiPassengerForm from '../../../components/provider/MultiPassengerForm';
+import Spinner from '../../../components/ui/Spinner';
+import ErrorAlert from '../../../components/shared/ErrorAlert';
 
 const FlightBookingFormPage = () => {
     const navigate = useNavigate();
     const [currentStep, setCurrentStep] = useState(1);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
-    
+
     // Data states
     const [flights, setFlights] = useState([]);
     const [schedules, setSchedules] = useState([]);
     const [availableSeats, setAvailableSeats] = useState([]);
-    
+
     // Form states
     const [bookingData, setBookingData] = useState({
         userId: '',
@@ -33,7 +33,7 @@ const FlightBookingFormPage = () => {
         paymentMethod: 'credit_card',
         specialRequests: ''
     });
-    
+
     const [selectedSeats, setSelectedSeats] = useState([]);
     const [passengers, setPassengers] = useState([]);
 
@@ -75,7 +75,7 @@ const FlightBookingFormPage = () => {
             setLoading(true);
             const data = await scheduleService.getFlightSchedules(flightId);
             // Filter for future schedules only
-            const futureSchedules = data.filter(schedule => 
+            const futureSchedules = data.filter(schedule =>
                 new Date(schedule.departureTime) > new Date()
             );
             setSchedules(futureSchedules);
@@ -131,7 +131,7 @@ const FlightBookingFormPage = () => {
 
         const basePrice = basePricePerClass[bookingData.seatClass] || 100;
         const total = basePrice * bookingData.numberOfPassengers;
-        
+
         setBookingData(prev => ({
             ...prev,
             totalPrice: total
@@ -148,7 +148,7 @@ const FlightBookingFormPage = () => {
 
     const handleSeatSelection = (seat) => {
         const isSelected = selectedSeats.find(s => s.seatNumber === seat.seatNumber);
-        
+
         if (isSelected) {
             setSelectedSeats(selectedSeats.filter(s => s.seatNumber !== seat.seatNumber));
         } else {
@@ -257,7 +257,7 @@ const FlightBookingFormPage = () => {
         width: '50px',
         height: '50px',
         borderRadius: '50%',
-        background: currentStep >= stepNumber 
+        background: currentStep >= stepNumber
             ? 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)'
             : '#e5e7eb',
         color: currentStep >= stepNumber ? 'white' : '#6b7280',
