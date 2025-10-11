@@ -29,6 +29,7 @@ import {
     ClearButton,
     SingleRowGrid
 } from './search-section.styles';
+import { useNavigate } from 'react-router-dom'; // ADD: điều hướng
 
 const SearchSection = ({ onSearch }) => {
     const [searchData, setSearchData] = useState({
@@ -42,6 +43,7 @@ const SearchSection = ({ onSearch }) => {
 
     const [anchorEl, setAnchorEl] = useState(null);
     const [errors, setErrors] = useState({});
+    const navigate = useNavigate(); // ADD
 
     const handleInputChange = (field) => (event) => {
         setSearchData({
@@ -75,6 +77,7 @@ const SearchSection = ({ onSearch }) => {
     };
 
     const handleClear = () => {
+        // Reset local state
         setSearchData({
             location: '',
             checkIn: '',
@@ -85,6 +88,12 @@ const SearchSection = ({ onSearch }) => {
         });
         setErrors({});
         setAnchorEl(null);
+
+        // NEW: báo cho parent reset HotelResult về trạng thái "chưa áp dụng search"
+        onSearch?.(null);
+
+        // NEW: điều hướng về /hotel-list
+        navigate('/hotel-list');
     };
 
     const validateForm = () => {

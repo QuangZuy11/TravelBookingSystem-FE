@@ -49,7 +49,7 @@ import ProviderLayout from "./pages/provider/ProviderLayout";
 // Traveler Pages
 import HotelPage from "./pages/traveler/HotelPage";
 import HotelListPage from "./pages/traveler/HotelListPage";
-import Profile from "./pages/traveler/components/Hotel/Traverler/Profile";
+import Profile from "./pages/traveler/components/Hotel/Profile/Profile";
 
 function App() {
   return (
