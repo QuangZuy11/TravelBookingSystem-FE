@@ -1,5 +1,6 @@
 import "./App.css";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import { Toaster } from 'react-hot-toast';
 import Homepage from "./pages/traveler/Homepage";
 import AuthPage from "./pages/auth/AuthPage";
 import { AuthProvider } from './contexts/AuthContext';
@@ -10,32 +11,42 @@ import NotFoundPage from './pages/NotFoundPage';
 import UnauthorizedPage from './pages/UnauthorizedPage';
 import DashboardLayout from "./components/layout/ProviderDashboard/DashboardLayout";
 import TourDashboard from "./pages/provider/dashboard/TourDashboard";
-import FlightDashboard from "./pages/provider/dashboard/FlightDashboard";
-import TourDetails from "./pages/provider/dashboard/TourDetails";
-import FlightDetails from "./pages/provider/dashboard/FlightDetails";
-import HotelDashboard from "./pages/provider/dashboard/HotelDashboard";
-import HotelDetailsPage from "./pages/provider/HotelDetailsPage";
-import RoomTypeDetailsPage from "./pages/provider/RoomTypeDetailsPage";
-import ProviderLayout from "./pages/provider/ProviderLayout";
-import CreateHotelPage from "./pages/provider/CreateHotelPage";
-import EditHotelPage from "./pages/provider/EditHotelPage";
-import RoomFormPage from "./pages/provider/RoomFormPage";
-import BookingManagementPage from "./pages/provider/BookingManagementPage";
-import RoomListPage from "./pages/provider/RoomListPage";
-// NEW Flight Management System
-import FlightListPageNew from "./pages/provider/FlightListPageNew";
-import FlightFormPage from "./pages/provider/FlightFormPage";
-import FlightDetailsPageNew from "./pages/provider/FlightDetailsPageNew";
-import FlightClassesManagementPage from "./pages/provider/FlightClassesManagementPage";
-import SeatsManagementPage from "./pages/provider/seats/SeatsManagementPage";
-import BulkSeatSetupPage from "./pages/provider/seats/BulkSeatSetupPage";
-import ScheduleManagementPage from "./pages/provider/schedules/ScheduleManagementPage";
 
-// OLD - Keep for backward compatibility (can be removed later)
-import FlightStatisticsPage from "./pages/provider/FlightStatisticsPage";
-import FlightBookingListPage from "./pages/provider/FlightBookingListPage";
-import FlightBookingDetailsPage from "./pages/provider/FlightBookingDetailsPage";
-import FlightBookingFormPage from "./pages/provider/FlightBookingFormPage";
+// Tour Management
+import TourDashboardPage from "./pages/provider/tour/TourDashboard";
+import TourListPage from "./pages/provider/tour/TourList";
+import CreateTourWizard from "./pages/provider/tour/CreateTourWizard";
+import TourDetailsPage from "./pages/provider/tour/TourDetailsPage";
+
+// Hotel Management  
+import HotelDashboard from "./pages/provider/hotel/HotelDashboard";
+import HotelDetailsPage from "./pages/provider/hotel/HotelDetailsPage";
+import RoomTypeDetailsPage from "./pages/provider/hotel/RoomTypeDetailsPage";
+import CreateHotelPage from "./pages/provider/hotel/CreateHotelPage";
+import EditHotelPage from "./pages/provider/hotel/EditHotelPage";
+import RoomFormPage from "./pages/provider/hotel/RoomFormPage";
+import BookingManagementPage from "./pages/provider/hotel/BookingManagementPage";
+import RoomListPage from "./pages/provider/hotel/RoomListPage";
+
+// Flight Management
+import FlightDashboard from "./pages/provider/flight/FlightDashboard";
+import FlightDetails from "./pages/provider/flight/FlightDetails";
+import FlightListPageNew from "./pages/provider/flight/FlightListPageNew";
+import FlightFormPage from "./pages/provider/flight/FlightFormPage";
+import FlightDetailsPageNew from "./pages/provider/flight/FlightDetailsPageNew";
+import FlightClassesManagementPage from "./pages/provider/flight/FlightClassesManagementPage";
+import SeatsManagementPage from "./pages/provider/flight/seats/SeatsManagementPage";
+import BulkSeatSetupPage from "./pages/provider/flight/seats/BulkSeatSetupPage";
+import ScheduleManagementPage from "./pages/provider/flight/schedules/ScheduleManagementPage";
+import FlightStatisticsPage from "./pages/provider/flight/FlightStatisticsPage";
+import FlightBookingListPage from "./pages/provider/flight/FlightBookingListPage";
+import FlightBookingDetailsPage from "./pages/provider/flight/FlightBookingDetailsPage";
+import FlightBookingFormPage from "./pages/provider/flight/FlightBookingFormPage";
+
+// Provider Layout
+import ProviderLayout from "./pages/provider/ProviderLayout";
+
+// Traveler Pages
 import HotelPage from "./pages/traveler/HotelPage";
 import HotelListPage from "./pages/traveler/HotelListPage";
 import Profile from "./pages/traveler/components/Hotel/Traverler/Profile";
@@ -45,13 +56,56 @@ function App() {
     <ErrorBoundary>
       <Router>
         <AuthProvider>
+          {/* Toast Notifications - Top Right Position */}
+          <Toaster
+            position="top-right"
+            reverseOrder={false}
+            gutter={8}
+            toastOptions={{
+              // Default options
+              duration: 4000,
+              style: {
+                background: '#363636',
+                color: '#fff',
+                padding: '16px',
+                borderRadius: '8px',
+                fontSize: '14px',
+                maxWidth: '500px',
+              },
+              // Success toast style
+              success: {
+                duration: 3000,
+                iconTheme: {
+                  primary: '#10b981',
+                  secondary: '#fff',
+                },
+                style: {
+                  background: '#10b981',
+                  color: '#fff',
+                },
+              },
+              // Error toast style
+              error: {
+                duration: 5000,
+                iconTheme: {
+                  primary: '#ef4444',
+                  secondary: '#fff',
+                },
+                style: {
+                  background: '#ef4444',
+                  color: '#fff',
+                },
+              },
+            }}
+          />
+
           <Routes>
             {/* Public Routes */}
             <Route path="/" element={<Homepage />} />
             <Route path="/hotel-page" element={<HotelPage />} />
             <Route path="/hotel-list" element={<HotelListPage />} />
             <Route path="/auth" element={<AuthPage />} />
-            
+
             {/* Error Pages */}
             <Route path="/unauthorized" element={<UnauthorizedPage />} />
 
@@ -77,14 +131,18 @@ function App() {
               }
             >
               <Route element={<DashboardLayout />}>
-                <Route index element={<TourDashboard />} />
+                <Route index element={<TourDashboardPage />} />
+                <Route path="dashboard" element={<TourDashboardPage />} />
                 <Route path="bookings" element={<BookingManagementPage />} />
 
-                {/* Tour Management */}
+                {/* Tour Management - NEW MODULE */}
                 <Route path="tours">
-                  <Route index element={<TourDashboard />} />
-                  <Route path=":id" element={<TourDetails />} />
-                  <Route path="new" element={<TourDetails />} />
+                  <Route index element={<TourDashboardPage />} />
+                  <Route path="create" element={<CreateTourWizard />} />
+                  <Route path=":tourId" element={<TourDetailsPage />} />
+                  <Route path=":tourId/edit" element={<CreateTourWizard />} />
+                  <Route path="bookings" element={<BookingManagementPage />} />
+                  <Route path="statistics" element={<TourDashboard />} />
                 </Route>
 
                 {/* Flight Management - NEW SYSTEM */}
@@ -93,14 +151,14 @@ function App() {
                   <Route path="new" element={<FlightFormPage />} />
                   <Route path=":flightId/edit" element={<FlightFormPage />} />
                   <Route path=":flightId" element={<FlightDetailsPageNew />} />
-                  
+
                   {/* Flight Classes (nested in flight details, but also accessible directly) */}
                   <Route path=":flightId/classes" element={<FlightClassesManagementPage />} />
-                  
+
                   {/* Flight Seats */}
                   <Route path=":flightId/seats" element={<SeatsManagementPage />} />
                   <Route path=":flightId/seats/setup" element={<BulkSeatSetupPage />} />
-                  
+
                   {/* Flight Schedules */}
                   <Route path=":flightId/schedules" element={<ScheduleManagementPage />} />
                 </Route>
@@ -128,7 +186,7 @@ function App() {
                 </Route>
               </Route>
             </Route>
-            
+
             {/* 404 - Must be last */}
             <Route path="*" element={<NotFoundPage />} />
           </Routes>
