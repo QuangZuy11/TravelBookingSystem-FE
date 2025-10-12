@@ -33,15 +33,15 @@ const AuthPage = () => {
 
     const body = isRegister
       ? {
-          name: formData.name,
-          email: formData.email,
-          password: formData.password,
-          role_name: formData.role,
-        }
+        name: formData.name,
+        email: formData.email,
+        password: formData.password,
+        role_name: formData.role,
+      }
       : {
-          email: formData.email,
-          password: formData.password,
-        };
+        email: formData.email,
+        password: formData.password,
+      };
 
     if (isRegister && formData.password !== formData.confirmPassword) {
       return alert("Mật khẩu xác nhận không khớp!");
@@ -62,9 +62,13 @@ const AuthPage = () => {
         throw new Error(data.message || "Có lỗi xảy ra, vui lòng thử lại.");
       }
 
-      // Lưu provider_id vào localStorage nếu user có role_id = 2
+      // Lưu provider_id và provider object vào localStorage nếu user có role_id = 2
       if (data.data.role_id === 2) {
         localStorage.setItem('providerId', data.data.id);
+        // Lưu toàn bộ provider object
+        if (data.data.provider) {
+          localStorage.setItem('provider', JSON.stringify(data.data.provider));
+        }
       }
 
       // Login và lấy role_id được trả về
@@ -72,7 +76,30 @@ const AuthPage = () => {
 
       // Điều hướng người dùng dựa vào role
       if (roleId === 2) {
-        navigate("/provider/hotels");
+        // Check nếu có provider object và đã đăng ký đầy đủ
+        const provider = data.data.provider;
+
+        // Nếu provider là null hoặc chưa có type/licenses -> chưa đăng ký
+        if (!provider ||
+          !provider.type ||
+          !Array.isArray(provider.type) ||
+          provider.type.length === 0 ||
+          !provider.licenses ||
+          !Array.isArray(provider.licenses) ||
+          provider.licenses.length === 0) {
+          // Chưa đăng ký provider với hệ thống -> redirect đến trang đăng ký
+          console.log("Provider chưa đăng ký đầy đủ, redirect to registration");
+          navigate("/register/service-provider");
+        } else if (!provider.admin_verified) {
+          // Đã đăng ký nhưng chưa được admin verify
+          alert("⏳ Tài khoản của bạn đang chờ xác minh từ Admin. Vui lòng đợi email thông báo từ hệ thống.");
+          console.log("Provider chưa được admin verify");
+          navigate("/");
+        } else {
+          // Đã đăng ký đầy đủ và đã verify -> vào provider route (sẽ auto-redirect theo type)
+          console.log("Provider đã được verify, redirect to provider route");
+          navigate("/provider");
+        }
       } else {
         navigate("/");
       }

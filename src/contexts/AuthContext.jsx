@@ -5,6 +5,7 @@ const AuthContext = createContext(null);
 
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
+  const [loading, setLoading] = useState(true); // Add loading state
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -13,6 +14,7 @@ export const AuthProvider = ({ children }) => {
     const fullName = localStorage.getItem('fullName');
     const providerId = localStorage.getItem('providerId');
     const role = localStorage.getItem('role');
+    const providerStr = localStorage.getItem('provider');
 
     // If we have a token and basic user info, restore the user state
     if (token && fullName) {
@@ -20,10 +22,13 @@ export const AuthProvider = ({ children }) => {
         name: fullName,
         providerId: providerId,
         role: role,
-        token: token
+        token: token,
+        provider: providerStr ? JSON.parse(providerStr) : null
       };
       setUser(restoredUser);
     }
+
+    setLoading(false); // Done checking localStorage
   }, []);
 
   const login = (data) => {
@@ -31,17 +36,25 @@ export const AuthProvider = ({ children }) => {
       name: data.fullName,
       providerId: data.id,
       role: data.role,
-      token: data.token
+      token: data.token,
+      provider: data.provider || null
     };
-    
+
     // Store all relevant data
     localStorage.setItem('token', data.token);
     localStorage.setItem('fullName', data.fullName);
     localStorage.setItem('providerId', data.id);
     localStorage.setItem('role', data.role);
     localStorage.setItem('user', JSON.stringify(userToSet));
-    
+
+    // Store provider object if exists
+    if (data.provider) {
+      localStorage.setItem('provider', JSON.stringify(data.provider));
+    }
+
     setUser(userToSet);
+
+    return data.role_id;
   };
 
   const logout = () => {
@@ -51,13 +64,14 @@ export const AuthProvider = ({ children }) => {
     localStorage.removeItem('providerId');
     localStorage.removeItem('role');
     localStorage.removeItem('user');
-    
+    localStorage.removeItem('provider');
+
     setUser(null);
     navigate('/');
   };
 
   return (
-    <AuthContext.Provider value={{ user, login, logout }}>
+    <AuthContext.Provider value={{ user, login, logout, loading }}>
       {children}
     </AuthContext.Provider>
   );

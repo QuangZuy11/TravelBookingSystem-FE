@@ -125,8 +125,10 @@
 /* Header nằm ngay dưới TopBar */
 .header {
   position: fixed;
-  top: 40px; /* bằng đúng chiều cao của TopBar */
+  top: 30px; /* bằng đúng chiều cao của TopBar */
   left: 0;
+  height: 50px;
+  gap: 24px;
   width: 100%;
   z-index: 1000;
   background: white;

@@ -1,0 +1,384 @@
+/* ==================== SERVICE PROVIDER DASHBOARD ==================== */
+
+.service-provider-dashboard {
+    min-height: 100vh;
+    background: #f3f4f6;
+    padding: 40px 60px;
+}
+
+/* Loading & Error States */
+.loading-container,
+.error-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 60vh;
+    gap: 20px;
+}
+
+.spinner {
+    width: 50px;
+    height: 50px;
+    border: 4px solid #e5e7eb;
+    border-top-color: #667eea;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+/* Dashboard Header */
+.dashboard-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 40px;
+    padding: 30px;
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.header-content h1 {
+    margin: 0 0 8px 0;
+    color: #1f2937;
+    font-size: 2rem;
+}
+
+.company-email {
+    margin: 0;
+    color: #6b7280;
+    font-size: 0.875rem;
+}
+
+.header-actions {
+    display: flex;
+    gap: 12px;
+}
+
+/* Service Types Overview */
+.service-types-overview {
+    background: white;
+    padding: 24px 30px;
+    border-radius: 12px;
+    margin-bottom: 30px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.service-types-overview h3 {
+    margin: 0 0 16px 0;
+    color: #374151;
+    font-size: 1.125rem;
+}
+
+.service-badges {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+.service-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 16px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border-radius: 20px;
+    font-size: 0.875rem;
+    font-weight: 600;
+    box-shadow: 0 2px 6px rgba(102, 126, 234, 0.3);
+}
+
+/* Service Sections */
+.service-section {
+    background: white;
+    border-radius: 12px;
+    padding: 30px;
+    margin-bottom: 30px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 24px;
+    padding-bottom: 20px;
+    border-bottom: 2px solid #e5e7eb;
+}
+
+.section-header h2 {
+    margin: 0;
+    color: #1f2937;
+    font-size: 1.5rem;
+}
+
+.btn-add {
+    padding: 10px 20px;
+    background: #10b981;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 0.875rem;
+    font-weight: 600;
+    transition: all 0.3s;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.btn-add:hover {
+    background: #059669;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+}
+
+/* License Grid */
+.license-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 20px;
+}
+
+.single-license-container {
+    max-width: 500px;
+}
+
+/* License Card */
+.license-card {
+    border: 2px solid #e5e7eb;
+    border-radius: 12px;
+    padding: 24px;
+    background: white;
+    transition: all 0.3s;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.license-card:hover {
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+    transform: translateY(-4px);
+}
+
+.license-card.verified {
+    border-color: #10b981;
+    background: #f0fdf4;
+}
+
+.license-card.pending {
+    border-color: #f59e0b;
+    background: #fffbeb;
+}
+
+.license-card.rejected {
+    border-color: #ef4444;
+    background: #fef2f2;
+}
+
+.license-card.single {
+    max-width: 100%;
+}
+
+.license-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-bottom: 16px;
+    border-bottom: 2px solid #e5e7eb;
+}
+
+.license-number {
+    margin: 0;
+    font-size: 1.25rem;
+    color: #1f2937;
+    font-weight: 700;
+}
+
+/* Status Badge */
+.status-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.badge-verified {
+    background-color: #f0fdf4;
+    border: 2px solid #10b981;
+    color: #065f46;
+}
+
+.badge-pending {
+    background-color: #fffbeb;
+    border: 2px solid #f59e0b;
+    color: #92400e;
+}
+
+.badge-rejected {
+    background-color: #fef2f2;
+    border: 2px solid #ef4444;
+    color: #991b1b;
+}
+
+/* License Card Body */
+.license-card-body {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    flex: 1;
+}
+
+.status-message {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-weight: 600;
+    font-size: 1rem;
+    margin: 0;
+}
+
+.status-message.success {
+    color: #065f46;
+}
+
+.status-message.warning {
+    color: #92400e;
+}
+
+.status-message.error {
+    color: #991b1b;
+}
+
+.status-icon {
+    font-size: 1.25rem;
+}
+
+.verified-date {
+    color: #6b7280;
+    font-size: 0.875rem;
+    margin: 0;
+}
+
+.status-hint {
+    color: #6b7280;
+    font-size: 0.875rem;
+    line-height: 1.5;
+}
+
+.rejection-reason {
+    background: white;
+    padding: 12px;
+    border-radius: 6px;
+    border-left: 4px solid #ef4444;
+}
+
+.rejection-reason strong {
+    display: block;
+    margin-bottom: 6px;
+    color: #991b1b;
+}
+
+.rejection-reason p {
+    margin: 0;
+    color: #6b7280;
+    font-size: 0.875rem;
+}
+
+.license-card-footer {
+    padding-top: 12px;
+    border-top: 1px solid #e5e7eb;
+}
+
+.documents-label {
+    margin: 0;
+    color: #6b7280;
+    font-size: 0.875rem;
+}
+
+/* Empty State */
+.empty-state {
+    text-align: center;
+    padding: 60px 20px;
+    color: #9ca3af;
+}
+
+.empty-state p {
+    font-size: 1.125rem;
+    margin: 0;
+}
+
+/* Info Text */
+.info-text {
+    color: #6b7280;
+    background: #f3f4f6;
+    padding: 16px;
+    border-radius: 8px;
+    border-left: 4px solid #3b82f6;
+    margin-top: 16px;
+    font-size: 0.875rem;
+    line-height: 1.6;
+}
+
+/* Responsive */
+@media (max-width: 1024px) {
+    .service-provider-dashboard {
+        padding: 30px 40px;
+    }
+
+    .license-grid {
+        grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    }
+}
+
+@media (max-width: 768px) {
+    .service-provider-dashboard {
+        padding: 20px;
+    }
+
+    .dashboard-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 16px;
+        padding: 20px;
+    }
+
+    .header-actions {
+        width: 100%;
+    }
+
+    .header-actions button {
+        flex: 1;
+    }
+
+    .section-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 16px;
+    }
+
+    .btn-add {
+        width: 100%;
+        justify-content: center;
+    }
+
+    .license-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .service-section {
+        padding: 20px;
+    }
+}
