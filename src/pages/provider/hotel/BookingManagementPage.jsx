@@ -288,7 +288,7 @@ const BookingManagementPage = () => {
                             <button
                                 key={status}
                                 onClick={() => setFilter(status)}
-                                style={filterButtonStyle(filter === status)}
+                                style={buttonStyle(filter === status)}
                                 onMouseEnter={(e) => {
                                     if (filter !== status) {
                                         e.currentTarget.style.transform = 'translateY(-2px)';

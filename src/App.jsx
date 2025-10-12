@@ -3,6 +3,8 @@ import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import { Toaster } from 'react-hot-toast';
 import Homepage from "./pages/traveler/Homepage";
 import AuthPage from "./pages/auth/AuthPage";
+import ServiceProviderRegistration from "./pages/auth/ServiceProviderRegistration";
+import PendingVerificationPage from "./pages/auth/PendingVerificationPage";
 import { AuthProvider } from './contexts/AuthContext';
 import { FlightProvider } from './contexts/FlightContext';
 import ErrorBoundary from './components/common/ErrorBoundary';
@@ -45,11 +47,20 @@ import FlightBookingFormPage from "./pages/provider/flight/FlightBookingFormPage
 
 // Provider Layout
 import ProviderLayout from "./pages/provider/ProviderLayout";
+import ProviderGeneralDashboard from "./pages/provider/ProviderGeneralDashboard";
+
+// Provider Routes
+import ProviderTypeRouter from "./components/routes/ProviderTypeRouter";
+import ProtectedProviderRoute from "./components/routes/ProtectedProviderRoute";
 
 // Traveler Pages
 import HotelPage from "./pages/traveler/HotelPage";
 import HotelListPage from "./pages/traveler/HotelListPage";
 import Profile from "./pages/traveler/components/Hotel/Profile/Profile";
+
+// Admin Pages
+import PendingProvidersList from "./pages/admin/PendingProvidersList";
+import ProviderDetailPage from "./pages/admin/ProviderDetailPage";
 
 function App() {
   return (
@@ -106,6 +117,12 @@ function App() {
             <Route path="/hotel-list" element={<HotelListPage />} />
             <Route path="/auth" element={<AuthPage />} />
 
+            {/* Provider Registration - Must be accessible without full authentication */}
+            <Route path="/register/service-provider" element={<ServiceProviderRegistration />} />
+
+            {/* Provider Pending Verification Page */}
+            <Route path="/provider/pending-verification" element={<PendingVerificationPage />} />
+
             {/* Error Pages */}
             <Route path="/unauthorized" element={<UnauthorizedPage />} />
 
@@ -119,20 +136,42 @@ function App() {
               }
             />
 
+            {/* Protected Routes - Admin */}
+            <Route
+              path="/admin/providers"
+              element={
+                <ProtectedRoute requiredRole="ADMIN">
+                  <PendingProvidersList />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/admin/providers/:id"
+              element={
+                <ProtectedRoute requiredRole="ADMIN">
+                  <ProviderDetailPage />
+                </ProtectedRoute>
+              }
+            />
+
             {/* Protected Routes - Provider */}
             <Route
               path="/provider"
               element={
-                <ProtectedRoute requiredRole="PROVIDER">
+                <ProtectedProviderRoute>
                   <FlightProvider>
                     <ProviderLayout />
                   </FlightProvider>
-                </ProtectedRoute>
+                </ProtectedProviderRoute>
               }
             >
               <Route element={<DashboardLayout />}>
-                <Route index element={<TourDashboardPage />} />
-                <Route path="dashboard" element={<TourDashboardPage />} />
+                {/* Provider Type Router - Auto-redirect based on provider type */}
+                <Route index element={<ProviderTypeRouter />} />
+
+                {/* General Dashboard for multi-service providers */}
+                <Route path="dashboard" element={<ProviderGeneralDashboard />} />
+
                 <Route path="bookings" element={<BookingManagementPage />} />
 
                 {/* Tour Management - NEW MODULE */}

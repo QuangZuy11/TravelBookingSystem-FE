@@ -306,9 +306,9 @@ const HotelDashboard = () => {
       {/* Stats Section */}
       <div style={statsContainerStyle}>
         {[
-          { title: 'Total Hotels', value: stats.totalHotels, icon: '🏨' },
-          { title: 'Total Rooms', value: stats.totalRooms, icon: '🛏️' },
-          { title: 'Occupancy Rate', value: stats.occupancyRate, icon: '📊' },
+          { title: 'Total Hotels', value: stats.totalHotels, icon: '' },
+          { title: 'Total Rooms', value: stats.totalRooms, icon: '' },
+          { title: 'Occupancy Rate', value: stats.occupancyRate, icon: '' },
           { title: 'Average Rating', value: `⭐ ${stats.averageRating}`, icon: '' }
         ].map((stat, index) => (
           <div

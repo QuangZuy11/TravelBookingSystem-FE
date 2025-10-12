@@ -3,8 +3,8 @@ import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from 'yup';
 import Modal from '@components/shared/Modal';
-import Input from '@components/common/Input';
-import Select from '@components/common/Select';
+import FormInput from '@components/common/FormInput';
+import FormSelect from '@components/common/FormSelect';
 import Button from '@components/common/Button';
 import { DollarSign, Save, X } from 'lucide-react';
 
@@ -81,7 +81,7 @@ const BudgetItemForm = ({ item, onSave, onCancel }) => {
         >
             <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
                 {/* Item Name */}
-                <Input
+                <FormInput
                     label="Tên Khoản Chi"
                     placeholder="VD: Vé xe khách Hà Nội - Sapa"
                     {...register('itemName')}
@@ -90,7 +90,7 @@ const BudgetItemForm = ({ item, onSave, onCancel }) => {
                 />
 
                 {/* Category */}
-                <Select
+                <FormSelect
                     label="Danh Mục"
                     {...register('category')}
                     options={categoryOptions}
@@ -99,7 +99,7 @@ const BudgetItemForm = ({ item, onSave, onCancel }) => {
                 />
 
                 {/* Amount */}
-                <Input
+                <FormInput
                     label="Số Tiền (VNĐ)"
                     type="number"
                     min="0"

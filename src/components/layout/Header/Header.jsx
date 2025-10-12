@@ -8,12 +8,13 @@ import {
 } from "react-icons/fa";
 import "./Header.css"; // Nhớ import file CSS
 import Logo from "../../assets/logo.png"; // Đường dẫn tới logo của bạn
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 const Header = () => {
   const [user, setUser] = useState(null);
   const [showDropdown, setShowDropdown] = useState(false);
   const dropdownRef = useRef(null);
+  const navigate = useNavigate();
 
   // Kiểm tra trạng thái đăng nhập khi component được tải
   useEffect(() => {
@@ -63,6 +64,36 @@ const Header = () => {
     setShowDropdown(!showDropdown);
   };
 
+  // Hàm xử lý click vào "Quản lý dịch vụ"
+  const handleServiceManagement = (e) => {
+    e.preventDefault();
+    setShowDropdown(false);
+
+    // Check provider registration status
+    const providerStr = localStorage.getItem('provider');
+    let provider = null;
+
+    try {
+      provider = providerStr ? JSON.parse(providerStr) : null;
+    } catch (error) {
+      console.error('Error parsing provider:', error);
+    }
+
+    // Nếu provider null hoặc chưa có type/licenses -> redirect đến registration
+    if (!provider ||
+      !Array.isArray(provider.type) ||
+      provider.type.length === 0 ||
+      !Array.isArray(provider.licenses) ||
+      provider.licenses.length === 0) {
+      console.log("Provider chưa đăng ký, redirect to registration");
+      navigate("/register/service-provider");
+    } else {
+      // Provider đã đăng ký đầy đủ -> vào dashboard
+      console.log("Provider đã đăng ký, redirect to hotels");
+      navigate("/provider/hotels");
+    }
+  };
+
   return (
     <header className="header">
       <div className="header-logo">
@@ -109,7 +140,13 @@ const Header = () => {
                   <span>Tour Đã Đặt</span>
                 </a>
                 {user.role === 'ServiceProvider' && (
-                  <a href="/provider/hotels" className="dropdown-item">Quản lý dịch vụ</a>
+                  <a
+                    href="#"
+                    onClick={handleServiceManagement}
+                    className="dropdown-item"
+                  >
+                    Quản lý dịch vụ
+                  </a>
                 )}
                 <div className="dropdown-divider"></div>
                 <button onClick={handleLogout} className="dropdown-item logout">

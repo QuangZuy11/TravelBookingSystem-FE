@@ -3,8 +3,8 @@ import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from 'yup';
 import Modal from '@components/shared/Modal';
-import Input from '@components/common/Input';
-import Select from '@components/common/Select';
+import FormInput from '@components/common/FormInput';
+import FormSelect from '@components/common/FormSelect';
 import Button from '@components/common/Button';
 import { Clock, MapPin, Save, X } from 'lucide-react';
 
@@ -84,7 +84,7 @@ const ActivityForm = ({ activity, dayNumber, onSave, onCancel }) => {
         >
             <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
                 {/* Title */}
-                <Input
+                <FormInput
                     label="Tiêu Đề Hoạt Động"
                     placeholder="VD: Tham quan Hồ Hoàn Kiếm"
                     {...register('title')}
@@ -111,7 +111,7 @@ const ActivityForm = ({ activity, dayNumber, onSave, onCancel }) => {
                 </div>
 
                 {/* Type */}
-                <Select
+                <FormSelect
                     label="Loại Hoạt Động"
                     {...register('type')}
                     options={activityTypes}
@@ -121,7 +121,7 @@ const ActivityForm = ({ activity, dayNumber, onSave, onCancel }) => {
 
                 {/* Time Range */}
                 <div className="grid grid-cols-2 gap-4">
-                    <Input
+                    <FormInput
                         label="Thời Gian Bắt Đầu"
                         type="time"
                         {...register('startTime')}
@@ -129,7 +129,7 @@ const ActivityForm = ({ activity, dayNumber, onSave, onCancel }) => {
                         icon={<Clock className="w-5 h-5" />}
                         required
                     />
-                    <Input
+                    <FormInput
                         label="Thời Gian Kết Thúc"
                         type="time"
                         {...register('endTime')}
@@ -140,7 +140,7 @@ const ActivityForm = ({ activity, dayNumber, onSave, onCancel }) => {
                 </div>
 
                 {/* Destination */}
-                <Input
+                <FormInput
                     label="Địa Điểm"
                     placeholder="VD: Hà Nội"
                     {...register('destination')}
