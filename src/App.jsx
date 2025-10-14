@@ -140,7 +140,7 @@ function App() {
             <Route
               path="/admin/providers"
               element={
-                <ProtectedRoute requiredRole="ADMIN">
+                <ProtectedRoute requiredRole="Admin">
                   <PendingProvidersList />
                 </ProtectedRoute>
               }
