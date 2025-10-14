@@ -3,52 +3,98 @@ import { useAuth } from "../../contexts/AuthContext";
 import Header from "../../components/layout/Header/Header";
 import "./Profile.css";
 
+const initialFormState = {
+  name: "",
+  email: "",
+  phone: "",
+  gender: "",
+  date_of_birth: "",
+  city: "",
+  passport_number: "",
+  nationality: "",
+};
+
+const mapProfileToForm = (profile) => ({
+  name: profile?.name || "",
+  email: profile?.email || "",
+  phone: profile?.traveler?.phone || "",
+  gender: profile?.traveler?.gender || "",
+  date_of_birth: profile?.traveler?.date_of_birth
+    ? profile.traveler.date_of_birth.substring(0, 10)
+    : "",
+  city: profile?.traveler?.city || "",
+  passport_number: profile?.traveler?.passport_number || "",
+  nationality: profile?.traveler?.nationality || "",
+});
+
 const Profile = () => {
   const { user, logout } = useAuth();
   const [activeTab, setActiveTab] = useState("info");
   const [profile, setProfile] = useState(null);
-  const [formData, setFormData] = useState({ name: "", email: "", phone: "" });
-  const [message, setMessage] = useState("");
+  const [formData, setFormData] = useState(initialFormState);
+  const [profileMessage, setProfileMessage] = useState("");
+  const [profileMessageType, setProfileMessageType] = useState(null);
   const [loading, setLoading] = useState(false);
 
-  // state đổi mật khẩu
   const [oldPassword, setOldPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
-  const [passwordMsg, setPasswordMsg] = useState("");
+  const [passwordMessage, setPasswordMessage] = useState("");
+  const [passwordMessageType, setPasswordMessageType] = useState(null);
 
   useEffect(() => {
     const token = localStorage.getItem("token");
-    if (token) {
-      fetch("http://localhost:3000/api/profiles/me", {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
+    if (!token) return;
+
+    setProfileMessage("");
+    setProfileMessageType(null);
+
+    fetch("http://localhost:3000/api/profiles/me", {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    })
+      .then((res) => res.json())
+      .then((data) => {
+        if (!data?.success) {
+          setProfileMessage(data?.message || "Không thể tải thông tin cá nhân.");
+          setProfileMessageType("error");
+          return;
+        }
+
+        setProfile(data.data);
+        setFormData(mapProfileToForm(data.data));
       })
-        .then((res) => res.json())
-        .then((data) => {
-          setProfile(data.data);
-          setFormData({
-            name: data.data?.name || "",
-            email: data.data?.email || "",
-            phone: data.data?.phone || "",
-          });
-        })
-        .catch((err) => console.error("Lỗi khi lấy profile:", err));
-    }
+      .catch((err) => {
+        console.error("Failed to fetch profile:", err);
+        setProfileMessage("Lỗi server!");
+        setProfileMessageType("error");
+      });
   }, []);
 
-  const handleChange = (e) => {
-    setFormData({
-      ...formData,
-      [e.target.name]: e.target.value,
-    });
+  const handleTabChange = (tab) => {
+    setActiveTab(tab);
+    if (tab === "update") {
+      setProfileMessage("");
+      setProfileMessageType(null);
+    }
   };
 
-  const handleUpdate = (e) => {
-    e.preventDefault();
+  const handleChange = (event) => {
+    const { name, value } = event.target;
+    setFormData((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
+  };
+
+  const handleUpdate = (event) => {
+    event.preventDefault();
     const token = localStorage.getItem("token");
+    if (!token) return;
+
     setLoading(true);
-    setMessage("");
+    setProfileMessage("");
+    setProfileMessageType(null);
 
     fetch("http://localhost:3000/api/profiles/me", {
       method: "PUT",
@@ -61,23 +107,42 @@ const Profile = () => {
       .then((res) => res.json())
       .then((data) => {
         setLoading(false);
-        if (data.success) {
-          setProfile(data.data);
-          setMessage("Cập nhật thành công!");
-        } else {
-          setMessage("Cập nhật thất bại!");
+
+        if (!data?.success) {
+          setProfileMessage(data?.message || "Cập nhật thất bại!");
+          setProfileMessageType("error");
+          return;
         }
+
+        setProfile(data.data);
+        setFormData(mapProfileToForm(data.data));
+        setProfileMessage("Cập nhật thành công!");
+        setProfileMessageType("success");
+        setActiveTab("info");
       })
       .catch((err) => {
-        console.error("Lỗi khi cập nhật profile:", err);
+        console.error("Failed to update profile:", err);
         setLoading(false);
-        setMessage("Lỗi server!");
+        setProfileMessage("Lỗi server!");
+        setProfileMessageType("error");
       });
   };
 
-  const handleChangePassword = (e) => {
-    e.preventDefault();
+  const handleChangePassword = (event) => {
+    event.preventDefault();
     const token = localStorage.getItem("token");
+    if (!token) return;
+
+    setPasswordMessage("");
+    setPasswordMessageType(null);
+
+    if (!oldPassword.trim() || !newPassword.trim()) {
+      setPasswordMessage(
+        "Vui lòng nhập đầy đủ mật khẩu cũ và mật khẩu mới."
+      );
+      setPasswordMessageType("error");
+      return;
+    }
 
     fetch("http://localhost:3000/api/profiles/change-password", {
       method: "PUT",
@@ -89,15 +154,22 @@ const Profile = () => {
     })
       .then((res) => res.json())
       .then((data) => {
-        if (data.success) {
-          setPasswordMsg("Đổi mật khẩu thành công!");
-          setOldPassword("");
-          setNewPassword("");
-        } else {
-          setPasswordMsg(data.message || "Đổi mật khẩu thất bại!");
+        if (!data?.success) {
+          setPasswordMessage(data?.message || "Đổi mật khẩu thất bại!");
+          setPasswordMessageType("error");
+          return;
         }
+
+        setPasswordMessage("Đổi mật khẩu thành công!");
+        setPasswordMessageType("success");
+        setOldPassword("");
+        setNewPassword("");
       })
-      .catch(() => setPasswordMsg("Lỗi server!"));
+      .catch((err) => {
+        console.error("Failed to change password:", err);
+        setPasswordMessage("Lỗi server!");
+        setPasswordMessageType("error");
+      });
   };
 
   if (!user) {
@@ -115,51 +187,89 @@ const Profile = () => {
     <>
       <Header />
       <div className="profile-page">
-        {/* Sidebar */}
         <div className="sidebar">
           <ul>
             <li
               className={activeTab === "info" ? "active" : ""}
-              onClick={() => setActiveTab("info")}
+              onClick={() => handleTabChange("info")}
             >
               Thông tin cá nhân
             </li>
             <li
               className={activeTab === "update" ? "active" : ""}
-              onClick={() => setActiveTab("update")}
+              onClick={() => handleTabChange("update")}
             >
               Cập nhật hồ sơ
             </li>
-            <li onClick={logout} className="logout-btn">
+            <li className="logout-btn" onClick={logout}>
               Đăng xuất
             </li>
           </ul>
         </div>
 
-        {/* Main Content */}
         <div className="content">
-          {activeTab === "info" && profile && (
+          {activeTab === "info" && (
             <div className="card">
               <h2>Thông tin cá nhân</h2>
-              <p>
-                <strong>Họ tên:</strong> {profile.name}
-              </p>
-              <p>
-                <strong>Email:</strong> {profile.email}
-              </p>
-              <p>
-                <strong>Số điện thoại:</strong>{" "}
-                {profile.phone || "Chưa có"}
-              </p>
-              <p>
-                <strong>Vai trò:</strong> {profile.role?.role_name}
-              </p>
+
+              {profileMessage && (
+                <div
+                  className={`alert ${
+                    profileMessageType === "success" ? "success" : "error"
+                  }`}
+                >
+                  {profileMessage}
+                </div>
+              )}
+
+              {profile ? (
+                <>
+                  <p>
+                    <strong>Họ tên:</strong> {profile.name}
+                  </p>
+                  <p>
+                    <strong>Email:</strong> {profile.email}
+                  </p>
+                  <p>
+                    <strong>Số điện thoại:</strong>{" "}
+                    {profile.traveler?.phone || "Chưa cập nhật"}
+                  </p>
+                  <p>
+                    <strong>Giới tính:</strong>{" "}
+                    {profile.traveler?.gender || "Chưa cập nhật"}
+                  </p>
+                  <p>
+                    <strong>Ngày sinh:</strong>{" "}
+                    {profile.traveler?.date_of_birth
+                      ? new Date(
+                          profile.traveler.date_of_birth
+                        ).toLocaleDateString("vi-VN")
+                      : "Chưa cập nhật"}
+                  </p>
+                  <p>
+                    <strong>Thành phố:</strong>{" "}
+                    {profile.traveler?.city || "Chưa cập nhật"}
+                  </p>
+                  <p>
+                    <strong>Số hộ chiếu:</strong>{" "}
+                    {profile.traveler?.passport_number || "Chưa cập nhật"}
+                  </p>
+                  <p>
+                    <strong>Quốc tịch:</strong>{" "}
+                    {profile.traveler?.nationality || "Chưa cập nhật"}
+                  </p>
+                  <p>
+                    <strong>Vai trò:</strong> {profile.role?.role_name}
+                  </p>
+                </>
+              ) : (
+                <p>Không có dữ liệu thông tin cá nhân.</p>
+              )}
             </div>
           )}
 
           {activeTab === "update" && (
             <div className="card update-form">
-              {/* Cập nhật thông tin */}
               <h2>Cập nhật hồ sơ</h2>
               <form onSubmit={handleUpdate}>
                 <div className="form-group">
@@ -192,22 +302,73 @@ const Profile = () => {
                     placeholder="Nhập số điện thoại"
                   />
                 </div>
+                <div className="form-group">
+                  <label>Giới tính:</label>
+                  <select
+                    name="gender"
+                    value={formData.gender}
+                    onChange={handleChange}
+                  >
+                    <option value="">Chọn giới tính</option>
+                    <option value="Male">Nam</option>
+                    <option value="Female">Nữ</option>
+                    <option value="Other">Khác</option>
+                  </select>
+                </div>
+                <div className="form-group">
+                  <label>Ngày sinh:</label>
+                  <input
+                    type="date"
+                    name="date_of_birth"
+                    value={formData.date_of_birth}
+                    onChange={handleChange}
+                  />
+                </div>
+                <div className="form-group">
+                  <label>Thành phố:</label>
+                  <input
+                    type="text"
+                    name="city"
+                    value={formData.city}
+                    onChange={handleChange}
+                    placeholder="Nhập thành phố"
+                  />
+                </div>
+                <div className="form-group">
+                  <label>Số hộ chiếu:</label>
+                  <input
+                    type="text"
+                    name="passport_number"
+                    value={formData.passport_number}
+                    onChange={handleChange}
+                    placeholder="Nhập số hộ chiếu"
+                  />
+                </div>
+                <div className="form-group">
+                  <label>Quốc tịch:</label>
+                  <input
+                    type="text"
+                    name="nationality"
+                    value={formData.nationality}
+                    onChange={handleChange}
+                    placeholder="Nhập quốc tịch"
+                  />
+                </div>
                 <button type="submit" className="btn-update" disabled={loading}>
                   {loading ? "Đang cập nhật..." : "Cập nhật"}
                 </button>
               </form>
 
-              {message && (
+              {profileMessage && (
                 <div
                   className={`alert ${
-                    message.includes("thành công") ? "success" : "error"
+                    profileMessageType === "success" ? "success" : "error"
                   }`}
                 >
-                  {message}
+                  {profileMessage}
                 </div>
               )}
 
-              {/* Đổi mật khẩu */}
               <h2 style={{ marginTop: "30px" }}>Đổi mật khẩu</h2>
               <form onSubmit={handleChangePassword}>
                 <div className="form-group">
@@ -215,7 +376,7 @@ const Profile = () => {
                   <input
                     type="password"
                     value={oldPassword}
-                    onChange={(e) => setOldPassword(e.target.value)}
+                    onChange={(event) => setOldPassword(event.target.value)}
                     placeholder="Nhập mật khẩu cũ"
                   />
                 </div>
@@ -224,7 +385,7 @@ const Profile = () => {
                   <input
                     type="password"
                     value={newPassword}
-                    onChange={(e) => setNewPassword(e.target.value)}
+                    onChange={(event) => setNewPassword(event.target.value)}
                     placeholder="Nhập mật khẩu mới"
                   />
                 </div>
@@ -232,13 +393,14 @@ const Profile = () => {
                   Đổi mật khẩu
                 </button>
               </form>
-              {passwordMsg && (
+
+              {passwordMessage && (
                 <div
                   className={`alert ${
-                    passwordMsg.includes("thành công") ? "success" : "error"
+                    passwordMessageType === "success" ? "success" : "error"
                   }`}
                 >
-                  {passwordMsg}
+                  {passwordMessage}
                 </div>
               )}
             </div>
@@ -250,4 +412,3 @@ const Profile = () => {
 };
 
 export default Profile;
-
