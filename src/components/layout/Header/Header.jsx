@@ -5,6 +5,7 @@ import {
   FaSignOutAlt,
   FaSuitcase,
   FaChevronDown,
+  FaUsers,
 } from "react-icons/fa";
 import "./Header.css"; // Nhớ import file CSS
 import Logo from "../../assets/logo.png"; // Đường dẫn tới logo của bạn
@@ -70,27 +71,29 @@ const Header = () => {
     setShowDropdown(false);
 
     // Check provider registration status
-    const providerStr = localStorage.getItem('provider');
+    const providerStr = localStorage.getItem("provider");
     let provider = null;
 
     try {
       provider = providerStr ? JSON.parse(providerStr) : null;
     } catch (error) {
-      console.error('Error parsing provider:', error);
+      console.error("Error parsing provider:", error);
     }
 
     // Nếu provider null hoặc chưa có type/licenses -> redirect đến registration
-    if (!provider ||
+    if (
+      !provider ||
       !Array.isArray(provider.type) ||
       provider.type.length === 0 ||
       !Array.isArray(provider.licenses) ||
-      provider.licenses.length === 0) {
+      provider.licenses.length === 0
+    ) {
       console.log("Provider chưa đăng ký, redirect to registration");
       navigate("/register/service-provider");
     } else {
       // Provider đã đăng ký đầy đủ -> route đến dashboard tương ứng với service type
       console.log("Provider đã đăng ký với types:", provider.type);
-      
+
       // Tất cả providers đều vào /provider/dashboard
       // Dashboard sẽ tự động hiển thị các sections tương ứng với provider.type
       navigate("/provider/dashboard");
@@ -142,7 +145,7 @@ const Header = () => {
                   <FaSuitcase className="dropdown-icon" />
                   <span>Tour Đã Đặt</span>
                 </a>
-                {user.role === 'ServiceProvider' && (
+                {user.role === "ServiceProvider" && (
                   <a
                     href="#"
                     onClick={handleServiceManagement}
@@ -150,6 +153,12 @@ const Header = () => {
                   >
                     Quản lý dịch vụ
                   </a>
+                )}
+                {user && user.role === "Admin" && (
+                  <Link to="/admin/dashboard" className="dropdown-item">
+                    <FaUsers className="dropdown-icon" />
+                    <span>Quản lý người dùng</span>
+                  </Link>
                 )}
                 <div className="dropdown-divider"></div>
                 <button onClick={handleLogout} className="dropdown-item logout">

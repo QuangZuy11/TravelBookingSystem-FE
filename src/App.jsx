@@ -1,16 +1,16 @@
 import "./App.css";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-import { Toaster } from 'react-hot-toast';
+import { Toaster } from "react-hot-toast";
 import Homepage from "./pages/traveler/Homepage";
 import AuthPage from "./pages/auth/AuthPage";
 import ServiceProviderRegistration from "./pages/auth/ServiceProviderRegistration";
 import PendingVerificationPage from "./pages/auth/PendingVerificationPage";
-import { AuthProvider } from './contexts/AuthContext';
-import { FlightProvider } from './contexts/FlightContext';
-import ErrorBoundary from './components/common/ErrorBoundary';
-import ProtectedRoute from './components/common/ProtectedRoute';
-import NotFoundPage from './pages/NotFoundPage';
-import UnauthorizedPage from './pages/UnauthorizedPage';
+import { AuthProvider } from "./contexts/AuthContext";
+import { FlightProvider } from "./contexts/FlightContext";
+import ErrorBoundary from "./components/common/ErrorBoundary";
+import ProtectedRoute from "./components/common/ProtectedRoute";
+import NotFoundPage from "./pages/NotFoundPage";
+import UnauthorizedPage from "./pages/UnauthorizedPage";
 import DashboardLayout from "./components/layout/ProviderDashboard/DashboardLayout";
 import TourDashboard from "./pages/provider/dashboard/TourDashboard";
 
@@ -20,7 +20,7 @@ import TourListPage from "./pages/provider/tour/TourList";
 import CreateTourWizard from "./pages/provider/tour/CreateTourWizard";
 import TourDetailsPage from "./pages/provider/tour/TourDetailsPage";
 
-// Hotel Management  
+// Hotel Management
 import HotelDashboard from "./pages/provider/hotel/HotelDashboard";
 import HotelDetailsPage from "./pages/provider/hotel/HotelDetailsPage";
 import RoomTypeDetailsPage from "./pages/provider/hotel/RoomTypeDetailsPage";
@@ -61,6 +61,8 @@ import Profile from "./pages/traveler/components/Hotel/Profile/Profile";
 // Admin Pages
 import PendingProvidersList from "./pages/admin/PendingProvidersList";
 import ProviderDetailPage from "./pages/admin/ProviderDetailPage";
+import AdminDashboardPage from "./pages/admin/AdminDashboardPage";
+import UserListPage from "./pages/admin/UserListPage";
 
 function App() {
   return (
@@ -76,35 +78,35 @@ function App() {
               // Default options
               duration: 4000,
               style: {
-                background: '#363636',
-                color: '#fff',
-                padding: '16px',
-                borderRadius: '8px',
-                fontSize: '14px',
-                maxWidth: '500px',
+                background: "#363636",
+                color: "#fff",
+                padding: "16px",
+                borderRadius: "8px",
+                fontSize: "14px",
+                maxWidth: "500px",
               },
               // Success toast style
               success: {
                 duration: 3000,
                 iconTheme: {
-                  primary: '#10b981',
-                  secondary: '#fff',
+                  primary: "#10b981",
+                  secondary: "#fff",
                 },
                 style: {
-                  background: '#10b981',
-                  color: '#fff',
+                  background: "#10b981",
+                  color: "#fff",
                 },
               },
               // Error toast style
               error: {
                 duration: 5000,
                 iconTheme: {
-                  primary: '#ef4444',
-                  secondary: '#fff',
+                  primary: "#ef4444",
+                  secondary: "#fff",
                 },
                 style: {
-                  background: '#ef4444',
-                  color: '#fff',
+                  background: "#ef4444",
+                  color: "#fff",
                 },
               },
             }}
@@ -118,10 +120,16 @@ function App() {
             <Route path="/auth" element={<AuthPage />} />
 
             {/* Provider Registration - Must be accessible without full authentication */}
-            <Route path="/register/service-provider" element={<ServiceProviderRegistration />} />
+            <Route
+              path="/register/service-provider"
+              element={<ServiceProviderRegistration />}
+            />
 
             {/* Provider Pending Verification Page */}
-            <Route path="/provider/pending-verification" element={<PendingVerificationPage />} />
+            <Route
+              path="/provider/pending-verification"
+              element={<PendingVerificationPage />}
+            />
 
             {/* Error Pages */}
             <Route path="/unauthorized" element={<UnauthorizedPage />} />
@@ -153,6 +161,22 @@ function App() {
                 </ProtectedRoute>
               }
             />
+            <Route
+              path="/admin/dashboard"
+              element={
+                <ProtectedRoute requiredRole="Admin">
+                  <AdminDashboardPage />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/admin/users"
+              element={
+                <ProtectedRoute requiredRole="Admin">
+                  <UserListPage />
+                </ProtectedRoute>
+              }
+            />
 
             {/* Protected Routes - Provider */}
             <Route
@@ -170,7 +194,10 @@ function App() {
                 <Route index element={<ProviderTypeRouter />} />
 
                 {/* General Dashboard for multi-service providers */}
-                <Route path="dashboard" element={<ProviderGeneralDashboard />} />
+                <Route
+                  path="dashboard"
+                  element={<ProviderGeneralDashboard />}
+                />
 
                 <Route path="bookings" element={<BookingManagementPage />} />
 
@@ -192,24 +219,42 @@ function App() {
                   <Route path=":flightId" element={<FlightDetailsPageNew />} />
 
                   {/* Flight Classes (nested in flight details, but also accessible directly) */}
-                  <Route path=":flightId/classes" element={<FlightClassesManagementPage />} />
+                  <Route
+                    path=":flightId/classes"
+                    element={<FlightClassesManagementPage />}
+                  />
 
                   {/* Flight Seats */}
-                  <Route path=":flightId/seats" element={<SeatsManagementPage />} />
-                  <Route path=":flightId/seats/setup" element={<BulkSeatSetupPage />} />
+                  <Route
+                    path=":flightId/seats"
+                    element={<SeatsManagementPage />}
+                  />
+                  <Route
+                    path=":flightId/seats/setup"
+                    element={<BulkSeatSetupPage />}
+                  />
 
                   {/* Flight Schedules */}
-                  <Route path=":flightId/schedules" element={<ScheduleManagementPage />} />
+                  <Route
+                    path=":flightId/schedules"
+                    element={<ScheduleManagementPage />}
+                  />
                 </Route>
 
                 {/* Flight Statistics - Keep for backward compatibility */}
-                <Route path="flight-statistics" element={<FlightStatisticsPage />} />
+                <Route
+                  path="flight-statistics"
+                  element={<FlightStatisticsPage />}
+                />
 
                 {/* Flight Bookings - Keep for backward compatibility */}
                 <Route path="flight-bookings">
                   <Route index element={<FlightBookingListPage />} />
                   <Route path="new" element={<FlightBookingFormPage />} />
-                  <Route path=":bookingId" element={<FlightBookingDetailsPage />} />
+                  <Route
+                    path=":bookingId"
+                    element={<FlightBookingDetailsPage />}
+                  />
                 </Route>
 
                 {/* Hotel Management */}
@@ -220,8 +265,14 @@ function App() {
                   <Route path=":hotelId" element={<HotelDetailsPage />} />
                   <Route path=":hotelId/rooms" element={<RoomListPage />} />
                   <Route path=":hotelId/rooms/new" element={<RoomFormPage />} />
-                  <Route path=":hotelId/rooms/:roomId" element={<RoomTypeDetailsPage />} />
-                  <Route path=":hotelId/rooms/:roomId/edit" element={<RoomFormPage />} />
+                  <Route
+                    path=":hotelId/rooms/:roomId"
+                    element={<RoomTypeDetailsPage />}
+                  />
+                  <Route
+                    path=":hotelId/rooms/:roomId/edit"
+                    element={<RoomFormPage />}
+                  />
                 </Route>
               </Route>
             </Route>
