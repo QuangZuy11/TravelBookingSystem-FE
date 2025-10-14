@@ -228,8 +228,24 @@ const ServiceProviderRegistration = () => {
             const response = await registerServiceProvider(data);
 
             if (response.success) {
-                // Update localStorage với provider data mới
-                localStorage.setItem('provider', JSON.stringify(response.data.provider));
+                const providerData = response.data.provider;
+
+                // Update localStorage với provider data mới (đầy đủ)
+                localStorage.setItem('provider', JSON.stringify(providerData));
+                localStorage.setItem('providerId', providerData._id);
+
+                // Update user object in localStorage
+                const userStr = localStorage.getItem('user');
+                if (userStr) {
+                    try {
+                        const user = JSON.parse(userStr);
+                        user.providerId = providerData._id;
+                        user.provider = providerData;
+                        localStorage.setItem('user', JSON.stringify(user));
+                    } catch (error) {
+                        console.error('Error updating user in localStorage:', error);
+                    }
+                }
 
                 toast.success('✅ Đăng ký thành công! Chờ admin xác minh.');
 
@@ -280,19 +296,20 @@ const ServiceProviderRegistration = () => {
                 </div>
 
                 <div className="form-group">
-                    <label>Email công ty *</label>
+                    <label>Email công ty (Company Email) *</label>
                     <input
                         type="email"
                         name="email"
-                        placeholder="company@email.com"
+                        placeholder="company@example.com"
                         value={companyInfo.email}
                         onChange={handleCompanyInfoChange}
                         required
                     />
+                    <small className="hint">Email chính thức của công ty</small>
                 </div>
 
                 <div className="form-group">
-                    <label>Số điện thoại *</label>
+                    <label>Số điện thoại công ty (Company Phone) *</label>
                     <input
                         type="tel"
                         name="phone"
@@ -301,6 +318,7 @@ const ServiceProviderRegistration = () => {
                         onChange={handleCompanyInfoChange}
                         required
                     />
+                    <small className="hint">Số điện thoại liên hệ của công ty</small>
                 </div>
 
                 <div className="form-group full-width">
