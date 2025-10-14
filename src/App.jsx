@@ -148,7 +148,7 @@ function App() {
             <Route
               path="/admin/providers/:id"
               element={
-                <ProtectedRoute requiredRole="ADMIN">
+                <ProtectedRoute requiredRole="Admin">
                   <ProviderDetailPage />
                 </ProtectedRoute>
               }

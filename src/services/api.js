@@ -1,4 +1,5 @@
 import axios from 'axios';
+import { clearAuthData } from '../utils/authHelpers';
 
 const API_URL = 'http://localhost:3000/api';
 
@@ -28,9 +29,8 @@ api.interceptors.response.use(
   (response) => response,
   (error) => {
     if (error.response?.status === 401) {
-      // Unauthorized - clear token and redirect to login
-      localStorage.removeItem('token');
-      localStorage.removeItem('user');
+      // Unauthorized - clear all auth data and redirect to login
+      clearAuthData();
       window.location.href = '/auth';
     }
     return Promise.reject(error);

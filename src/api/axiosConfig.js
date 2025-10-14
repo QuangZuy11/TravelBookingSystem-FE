@@ -1,5 +1,6 @@
 import axios from 'axios';
 import toast from 'react-hot-toast';
+import { clearAuthData } from '../utils/authHelpers';
 
 const axiosInstance = axios.create({
   baseURL: import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000/api',
@@ -38,9 +39,8 @@ axiosInstance.interceptors.response.use(
       
       switch (status) {
         case 401:
-          // Unauthorized - clear token and redirect to login
-          localStorage.removeItem('token');
-          localStorage.removeItem('user');
+          // Unauthorized - clear all auth data and redirect to login
+          clearAuthData();
           toast.error('Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại.');
           window.location.href = '/auth';
           break;

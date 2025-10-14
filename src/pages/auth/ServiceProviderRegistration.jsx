@@ -65,6 +65,7 @@ const ServiceProviderRegistration = () => {
         if (!companyInfo.company_name || !companyInfo.contact_person ||
             !companyInfo.email || !companyInfo.phone || !companyInfo.address) {
             toast.error('Vui lòng điền đầy đủ thông tin công ty!');
+            console.log('Validation failed - missing fields:', companyInfo);
             return false;
         }
         const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -72,6 +73,12 @@ const ServiceProviderRegistration = () => {
             toast.error('Email công ty không hợp lệ!');
             return false;
         }
+        // Validate phone format (basic)
+        if (companyInfo.phone.length < 10) {
+            toast.error('Số điện thoại phải có ít nhất 10 số!');
+            return false;
+        }
+        console.log('Company info validation passed:', companyInfo);
         return true;
     };
 
@@ -209,12 +216,14 @@ const ServiceProviderRegistration = () => {
             const data = {
                 company_name: companyInfo.company_name,
                 contact_person: companyInfo.contact_person,
-                email: companyInfo.email,
-                phone: companyInfo.phone,
+                company_email: companyInfo.email, // Backend expects 'company_email'
+                company_phone: companyInfo.phone, // Backend expects 'company_phone'
                 address: companyInfo.address,
                 type: serviceTypes, // Array of service types
                 licenses: licenses  // Array of license objects
             };
+
+            console.log('Sending registration data:', data); // Debug log
 
             const response = await registerServiceProvider(data);
 

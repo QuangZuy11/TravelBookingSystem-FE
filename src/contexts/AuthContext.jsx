@@ -1,5 +1,6 @@
 import React, { createContext, useState, useContext, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { clearAuthData } from '../utils/authHelpers';
 
 const AuthContext = createContext(null);
 
@@ -58,14 +59,8 @@ export const AuthProvider = ({ children }) => {
   };
 
   const logout = () => {
-    // Clear all stored data
-    localStorage.removeItem('token');
-    localStorage.removeItem('fullName');
-    localStorage.removeItem('providerId');
-    localStorage.removeItem('role');
-    localStorage.removeItem('user');
-    localStorage.removeItem('provider');
-
+    // Clear all stored data using centralized helper
+    clearAuthData();
     setUser(null);
     navigate('/');
   };
