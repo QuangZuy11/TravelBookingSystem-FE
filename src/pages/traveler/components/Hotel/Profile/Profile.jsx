@@ -25,6 +25,13 @@ const Profile = () => {
     }
   }, []);
 
+  const handleProfileUpdated = (updatedProfile) => {
+    if (updatedProfile) {
+      setProfile(updatedProfile);
+    }
+    setActiveTab("info");
+  };
+
   if (!user) {
     return (
       <>
@@ -69,7 +76,9 @@ const Profile = () => {
         {/* Main Content */}
         <div className="content">
           {activeTab === "info" && profile && <PersonalInfo profile={profile} />}
-          {activeTab === "update" && <UpdateProfile profile={profile} />}
+          {activeTab === "update" && (
+            <UpdateProfile profile={profile} onProfileUpdated={handleProfileUpdated} />
+          )}
           {activeTab === "logout" && <LogoutSection logout={logout} />}
         </div>
       </div>

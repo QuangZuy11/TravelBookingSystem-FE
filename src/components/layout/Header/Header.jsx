@@ -10,6 +10,7 @@ import {
 import "./Header.css"; // Nhớ import file CSS
 import Logo from "../../assets/logo.png"; // Đường dẫn tới logo của bạn
 import { Link, useNavigate } from "react-router-dom";
+import { clearAuthData } from "../../../utils/authHelpers"; // Import helper
 
 const Header = () => {
   const [user, setUser] = useState(null);
@@ -54,8 +55,8 @@ const Header = () => {
 
   // Hàm xử lý đăng xuất
   const handleLogout = () => {
-    localStorage.removeItem("user");
-    localStorage.removeItem("token");
+    // Clear all auth data using centralized helper
+    clearAuthData();
     setUser(null);
     setShowDropdown(false);
     window.location.href = "/"; // Chuyển hướng về trang chủ

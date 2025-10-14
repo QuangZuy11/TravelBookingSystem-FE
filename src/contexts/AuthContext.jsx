@@ -13,9 +13,24 @@ export const AuthProvider = ({ children }) => {
     // Check token and other stored data
     const token = localStorage.getItem('token');
     const fullName = localStorage.getItem('fullName');
-    const providerId = localStorage.getItem('providerId');
+    let providerId = localStorage.getItem('providerId');
     const role = localStorage.getItem('role');
     const providerStr = localStorage.getItem('provider');
+
+    // Parse provider object
+    let provider = null;
+    try {
+      provider = providerStr ? JSON.parse(providerStr) : null;
+    } catch (error) {
+      console.error('Error parsing provider:', error);
+    }
+
+    // If providerId is missing but provider exists, sync it from provider._id
+    if (!providerId && provider && provider._id) {
+      providerId = provider._id;
+      localStorage.setItem('providerId', providerId);
+      console.log('✅ Synced providerId from provider object:', providerId);
+    }
 
     // If we have a token and basic user info, restore the user state
     if (token && fullName) {
@@ -24,7 +39,7 @@ export const AuthProvider = ({ children }) => {
         providerId: providerId,
         role: role,
         token: token,
-        provider: providerStr ? JSON.parse(providerStr) : null
+        provider: provider
       };
       setUser(restoredUser);
     }

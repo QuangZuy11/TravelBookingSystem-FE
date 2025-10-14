@@ -1,4 +1,5 @@
 import axios from 'axios';
+import { clearAuthData } from '../utils/authHelpers';
 
 // Create axios instance with default config
 const apiClient = axios.create({
@@ -62,10 +63,8 @@ apiClient.interceptors.response.use(
                 originalRequest.headers.Authorization = `Bearer ${accessToken}`;
                 return apiClient(originalRequest);
             } catch (refreshError) {
-                // Refresh failed - Clear tokens and redirect to login
-                localStorage.removeItem('accessToken');
-                localStorage.removeItem('refreshToken');
-                localStorage.removeItem('user');
+                // Refresh failed - Clear all auth data and redirect to login
+                clearAuthData();
                 
                 window.location.href = '/auth/login';
                 return Promise.reject(refreshError);
