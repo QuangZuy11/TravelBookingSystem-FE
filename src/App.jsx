@@ -57,6 +57,7 @@ import ProtectedProviderRoute from "./components/routes/ProtectedProviderRoute";
 import HotelPage from "./pages/traveler/HotelPage";
 import HotelListPage from "./pages/traveler/HotelListPage";
 import Profile from "./pages/traveler/components/Hotel/Profile/Profile";
+import BookTourPage from "./pages/traveler/BookTourPage";
 
 // Admin Pages
 import PendingProvidersList from "./pages/admin/PendingProvidersList";
@@ -116,6 +117,8 @@ function App() {
             <Route path="/hotel-page" element={<HotelPage />} />
             <Route path="/hotel-list" element={<HotelListPage />} />
             <Route path="/auth" element={<AuthPage />} />
+            {/* Trang List Tour cho Traveler*/}
+            <Route path="/tour" element={<BookTourPage />} />
 
             {/* Provider Registration - Must be accessible without full authentication */}
             <Route path="/register/service-provider" element={<ServiceProviderRegistration />} />
