@@ -35,13 +35,17 @@ const CreateTourWizard = () => {
 
                 // 1. Load basic tour info
                 const tourResponse = await axios.get(
-                    `http://localhost:3000/api/tour/provider/${providerId}/tours/${editTourId}`
+                    `http://localhost:3000/api/tour/provider/${providerId}/tours/${editTourId}`, {
+                headers: { Authorization: `Bearer ${token}` }
+            }
                 );
                 const tourInfo = tourResponse.data.data;
 
                 // 2. Load itineraries with activities
                 const itinerariesResponse = await axios.get(
-                    `http://localhost:3000/api/itineraries/tour/${editTourId}`
+                    `http://localhost:3000/api/itineraries/tour/${editTourId}`, {
+                headers: { Authorization: `Bearer ${token}` }
+            }
                 );
                 const itinerariesData = itinerariesResponse.data.data || [];
 
@@ -50,7 +54,9 @@ const CreateTourWizard = () => {
                     itinerariesData.map(async (itinerary) => {
                         try {
                             const activitiesResponse = await axios.get(
-                                `http://localhost:3000/api/itineraries/${itinerary._id}/activities`
+                                `http://localhost:3000/api/itineraries/${itinerary._id}/activities`, {
+                headers: { Authorization: `Bearer ${token}` }
+            }
                             );
                             return {
                                 ...itinerary,
@@ -70,7 +76,9 @@ const CreateTourWizard = () => {
                 let budgetData = [];
                 try {
                     const budgetResponse = await axios.get(
-                        `http://localhost:3000/api/budget-breakdowns/tour/${editTourId}`
+                        `http://localhost:3000/api/budget-breakdowns/tour/${editTourId}`, {
+                headers: { Authorization: `Bearer ${token}` }
+            }
                     );
                     budgetData = budgetResponse.data.data || [];
                 } catch (error) {

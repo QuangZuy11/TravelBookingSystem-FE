@@ -26,13 +26,17 @@ const TourDetailsPage = () => {
 
             // 1. Fetch tour basic info
             const tourResponse = await axios.get(
-                `http://localhost:3000/api/tour/provider/${providerId}/tours/${tourId}`
+                `http://localhost:3000/api/tour/provider/${providerId}/tours/${tourId}`, {
+                headers: { Authorization: `Bearer ${token}` }
+            }
             );
             setTour(tourResponse.data.data);
 
             // 2. Fetch itineraries
             const itinerariesResponse = await axios.get(
-                `http://localhost:3000/api/itineraries/tour/${tourId}`
+                `http://localhost:3000/api/itineraries/tour/${tourId}`, {
+                headers: { Authorization: `Bearer ${token}` }
+            }
             );
 
             if (itinerariesResponse.data.data) {
@@ -43,7 +47,9 @@ const TourDetailsPage = () => {
                     itinerariesData.map(async (itinerary) => {
                         try {
                             const activitiesResponse = await axios.get(
-                                `http://localhost:3000/api/itineraries/${itinerary._id}/activities`
+                                `http://localhost:3000/api/itineraries/${itinerary._id}/activities`, {
+                headers: { Authorization: `Bearer ${token}` }
+            }
                             );
                             return {
                                 ...itinerary,
@@ -62,7 +68,9 @@ const TourDetailsPage = () => {
             // 4. Fetch budget breakdown
             try {
                 const budgetResponse = await axios.get(
-                    `http://localhost:3000/api/budget-breakdowns/tour/${tourId}`
+                    `http://localhost:3000/api/budget-breakdowns/tour/${tourId}`, {
+                headers: { Authorization: `Bearer ${token}` }
+            }
                 );
                 setBudgetItems(budgetResponse.data.data?.items || []);
             } catch (error) {

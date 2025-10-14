@@ -5,13 +5,17 @@ const API_BASE_URL = '/api/flight';
 const passengerService = {
     // Get all passengers for a booking
     getBookingPassengers: async (bookingId) => {
-        const response = await axios.get(`${API_BASE_URL}/bookings/${bookingId}/passengers`);
+        const response = await axios.get(`${API_BASE_URL}/bookings/${bookingId}/passengers`, {
+                headers: { Authorization: `Bearer ${token}` }
+            });
         return response.data;
     },
 
     // Get a specific passenger
     getPassengerById: async (bookingId, passengerId) => {
-        const response = await axios.get(`${API_BASE_URL}/bookings/${bookingId}/passengers/${passengerId}`);
+        const response = await axios.get(`${API_BASE_URL}/bookings/${bookingId}/passengers/${passengerId}`, {
+                headers: { Authorization: `Bearer ${token}` }
+            });
         return response.data;
     },
 
@@ -29,7 +33,8 @@ const passengerService = {
 
     // Update passenger information
     updatePassenger: async (bookingId, passengerId, passengerData) => {
-        const response = await axios.put(`${API_BASE_URL}/bookings/${bookingId}/passengers/${passengerId}`, passengerData);
+        const response = await axios.put(`${API_BASE_URL}/bookings/${bookingId}/passengers/${passengerId}`, passengerData,
+                { headers: { Authorization: `Bearer ${token}` } });
         return response.data;
     },
 

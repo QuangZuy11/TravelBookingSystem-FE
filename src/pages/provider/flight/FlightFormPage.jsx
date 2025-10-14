@@ -7,6 +7,7 @@ import { ErrorAlert } from '../../../components/shared/ErrorAlert';
 
 const FlightFormPage = () => {
     const navigate = useNavigate();
+    const token = localStorage.getItem('token');
     const { id } = useParams();
     const providerId = localStorage.getItem('providerId');
     const isEditMode = Boolean(id);
@@ -191,10 +192,14 @@ const FlightFormPage = () => {
             const backendData = transformFormDataForBackend(formData);
             
             if (isEditMode) {
-                await axios.put(`/api/flight/provider/${providerId}/flights/${id}`, backendData);
+                await axios.put(`/api/flight/provider/${providerId}/flights/${id}`, backendData, {
+                headers: { Authorization: `Bearer ${token}` }
+            });
                 alert('Flight updated successfully!');
             } else {
-                await axios.post(`/api/flight/provider/${providerId}/flights`, backendData);
+                await axios.post(`/api/flight/provider/${providerId}/flights`, backendData, {
+                headers: { Authorization: `Bearer ${token}` }
+            });
                 alert('Flight created successfully!');
             }
             navigate('/provider/flights');
@@ -213,9 +218,11 @@ const FlightFormPage = () => {
             const backendData = transformFormDataForBackend(draftFormData);
             
             if (isEditMode) {
-                await axios.put(`/api/flight/provider/${providerId}/flights/${id}`, backendData);
+                await axios.put(`/api/flight/provider/${providerId}/flights/${id}`, backendData,
+                { headers: { Authorization: `Bearer ${token}` } });
             } else {
-                await axios.post(`/api/flight/provider/${providerId}/flights`, backendData);
+                await axios.post(`/api/flight/provider/${providerId}/flights`, backendData,
+                { headers: { Authorization: `Bearer ${token}` } });
             }
             alert('Draft saved successfully!');
             navigate('/provider/flights');

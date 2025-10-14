@@ -15,10 +15,13 @@ const HotelListPage = () => {
     const [editingHotel, setEditingHotel] = useState(null);
     const [searchTerm, setSearchTerm] = useState('');
 
+    const token = localStorage.getItem('token');
     const fetchHotels = async () => {
         try {
             setLoading(true);
-            const response = await axios.get(`/api/provider/${providerId}/hotels`);
+            const response = await axios.get(`/api/provider/${providerId}/hotels`, {
+                headers: { Authorization: `Bearer ${token}` }
+            });
             setHotels(response.data.data);
         } catch (err) {
             setError('Failed to fetch hotels.');
@@ -45,7 +48,9 @@ const HotelListPage = () => {
     const handleDeleteHotel = async (hotelId) => {
         if (window.confirm('Are you sure you want to delete this hotel?')) {
             try {
-                await axios.delete(`/api/provider/${providerId}/hotels/${hotelId}`);
+                await axios.delete(`/api/provider/${providerId}/hotels/${hotelId}`, {
+                headers: { Authorization: `Bearer ${token}` }
+            });
                 await fetchHotels();
                 alert('Hotel deleted successfully!');
             } catch (err) {
@@ -58,10 +63,14 @@ const HotelListPage = () => {
     const handleFormSubmit = async (formData) => {
         try {
             if (editingHotel) {
-                await axios.put(`/api/provider/${providerId}/hotels/${editingHotel._id}`, formData);
+                await axios.put(`/api/provider/${providerId}/hotels/${editingHotel._id}`, formData, {
+                headers: { Authorization: `Bearer ${token}` }
+            });
                 alert('Hotel updated successfully!');
             } else {
-                await axios.post(`/api/provider/${providerId}/hotels`, formData);
+                await axios.post(`/api/provider/${providerId}/hotels`, formData, {
+                headers: { Authorization: `Bearer ${token}` }
+            });
                 alert('Hotel created successfully!');
             }
             setIsFormModalOpen(false);

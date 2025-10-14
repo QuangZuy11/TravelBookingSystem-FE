@@ -12,7 +12,7 @@ const EditHotelPage = () => {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [hotel, setHotel] = useState(null);
-
+    const token = localStorage.getItem('token');
     useEffect(() => {
         fetchHotelData();
     }, []);
@@ -20,7 +20,9 @@ const EditHotelPage = () => {
     const fetchHotelData = async () => {
         try {
             setLoading(true);
-            const response = await axios.get(`/api/hotel/provider/${providerId}/hotels/${hotelId}`);
+            const response = await axios.get(`/api/hotel/provider/${providerId}/hotels/${hotelId}`, {
+                headers: { Authorization: `Bearer ${token}` }
+            });
             if (response.data.success && response.data.data) {
                 setHotel(response.data.data);
             } else {
@@ -36,7 +38,8 @@ const EditHotelPage = () => {
 
     const handleSubmit = async (formData) => {
         try {
-            await axios.put(`/api/hotel/provider/${providerId}/hotels/${hotelId}`, formData);
+            await axios.put(`/api/hotel/provider/${providerId}/hotels/${hotelId}`, formData,
+                { headers: { Authorization: `Bearer ${token}` } });
             alert('Hotel updated successfully!');
             navigate(`/provider/hotels/${hotelId}`);
         } catch (err) {

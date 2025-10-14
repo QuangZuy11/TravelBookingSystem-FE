@@ -16,6 +16,7 @@ const HotelDashboard = () => {
     occupancyRate: '0%',
     averageRating: 0
   });
+  const token = localStorage.getItem('token');
   const [hoveredCard, setHoveredCard] = useState(null);
   const [hoveredRow, setHoveredRow] = useState(null);
 
@@ -32,7 +33,9 @@ const HotelDashboard = () => {
         return;
       }
       
-      const response = await axios.get(`/api/hotel/provider/${currentProviderId}/hotels`);
+      const response = await axios.get(`/api/hotel/provider/${currentProviderId}/hotels`, {
+                headers: { Authorization: `Bearer ${token}` }
+            });
       const hotelList = response.data.data || [];
       setHotels(hotelList);
 

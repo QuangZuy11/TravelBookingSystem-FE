@@ -6,7 +6,7 @@ import Breadcrumb from '../../../components/shared/Breadcrumb';
 
 const CreateHotelPage = () => {
   const navigate = useNavigate();
-
+  const token = localStorage.getItem('token');
   const handleSubmitHotel = async (formData) => {
     try {
       const providerId = localStorage.getItem('providerId');
@@ -15,7 +15,9 @@ const CreateHotelPage = () => {
         return;
       }
 
-      await axios.post(`/api/hotel/provider/${providerId}/hotels`, formData);
+      await axios.post(`/api/hotel/provider/${providerId}/hotels`, formData, {
+                headers: { Authorization: `Bearer ${token}` }
+            });
       alert('Hotel added successfully!');
       navigate('/provider/hotels'); // Quay lại trang danh sách hotel
     } catch (err) {

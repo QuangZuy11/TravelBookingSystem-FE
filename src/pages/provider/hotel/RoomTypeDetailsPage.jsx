@@ -12,6 +12,7 @@ const RoomTypeDetailsPage = () => {
     const { providerId, hotelId, roomId } = useParams();
     const navigate = useNavigate();
     
+    const token = localStorage.getItem('token');
     // State management
     const [room, setRoom] = useState(null);
     const [pricingRules, setPricingRules] = useState([]);
@@ -31,7 +32,9 @@ const RoomTypeDetailsPage = () => {
     const fetchRoomDetails = async () => {
         try {
             setLoading(true);
-            const response = await axios.get(`/api/provider/${providerId}/hotels/${hotelId}/rooms/${roomId}`);
+            const response = await axios.get(`/api/provider/${providerId}/hotels/${hotelId}/rooms/${roomId}`, {
+                headers: { Authorization: `Bearer ${token}` }
+            });
             setRoom(response.data.data);
             setLoading(false);
         } catch (err) {
@@ -44,7 +47,9 @@ const RoomTypeDetailsPage = () => {
     // Fetch pricing rules
     const fetchPricingRules = async () => {
         try {
-            const response = await axios.get(`/api/room-prices/${roomId}`);
+            const response = await axios.get(`/api/room-prices/${roomId}`, {
+                headers: { Authorization: `Bearer ${token}` }
+            });
             setPricingRules(response.data.data);
         } catch (err) {
             console.error('Failed to fetch pricing rules:', err);
@@ -54,7 +59,9 @@ const RoomTypeDetailsPage = () => {
     // Fetch bookings
     const fetchBookings = async () => {
         try {
-            const response = await axios.get(`/api/provider/${providerId}/hotels/${hotelId}/rooms/${roomId}/bookings`);
+            const response = await axios.get(`/api/provider/${providerId}/hotels/${hotelId}/rooms/${roomId}/bookings`, {
+                headers: { Authorization: `Bearer ${token}` }
+            });
             setBookings(response.data.data);
         } catch (err) {
             console.error('Failed to fetch bookings:', err);
@@ -64,7 +71,9 @@ const RoomTypeDetailsPage = () => {
     // Fetch maintenance records
     const fetchMaintenanceRecords = async () => {
         try {
-            const response = await axios.get(`/api/provider/${providerId}/hotels/${hotelId}/rooms/${roomId}/maintenance`);
+            const response = await axios.get(`/api/provider/${providerId}/hotels/${hotelId}/rooms/${roomId}/maintenance`, {
+                headers: { Authorization: `Bearer ${token}` }
+            });
             setMaintenanceRecords(response.data.data);
         } catch (err) {
             console.error('Failed to fetch maintenance records:', err);
@@ -90,7 +99,8 @@ const RoomTypeDetailsPage = () => {
 
     const handleUpdateRoomSubmit = async (formData) => {
         try {
-            await axios.put(`/api/provider/${providerId}/hotels/${hotelId}/rooms/${roomId}`, formData);
+            await axios.put(`/api/provider/${providerId}/hotels/${hotelId}/rooms/${roomId}`, formData,
+                { headers: { Authorization: `Bearer ${token}` } });
             alert('Room type updated successfully!');
             setIsEditModalOpen(false);
             fetchRoomDetails();
@@ -127,10 +137,14 @@ const RoomTypeDetailsPage = () => {
     const handlePricingRuleSubmit = async (formData) => {
         try {
             if (editingPricingRule) {
-                await axios.put(`/api/room-prices/${editingPricingRule._id}`, formData);
+                await axios.put(`/api/room-prices/${editingPricingRule._id}`, formData, {
+                headers: { Authorization: `Bearer ${token}` }
+            });
                 alert('Pricing rule updated successfully!');
             } else {
-                await axios.post('/api/room-prices', { ...formData, roomId });
+                await axios.post('/api/room-prices', { ...formData, roomId }, {
+                    headers: { Authorization: `Bearer ${token}` }
+                });
                 alert('Pricing rule created successfully!');
             }
             setIsPricingModalOpen(false);
@@ -161,7 +175,9 @@ const RoomTypeDetailsPage = () => {
 
     const handleMaintenanceRecordSubmit = async (formData) => {
         try {
-            await axios.post(`/api/provider/${providerId}/hotels/${hotelId}/rooms/${roomId}/maintenance`, formData);
+            await axios.post(`/api/provider/${providerId}/hotels/${hotelId}/rooms/${roomId}/maintenance`, formData, {
+                headers: { Authorization: `Bearer ${token}` }
+            });
             alert('Maintenance record added successfully!');
             setIsMaintenanceModalOpen(false);
             fetchMaintenanceRecords();

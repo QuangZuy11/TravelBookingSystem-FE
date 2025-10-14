@@ -13,7 +13,7 @@ const RoomListPage = () => {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [hoveredRow, setHoveredRow] = useState(null);
-
+    const token = localStorage.getItem('token');
     useEffect(() => {
         fetchRooms();
     }, [hotelId]);
@@ -21,7 +21,9 @@ const RoomListPage = () => {
     const fetchRooms = async () => {
         try {
             setLoading(true);
-            const response = await axios.get(`/api/hotel/provider/${providerId}/hotels/${hotelId}/rooms`);
+            const response = await axios.get(`/api/hotel/provider/${providerId}/hotels/${hotelId}/rooms`, {
+                headers: { Authorization: `Bearer ${token}` }
+            });
             if (response.data.success) {
                 setRooms(response.data.data);
             }

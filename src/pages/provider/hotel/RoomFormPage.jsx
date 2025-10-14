@@ -7,6 +7,7 @@ import { ErrorAlert } from '../../../components/shared/ErrorAlert';
 
 const RoomFormPage = () => {
   const navigate = useNavigate();
+  const token = localStorage.getItem('token');
   const providerId = localStorage.getItem('providerId');
   if (!providerId) {
     alert('Provider ID not found. Please log in again.');
@@ -30,7 +31,9 @@ const RoomFormPage = () => {
       console.log('Fetching room data with:', { providerId, hotelId, roomId });
       
       // Thay đổi URL API để phù hợp với response
-      const response = await axios.get(`/api/hotel/provider/${providerId}/hotels/${hotelId}/rooms/${roomId}`);
+      const response = await axios.get(`/api/hotel/provider/${providerId}/hotels/${hotelId}/rooms/${roomId}`, {
+                headers: { Authorization: `Bearer ${token}` }
+            });
       
       console.log('Room data response:', response.data);
       
@@ -54,10 +57,14 @@ const RoomFormPage = () => {
     try {
       if (roomId) {
         // Update existing room
-        await axios.put(`/api/hotel/provider/${providerId}/hotels/${hotelId}/rooms/${roomId}`, formData);
+        await axios.put(`/api/hotel/provider/${providerId}/hotels/${hotelId}/rooms/${roomId}`, formData, {
+                headers: { Authorization: `Bearer ${token}` }
+            });
       } else {
         // Create new room
-        await axios.post(`/api/hotel/provider/${providerId}/hotels/${hotelId}/rooms`, formData);
+        await axios.post(`/api/hotel/provider/${providerId}/hotels/${hotelId}/rooms`, formData, {
+                headers: { Authorization: `Bearer ${token}` }
+            });
       }
       navigate(`/provider/hotels/${hotelId}`);
     } catch (err) {

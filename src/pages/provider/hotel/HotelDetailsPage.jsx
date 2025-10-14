@@ -22,11 +22,14 @@ const HotelDetailsPage = () => {
     const [isRoomFormModalOpen, setIsRoomFormModalOpen] = useState(false);
     const [editingRoom, setEditingRoom] = useState(null);
     const [hoveredRow, setHoveredRow] = useState(null);
+    const token = localStorage.getItem('token');
 
     const fetchHotelDetails = async () => {
         try {
             setLoading(true);
-            const hotelsResponse = await axios.get(`/api/hotel/provider/${providerId}/hotels`);
+            const hotelsResponse = await axios.get(`/api/hotel/provider/${providerId}/hotels`, {
+                headers: { Authorization: `Bearer ${token}` }
+            });
             const foundHotel = hotelsResponse.data.data.find(h => h._id === hotelId);
 
             if (!foundHotel) {
@@ -45,7 +48,9 @@ const HotelDetailsPage = () => {
 
     const fetchRoomsForHotel = async () => {
         try {
-            const response = await axios.get(`/api/hotel/provider/${providerId}/hotels/${hotelId}/rooms`);
+            const response = await axios.get(`/api/hotel/provider/${providerId}/hotels/${hotelId}/rooms`, {
+                headers: { Authorization: `Bearer ${token}` }
+            });
             setRooms(response.data.data);
         } catch (err) {
             console.error('Failed to fetch rooms for hotel:', err);
@@ -54,7 +59,9 @@ const HotelDetailsPage = () => {
 
     const fetchBookingsForHotel = async () => {
         try {
-            const response = await axios.get(`/api/hotel/provider/${providerId}/hotels/${hotelId}/bookings`);
+            const response = await axios.get(`/api/hotel/provider/${providerId}/hotels/${hotelId}/bookings`, {
+                headers: { Authorization: `Bearer ${token}` }
+            });
             setBookings(response.data.data);
         } catch (err) {
             console.error('Failed to fetch bookings for hotel:', err);
@@ -78,7 +85,8 @@ const HotelDetailsPage = () => {
 
     const handleUpdateHotelSubmit = async (formData) => {
         try {
-            await axios.put(`/api/hotel/provider/${providerId}/hotels/${hotelId}`, formData);
+            await axios.put(`/api/hotel/provider/${providerId}/hotels/${hotelId}`, formData,
+                { headers: { Authorization: `Bearer ${token}` } });
             alert('Hotel updated successfully!');
             setIsEditModalOpen(false);
             fetchHotelDetails();
@@ -112,10 +120,14 @@ const HotelDetailsPage = () => {
     const handleRoomFormSubmit = async (formData) => {
         try {
             if (editingRoom) {
-                await axios.put(`/api/hotel/provider/${providerId}/hotels/${hotelId}/rooms/${editingRoom._id}`, formData);
+                await axios.put(`/api/hotel/provider/${providerId}/hotels/${hotelId}/rooms/${editingRoom._id}`, formData, {
+                headers: { Authorization: `Bearer ${token}` }
+            });
                 alert('Room type updated successfully!');
             } else {
-                await axios.post(`/api/hotel/provider/${providerId}/hotels/${hotelId}/rooms`, formData);
+                await axios.post(`/api/hotel/provider/${providerId}/hotels/${hotelId}/rooms`, formData, {
+                    headers: { Authorization: `Bearer ${token}` }
+                });
                 alert('Room type created successfully!');
             }
             setIsRoomFormModalOpen(false);

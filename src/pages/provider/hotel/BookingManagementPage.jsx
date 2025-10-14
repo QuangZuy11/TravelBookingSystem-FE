@@ -17,7 +17,7 @@ const BookingManagementPage = () => {
     const [hotels, setHotels] = useState([]);
     const [selectedHotel, setSelectedHotel] = useState(null);
     const [availability, setAvailability] = useState(null);
-
+    const token = localStorage.getItem('token');
     useEffect(() => {
         fetchHotels();
     }, []);
@@ -31,7 +31,8 @@ const BookingManagementPage = () => {
 
     const fetchHotels = async () => {
         try {
-            const response = await axios.get(`/api/hotel/provider/${providerId}/hotels`);
+            const response = await axios.get(`/api/hotel/provider/${providerId}/hotels`,
+                { headers: { Authorization: `Bearer ${token}` } });
             if (response.data.success) {
                 setHotels(response.data.data);
                 if (response.data.data.length > 0) {
@@ -46,7 +47,8 @@ const BookingManagementPage = () => {
 
     const fetchAvailability = async () => {
         try {
-            const response = await axios.get(`/api/hotel/provider/${providerId}/hotels/${selectedHotel._id}/availability`);
+            const response = await axios.get(`/api/hotel/provider/${providerId}/hotels/${selectedHotel._id}/availability`,
+                { headers: { Authorization: `Bearer ${token}` } });
             if (response.data.success) {
                 setAvailability(response.data.data);
             }
@@ -58,7 +60,8 @@ const BookingManagementPage = () => {
     const fetchBookings = async () => {
         try {
             setLoading(true);
-            const response = await axios.get(`/api/hotel/provider/${providerId}/hotels/${selectedHotel._id}/bookings`);
+            const response = await axios.get(`/api/hotel/provider/${providerId}/hotels/${selectedHotel._id}/bookings`,
+                { headers: { Authorization: `Bearer ${token}` } });
             if (response.data.success) {
                 setBookings(response.data.data);
             }
@@ -74,7 +77,8 @@ const BookingManagementPage = () => {
         try {
             await axios.put(`/api/hotel/provider/${providerId}/bookings/${bookingId}`, {
                 status: newStatus
-            });
+            },
+                { headers: { Authorization: `Bearer ${token}` } });
             alert('Booking status updated successfully!');
             fetchBookings(); // Refresh bookings list
         } catch (err) {

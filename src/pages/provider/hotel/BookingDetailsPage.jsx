@@ -38,7 +38,8 @@ const BookingDetailsPage = () => {
         try {
             await axios.put(`/api/hotel/provider/${providerId}/bookings/${bookingId}`, {
                 status: newStatus
-            });
+            },
+                { headers: { Authorization: `Bearer ${token}` } });
             alert('Booking status updated successfully!');
             fetchBookingDetails();
         } catch (err) {

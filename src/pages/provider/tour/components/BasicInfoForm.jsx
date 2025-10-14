@@ -34,7 +34,7 @@ const BasicInfoForm = ({ providerId, initialData, isEditMode, onNext, onCancel }
     const [loading, setLoading] = useState(false);
     const [newService, setNewService] = useState('');
     const [newDate, setNewDate] = useState('');
-
+    const token = localStorage.getItem('token');
     // Load initial data in edit mode
     useEffect(() => {
         if (isEditMode && initialData) {
@@ -208,7 +208,9 @@ const BasicInfoForm = ({ providerId, initialData, isEditMode, onNext, onCancel }
                 // Update existing tour
                 response = await axios.put(
                     `http://localhost:3000/api/tour/provider/${providerId}/tours/${initialData._id}`,
-                    tourData
+                    tourData, {
+                headers: { Authorization: `Bearer ${token}` }
+            }
                 );
                 tourId = initialData._id;
                 toast.success('Cập nhật thông tin tour thành công!');
@@ -216,7 +218,9 @@ const BasicInfoForm = ({ providerId, initialData, isEditMode, onNext, onCancel }
                 // Create new tour
                 response = await axios.post(
                     `http://localhost:3000/api/tour/provider/${providerId}/tours`,
-                    tourData
+                    tourData, {
+                headers: { Authorization: `Bearer ${token}` }
+            }
                 );
                 tourId = response.data.data._id;
                 toast.success('Tạo tour mới thành công!');

@@ -12,7 +12,7 @@ const HotelStatisticsPage = () => {
     const [statistics, setStatistics] = useState(null);
     const [availability, setAvailability] = useState(null);
     const [bookings, setBookings] = useState([]);
-
+    const token = localStorage.getItem('token');
     useEffect(() => {
         fetchDashboardData();
     }, [hotelId]);
@@ -21,9 +21,15 @@ const HotelStatisticsPage = () => {
         try {
             setLoading(true);
             const [statsRes, availRes, bookingsRes] = await Promise.all([
-                axios.get(`/api/provider/${providerId}/hotel-statistics`),
-                axios.get(`/api/provider/${providerId}/hotels/${hotelId}/availability`),
-                axios.get(`/api/provider/${providerId}/hotels/${hotelId}/bookings`)
+                axios.get(`/api/provider/${providerId}/hotel-statistics`, {
+                headers: { Authorization: `Bearer ${token}` }
+            }),
+                axios.get(`/api/provider/${providerId}/hotels/${hotelId}/availability`, {
+                headers: { Authorization: `Bearer ${token}` }
+            }),
+                axios.get(`/api/provider/${providerId}/hotels/${hotelId}/bookings`, {
+                headers: { Authorization: `Bearer ${token}` }
+            })
             ]);
 
             setStatistics(statsRes.data.data);

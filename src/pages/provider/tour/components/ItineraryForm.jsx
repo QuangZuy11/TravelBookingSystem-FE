@@ -8,6 +8,7 @@ const ItineraryForm = ({ tourId, basicInfo, existingItineraries = [], isEditMode
     // Nếu edit mode và có itineraries, bắt đầu từ ngày 1 để có thể edit
     // Nếu create mode hoặc chưa có itineraries, bắt đầu từ ngày 1
     const [currentDay, setCurrentDay] = useState(1);
+    const token = localStorage.getItem('token');
     const [formData, setFormData] = useState({
         day_number: 1,
         title: '',
@@ -215,7 +216,9 @@ const ItineraryForm = ({ tourId, basicInfo, existingItineraries = [], isEditMode
                         title: formData.title,
                         description: formData.description,
                         meals: formData.meals
-                    }
+                    }, {
+                headers: { Authorization: `Bearer ${token}` }
+            }
                 );
                 itineraryId = existingItinerary._id;
 
@@ -230,7 +233,9 @@ const ItineraryForm = ({ tourId, basicInfo, existingItineraries = [], isEditMode
                         title: formData.title,
                         description: formData.description,
                         meals: formData.meals
-                    }
+                    }, {
+                    headers: { Authorization: `Bearer ${token}` }
+                }
                 );
                 itineraryId = itineraryResponse.data.data._id;
             }
@@ -273,7 +278,8 @@ const ItineraryForm = ({ tourId, basicInfo, existingItineraries = [], isEditMode
                             end_time: activity.end_time,
                             description: activity.description,
                             location: activity.location
-                        }
+                        },
+                { headers: { Authorization: `Bearer ${token}` } }
                     );
                 } else {
                     // CREATE new activity

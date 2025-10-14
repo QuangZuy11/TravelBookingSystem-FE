@@ -7,6 +7,7 @@ const BudgetForm = ({ tourId, itineraries, existingBudgetItems = [], isEditMode,
     const [budgetItems, setBudgetItems] = useState(existingBudgetItems);
     const [loadedItineraries, setLoadedItineraries] = useState([]);
     const [loadingItineraries, setLoadingItineraries] = useState(true);
+    const token = localStorage.getItem('token');
     const [formData, setFormData] = useState({
         itinerary_id: '',
         day_number: 1,
@@ -41,7 +42,9 @@ const BudgetForm = ({ tourId, itineraries, existingBudgetItems = [], isEditMode,
 
                 // Fetch itineraries cho tour này
                 const itinerariesResponse = await axios.get(
-                    `http://localhost:3000/api/itineraries/tour/${tourId}`
+                    `http://localhost:3000/api/itineraries/tour/${tourId}`, {
+                headers: { Authorization: `Bearer ${token}` }
+            }
                 );
 
                 const itinerariesData = itinerariesResponse.data.data || [];
@@ -51,7 +54,9 @@ const BudgetForm = ({ tourId, itineraries, existingBudgetItems = [], isEditMode,
                     itinerariesData.map(async (itinerary) => {
                         try {
                             const activitiesResponse = await axios.get(
-                                `http://localhost:3000/api/itineraries/${itinerary._id}/activities`
+                                `http://localhost:3000/api/itineraries/${itinerary._id}/activities`, {
+                headers: { Authorization: `Bearer ${token}` }
+            }
                             );
                             return {
                                 ...itinerary,
@@ -208,7 +213,9 @@ const BudgetForm = ({ tourId, itineraries, existingBudgetItems = [], isEditMode,
 
                     console.log('📤 Sending budget item:', payload);
 
-                    await axios.post('http://localhost:3000/api/budget-breakdowns', payload);
+                    await axios.post('http://localhost:3000/api/budget-breakdowns', payload, {
+                headers: { Authorization: `Bearer ${token}` }
+            });
                 }
             }
 
