@@ -88,9 +88,12 @@ const Header = () => {
       console.log("Provider chưa đăng ký, redirect to registration");
       navigate("/register/service-provider");
     } else {
-      // Provider đã đăng ký đầy đủ -> vào dashboard
-      console.log("Provider đã đăng ký, redirect to hotels");
-      navigate("/provider/hotels");
+      // Provider đã đăng ký đầy đủ -> route đến dashboard tương ứng với service type
+      console.log("Provider đã đăng ký với types:", provider.type);
+      
+      // Tất cả providers đều vào /provider/dashboard
+      // Dashboard sẽ tự động hiển thị các sections tương ứng với provider.type
+      navigate("/provider/dashboard");
     }
   };
 
