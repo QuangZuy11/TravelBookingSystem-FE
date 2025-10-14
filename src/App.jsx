@@ -2,7 +2,7 @@ import "./App.css";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Homepage from "./pages/traveler/Homepage";
 import AuthPage from "./pages/auth/AuthPage";
-import { AuthProvider } from './contexts/AuthContext';
+import { AuthProvider } from "./contexts/AuthContext";
 import DashboardLayout from "./components/layout/ProviderDashboard/DashboardLayout";
 import TourDashboard from "./pages/provider/dashboard/TourDashboard";
 import FlightDashboard from "./pages/provider/dashboard/FlightDashboard";
@@ -20,7 +20,7 @@ import RoomListPage from "./pages/provider/RoomListPage";
 import HotelPage from "./pages/traveler/HotelPage";
 import HotelListPage from "./pages/traveler/HotelListPage";
 import Profile from "./pages/traveler/Profile";
-
+import BookTourPage from "./pages/traveler/BookTourPage";
 function App() {
   return (
     <Router>
@@ -32,10 +32,11 @@ function App() {
           <Route path="/hotel-page" element={<HotelPage />} />
           {/* Trang List Hotel cho Traveler*/}
           <Route path="/hotel-list" element={<HotelListPage />} />
-
           {/* Trang List Hotel cho Traveler*/}
           <Route path="/profile" element={<Profile />} />
 
+          {/* Trang List Tour cho Traveler*/}
+          <Route path="/tour" element={<BookTourPage />} />
           {/* Trang login */}
           <Route path="/auth" element={<AuthPage />} />
 
@@ -44,7 +45,10 @@ function App() {
             {/* Provider Dashboard Routes */}
             <Route element={<DashboardLayout />}>
               <Route index element={<TourDashboard />} />
-              <Route path="/provider/bookings" element={<BookingManagementPage />} />
+              <Route
+                path="/provider/bookings"
+                element={<BookingManagementPage />}
+              />
 
               {/* Tour Management */}
               <Route path="tours">
@@ -68,14 +72,20 @@ function App() {
                 <Route path=":hotelId" element={<HotelDetailsPage />} />
                 <Route path=":hotelId/rooms" element={<RoomListPage />} />
                 <Route path=":hotelId/rooms/new" element={<RoomFormPage />} />
-                <Route path=":hotelId/rooms/:roomId" element={<RoomTypeDetailsPage />} />
-                <Route path=":hotelId/rooms/:roomId/edit" element={<RoomFormPage />} />
+                <Route
+                  path=":hotelId/rooms/:roomId"
+                  element={<RoomTypeDetailsPage />}
+                />
+                <Route
+                  path=":hotelId/rooms/:roomId/edit"
+                  element={<RoomFormPage />}
+                />
               </Route>
             </Route>
           </Route>
         </Routes>
       </AuthProvider>
-    </Router >
+    </Router>
   );
 }
 
