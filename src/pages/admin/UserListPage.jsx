@@ -9,18 +9,15 @@ import UserPasswordModal from "../../pages/admin/UserPasswordModal";
 import "./Admin.css";
 
 const UserListPage = () => {
-  const [randomSeed, setRandomSeed] = useState(null);
   const [users, setUsers] = useState([]);
   const [pagination, setPagination] = useState({});
   const [loading, setLoading] = useState(true);
-  const [filters, setFilters] = useState({
+   const [filters, setFilters] = useState({
     page: 1,
     limit: 10,
     role: "",
     status: "",
     search: "",
-    sort: "random", // Mặc định là 'random'
-    seed: null,
   });
 
   // State để quản lý các modal
@@ -40,24 +37,15 @@ const UserListPage = () => {
       setPagination(response.data.data.pagination);
     } catch (error) {
       toast.error("Không thể tải danh sách người dùng.");
-      console.error("Failed to fetch users:", error);
     } finally {
       setLoading(false);
     }
   }, [filters]);
 
-  useEffect(() => {
-    // Debounce search input to avoid excessive API calls
-    const handler = setTimeout(() => {
-      fetchUsers();
-    }, 500); // Chờ 500ms sau khi người dùng ngừng gõ
+   useEffect(() => {
+    const handler = setTimeout(() => { fetchUsers(); }, 500);
     return () => clearTimeout(handler);
-  }, [filters, refreshTrigger]);
-  useEffect(() => {
-    const initialSeed = Date.now();
-    setRandomSeed(initialSeed);
-    setFilters((prev) => ({ ...prev, seed: initialSeed }));
-  }, []); // Mảng rỗng đảm bảo nó chỉ chạy 1 lần
+  }, [filters, refreshTrigger, fetchUsers]);
 
   // ---- Handlers cho các hành động ----
   const handleFilterChange = (e) => {
@@ -211,7 +199,6 @@ const UserListPage = () => {
                 <th>Hành động</th>
               </tr>
             </thead>
-            {/* ================================================= */}
             <tbody>
               {loading ? (
                 <tr>
@@ -227,29 +214,17 @@ const UserListPage = () => {
                   </td>
                 </tr>
               ) : (
-                users.map((user) => (
+              users.map((user) => (
                   <tr key={user._id}>
-                    <td>
-                      <strong>{user.name}</strong>
-                    </td>
+                    <td><strong>{user.name}</strong></td>
                     <td>{user.email}</td>
                     <td>
-                      <span
-                        className={`badge role-${user.role?.role_name?.toLowerCase()}`}
-                      >
-                        {user.role?.role_name || "N/A"}
+                      <span className={`badge role-${user.role?.role_name?.toLowerCase() || 'default'}`}>
+                        {user.role?.role_name || "Chưa có"}
                       </span>
                     </td>
-                    <td>
-                      <span className={`badge status-${user.status}`}>
-                        {user.status}
-                      </span>
-                    </td>
-                    <td>
-                      {new Date(
-                        user.createdAt || user.created_at
-                      ).toLocaleDateString("vi-VN")}
-                    </td>
+                    <td><span className={`badge status-${user.status}`}>{user.status}</span></td>
+                    <td>{new Date(user.createdAt || user.created_at).toLocaleDateString("vi-VN")}</td>
                     <td className="actions-cell">
                       <button
                         onClick={() => openEditModal(user)}
