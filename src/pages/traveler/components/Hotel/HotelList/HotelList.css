@@ -218,7 +218,7 @@
 /* Cỡ chữ giá tiền */
 .price-amount {
   font-weight: 800 !important;                 /* Rất đậm cho giá chính */
-  font-size: 1.5rem !important;                /* Giảm nhẹ để cột giá gọn lại */
+  font-size: 1.7rem !important;                /* Giảm nhẹ để cột giá gọn lại */
   color: #e53e3e !important;                   /* Màu đỏ nổi bật */
   background: linear-gradient(135deg, #e53e3e, #fc8181); /* Hiệu ứng chuyển sắc trên chữ */
   -webkit-background-clip: text;               /* Dùng gradient làm màu chữ */

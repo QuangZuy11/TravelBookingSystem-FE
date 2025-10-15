@@ -1,0 +1,579 @@
+.itinerary-form {
+    max-width: 1000px;
+    margin: 0 auto;
+}
+
+.form-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 30px;
+    padding-bottom: 15px;
+    border-bottom: 2px solid #e5e7eb;
+}
+
+.form-section-title {
+    font-size: 28px;
+    font-weight: 700;
+    color: #1f2937;
+    margin: 0;
+}
+
+.day-counter {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+}
+
+.current-day {
+    font-size: 20px;
+    font-weight: 700;
+    color: #667eea;
+}
+
+.saved-days {
+    font-size: 13px;
+    color: #6b7280;
+    margin-top: 4px;
+}
+
+/* Form Groups */
+.form-group {
+    margin-bottom: 24px;
+}
+
+.form-label {
+    display: block;
+    font-size: 14px;
+    font-weight: 600;
+    color: #374151;
+    margin-bottom: 8px;
+}
+
+.required {
+    color: #ef4444;
+    margin-left: 4px;
+}
+
+.form-input,
+.form-textarea {
+    width: 100%;
+    padding: 12px 16px;
+    font-size: 15px;
+    color: #1f2937;
+    background-color: #ffffff;
+    border: 2px solid #d1d5db;
+    border-radius: 8px;
+    transition: all 0.2s ease;
+    box-sizing: border-box;
+}
+
+.form-input:focus,
+.form-textarea:focus {
+    outline: none;
+    border-color: #667eea;
+    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+.form-textarea {
+    resize: vertical;
+    min-height: 80px;
+    font-family: inherit;
+}
+
+.form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+}
+
+/* Meals Section */
+.meals-section {
+    margin-bottom: 32px;
+    padding: 20px;
+    background-color: #f9fafb;
+    border-radius: 12px;
+}
+
+.meals-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+    margin-top: 12px;
+}
+
+.meal-checkbox {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 16px;
+    background-color: #ffffff;
+    border: 2px solid #d1d5db;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.meal-checkbox input[type="checkbox"] {
+    display: none;
+}
+
+.meal-checkbox.checked {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border-color: #667eea;
+    color: #ffffff;
+}
+
+.meal-icon {
+    font-size: 32px;
+    margin-bottom: 8px;
+}
+
+.meal-label {
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.meal-checkbox:hover {
+    border-color: #667eea;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+/* Activities Section */
+.activities-section {
+    margin-bottom: 32px;
+}
+
+.section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.subsection-title {
+    font-size: 18px;
+    font-weight: 700;
+    color: #1f2937;
+    margin: 0;
+}
+
+.btn-add-activity {
+    padding: 10px 20px;
+    font-size: 14px;
+    font-weight: 600;
+    color: #ffffff;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.btn-add-activity:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+}
+
+/* Empty State */
+.empty-state {
+    text-align: center;
+    padding: 48px 24px;
+    background-color: #f9fafb;
+    border: 2px dashed #d1d5db;
+    border-radius: 12px;
+}
+
+.empty-icon {
+    font-size: 48px;
+    display: block;
+    margin-bottom: 12px;
+}
+
+.empty-state p {
+    color: #6b7280;
+    font-size: 15px;
+    margin: 0;
+}
+
+/* Activity Cards */
+.activities-list {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.activity-card {
+    padding: 20px;
+    background-color: #ffffff;
+    border: 2px solid #e5e7eb;
+    border-radius: 12px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+.activity-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.activity-number {
+    font-size: 16px;
+    font-weight: 700;
+    color: #667eea;
+}
+
+.btn-remove-activity {
+    padding: 6px 12px;
+    font-size: 13px;
+    font-weight: 600;
+    color: #ef4444;
+    background-color: #fee2e2;
+    border: 1px solid #fecaca;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.btn-remove-activity:hover {
+    background-color: #ef4444;
+    color: #ffffff;
+}
+
+.activity-form {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.checkboxes-group {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    justify-content: center;
+}
+
+.checkbox-label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 14px;
+    color: #374151;
+    cursor: pointer;
+}
+
+.checkbox-label input[type="checkbox"] {
+    width: 18px;
+    height: 18px;
+    cursor: pointer;
+}
+
+/* Saved Itineraries */
+.saved-itineraries {
+    margin-bottom: 32px;
+    padding: 20px;
+    background-color: #f0fdf4;
+    border: 2px solid #86efac;
+    border-radius: 12px;
+}
+
+.saved-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-top: 16px;
+}
+
+.saved-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 16px;
+    background-color: #ffffff;
+    border: 1px solid #d1fae5;
+    border-radius: 8px;
+}
+
+.saved-icon {
+    font-size: 18px;
+    color: #10b981;
+}
+
+.saved-title {
+    flex: 1;
+    font-size: 15px;
+    font-weight: 600;
+    color: #1f2937;
+}
+
+.saved-activities {
+    font-size: 13px;
+    color: #6b7280;
+    background-color: #f3f4f6;
+    padding: 4px 12px;
+    border-radius: 12px;
+}
+
+/* Form Actions */
+.form-actions {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-top: 24px;
+    border-top: 2px solid #e5e7eb;
+}
+
+.right-actions {
+    display: flex;
+    gap: 12px;
+}
+
+.btn-cancel {
+    padding: 12px 24px;
+    font-size: 15px;
+    font-weight: 600;
+    color: #6b7280;
+    background-color: #f3f4f6;
+    border: 2px solid #d1d5db;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.btn-cancel:hover {
+    background-color: #e5e7eb;
+    color: #374151;
+}
+
+.btn-add-day {
+    padding: 12px 24px;
+    font-size: 15px;
+    font-weight: 600;
+    color: #667eea;
+    background-color: #ffffff;
+    border: 2px solid #667eea;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.btn-add-day:hover:not(:disabled) {
+    background-color: #667eea;
+    color: #ffffff;
+}
+
+.btn-submit {
+    padding: 12px 32px;
+    font-size: 15px;
+    font-weight: 600;
+    color: #ffffff;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.btn-submit:hover:not(:disabled) {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+}
+
+.btn-add-day:disabled,
+.btn-submit:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .form-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 12px;
+    }
+
+    .day-counter {
+        align-items: flex-start;
+    }
+
+    .form-section-title {
+        font-size: 24px;
+    }
+
+    .meals-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .form-row {
+        grid-template-columns: 1fr;
+    }
+
+    .section-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 12px;
+    }
+
+    .btn-add-activity {
+        width: 100%;
+    }
+
+    .form-actions {
+        flex-direction: column;
+        gap: 12px;
+    }
+
+    .right-actions {
+        flex-direction: column;
+        width: 100%;
+    }
+
+    .btn-cancel,
+    .btn-add-day,
+    .btn-submit {
+        width: 100%;
+        justify-content: center;
+    }
+}
+
+@media (max-width: 1024px) and (min-width: 769px) {
+    .itinerary-form {
+        max-width: 800px;
+    }
+
+    .meals-grid {
+        grid-template-columns: repeat(3, 1fr);
+    }
+}
+/* Saved Days Navigation */
+.saved-days-nav {
+    margin-bottom: 32px;
+    padding: 20px;
+    background: linear-gradient(135deg, #f0f4ff 0%, #e8f0fe 100%);
+    border-radius: 12px;
+    border: 2px solid #c7d7fe;
+}
+
+.nav-title {
+    font-size: 16px;
+    font-weight: 700;
+    color: #1e3a8a;
+    margin: 0 0 16px 0;
+}
+
+.days-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 16px;
+}
+
+.day-card {
+    background: white;
+    border-radius: 10px;
+    border: 2px solid #e5e7eb;
+    overflow: hidden;
+    transition: all 0.3s ease;
+    cursor: pointer;
+}
+
+.day-card:hover {
+    border-color: #667eea;
+    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.2);
+}
+
+.day-card.active {
+    border-color: #667eea;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+}
+
+.day-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 16px;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.day-card.active .day-card-header {
+    border-bottom-color: rgba(255, 255, 255, 0.2);
+}
+
+.day-number {
+    font-weight: 700;
+    font-size: 14px;
+    color: #1f2937;
+}
+
+.day-card.active .day-number {
+    color: white;
+}
+
+.btn-delete-day {
+    background: none;
+    border: none;
+    font-size: 16px;
+    cursor: pointer;
+    padding: 4px;
+    border-radius: 4px;
+    transition: all 0.2s;
+}
+
+.btn-delete-day:hover {
+    background: #fee2e2;
+    transform: scale(1.1);
+}
+
+.day-card.active .btn-delete-day:hover {
+    background: rgba(255, 255, 255, 0.2);
+}
+
+.day-card-body {
+    padding: 12px 16px;
+}
+
+.day-title {
+    font-size: 14px;
+    font-weight: 600;
+    color: #374151;
+    margin: 0 0 8px 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.day-card.active .day-title {
+    color: white;
+}
+
+.day-meta {
+    font-size: 12px;
+    color: #6b7280;
+    margin: 0;
+}
+
+.day-card.active .day-meta {
+    color: rgba(255, 255, 255, 0.9);
+}
+
+.btn-edit-day {
+    width: 100%;
+    padding: 10px;
+    background: #667eea;
+    color: white;
+    border: none;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.btn-edit-day:hover {
+    background: #5568d3;
+}

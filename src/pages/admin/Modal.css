@@ -1,0 +1,107 @@
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(17, 24, 39, 0.6);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+    backdrop-filter: blur(4px);
+    animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+.modal-content {
+    background: white;
+    padding: 2rem;
+    border-radius: 12px;
+    width: 100%;
+    max-width: 500px;
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+    animation: slideUp 0.3s ease;
+}
+
+@keyframes slideUp {
+    from { transform: translateY(20px); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+}
+
+.modal-title {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #111827;
+    margin-bottom: 1rem;
+}
+
+.modal-description {
+    color: #4b5563;
+    margin-bottom: 1.5rem;
+}
+
+.modal-content .form-group {
+    margin-bottom: 1.25rem;
+}
+
+.modal-content .form-group label {
+    display: block;
+    font-weight: 600;
+    color: #374151;
+    margin-bottom: 0.5rem;
+    font-size: 0.875rem;
+}
+
+.modal-content .form-group input,
+.modal-content .form-group textarea {
+    width: 100%;
+    padding: 0.75rem 1rem;
+    border: 1px solid #d1d5db;
+    border-radius: 8px;
+    font-size: 1rem;
+}
+
+.modal-content .form-group textarea {
+    resize: vertical;
+    min-height: 80px;
+}
+
+.modal-error {
+    color: #b91c1c;
+    font-size: 0.875rem;
+    margin-top: -0.5rem;
+    margin-bottom: 1rem;
+}
+
+.modal-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 0.75rem;
+    margin-top: 2rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid #e5e7eb;
+}
+
+.modal-actions button {
+    padding: 0.625rem 1.25rem;
+    border: none;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.btn-primary { background-color: #2563eb; color: white; }
+.btn-secondary { background-color: #e5e7eb; color: #374151; }
+.btn-danger { background-color: #dc2626; color: white; }
+.btn-success { background-color: #16a34a; color: white; }
+
+.btn-primary:hover { background-color: #1d4ed8; }
+.btn-secondary:hover { background-color: #d1d5db; }
+.btn-danger:hover { background-color: #b91c1c; }
+.btn-success:hover { background-color: #15803d; }

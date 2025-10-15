@@ -5,15 +5,18 @@ import {
   FaSignOutAlt,
   FaSuitcase,
   FaChevronDown,
+  FaUsers,
 } from "react-icons/fa";
 import "./Header.css"; // Nhớ import file CSS
 import Logo from "../../assets/logo.png"; // Đường dẫn tới logo của bạn
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { clearAuthData } from "../../../utils/authHelpers"; // Import helper
 
 const Header = () => {
   const [user, setUser] = useState(null);
   const [showDropdown, setShowDropdown] = useState(false);
   const dropdownRef = useRef(null);
+  const navigate = useNavigate();
 
   // Kiểm tra trạng thái đăng nhập khi component được tải
   useEffect(() => {
@@ -52,8 +55,8 @@ const Header = () => {
 
   // Hàm xử lý đăng xuất
   const handleLogout = () => {
-    localStorage.removeItem("user");
-    localStorage.removeItem("token");
+    // Clear all auth data using centralized helper
+    clearAuthData();
     setUser(null);
     setShowDropdown(false);
     window.location.href = "/"; // Chuyển hướng về trang chủ
@@ -61,6 +64,41 @@ const Header = () => {
 
   const toggleDropdown = () => {
     setShowDropdown(!showDropdown);
+  };
+
+  // Hàm xử lý click vào "Quản lý dịch vụ"
+  const handleServiceManagement = (e) => {
+    e.preventDefault();
+    setShowDropdown(false);
+
+    // Check provider registration status
+    const providerStr = localStorage.getItem("provider");
+    let provider = null;
+
+    try {
+      provider = providerStr ? JSON.parse(providerStr) : null;
+    } catch (error) {
+      console.error("Error parsing provider:", error);
+    }
+
+    // Nếu provider null hoặc chưa có type/licenses -> redirect đến registration
+    if (
+      !provider ||
+      !Array.isArray(provider.type) ||
+      provider.type.length === 0 ||
+      !Array.isArray(provider.licenses) ||
+      provider.licenses.length === 0
+    ) {
+      console.log("Provider chưa đăng ký, redirect to registration");
+      navigate("/register/service-provider");
+    } else {
+      // Provider đã đăng ký đầy đủ -> route đến dashboard tương ứng với service type
+      console.log("Provider đã đăng ký với types:", provider.type);
+
+      // Tất cả providers đều vào /provider/dashboard
+      // Dashboard sẽ tự động hiển thị các sections tương ứng với provider.type
+      navigate("/provider/dashboard");
+    }
   };
 
   return (
@@ -73,7 +111,7 @@ const Header = () => {
       <nav className="header-nav">
         <a href="/">Trang Chủ</a>
         <a href="/tour">Tour Du Lịch</a>
-        <a href="/hotel-list">Khách Sạn</a>
+        <a href="/hotel-page">Khách Sạn</a>
         <a href="/about">Về Chúng Tôi</a>
         <a href="/contact">Liên Hệ</a>
       </nav>
@@ -108,6 +146,21 @@ const Header = () => {
                   <FaSuitcase className="dropdown-icon" />
                   <span>Tour Đã Đặt</span>
                 </a>
+                {user.role === "ServiceProvider" && (
+                  <a
+                    href="#"
+                    onClick={handleServiceManagement}
+                    className="dropdown-item"
+                  >
+                    Quản lý dịch vụ
+                  </a>
+                )}
+                {user && user.role === "Admin" && (
+                  <Link to="/admin/dashboard" className="dropdown-item">
+                    <FaUsers className="dropdown-icon" />
+                    <span>Quản lý người dùng</span>
+                  </Link>
+                )}
                 <div className="dropdown-divider"></div>
                 <button onClick={handleLogout} className="dropdown-item logout">
                   <FaSignOutAlt className="dropdown-icon" />

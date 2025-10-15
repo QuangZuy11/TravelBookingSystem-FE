@@ -1,8 +1,8 @@
 .header {
   display: flex;
-  justify-content: space-around;
+  justify-content: space-between;
   align-items: center;
-  padding: 12px 0px;
+  padding: 35px 10px;
   background-color: rgba(255, 255, 255, 0.7);
   color: #002f2f;
   font-size: 17px;
@@ -37,7 +37,7 @@
 /* --- Navigation menu --- */
 .header-nav {
   display: flex;
-  gap: 24px;
+  gap: 40px;
 }
 
 .header-nav a {
@@ -46,6 +46,7 @@
   font-weight: 500;
   transition: color 0.3s, border-bottom 0.3s;
   padding-bottom: 2px;
+   padding: 0 10px;
 }
 
 .header-nav a:hover {
