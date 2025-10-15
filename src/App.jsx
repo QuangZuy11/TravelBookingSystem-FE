@@ -168,7 +168,7 @@ function App() {
               path="/admin/dashboard"
               element={
                 // <ProtectedRoute requiredRole="Admin">
-                  <AdminDashboardPage />
+                <AdminDashboardPage />
                 // </ProtectedRoute>
               }
             />
@@ -176,7 +176,7 @@ function App() {
               path="/admin/users"
               element={
                 // <ProtectedRoute requiredRole="Admin">
-                  <UserListPage />
+                <UserListPage />
                 // </ProtectedRoute>
               }
             />
