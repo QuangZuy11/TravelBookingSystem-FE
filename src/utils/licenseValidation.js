@@ -21,14 +21,6 @@ export const validateServiceProviderLicenses = (serviceTypes, licenses) => {
     errors.push('🗺️ Tour phải có ít nhất 1 giấy phép.');
   }
   
-  // 2. Check flight licenses count - MUST BE EXACTLY 1
-  const flightLicenses = licenses.filter(l => l.service_type === 'flight');
-  if (flightLicenses.length > 1) {
-    errors.push('✈️ Flight chỉ được có 1 giấy phép duy nhất. Vui lòng xóa các giấy phép thừa.');
-  }
-  if (serviceTypes.includes('flight') && flightLicenses.length === 0) {
-    errors.push('✈️ Flight phải có ít nhất 1 giấy phép.');
-  }
   
   // 3. Check hotel licenses - can be multiple
   const hotelLicenses = licenses.filter(l => l.service_type === 'hotel');
@@ -91,14 +83,14 @@ export const canAddLicense = (serviceType) => {
 
 /**
  * Check if can remove license for a service type
- * Tour and Flight MUST have at least 1 license
+ * Tour MUST have at least 1 license
  * @param {string} serviceType - Service type to check
  * @param {number} currentCount - Current number of licenses
  * @returns {boolean} True if can remove license
  */
 export const canRemoveLicense = (serviceType, currentCount) => {
-  if (serviceType === 'tour' || serviceType === 'flight') {
-    return currentCount > 1; // Must keep at least 1
+  if (serviceType === 'tour') {
+    return currentCount > 1; // Must keep at least 1 for tour
   }
   return true; // Hotel can remove any
 };
@@ -131,8 +123,7 @@ export const isValidLicenseFormat = (licenseNumber) => {
 export const getServiceTypeDisplay = (serviceType) => {
   const displays = {
     hotel: '🏨 Khách sạn',
-    tour: '🗺️ Tour',
-    flight: '✈️ Hàng không'
+    tour: '🗺️ Tour'
   };
   return displays[serviceType] || serviceType;
 };
@@ -175,13 +166,13 @@ export const getLicenseStatusConfig = (status) => {
 /**
  * Get max licenses allowed for service type
  * @param {string} serviceType - Service type
- * @returns {number} Max licenses (Infinity for hotel, 1 for tour/flight)
+ * @returns {number} Max licenses (Infinity for hotel, 1 for tour)
  */
 export const getMaxLicenses = (serviceType) => {
   if (serviceType === 'hotel') {
     return Infinity;
   }
-  return 1; // tour and flight
+  return 1; // tour
 };
 
 /**
@@ -191,8 +182,6 @@ export const ERROR_MESSAGES = {
   'Tour provider chỉ có thể đăng ký 1 license duy nhất': 
     '🗺️ Tour chỉ được có 1 giấy phép. Vui lòng xóa các giấy phép thừa.',
   
-  'Flight provider chỉ có thể đăng ký 1 license duy nhất': 
-    '✈️ Flight chỉ được có 1 giấy phép. Vui lòng xóa các giấy phép thừa.',
   
   'License number không được trùng lặp': 
     '🔒 Các license number phải khác nhau. Vui lòng kiểm tra lại.',
@@ -201,7 +190,7 @@ export const ERROR_MESSAGES = {
     '⚠️ License number này đã được sử dụng. Vui lòng sử dụng số khác.',
   
   'Chỉ có thể thêm license cho service type hotel': 
-    '🏨 Tour và Flight chỉ được có 1 license duy nhất, không thể thêm mới.',
+    '🏨 Tour chỉ được có 1 license duy nhất, không thể thêm mới.',
     
   'Provider chưa đăng ký service type hotel':
     '⚠️ Công ty của bạn chưa đăng ký dịch vụ khách sạn.',

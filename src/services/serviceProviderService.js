@@ -19,7 +19,7 @@ import axiosInstance from '../api/axiosConfig';
  * @param {string} data.company_email - Company email
  * @param {string} data.company_phone - Company phone
  * @param {string} data.address - Company address
- * @param {Array<string>} data.service_types - Array of service types ['hotel', 'tour', 'flight']
+ * @param {Array<string>} data.service_types - Array of service types ['hotel', 'tour']
  * @param {Array<Object>} data.licenses - Array of license objects
  * @returns {Promise<Object>} Response with token and provider data
  */
@@ -88,7 +88,7 @@ export const updateServiceProviderProfile = async (data) => {
  * Get all service providers (Admin only)
  * @param {Object} params - Query parameters
  * @param {string} params.verification_status - Filter by status ('verified', 'pending', 'rejected')
- * @param {string} params.service_type - Filter by service type ('hotel', 'tour', 'flight')
+ * @param {string} params.service_type - Filter by service type ('hotel', 'tour')
  * @param {number} params.page - Page number
  * @param {number} params.limit - Results per page
  * @returns {Promise<Object>} List of providers
@@ -133,7 +133,7 @@ export const getServiceProviderDetail = async (providerId) => {
  * Verify or reject a license (Admin only)
  * @param {string} providerId - Provider ID
  * @param {Object} data - Verification data
- * @param {string} data.service_type - Service type ('hotel', 'tour', 'flight')
+ * @param {string} data.service_type - Service type ('hotel', 'tour')
  * @param {string} data.status - Status ('verified' or 'rejected')
  * @param {string} data.rejection_reason - Reason if rejected
  * @returns {Promise<Object>} Updated provider data

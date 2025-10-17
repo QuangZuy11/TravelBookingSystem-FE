@@ -133,7 +133,7 @@ const ProviderDetailPage = () => {
     };
 
     const getServiceIcon = (type) => {
-        const icons = { hotel: '🏨', tour: '🗺️', flight: '✈️' };
+        const icons = { hotel: '🏨', tour: '🗺️'};
         return icons[type] || '📦';
     };
 

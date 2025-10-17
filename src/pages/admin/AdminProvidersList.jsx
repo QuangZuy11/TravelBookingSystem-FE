@@ -64,7 +64,6 @@ const AdminProvidersList = () => {
                     <option value="">Tất cả dịch vụ</option>
                     <option value="hotel">🏨 Hotel</option>
                     <option value="tour">🗺️ Tour</option>
-                    <option value="flight">✈️ Flight</option>
                 </select>
 
                 <button onClick={() => setFilters({ verification_status: '', service_type: '', page: 1, limit: 20 })} className="btn-secondary">

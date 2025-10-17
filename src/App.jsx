@@ -6,7 +6,6 @@ import AuthPage from "./pages/auth/AuthPage";
 import ServiceProviderRegistration from "./pages/auth/ServiceProviderRegistration";
 import PendingVerificationPage from "./pages/auth/PendingVerificationPage";
 import { AuthProvider } from "./contexts/AuthContext";
-import { FlightProvider } from "./contexts/FlightContext";
 import ErrorBoundary from "./components/common/ErrorBoundary";
 import ProtectedRoute from "./components/common/ProtectedRoute";
 import NotFoundPage from "./pages/NotFoundPage";
@@ -30,20 +29,6 @@ import RoomFormPage from "./pages/provider/hotel/RoomFormPage";
 import BookingManagementPage from "./pages/provider/hotel/BookingManagementPage";
 import RoomListPage from "./pages/provider/hotel/RoomListPage";
 
-// Flight Management
-import FlightDashboard from "./pages/provider/flight/FlightDashboard";
-import FlightDetails from "./pages/provider/flight/FlightDetails";
-import FlightListPageNew from "./pages/provider/flight/FlightListPageNew";
-import FlightFormPage from "./pages/provider/flight/FlightFormPage";
-import FlightDetailsPageNew from "./pages/provider/flight/FlightDetailsPageNew";
-import FlightClassesManagementPage from "./pages/provider/flight/FlightClassesManagementPage";
-import SeatsManagementPage from "./pages/provider/flight/seats/SeatsManagementPage";
-import BulkSeatSetupPage from "./pages/provider/flight/seats/BulkSeatSetupPage";
-import ScheduleManagementPage from "./pages/provider/flight/schedules/ScheduleManagementPage";
-import FlightStatisticsPage from "./pages/provider/flight/FlightStatisticsPage";
-import FlightBookingListPage from "./pages/provider/flight/FlightBookingListPage";
-import FlightBookingDetailsPage from "./pages/provider/flight/FlightBookingDetailsPage";
-import FlightBookingFormPage from "./pages/provider/flight/FlightBookingFormPage";
 
 // Provider Layout
 import ProviderLayout from "./pages/provider/ProviderLayout";
@@ -186,9 +171,7 @@ function App() {
               path="/provider"
               element={
                 <ProtectedProviderRoute>
-                  <FlightProvider>
-                    <ProviderLayout />
-                  </FlightProvider>
+                  <ProviderLayout />
                 </ProtectedProviderRoute>
               }
             >
@@ -213,53 +196,6 @@ function App() {
                   <Route path="bookings" element={<BookingManagementPage />} />
                   <Route path="statistics" element={<TourDashboard />} />
                 </Route>
-
-                {/* Flight Management - NEW SYSTEM */}
-                <Route path="flights">
-                  <Route index element={<FlightListPageNew />} />
-                  <Route path="new" element={<FlightFormPage />} />
-                  <Route path=":flightId/edit" element={<FlightFormPage />} />
-                  <Route path=":flightId" element={<FlightDetailsPageNew />} />
-
-                  {/* Flight Classes (nested in flight details, but also accessible directly) */}
-                  <Route
-                    path=":flightId/classes"
-                    element={<FlightClassesManagementPage />}
-                  />
-
-                  {/* Flight Seats */}
-                  <Route
-                    path=":flightId/seats"
-                    element={<SeatsManagementPage />}
-                  />
-                  <Route
-                    path=":flightId/seats/setup"
-                    element={<BulkSeatSetupPage />}
-                  />
-
-                  {/* Flight Schedules */}
-                  <Route
-                    path=":flightId/schedules"
-                    element={<ScheduleManagementPage />}
-                  />
-                </Route>
-
-                {/* Flight Statistics - Keep for backward compatibility */}
-                <Route
-                  path="flight-statistics"
-                  element={<FlightStatisticsPage />}
-                />
-
-                {/* Flight Bookings - Keep for backward compatibility */}
-                <Route path="flight-bookings">
-                  <Route index element={<FlightBookingListPage />} />
-                  <Route path="new" element={<FlightBookingFormPage />} />
-                  <Route
-                    path=":bookingId"
-                    element={<FlightBookingDetailsPage />}
-                  />
-                </Route>
-
                 {/* Hotel Management */}
                 <Route path="hotels">
                   <Route index element={<HotelDashboard />} />

@@ -370,19 +370,6 @@ const ServiceProviderRegistration = () => {
                     </div>
                 </label>
 
-                <label className="service-type-card">
-                    <input
-                        type="checkbox"
-                        value="flight"
-                        checked={serviceTypes.includes('flight')}
-                        onChange={() => handleServiceTypeChange('flight')}
-                    />
-                    <div className="service-type-content">
-                        <span className="service-icon">✈️</span>
-                        <span className="service-name">Hàng không</span>
-                        <small className="service-hint">Chỉ 1 license duy nhất</small>
-                    </div>
-                </label>
             </div>
 
             {serviceTypes.length === 0 && (
@@ -408,7 +395,7 @@ const ServiceProviderRegistration = () => {
                                     {serviceType === 'hotel' && (
                                         <span className="license-badge unlimited">Không giới hạn licenses</span>
                                     )}
-                                    {(serviceType === 'tour' || serviceType === 'flight') && (
+                                    {(serviceType === 'tour') && (
                                         <span className="license-badge limited">Chỉ 1 license duy nhất</span>
                                     )}
                                 </h3>
@@ -468,7 +455,6 @@ const ServiceProviderRegistration = () => {
                                             <small className="hint">
                                                 {serviceType === 'hotel' && '🏨 Mỗi khách sạn cần 1 giấy phép riêng'}
                                                 {serviceType === 'tour' && '🗺️ Giấy phép kinh doanh tour du lịch'}
-                                                {serviceType === 'flight' && '✈️ Giấy phép vận chuyển hàng không'}
                                             </small>
                                             {license.license_number && !isValidLicenseFormat(license.license_number) && (
                                                 <small className="error-text">❌ Format: XXX-YYYY-NNN (VD: HTL-2024-001)</small>
@@ -541,19 +527,6 @@ const ServiceProviderRegistration = () => {
                                                 <li>⚠️ Chỉ được có <strong>1 LICENSE DUY NHẤT</strong></li>
                                                 <li>🎫 1 giấy phép kinh doanh tour du lịch</li>
                                                 <li>📄 Cấp bởi Sở Du lịch địa phương</li>
-                                            </ul>
-                                        </div>
-                                    </>
-                                )}
-                                {serviceType === 'flight' && (
-                                    <>
-                                        <div className="info-icon">✈️</div>
-                                        <div className="info-content">
-                                            <strong>Quy định về license Flight:</strong>
-                                            <ul>
-                                                <li>⚠️ Chỉ được có <strong>1 LICENSE DUY NHẤT</strong></li>
-                                                <li>✈️ 1 giấy phép vận chuyển hàng không</li>
-                                                <li>📄 Cấp bởi Cục Hàng không Việt Nam</li>
                                             </ul>
                                         </div>
                                     </>

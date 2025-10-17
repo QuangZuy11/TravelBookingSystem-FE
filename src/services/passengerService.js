@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const API_BASE_URL = '/api/flight';
+const API_BASE_URL = '/api';
 
 const passengerService = {
     // Get all passengers for a booking
