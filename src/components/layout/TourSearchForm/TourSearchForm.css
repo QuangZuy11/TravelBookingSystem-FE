@@ -57,7 +57,7 @@
 .tour-search-icon {
   position: absolute;
   left: 12px;
-  top: 50%;
+  top: 45%;
   transform: translateY(-50%);
   color: #9ca3af;
   width: 20px;
@@ -67,7 +67,7 @@
 
 /* Input & Select */
 .tour-search-input {
-  width: 60%;
+  width: 100%;
   padding: 12px 16px 12px 40px;
   border: 1px solid #e5e7eb;
   border-radius: 8px;
@@ -101,10 +101,10 @@
 
 /* Button */
 .tour-search-button {
-  width: 54%;
+  width: 60%;
   background-color: #00282b;
   color: white;
-  padding: 12px 24px;
+  padding: 4px 24px;
   border-radius: 8px;
   border: none;
   font-weight: 500;

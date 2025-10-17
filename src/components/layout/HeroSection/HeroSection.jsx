@@ -5,9 +5,9 @@ const HeroSection = () => {
     <section className="hero">
       <div className="hero-overlay">
         <div className="hero-content">
-          <h1 class="title">
+          <h1 className="title">
             Khám Phá Việt Nam <br />
-            <span class="highlight">Cùng AI Thông Minh</span>
+            <span className="highlight">Cùng AI Thông Minh</span>
           </h1>
           <p>
             Trải nghiệm du lịch được cá nhân hóa với công nghệ AI tiên tiến. Tìm

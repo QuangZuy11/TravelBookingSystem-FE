@@ -7,10 +7,10 @@ import {
   FaChevronDown,
   FaUsers,
 } from "react-icons/fa";
-import "./Header.css"; // Nhớ import file CSS
-import Logo from "../../assets/logo.png"; // Đường dẫn tới logo của bạn
+import "./Header.css";
+import Logo from "../../assets/logo.png";
 import { Link, useNavigate } from "react-router-dom";
-import { clearAuthData } from "../../../utils/authHelpers"; // Import helper
+import { clearAuthData } from "../../../utils/authHelpers";
 
 const Header = () => {
   const [user, setUser] = useState(null);
@@ -102,7 +102,7 @@ const Header = () => {
   };
 
   return (
-    <header className="header">
+    <header className="header ">
       <div className="header-logo">
         <img src={Logo} alt="VietTravel Logo" className="logo-img" />
         <span className="logo-text">VietTravel</span>
