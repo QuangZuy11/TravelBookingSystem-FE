@@ -49,8 +49,9 @@ import PendingProvidersList from "./pages/admin/PendingProvidersList";
 import ProviderDetailPage from "./pages/admin/ProviderDetailPage";
 import AdminDashboardPage from "./pages/admin/AdminDashboardPage";
 import UserListPage from "./pages/admin/UserListPage";
-// AI Itinerary (dev)
 import AIItineraryGenerator from "./components/ai/AIItineraryGenerator";
+import MyItineraries from "./components/ai/MyItineraries";
+import ItineraryDetail from "./components/ai/ItineraryDetail";
 
 function App() {
   return (
@@ -103,7 +104,6 @@ function App() {
           <Routes>
             {/* Public Routes */}
             <Route path="/" element={<Homepage />} />
-            <Route path="/ai-itinerary" element={<AIItineraryGenerator />} />
             <Route path="/hotel-page" element={<HotelPage />} />
             <Route path="/hotel-list" element={<HotelListPage />} />
             <Route path="/auth" element={<AuthPage />} />
@@ -134,6 +134,10 @@ function App() {
                 </ProtectedRoute>
               }
             />
+
+            <Route path="/ai-itinerary" element={<AIItineraryGenerator />} />
+            <Route path="/my-itineraries" element={<MyItineraries />} />
+            <Route path="/ai-itinerary/:itineraryId" element={<ItineraryDetail />} />
 
             {/* Protected Routes - Admin */}
             <Route
