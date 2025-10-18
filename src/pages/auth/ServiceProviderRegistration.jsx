@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import toast from 'react-hot-toast';
-import { registerServiceProvider, uploadLicenseDocuments } from '../../services/serviceProviderService';
+import { registerServiceProvider } from '../../services/serviceProviderService';
 import {
     validateServiceProviderLicenses,
     canAddLicense,
@@ -32,7 +32,6 @@ const ServiceProviderRegistration = () => {
 
     // Step 3: Licenses
     const [licenses, setLicenses] = useState([]);
-    const [uploadingFiles, setUploadingFiles] = useState({});
 
     // ==================== STEP NAVIGATION ====================
 
@@ -172,41 +171,7 @@ const ServiceProviderRegistration = () => {
         setLicenses(updatedLicenses);
     };
 
-    const handleFileUpload = async (index, files) => {
-        if (!files || files.length === 0) return;
 
-        setUploadingFiles({ ...uploadingFiles, [index]: true });
-
-        try {
-            const formData = new FormData();
-            Array.from(files).forEach(file => {
-                formData.append('files', file);
-            });
-
-            const urls = await uploadLicenseDocuments(formData);
-
-            const updatedLicenses = [...licenses];
-            updatedLicenses[index] = {
-                ...updatedLicenses[index],
-                documents: [...(updatedLicenses[index].documents || []), ...urls]
-            };
-            setLicenses(updatedLicenses);
-
-            toast.success('Upload thành công!');
-        } catch (error) {
-            console.error('Upload error:', error);
-            toast.error('Upload thất bại. Vui lòng thử lại.');
-        } finally {
-            setUploadingFiles({ ...uploadingFiles, [index]: false });
-        }
-    };
-
-    const handleRemoveDocument = (licenseIndex, docIndex) => {
-        const updatedLicenses = [...licenses];
-        updatedLicenses[licenseIndex].documents =
-            updatedLicenses[licenseIndex].documents.filter((_, i) => i !== docIndex);
-        setLicenses(updatedLicenses);
-    };
 
     // ==================== SUBMIT ====================
 
@@ -389,7 +354,7 @@ const ServiceProviderRegistration = () => {
     const renderStep4 = () => (
         <div className="registration-step">
             <h2>Bước 3: Giấy phép kinh doanh</h2>
-            <p className="step-description">Upload giấy phép cho từng loại dịch vụ đã chọn</p>
+            <p className="step-description">Nhập số giấy phép kinh doanh cho loại dịch vụ đã chọn</p>
 
             <div className="licenses-section">
                 {serviceTypes.map(serviceType => {
@@ -469,44 +434,7 @@ const ServiceProviderRegistration = () => {
                                             )}
                                         </div>
 
-                                        <div className="form-group">
-                                            <label>Tài liệu giấy phép</label>
-                                            <input
-                                                type="file"
-                                                multiple
-                                                onChange={(e) => handleFileUpload(globalIndex, e.target.files)}
-                                                disabled={uploadingFiles[globalIndex]}
-                                                accept=".pdf,.jpg,.jpeg,.png"
-                                            />
-                                            <small className="hint">
-                                                Upload file PDF, JPG, PNG (tối đa 10MB mỗi file)
-                                            </small>
-                                            {uploadingFiles[globalIndex] && (
-                                                <small className="uploading-text">⏳ Đang upload...</small>
-                                            )}
-                                        </div>
 
-                                        {license.documents && license.documents.length > 0 && (
-                                            <div className="uploaded-documents">
-                                                <label>Tài liệu đã upload:</label>
-                                                <ul>
-                                                    {license.documents.map((doc, docIdx) => (
-                                                        <li key={docIdx}>
-                                                            <a href={doc} target="_blank" rel="noopener noreferrer">
-                                                                📄 Document {docIdx + 1}
-                                                            </a>
-                                                            <button
-                                                                type="button"
-                                                                onClick={() => handleRemoveDocument(globalIndex, docIdx)}
-                                                                className="btn-remove-doc"
-                                                            >
-                                                                ✕
-                                                            </button>
-                                                        </li>
-                                                    ))}
-                                                </ul>
-                                            </div>
-                                        )}
                                     </div>
                                 );
                             })}
