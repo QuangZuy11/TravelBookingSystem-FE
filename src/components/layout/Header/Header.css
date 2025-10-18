@@ -1,28 +1,31 @@
+/* ========== HEADER ========== */
 .header {
+  position: fixed;
+  top: 30px;
+  left: 0;
+  width: 100%;
+  height: 50px;
+  z-index: 1000;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 10px 10px;
+  padding: 10px;
   background-color: rgba(255, 255, 255, 0.7);
   backdrop-filter: blur(20px) saturate(180%);
   -webkit-backdrop-filter: blur(20px) saturate(180%);
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.6);
   color: #002f2f;
   font-size: 18px;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.6);
-  position: fixed;
-  top: 40px;
-  z-index: 1000;
-  left: 0;
-  width: 100%;
-  height: 35px;
   transition: all 0.3s ease;
 }
+
+/* ========== LOGO ========== */
 .header-logo {
-  margin-left: 150px;
   display: flex;
   align-items: center;
   gap: 8px;
+  margin-left: 150px;
 }
 
 .logo-img {
@@ -37,7 +40,7 @@
   color: #007b7f;
 }
 
-/* --- Navigation menu --- */
+/* ========== NAVIGATION ========== */
 .header-nav {
   display: flex;
   gap: 40px;
@@ -45,26 +48,13 @@
 }
 
 .header-nav a {
+  position: relative;
   text-decoration: none;
   color: #002f2f;
   font-weight: 500;
-  transition: all 0.3s ease;
-  padding-bottom: 2px;
   padding: 8px 10px;
   border-radius: 6px;
-  position: relative;
-}
-
-.header-nav a::after {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  color: #667eea;
-  font-weight: 600;
-  cursor: pointer;
-  height: 80px;
-  transition: all 0.3s;
-  margin-left: 45px;
+  transition: all 0.3s ease;
 }
 
 .header-nav a:hover {
@@ -72,27 +62,22 @@
   background-color: rgba(0, 123, 127, 0.1);
 }
 
-.header-nav a:hover::after {
-  width: calc(100% - 20px);
-}
-
-/* --- KHU VỰC ĐĂNG NHẬP / USER --- */
+/* ========== LOGIN / AUTH ========== */
 .header-auth {
   position: relative;
-  margin-right: 150px;
-  height: 50%;
   display: flex;
   align-items: center;
+  height: 50%;
+  margin-right: 150px;
 }
 
-/* Nút đăng nhập */
+/* --- Nút đăng nhập --- */
 .header-login {
   display: flex;
   align-items: center;
   gap: 6px;
   cursor: pointer;
   font-weight: 500;
-  transition: all 0.3s ease;
   text-decoration: none;
   color: #002f2f;
   padding: 8px 16px;
@@ -100,6 +85,7 @@
   background-color: rgba(0, 123, 127, 0.1);
   backdrop-filter: blur(2px);
   -webkit-backdrop-filter: blur(2px);
+  transition: all 0.3s ease;
 }
 
 .header-login:hover {
@@ -112,12 +98,12 @@
   font-size: 22px;
 }
 
-/* --- KHU VỰC USER VÀ DROPDOWN --- */
+/* ========== USER AREA ========== */
 .header-user {
   position: relative;
-  height: 50%;
   display: flex;
   align-items: center;
+  height: 50%;
 }
 
 .user-info {
@@ -125,14 +111,14 @@
   align-items: center;
   gap: 8px;
   cursor: pointer;
-  padding: 0px 20px 0px 18px;
+  height: 44px;
+  margin-right: -15px;
+  padding: 0 20px 0 18px;
   border-radius: 24px;
-  transition: all 0.3s ease;
   background-color: rgba(0, 123, 127, 0.08);
   backdrop-filter: blur(4px);
   -webkit-backdrop-filter: blur(4px);
-  height: 44px;
-  margin-right: -15px;
+  transition: all 0.3s ease;
 }
 
 .user-info:hover {
@@ -150,11 +136,11 @@
 .user-name {
   font-weight: 600;
   color: #002f2f;
+  font-size: 15px;
   max-width: 120px;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-  font-size: 15px;
 }
 
 .dropdown-arrow {
@@ -168,35 +154,23 @@
   transform: rotate(180deg);
 }
 
-/* --- Menu Dropdown --- */
+/* ========== DROPDOWN MENU ========== */
 .user-dropdown {
   position: absolute;
   top: calc(100% + 12px);
   right: -18px;
+  min-width: 240px;
   background: rgba(255, 255, 255, 0.85);
+  border: 1px solid rgba(0, 123, 127, 0.2);
+  border-radius: 12px;
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
-  border-radius: 12px;
   box-shadow: 0 8px 32px rgba(0, 47, 47, 0.2), 0 2px 8px rgba(0, 47, 47, 0.15);
-  min-width: 240px;
   overflow: hidden;
   animation: dropdownSlide 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-  border: 1px solid rgba(0, 123, 127, 0.2);
 }
 
-/* Animation trượt xuống */
-@keyframes dropdownSlide {
-  from {
-    opacity: 0;
-    transform: translateY(-8px) scale(0.95);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0) scale(1);
-  }
-}
-
-/* Mũi tên tam giác kết nối */
+/* --- Mũi tên tam giác --- */
 .user-dropdown::before {
   content: "";
   position: absolute;
@@ -217,21 +191,33 @@
   border-bottom: 8px solid rgba(255, 255, 255, 0.85);
 }
 
-/* --- Các mục trong Dropdown --- */
+/* --- Animation --- */
+@keyframes dropdownSlide {
+  from {
+    opacity: 0;
+    transform: translateY(-8px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* --- Dropdown item --- */
 .dropdown-item {
   display: flex;
   align-items: center;
   gap: 14px;
-  padding: 14px 20px;
-  color: #002f2f;
-  text-decoration: none;
-  transition: all 0.2s ease;
-  cursor: pointer;
-  border: none;
-  background: transparent;
   width: 100%;
+  padding: 14px 20px;
   font-size: 15px;
   font-weight: 500;
+  color: #002f2f;
+  text-decoration: none;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s ease;
   position: relative;
 }
 
@@ -260,7 +246,7 @@
 .dropdown-icon {
   font-size: 18px;
   color: #002f2f;
-  transition: transform 0.2s ease;
+  transition: transform 0.2s ease, color 0.2s ease;
   flex-shrink: 0;
 }
 
@@ -269,18 +255,14 @@
   transform: scale(1.1);
 }
 
+/* --- Divider --- */
 .dropdown-divider {
   height: 1px;
-  background: linear-gradient(
-    90deg,
-    transparent 0%,
-    rgba(0, 123, 127, 0.2) 50%,
-    transparent 100%
-  );
   margin: 8px 0;
+  background: linear-gradient(90deg, transparent 0%, rgba(0, 123, 127, 0.2) 50%, transparent 100%);
 }
 
-/* Nút logout đặc biệt */
+/* --- Logout item --- */
 .dropdown-item.logout {
   color: #e53935;
   margin-top: 4px;
@@ -288,7 +270,6 @@
 
 .dropdown-item.logout:hover {
   background-color: rgba(229, 57, 53, 0.12);
-  color: #e53935;
 }
 
 .dropdown-item.logout::before {
@@ -299,11 +280,7 @@
   color: #e53935;
 }
 
-.dropdown-item.logout:hover .dropdown-icon {
-  color: #e53935;
-}
-
-/* Responsive */
+/* ========== RESPONSIVE ========== */
 @media (max-width: 768px) {
   .header {
     padding: 20px 10px;

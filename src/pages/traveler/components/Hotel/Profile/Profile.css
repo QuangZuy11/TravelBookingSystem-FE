@@ -122,15 +122,3 @@
   z-index: 1100;
 }
 
-/* Header nằm ngay dưới TopBar */
-.header {
-  position: fixed;
-  top: 30px; /* bằng đúng chiều cao của TopBar */
-  left: 0;
-  height: 50px;
-  gap: 24px;
-  width: 100%;
-  z-index: 1000;
-  background: white;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-}
