@@ -378,6 +378,39 @@ const useItinerary = (tourId) => {
     return grouped;
   }, [budgetBreakdown]);
 
+  // ========== AI GENERATION ==========
+
+  /**
+   * Generate an itinerary using AI (server-side) and set as current
+   * @param {object} aiInput - payload describing preferences (days, budget, travelers, interests...)
+   * @returns {object} generated itinerary
+   */
+  const generateItineraryFromAI = useCallback(async (aiInput = {}) => {
+    try {
+      setLoading(true);
+      setError(null);
+      const response = await tourApi.generateItineraryAI(tourId, aiInput);
+
+      // server returns itinerary in response.itinerary or raw
+      const generated = response.itinerary || response;
+
+      if (generated) {
+        // Add into itineraries list and set as current
+        setItineraries((prev) => [...prev, generated]);
+        setCurrentItinerary(generated);
+      }
+
+      return generated;
+    } catch (err) {
+      const errorMessage = err.response?.data?.message || 'Không thể tạo itinerary bằng AI';
+      setError(errorMessage);
+      toast.error(errorMessage);
+      throw err;
+    } finally {
+      setLoading(false);
+    }
+  }, [tourId]);
+
   return {
     // State
     itineraries,
@@ -392,6 +425,7 @@ const useItinerary = (tourId) => {
     createItinerary,
     updateItinerary,
     deleteItinerary,
+  generateItineraryFromAI,
     setCurrentItinerary,
 
     // Activity operations

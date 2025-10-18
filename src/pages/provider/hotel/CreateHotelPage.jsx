@@ -1,32 +1,73 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { HotelForm } from '../../../components/provider/forms/HotelForm';
-import axios from 'axios';
+import hotelService from '../../../services/hotelService';
+import toast from 'react-hot-toast';
 import Breadcrumb from '../../../components/shared/Breadcrumb';
 
 const CreateHotelPage = () => {
   const navigate = useNavigate();
-  const token = localStorage.getItem('token');
+
   const handleSubmitHotel = async (formData) => {
     try {
-      const providerId = localStorage.getItem('providerId');
+      const token = localStorage.getItem('token');
+      const providerStr = localStorage.getItem('provider');
+      let providerId = null;
+
+      // ✅ ALWAYS prioritize provider._id from provider object (this is the CORRECT provider ID)
+      if (providerStr) {
+        try {
+          const provider = JSON.parse(providerStr);
+          if (provider && provider._id) {
+            providerId = provider._id;
+            // Sync localStorage for future use
+            localStorage.setItem('providerId', providerId);
+            console.log('✅ Using provider._id from provider object:', providerId);
+          }
+        } catch (e) {
+          console.error('Error parsing provider:', e);
+        }
+      }
+
+      // Fallback to localStorage (but this was wrong before the fix)
       if (!providerId) {
-        alert('Provider ID not found. Please log in again.');
+        providerId = localStorage.getItem('providerId');
+        console.warn('⚠️ Fallback to localStorage providerId (may be incorrect):', providerId);
+      }
+
+      if (!providerId) {
+        toast.error('❌ Provider ID không tìm thấy. Backend cần thêm serviceProviderId vào JWT token khi login.');
+        toast.error('Giải pháp tạm: Đăng xuất và đăng nhập lại để backend cấp token mới.');
         return;
       }
 
-      await axios.post(`/api/hotel/provider/${providerId}/hotels`, formData, {
-                headers: { Authorization: `Bearer ${token}` }
-            });
-      alert('Hotel added successfully!');
-      navigate('/provider/hotels'); // Quay lại trang danh sách hotel
+      if (!token) {
+        toast.error('Authentication token not found. Please log in again.');
+        navigate('/auth');
+        return;
+      }
+
+      try {
+        console.log('=== Sending Create Hotel Request ===');
+        console.log('providerId:', providerId);
+        console.log('Full provider object:', JSON.parse(providerStr));
+        console.log('Request URL:', `${import.meta.env.VITE_API_BASE_URL || 'http://localhost:3000/api'}/hotel/provider/${providerId}/hotels`);
+
+        const response = await hotelService.createHotel(providerId, formData);
+        toast.success('Hotel added successfully!');
+        navigate('/provider/hotels');
+      } catch (createError) {
+        throw createError;
+      }
     } catch (err) {
-      alert(err.response?.data?.message || 'Failed to add hotel');
-      console.error(err);
+      if (err.response?.status === 403 && err.response?.data?.error?.includes('Service provider ID not found')) {
+        toast.error('⚠️ TOKEN THIẾU serviceProviderId - Backend cần fix:', { duration: 6000 });
+        toast.error('Backend phải thêm serviceProviderId vào JWT khi user ServiceProvider login', { duration: 6000 });
+      } else {
+        toast.error(err.response?.data?.message || 'Failed to add hotel');
+      }
     }
   };
-
-  
 
   return (
     <div className="create-hotel-page p-6">

@@ -64,7 +64,16 @@ const AuthPage = () => {
 
       // Lưu provider_id và provider object vào localStorage nếu user có role_id = 2
       if (data.data.role_id === 2) {
-        localStorage.setItem('providerId', data.data.id);
+        // ✅ FIX: Lưu provider._id thay vì user.id
+        if (data.data.provider && data.data.provider._id) {
+          localStorage.setItem('providerId', data.data.provider._id);
+          console.log('✅ Saved providerId from provider object:', data.data.provider._id);
+        } else {
+          // Fallback: nếu chưa có provider object, lưu user.id tạm
+          localStorage.setItem('providerId', data.data.id);
+          console.warn('⚠️ Provider object not found, using user.id as fallback');
+        }
+
         // Lưu toàn bộ provider object
         if (data.data.provider) {
           localStorage.setItem('provider', JSON.stringify(data.data.provider));

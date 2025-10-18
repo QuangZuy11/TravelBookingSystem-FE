@@ -84,7 +84,11 @@ const ServiceProviderRegistration = () => {
 
     const validateServiceTypes = () => {
         if (serviceTypes.length === 0) {
-            toast.error('Vui lòng chọn ít nhất 1 loại dịch vụ!');
+            toast.error('Vui lòng chọn 1 loại dịch vụ!');
+            return false;
+        }
+        if (serviceTypes.length > 1) {
+            toast.error('⚠️ Chỉ được chọn 1 loại dịch vụ duy nhất!');
             return false;
         }
         return true;
@@ -109,20 +113,22 @@ const ServiceProviderRegistration = () => {
     };
 
     const handleServiceTypeChange = (type) => {
+        // ✅ CHỈ ĐƯỢC CHỌN 1 LOẠI DUY NHẤT - thay thế hoàn toàn
         if (serviceTypes.includes(type)) {
-            // Remove service type
-            setServiceTypes(serviceTypes.filter(t => t !== type));
-            // Remove all licenses of this type
-            setLicenses(licenses.filter(l => l.service_type !== type));
+            // Nếu click vào loại đã chọn -> bỏ chọn
+            setServiceTypes([]);
+            setLicenses([]);
         } else {
-            // Add service type
-            setServiceTypes([...serviceTypes, type]);
-            // Add default license
-            setLicenses([...licenses, {
+            // Chọn loại mới -> xóa tất cả loại cũ và licenses cũ
+            setServiceTypes([type]);
+            // Add default license cho loại mới
+            setLicenses([{
                 service_type: type,
                 license_number: '',
                 documents: []
             }]);
+
+            toast.success(`✅ Đã chọn dịch vụ: ${getServiceTypeDisplay(type)}`);
         }
     };
 
@@ -339,12 +345,13 @@ const ServiceProviderRegistration = () => {
     const renderStep2 = () => (
         <div className="registration-step">
             <h2>Bước 2: Chọn loại dịch vụ</h2>
-            <p className="step-description">Chọn các loại dịch vụ mà công ty bạn cung cấp</p>
+            <p className="step-description">⚠️ <strong>Chỉ được chọn 1 loại dịch vụ duy nhất</strong></p>
 
             <div className="service-types">
                 <label className="service-type-card">
                     <input
-                        type="checkbox"
+                        type="radio"
+                        name="serviceType"
                         value="hotel"
                         checked={serviceTypes.includes('hotel')}
                         onChange={() => handleServiceTypeChange('hotel')}
@@ -358,7 +365,8 @@ const ServiceProviderRegistration = () => {
 
                 <label className="service-type-card">
                     <input
-                        type="checkbox"
+                        type="radio"
+                        name="serviceType"
                         value="tour"
                         checked={serviceTypes.includes('tour')}
                         onChange={() => handleServiceTypeChange('tour')}
@@ -373,7 +381,7 @@ const ServiceProviderRegistration = () => {
             </div>
 
             {serviceTypes.length === 0 && (
-                <p className="warning-text">⚠️ Vui lòng chọn ít nhất 1 loại dịch vụ</p>
+                <p className="warning-text">⚠️ Vui lòng chọn 1 loại dịch vụ</p>
             )}
         </div>
     );
