@@ -1,0 +1,297 @@
+.poi-page {
+  padding: 160px 24px 64px;
+  max-width: 1200px;
+  margin: 0 auto;
+  font-family: "Inter", sans-serif;
+}
+
+.poi-hero {
+  text-align: center;
+  margin-bottom: 40px;
+}
+
+.poi-hero h1 {
+  font-size: 2.5rem;
+  margin-bottom: 12px;
+  color: #0d1b2a;
+}
+
+.poi-hero p {
+  color: #415a77;
+  max-width: 720px;
+  margin: 0 auto;
+  line-height: 1.6;
+}
+
+.poi-filter-card {
+  background: #ffffff;
+  border-radius: 16px;
+  box-shadow: 0 8px 20px rgba(15, 23, 42, 0.08);
+  padding: 24px;
+  margin-bottom: 36px;
+}
+
+.poi-filter-card-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 16px;
+  color: #0d1b2a;
+}
+
+.poi-filter-card-header h2 {
+  font-size: 1.2rem;
+  font-weight: 600;
+  margin: 0;
+}
+
+.poi-filter-grid {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.poi-filter-item label {
+  display: block;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #334155;
+  margin-bottom: 6px;
+}
+
+.poi-filter-item input,
+.poi-filter-item select {
+  width: 100%;
+  padding: 10px 12px;
+  border-radius: 10px;
+  border: 1px solid #d4dbe5;
+  font-size: 0.95rem;
+  outline: none;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.poi-filter-item input:focus,
+.poi-filter-item select:focus {
+  border-color: #2563eb;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
+}
+
+.poi-btn-primary {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 12px;
+  border-radius: 10px;
+  border: none;
+  background: #2563eb;
+  color: #ffffff;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s ease, transform 0.2s ease;
+}
+
+.poi-btn-primary:hover {
+  background: #1d4ed8;
+  transform: translateY(-1px);
+}
+
+.poi-status-card {
+  background: #ecf2ff;
+  color: #1b263b;
+  border-radius: 12px;
+  padding: 24px;
+  text-align: center;
+  font-weight: 500;
+}
+
+.poi-status-error {
+  background: #ffe8e8;
+  color: #b91c1c;
+}
+
+.poi-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 24px;
+}
+
+.poi-card {
+  background: #ffffff;
+  border-radius: 18px;
+  box-shadow: 0 12px 30px rgba(15, 23, 42, 0.08);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.poi-card:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 16px 40px rgba(15, 23, 42, 0.16);
+}
+
+.poi-card-image-wrapper {
+  position: relative;
+  width: 100%;
+  height: 210px;
+  overflow: hidden;
+}
+
+.poi-card-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.poi-card-image.placeholder {
+  background: linear-gradient(135deg, #e2e8f0, #cbd5f5);
+}
+
+.poi-card-badge {
+  position: absolute;
+  top: 14px;
+  left: 14px;
+  background: rgba(22, 101, 52, 0.9);
+  color: #ffffff;
+  font-size: 0.7rem;
+  letter-spacing: 0.05em;
+  padding: 6px 12px;
+  border-radius: 999px;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.poi-card-body {
+  padding: 20px 22px 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.poi-card-title {
+  font-size: 1.15rem;
+  color: #111827;
+  font-weight: 700;
+  margin: 0;
+}
+
+.poi-card-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.poi-card-meta-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #475569;
+  font-size: 0.9rem;
+}
+
+.poi-card-meta-item svg {
+  color: #2563eb;
+}
+
+.poi-card-meta-text {
+  flex: 1;
+  line-height: 1.4;
+}
+
+.poi-card-refund {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: #eef6ff;
+  color: #0d4f8b;
+  font-size: 0.85rem;
+  font-weight: 600;
+  padding: 6px 12px;
+  border-radius: 999px;
+  width: fit-content;
+}
+
+.poi-card-refund svg {
+  color: inherit;
+}
+
+.poi-card-pricing {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.poi-card-pricing-label {
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: #9ca3af;
+}
+
+.poi-card-price-row {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.poi-card-price-current {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #dc2626;
+}
+
+.poi-card-price-original {
+  font-size: 0.95rem;
+  color: #9ca3af;
+  text-decoration: line-through;
+}
+
+.poi-card-discount {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: #dc2626;
+  background: #fee2e2;
+  padding: 4px 8px;
+  border-radius: 8px;
+}
+
+.poi-card-links {
+  margin-top: auto;
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.poi-card-links a {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #2563eb;
+  text-decoration: none;
+}
+
+.poi-card-links a:hover {
+  text-decoration: underline;
+}
+
+@media (max-width: 768px) {
+  .poi-page {
+    padding: 140px 16px 48px;
+  }
+
+  .poi-hero h1 {
+    font-size: 2rem;
+  }
+
+  .poi-filter-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .poi-card-links {
+    flex-direction: column;
+  }
+}
