@@ -597,11 +597,6 @@
     background: linear-gradient(135deg, #fffbeb 0%, #fef3c7 100%);
 }
 
-.license-info-box.flight {
-    border-color: #3b82f6;
-    background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);
-}
-
 .license-info-box .info-icon {
     font-size: 2.5rem;
     line-height: 1;

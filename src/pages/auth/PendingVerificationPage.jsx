@@ -66,7 +66,7 @@ const PendingVerificationPage = () => {
                                 <span className="info-label">Loại dịch vụ:</span>
                                 <span className="info-value">
                                     {providerInfo.type?.map(t => {
-                                        const icons = { hotel: '🏨', tour: '🗺️', flight: '✈️' };
+                                        const icons = { hotel: '🏨', tour: '🗺️'};
                                         return (
                                             <span key={t} className="service-badge">
                                                 {icons[t]} {t.charAt(0).toUpperCase() + t.slice(1)}

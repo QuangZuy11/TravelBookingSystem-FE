@@ -8,7 +8,7 @@ import { useAuth } from '../../contexts/AuthContext';
  * Logic:
  * - All providers go to /provider/dashboard
  * - Dashboard will automatically show only sections for registered service types
- * - ServiceProviderDashboard uses provider.type.includes('hotel'|'tour'|'flight') to conditionally render sections
+ * - ServiceProviderDashboard uses provider.type.includes('hotel'|'tour') to conditionally render sections
  */
 const ProviderTypeRouter = () => {
     const { user } = useAuth();

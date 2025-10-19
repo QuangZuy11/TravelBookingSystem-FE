@@ -52,10 +52,6 @@ const ServiceProviderDashboard = () => {
         navigate('/provider/tours');
     };
 
-    const goToFlightManagement = () => {
-        navigate('/provider/flights');
-    };
-
     const handleContactAdmin = () => {
         toast.info('Vui lòng liên hệ admin qua email: admin@viettravel.com');
     };
@@ -83,7 +79,6 @@ const ServiceProviderDashboard = () => {
     // Group licenses by service type
     const hotelLicenses = getLicensesByType(provider.licenses, 'hotel');
     const tourLicense = provider.licenses.find(l => l.service_type === 'tour');
-    const flightLicense = provider.licenses.find(l => l.service_type === 'flight');
 
     return (
         <div className="service-provider-dashboard">
@@ -168,29 +163,6 @@ const ServiceProviderDashboard = () => {
                     {/* ⚠️ QUAN TRỌNG: KHÔNG có button "Thêm license" */}
                     <p className="info-text">
                         ℹ️ Tour chỉ được có 1 license duy nhất. Không thể thêm license mới.
-                    </p>
-                </section>
-            )}
-
-            {/* ====== FLIGHT SECTION - 1 license duy nhất ====== */}
-            {provider.type.includes('flight') && flightLicense && (
-                <section className="service-section flight-section">
-                    <div className="section-header">
-                        <h2>✈️ Giấy phép Hàng không</h2>
-                    </div>
-
-                    <div className="single-license-container">
-                        <LicenseCard
-                            license={flightLicense}
-                            onManage={goToFlightManagement}
-                            onContact={handleContactAdmin}
-                            isSingle
-                        />
-                    </div>
-
-                    {/* ⚠️ QUAN TRỌNG: KHÔNG có button "Thêm license" */}
-                    <p className="info-text">
-                        ℹ️ Flight chỉ được có 1 license duy nhất. Không thể thêm license mới.
                     </p>
                 </section>
             )}

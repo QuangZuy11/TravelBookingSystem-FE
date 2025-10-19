@@ -1,6 +1,6 @@
 .footer {
   color: rgb(0, 0, 0);
-  padding: 3rem 1rem;
+  padding: 1rem 1rem;
 }
 .footer-divider {
   border-top: 1px solid #ddd;
@@ -176,9 +176,6 @@
 
 .footer-bottom {
   border-top: 1px solid #ddd; /* Dòng kẻ trên cùng */
-  margin-bottom: 30px;
-  margin-top: 2rem;
-  padding-top: 2rem;
   text-align: center;
   font-size: 0.85rem;
   color: #000000;
