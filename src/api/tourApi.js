@@ -388,6 +388,28 @@ export const tourApi = {
       params: searchParams
     });
   },
+
+  // ============ AI ITINERARY (Server-assisted) ============
+
+  /**
+   * Generate itinerary using AI on the server
+   * @param {string} tourId - Tour ID (optional)
+   * @param {object} aiInput - AI input payload (preferences, days, budget, travelers, etc.)
+   * @returns {Promise} Generated itinerary data
+   */
+  generateItineraryAI: async (tourId, aiInput = {}) => {
+    // Using a dedicated AI endpoint; axiosInstance already prefixes with /api base
+    return await axiosInstance.post(`/ai/itinerary`, { tourId, ...aiInput });
+  },
+
+  /**
+   * Create an AI itinerary request record (store user request)
+   * @param {object} requestData - full request payload matching AI_REQUEST schema
+   * @returns {Promise} created request
+   */
+  createAiItineraryRequest: async (requestData) => {
+    return await axiosInstance.post(`/ai/requests`, requestData);
+  },
 };
 
 export default tourApi;

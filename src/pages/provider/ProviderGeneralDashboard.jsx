@@ -55,14 +55,6 @@ const ProviderGeneralDashboard = () => {
                 color: '#10b981',
                 bgColor: '#f0fdf4'
             },
-            flight: {
-                icon: '✈️',
-                title: 'Quản lý Chuyến bay',
-                description: 'Quản lý chuyến bay, ghế ngồi và booking',
-                route: '/provider/flights',
-                color: '#f59e0b',
-                bgColor: '#fffbeb'
-            }
         };
 
         return configs[type.toLowerCase()] || null;

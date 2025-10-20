@@ -1,0 +1,313 @@
+/**
+ * AI Itinerary Styles
+ * Following design spec from Frontend_AI_Itinerary_Guide.md
+ * Color Scheme:
+ *   Primary: #2563EB (Blue)
+ *   Secondary: #10B981 (Green)
+ *   Accent: #F59E0B (Amber)
+ */
+
+/* ============ Color Variables ============ */
+:root {
+    /* Primary Colors */
+    --primary-color: #2563EB;
+    --secondary-color: #10B981;
+    --accent-color: #F59E0B;
+
+    /* Semantic Colors */
+    --success-color: #10B981;
+    --error-color: #EF4444;
+    --warning-color: #F59E0B;
+    --info-color: #3B82F6;
+
+    /* Text Colors */
+    --text-primary: #111827;
+    --text-secondary: #6B7280;
+    --text-tertiary: #9CA3AF;
+
+    /* Background */
+    --bg-primary: #FFFFFF;
+    --bg-secondary: #F9FAFB;
+    --bg-tertiary: #F3F4F6;
+
+    /* Spacing Scale */
+    --space-1: 4px;
+    --space-2: 8px;
+    --space-3: 12px;
+    --space-4: 16px;
+    --space-5: 20px;
+    --space-6: 24px;
+    --space-8: 32px;
+    --space-10: 40px;
+    --space-12: 48px;
+}
+
+/* ============ Typography ============ */
+body {
+    font-family: 'Inter', 'SF Pro Display', -apple-system, system-ui, sans-serif;
+    color: var(--text-primary);
+    line-height: 1.5;
+}
+
+/* ============ Form Card ============ */
+.ai-card {
+    background: var(--bg-primary);
+    border-radius: 16px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    padding: var(--space-8);
+    border: 1px solid #E5E7EB;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.ai-card:hover {
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
+}
+
+/* ============ Results View ============ */
+.itinerary-results {
+    animation: fadeIn 0.5s ease-in;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.results-header {
+    padding-bottom: var(--space-6);
+    border-bottom: 2px solid var(--bg-tertiary);
+}
+
+/* ============ Day Cards ============ */
+.day-card {
+    background: var(--bg-primary);
+    border: 2px solid #E5E7EB;
+    border-radius: 12px;
+    overflow: hidden;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.day-card:hover {
+    border-color: var(--primary-color);
+    box-shadow: 0 4px 12px rgba(37, 99, 235, 0.1);
+}
+
+.day-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: var(--space-6);
+    background: linear-gradient(135deg, #F9FAFB 0%, #FFFFFF 100%);
+    border-bottom: 1px solid #E5E7EB;
+    transition: background 0.3s;
+}
+
+.day-header:hover {
+    background: linear-gradient(135deg, #EFF6FF 0%, #F9FAFB 100%);
+}
+
+.day-activities {
+    padding: var(--space-6);
+}
+
+/* ============ Activity Cards ============ */
+.activity-card {
+    background: var(--bg-primary);
+    border: 1px solid #E5E7EB;
+    border-left: 4px solid var(--primary-color);
+    border-radius: 12px;
+    padding: var(--space-6);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.activity-card:hover {
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+    transform: translateY(-2px);
+    border-left-color: var(--secondary-color);
+}
+
+.activity-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: var(--space-4);
+}
+
+.activity-description {
+    line-height: 1.6;
+    font-size: 15px;
+}
+
+.activity-actions {
+    padding-top: var(--space-3);
+    border-top: 1px solid var(--bg-tertiary);
+}
+
+/* ============ Animations ============ */
+@keyframes pulse {
+
+    0%,
+    100% {
+        opacity: 1;
+    }
+
+    50% {
+        opacity: 0.5;
+    }
+}
+
+@keyframes spin {
+    from {
+        transform: rotate(0deg);
+    }
+
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+.animate-spin {
+    animation: spin 1s linear infinite;
+}
+
+.animate-pulse {
+    animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+/* ============ Responsive Design ============ */
+@media (max-width: 768px) {
+    .ai-card {
+        padding: var(--space-5);
+    }
+
+    .day-header,
+    .day-activities,
+    .activity-card {
+        padding: var(--space-4);
+    }
+
+    .activity-header {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .activity-actions {
+        flex-direction: column;
+        gap: var(--space-2);
+    }
+}
+
+@media (max-width: 640px) {
+    .results-header h2 {
+        font-size: 24px;
+    }
+
+    .day-card h3 {
+        font-size: 18px;
+    }
+
+    .activity-card h4 {
+        font-size: 16px;
+    }
+}
+
+/* ============ Utility Classes ============ */
+.transition {
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.card-hover:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+}
+
+/* ============ Loading State ============ */
+.loading-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: var(--space-12);
+    gap: var(--space-4);
+}
+
+.loading-spinner {
+    width: 48px;
+    height: 48px;
+    border: 4px solid var(--bg-tertiary);
+    border-top-color: var(--primary-color);
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+.loading-message {
+    color: var(--text-secondary);
+    font-size: 16px;
+    font-weight: 500;
+    animation: pulse 2s ease-in-out infinite;
+}
+
+/* ============ Drag & Drop Styles ============ */
+.drag-handle {
+    position: absolute;
+    left: 8px;
+    top: 50%;
+    transform: translateY(-50%);
+    cursor: grab;
+    padding: 8px;
+    border-radius: 6px;
+    transition: background-color 0.2s;
+    touch-action: none;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.drag-handle:hover {
+    background-color: rgba(0, 0, 0, 0.05);
+}
+
+.drag-handle:active {
+    cursor: grabbing;
+}
+
+.drag-handle-dot {
+    width: 4px;
+    height: 4px;
+    background-color: #9CA3AF;
+    border-radius: 50%;
+}
+
+.drag-handle:hover .drag-handle-dot {
+    background-color: #6B7280;
+}
+
+/* Activity card with drag handle */
+.activity-card.draggable {
+    position: relative;
+    padding-left: 48px;
+}
+
+/* Dragging state */
+.activity-card.is-dragging {
+    opacity: 0.5;
+    cursor: grabbing;
+}
+
+/* Drop zone indicator */
+.activity-card.is-over {
+    border-top: 3px solid var(--primary-color);
+    margin-top: 4px;
+}
+
+/* Smooth transitions during reorder */
+.day-activities .activity-card {
+    transition: transform 200ms cubic-bezier(0.4, 0, 0.2, 1);
+}

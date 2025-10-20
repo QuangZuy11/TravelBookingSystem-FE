@@ -1,10 +1,10 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect } from 'react';
 import { NavLink, Outlet, useLocation } from 'react-router-dom';
 import './DashboardLayout.css';
+import { useState } from 'react';
 
 const DashboardLayout = () => {
   const location = useLocation();
-  const [isFlightMenuOpen, setIsFlightMenuOpen] = useState(false);
   const [isTourMenuOpen, setIsTourMenuOpen] = useState(false);
   const [providerTypes, setProviderTypes] = useState([]);
 
@@ -23,11 +23,8 @@ const DashboardLayout = () => {
     }
   }, []);
 
-  // Auto-expand dropdown if user is on a flight-related page
+  // Auto-expand dropdown if user is on a tour-related page
   useEffect(() => {
-    if (location.pathname.includes('/flight')) {
-      setIsFlightMenuOpen(true);
-    }
     if (location.pathname.includes('/tour')) {
       setIsTourMenuOpen(true);
     }
@@ -42,12 +39,6 @@ const DashboardLayout = () => {
     menuItems.push({ path: '/provider/hotels', label: 'Hotels', icon: '🏨' });
   }
 
-  const flightSubmenu = [
-    { path: '/provider/flights', label: 'All Flights', icon: '✈️' },
-    { path: '/provider/flight-statistics', label: 'Statistics', icon: '📈' },
-    { path: '/provider/flight-bookings', label: 'Bookings', icon: '📋' },
-    { path: '/provider/flight-classes', label: 'Classes', icon: '🎖️' },
-  ];
 
   const tourSubmenu = [
     { path: '/provider/tours', label: 'Dashboard', icon: '📊' },
@@ -111,40 +102,6 @@ const DashboardLayout = () => {
             </div>
           )}
 
-          {/* Flight Menu with Dropdown - Only show if provider has 'flight' type */}
-          {providerTypes.includes('flight') && (
-            <div className="nav-item-wrapper">
-              <button
-                className={`nav-item-dropdown ${location.pathname.includes('/flight') ? 'active' : ''
-                  }`}
-                onClick={() => setIsFlightMenuOpen(!isFlightMenuOpen)}
-              >
-                <div className="nav-item-label">
-                  <span className="nav-icon">✈️</span>
-                  <span className="nav-label">Flight Management</span>
-                </div>
-                <span className={`dropdown-arrow ${isFlightMenuOpen ? 'open' : ''}`}>
-                  ▼
-                </span>
-              </button>
-
-              {/* Submenu */}
-              <div className={`submenu ${isFlightMenuOpen ? 'open' : ''}`}>
-                {flightSubmenu.map((item) => (
-                  <NavLink
-                    key={item.path}
-                    to={item.path}
-                    className={({ isActive }) =>
-                      `submenu-item ${isActive ? 'active' : ''}`
-                    }
-                  >
-                    <span className="nav-icon">{item.icon}</span>
-                    <span className="nav-label">{item.label}</span>
-                  </NavLink>
-                ))}
-              </div>
-            </div>
-          )}
         </nav>
       </aside>
       <main className="dashboard-main">

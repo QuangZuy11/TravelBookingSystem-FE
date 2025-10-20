@@ -9,7 +9,7 @@ const PendingProvidersList = () => {
     const navigate = useNavigate();
     const [providers, setProviders] = useState([]);
     const [loading, setLoading] = useState(true);
-    const [filter, setFilter] = useState('all'); // all, hotel, tour, flight
+    const [filter, setFilter] = useState('all'); // all, hotel, tour
     const [searchTerm, setSearchTerm] = useState('');
 
     useEffect(() => {
@@ -104,13 +104,6 @@ const PendingProvidersList = () => {
                         🗺️ Tour <span className="count">{getFilterCount('tour')}</span>
                     </button>
                     <button
-                        onClick={() => setFilter('flight')}
-                        className={`filter-btn ${filter === 'flight' ? 'active' : ''}`}
-                    >
-                        ✈️ Flight <span className="count">{getFilterCount('flight')}</span>
-                    </button>
-
-                    <button
                         onClick={fetchPendingProviders}
                         className="filter-btn btn-refresh"
                     >
@@ -175,7 +168,7 @@ const PendingProvidersList = () => {
                                                 key={type}
                                                 className={`service-badge ${type}`}
                                             >
-                                                {type === 'hotel' ? '🏨' : type === 'tour' ? '🗺️' : '✈️'} {type.toUpperCase()}
+                                                {type === 'hotel' ? '🏨' : '🗺️'} {type.toUpperCase()}
                                             </span>
                                         ))}
                                     </div>

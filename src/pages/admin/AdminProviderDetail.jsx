@@ -288,7 +288,7 @@ const AdminProviderDetail = () => {
                 {/* Info Box */}
                 <div className="info-box">
                     <p>ℹ️ <strong>Hotel:</strong> Có thể có nhiều licenses (mỗi khách sạn 1 license)</p>
-                    <p>ℹ️ <strong>Tour/Flight:</strong> Chỉ có 1 license duy nhất (1 công ty = 1 giấy phép)</p>
+                    <p>ℹ️ <strong>Tour:</strong> Chỉ có 1 license duy nhất (1 công ty = 1 giấy phép)</p>
                     <p>🔒 <strong>License number:</strong> Phải unique trong toàn hệ thống (format: XXX-YYYY-NNN)</p>
                 </div>
             </div>

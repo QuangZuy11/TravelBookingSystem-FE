@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import toast from 'react-hot-toast';
-import { registerServiceProvider, uploadLicenseDocuments } from '../../services/serviceProviderService';
+import { registerServiceProvider } from '../../services/serviceProviderService';
 import {
     validateServiceProviderLicenses,
     canAddLicense,
@@ -32,7 +32,6 @@ const ServiceProviderRegistration = () => {
 
     // Step 3: Licenses
     const [licenses, setLicenses] = useState([]);
-    const [uploadingFiles, setUploadingFiles] = useState({});
 
     // ==================== STEP NAVIGATION ====================
 
@@ -84,7 +83,11 @@ const ServiceProviderRegistration = () => {
 
     const validateServiceTypes = () => {
         if (serviceTypes.length === 0) {
-            toast.error('Vui lòng chọn ít nhất 1 loại dịch vụ!');
+            toast.error('Vui lòng chọn 1 loại dịch vụ!');
+            return false;
+        }
+        if (serviceTypes.length > 1) {
+            toast.error('⚠️ Chỉ được chọn 1 loại dịch vụ duy nhất!');
             return false;
         }
         return true;
@@ -109,20 +112,22 @@ const ServiceProviderRegistration = () => {
     };
 
     const handleServiceTypeChange = (type) => {
+        // ✅ CHỈ ĐƯỢC CHỌN 1 LOẠI DUY NHẤT - thay thế hoàn toàn
         if (serviceTypes.includes(type)) {
-            // Remove service type
-            setServiceTypes(serviceTypes.filter(t => t !== type));
-            // Remove all licenses of this type
-            setLicenses(licenses.filter(l => l.service_type !== type));
+            // Nếu click vào loại đã chọn -> bỏ chọn
+            setServiceTypes([]);
+            setLicenses([]);
         } else {
-            // Add service type
-            setServiceTypes([...serviceTypes, type]);
-            // Add default license
-            setLicenses([...licenses, {
+            // Chọn loại mới -> xóa tất cả loại cũ và licenses cũ
+            setServiceTypes([type]);
+            // Add default license cho loại mới
+            setLicenses([{
                 service_type: type,
                 license_number: '',
                 documents: []
             }]);
+
+            toast.success(`✅ Đã chọn dịch vụ: ${getServiceTypeDisplay(type)}`);
         }
     };
 
@@ -166,41 +171,7 @@ const ServiceProviderRegistration = () => {
         setLicenses(updatedLicenses);
     };
 
-    const handleFileUpload = async (index, files) => {
-        if (!files || files.length === 0) return;
 
-        setUploadingFiles({ ...uploadingFiles, [index]: true });
-
-        try {
-            const formData = new FormData();
-            Array.from(files).forEach(file => {
-                formData.append('files', file);
-            });
-
-            const urls = await uploadLicenseDocuments(formData);
-
-            const updatedLicenses = [...licenses];
-            updatedLicenses[index] = {
-                ...updatedLicenses[index],
-                documents: [...(updatedLicenses[index].documents || []), ...urls]
-            };
-            setLicenses(updatedLicenses);
-
-            toast.success('Upload thành công!');
-        } catch (error) {
-            console.error('Upload error:', error);
-            toast.error('Upload thất bại. Vui lòng thử lại.');
-        } finally {
-            setUploadingFiles({ ...uploadingFiles, [index]: false });
-        }
-    };
-
-    const handleRemoveDocument = (licenseIndex, docIndex) => {
-        const updatedLicenses = [...licenses];
-        updatedLicenses[licenseIndex].documents =
-            updatedLicenses[licenseIndex].documents.filter((_, i) => i !== docIndex);
-        setLicenses(updatedLicenses);
-    };
 
     // ==================== SUBMIT ====================
 
@@ -339,12 +310,13 @@ const ServiceProviderRegistration = () => {
     const renderStep2 = () => (
         <div className="registration-step">
             <h2>Bước 2: Chọn loại dịch vụ</h2>
-            <p className="step-description">Chọn các loại dịch vụ mà công ty bạn cung cấp</p>
+            <p className="step-description">⚠️ <strong>Chỉ được chọn 1 loại dịch vụ duy nhất</strong></p>
 
             <div className="service-types">
                 <label className="service-type-card">
                     <input
-                        type="checkbox"
+                        type="radio"
+                        name="serviceType"
                         value="hotel"
                         checked={serviceTypes.includes('hotel')}
                         onChange={() => handleServiceTypeChange('hotel')}
@@ -358,7 +330,8 @@ const ServiceProviderRegistration = () => {
 
                 <label className="service-type-card">
                     <input
-                        type="checkbox"
+                        type="radio"
+                        name="serviceType"
                         value="tour"
                         checked={serviceTypes.includes('tour')}
                         onChange={() => handleServiceTypeChange('tour')}
@@ -370,23 +343,10 @@ const ServiceProviderRegistration = () => {
                     </div>
                 </label>
 
-                <label className="service-type-card">
-                    <input
-                        type="checkbox"
-                        value="flight"
-                        checked={serviceTypes.includes('flight')}
-                        onChange={() => handleServiceTypeChange('flight')}
-                    />
-                    <div className="service-type-content">
-                        <span className="service-icon">✈️</span>
-                        <span className="service-name">Hàng không</span>
-                        <small className="service-hint">Chỉ 1 license duy nhất</small>
-                    </div>
-                </label>
             </div>
 
             {serviceTypes.length === 0 && (
-                <p className="warning-text">⚠️ Vui lòng chọn ít nhất 1 loại dịch vụ</p>
+                <p className="warning-text">⚠️ Vui lòng chọn 1 loại dịch vụ</p>
             )}
         </div>
     );
@@ -394,7 +354,7 @@ const ServiceProviderRegistration = () => {
     const renderStep4 = () => (
         <div className="registration-step">
             <h2>Bước 3: Giấy phép kinh doanh</h2>
-            <p className="step-description">Upload giấy phép cho từng loại dịch vụ đã chọn</p>
+            <p className="step-description">Nhập số giấy phép kinh doanh cho loại dịch vụ đã chọn</p>
 
             <div className="licenses-section">
                 {serviceTypes.map(serviceType => {
@@ -408,7 +368,7 @@ const ServiceProviderRegistration = () => {
                                     {serviceType === 'hotel' && (
                                         <span className="license-badge unlimited">Không giới hạn licenses</span>
                                     )}
-                                    {(serviceType === 'tour' || serviceType === 'flight') && (
+                                    {(serviceType === 'tour') && (
                                         <span className="license-badge limited">Chỉ 1 license duy nhất</span>
                                     )}
                                 </h3>
@@ -468,51 +428,13 @@ const ServiceProviderRegistration = () => {
                                             <small className="hint">
                                                 {serviceType === 'hotel' && '🏨 Mỗi khách sạn cần 1 giấy phép riêng'}
                                                 {serviceType === 'tour' && '🗺️ Giấy phép kinh doanh tour du lịch'}
-                                                {serviceType === 'flight' && '✈️ Giấy phép vận chuyển hàng không'}
                                             </small>
                                             {license.license_number && !isValidLicenseFormat(license.license_number) && (
                                                 <small className="error-text">❌ Format: XXX-YYYY-NNN (VD: HTL-2024-001)</small>
                                             )}
                                         </div>
 
-                                        <div className="form-group">
-                                            <label>Tài liệu giấy phép</label>
-                                            <input
-                                                type="file"
-                                                multiple
-                                                onChange={(e) => handleFileUpload(globalIndex, e.target.files)}
-                                                disabled={uploadingFiles[globalIndex]}
-                                                accept=".pdf,.jpg,.jpeg,.png"
-                                            />
-                                            <small className="hint">
-                                                Upload file PDF, JPG, PNG (tối đa 10MB mỗi file)
-                                            </small>
-                                            {uploadingFiles[globalIndex] && (
-                                                <small className="uploading-text">⏳ Đang upload...</small>
-                                            )}
-                                        </div>
 
-                                        {license.documents && license.documents.length > 0 && (
-                                            <div className="uploaded-documents">
-                                                <label>Tài liệu đã upload:</label>
-                                                <ul>
-                                                    {license.documents.map((doc, docIdx) => (
-                                                        <li key={docIdx}>
-                                                            <a href={doc} target="_blank" rel="noopener noreferrer">
-                                                                📄 Document {docIdx + 1}
-                                                            </a>
-                                                            <button
-                                                                type="button"
-                                                                onClick={() => handleRemoveDocument(globalIndex, docIdx)}
-                                                                className="btn-remove-doc"
-                                                            >
-                                                                ✕
-                                                            </button>
-                                                        </li>
-                                                    ))}
-                                                </ul>
-                                            </div>
-                                        )}
                                     </div>
                                 );
                             })}
@@ -541,19 +463,6 @@ const ServiceProviderRegistration = () => {
                                                 <li>⚠️ Chỉ được có <strong>1 LICENSE DUY NHẤT</strong></li>
                                                 <li>🎫 1 giấy phép kinh doanh tour du lịch</li>
                                                 <li>📄 Cấp bởi Sở Du lịch địa phương</li>
-                                            </ul>
-                                        </div>
-                                    </>
-                                )}
-                                {serviceType === 'flight' && (
-                                    <>
-                                        <div className="info-icon">✈️</div>
-                                        <div className="info-content">
-                                            <strong>Quy định về license Flight:</strong>
-                                            <ul>
-                                                <li>⚠️ Chỉ được có <strong>1 LICENSE DUY NHẤT</strong></li>
-                                                <li>✈️ 1 giấy phép vận chuyển hàng không</li>
-                                                <li>📄 Cấp bởi Cục Hàng không Việt Nam</li>
                                             </ul>
                                         </div>
                                     </>

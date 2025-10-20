@@ -278,11 +278,6 @@
     color: #065f46;
 }
 
-.service-badge.flight {
-    background: #fed7aa;
-    color: #9a3412;
-}
-
 /* License Stats */
 .license-stats {
     display: flex;
