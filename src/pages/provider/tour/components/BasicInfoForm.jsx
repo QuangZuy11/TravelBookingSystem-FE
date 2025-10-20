@@ -148,9 +148,8 @@ const BasicInfoForm = ({ providerId, initialData, isEditMode, onNext, onCancel }
         }
 
         const description = String(formData.description || '');
-        if (!description.trim()) {
-            newErrors.description = 'Vui lòng nhập mô tả tour';
-        } else if (description.trim().length < 50) {
+        // Description is optional, but if provided must be at least 50 characters
+        if (description.trim() && description.trim().length < 50) {
             newErrors.description = 'Mô tả phải có ít nhất 50 ký tự';
         }
 
@@ -209,8 +208,8 @@ const BasicInfoForm = ({ providerId, initialData, isEditMode, onNext, onCancel }
                 response = await axios.put(
                     `http://localhost:3000/api/tour/provider/${providerId}/tours/${initialData._id}`,
                     tourData, {
-                headers: { Authorization: `Bearer ${token}` }
-            }
+                    headers: { Authorization: `Bearer ${token}` }
+                }
                 );
                 tourId = initialData._id;
                 toast.success('Cập nhật thông tin tour thành công!');
@@ -219,8 +218,8 @@ const BasicInfoForm = ({ providerId, initialData, isEditMode, onNext, onCancel }
                 response = await axios.post(
                     `http://localhost:3000/api/tour/provider/${providerId}/tours`,
                     tourData, {
-                headers: { Authorization: `Bearer ${token}` }
-            }
+                    headers: { Authorization: `Bearer ${token}` }
+                }
                 );
                 tourId = response.data.data._id;
                 toast.success('Tạo tour mới thành công!');
@@ -264,7 +263,7 @@ const BasicInfoForm = ({ providerId, initialData, isEditMode, onNext, onCancel }
             {/* Description */}
             <div className="form-group">
                 <label className="form-label">
-                    Mô tả <span className="required">*</span>
+                    Mô tả <span className="optional">(Tùy chọn - tối thiểu 50 ký tự nếu nhập)</span>
                 </label>
                 <textarea
                     name="description"
@@ -275,7 +274,7 @@ const BasicInfoForm = ({ providerId, initialData, isEditMode, onNext, onCancel }
                     placeholder="Mô tả chi tiết về tour, các điểm đến, hoạt động..."
                 />
                 <div className="char-count">
-                    {formData.description.length}/50 ký tự tối thiểu
+                    {formData.description.length} ký tự {formData.description.length > 0 && formData.description.length < 50 ? '(tối thiểu 50)' : ''}
                 </div>
                 {errors.description && <span className="error-message">{errors.description}</span>}
             </div>

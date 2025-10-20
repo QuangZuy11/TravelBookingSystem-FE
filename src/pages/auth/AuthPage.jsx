@@ -88,14 +88,14 @@ const AuthPage = () => {
         // Check nếu có provider object và đã đăng ký đầy đủ
         const provider = data.data.provider;
 
-        // Nếu provider là null hoặc chưa có type/licenses -> chưa đăng ký
-        if (!provider ||
-          !provider.type ||
-          !Array.isArray(provider.type) ||
-          provider.type.length === 0 ||
-          !provider.licenses ||
-          !Array.isArray(provider.licenses) ||
-          provider.licenses.length === 0) {
+        // Check if provider has valid data (_id and licenses)
+        const hasProvider = !!provider && !!provider._id;
+        const hasLicenses = provider &&
+          Array.isArray(provider.licenses) &&
+          provider.licenses.length > 0;
+
+        // Nếu provider chưa có _id hoặc licenses -> chưa đăng ký
+        if (!hasProvider || !hasLicenses) {
           // Chưa đăng ký provider với hệ thống -> redirect đến trang đăng ký
           console.log("Provider chưa đăng ký đầy đủ, redirect to registration");
           navigate("/register/service-provider");

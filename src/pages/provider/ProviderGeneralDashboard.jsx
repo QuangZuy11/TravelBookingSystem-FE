@@ -32,7 +32,18 @@ const ProviderGeneralDashboard = () => {
         }
 
         if (provider) {
-            setProviderTypes(provider.type || []);
+            // Get provider types from licenses or type field
+            let types = [];
+            if (Array.isArray(provider.type)) {
+                types = provider.type;
+            } else if (typeof provider.type === 'string') {
+                types = [provider.type];
+            } else if (provider.licenses && Array.isArray(provider.licenses)) {
+                // Derive from licenses if type field missing
+                types = [...new Set(provider.licenses.map(l => l.service_type))];
+            }
+
+            setProviderTypes(types);
             setCompanyName(provider.company_name || 'Provider');
         }
     };

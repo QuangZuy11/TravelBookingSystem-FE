@@ -65,14 +65,25 @@ const PendingVerificationPage = () => {
                             <div className="info-row">
                                 <span className="info-label">Loại dịch vụ:</span>
                                 <span className="info-value">
-                                    {providerInfo.type?.map(t => {
-                                        const icons = { hotel: '🏨', tour: '🗺️'};
-                                        return (
+                                    {(() => {
+                                        // Get provider types from licenses or type field
+                                        let types = [];
+                                        if (Array.isArray(providerInfo.type)) {
+                                            types = providerInfo.type;
+                                        } else if (typeof providerInfo.type === 'string') {
+                                            types = [providerInfo.type];
+                                        } else if (providerInfo.licenses && Array.isArray(providerInfo.licenses)) {
+                                            // Derive from licenses if type field missing
+                                            types = [...new Set(providerInfo.licenses.map(l => l.service_type))];
+                                        }
+
+                                        const icons = { hotel: '🏨', tour: '🗺️' };
+                                        return types.map(t => (
                                             <span key={t} className="service-badge">
                                                 {icons[t]} {t.charAt(0).toUpperCase() + t.slice(1)}
                                             </span>
-                                        );
-                                    })}
+                                        ));
+                                    })()}
                                 </span>
                             </div>
                             <div className="info-row">
