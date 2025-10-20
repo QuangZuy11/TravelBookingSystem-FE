@@ -26,7 +26,8 @@
   border-radius: 16px;
   padding: 32px;
   box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
-  max-width: 1000px; /* chỉnh tùy ý, ví dụ 800px, 1000px */
+  max-width: 1000px;
+  /* chỉnh tùy ý, ví dụ 800px, 1000px */
   margin: 0 auto;
 }
 
@@ -34,35 +35,46 @@
   display: grid;
   grid-template-columns: repeat(4, 1fr);
   gap: 16px;
-  margin-bottom: 12px;
+  margin-bottom: 8px;
+  /* Reduced from 12px to prevent overlap */
 }
 
 .tour-search-label {
   font-size: 14px;
   font-weight: 500;
   color: #374151;
+  display: block;
+  margin-bottom: 0;
+  /* Remove extra margin */
 }
 
 .tour-search-inputs-row {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
   gap: 16px;
+  align-items: start;
+  /* Prevent stretching */
 }
 
 .tour-search-input-wrapper {
   position: relative;
+  display: flex;
+  flex-direction: column;
 }
 
 /* Icon */
 .tour-search-icon {
   position: absolute;
   left: 12px;
-  top: 45%;
+  top: 50%;
+  /* Center vertically in input */
   transform: translateY(-50%);
   color: #9ca3af;
   width: 20px;
   height: 20px;
   pointer-events: none;
+  z-index: 2;
+  /* Above input */
 }
 
 /* Input & Select */
@@ -75,9 +87,15 @@
   outline: none;
   transition: all 0.2s;
   background-color: white;
+  box-sizing: border-box;
+  /* Ensure padding is included in width */
+  position: relative;
+  z-index: 1;
+  /* Below icon */
 }
+
 .tour-search-select {
-  width: 80%;
+  width: 100%;
   padding: 12px 16px 12px 40px;
   border: 1px solid #e5e7eb;
   border-radius: 8px;
@@ -85,11 +103,15 @@
   outline: none;
   transition: all 0.2s;
   background-color: white;
-}
-.tour-search-select {
+  box-sizing: border-box;
+  position: relative;
+  z-index: 1;
   appearance: none;
   cursor: pointer;
-  background-size: 20px;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%239ca3af' d='M6 9L1 4h10z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+  background-size: 12px;
   padding-right: 40px;
 }
 
@@ -101,10 +123,12 @@
 
 /* Button */
 .tour-search-button {
-  width: 60%;
+  width: 100%;
+  /* Changed from 60% to 100% */
   background-color: #00282b;
   color: white;
-  padding: 4px 24px;
+  padding: 12px 24px;
+  /* Increased from 4px to match inputs */
   border-radius: 8px;
   border: none;
   font-weight: 500;
@@ -114,6 +138,9 @@
   display: flex;
   align-items: center;
   justify-content: center;
+  gap: 8px;
+  /* Add gap between icon and text */
+  box-sizing: border-box;
 }
 
 .tour-search-button:hover {
@@ -158,6 +185,7 @@
 
 /* Responsive */
 @media (max-width: 768px) {
+
   .tour-search-labels-row,
   .tour-search-inputs-row {
     grid-template-columns: 1fr;
@@ -170,6 +198,7 @@
   .tour-search-title {
     font-size: 24px;
   }
+
   .horizontal-line {
     height: 1px;
     background-color: #ccc;

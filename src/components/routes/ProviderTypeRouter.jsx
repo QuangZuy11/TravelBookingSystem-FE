@@ -33,15 +33,25 @@ const ProviderTypeRouter = () => {
             provider = user.provider;
         }
 
-        // Safety check
-        if (!provider || !Array.isArray(provider.type) || provider.type.length === 0) {
-            console.error('Invalid provider type data');
-            setTargetRoute('/');
+        console.log('🔍 ProviderTypeRouter checking:', {
+            hasProvider: !!provider,
+            providerId: provider?._id,
+            licensesCount: provider?.licenses?.length
+        });
+
+        // Simplified check: If has provider._id and licenses, go to dashboard
+        if (!provider || !provider._id || !Array.isArray(provider.licenses) || provider.licenses.length === 0) {
+            console.log('❌ Invalid provider - redirecting to registration');
+            setTargetRoute('/register/service-provider');
             return;
         }
 
-        // ALL providers go to the same dashboard
-        // Dashboard will show only sections for their registered types
+        console.log('✅ Valid provider - routing to dashboard', {
+            provider_id: provider._id,
+            service_types: provider.licenses.map(l => l.service_type)
+        });
+
+        // All providers with valid data go to dashboard
         setTargetRoute('/provider/dashboard');
     };
 

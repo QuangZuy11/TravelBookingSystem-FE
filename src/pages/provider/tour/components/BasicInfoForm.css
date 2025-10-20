@@ -76,6 +76,17 @@
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
     gap: 1rem;
+    margin-bottom: 0;
+    /* Remove margin, let form-group handle it */
+}
+
+/* Form groups inside form-row should not have extra margin */
+.form-row .form-group {
+    margin-bottom: 0;
+}
+
+/* Only last form-row should have bottom margin */
+.form-row:not(:last-child) {
     margin-bottom: 1.5rem;
 }
 

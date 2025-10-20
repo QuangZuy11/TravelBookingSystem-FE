@@ -1,0 +1,391 @@
+/**
+ * GLOBAL FORM FIXES
+ * Fix input overlapping, label positioning, and form layout issues
+ * Last Updated: October 20, 2025
+ */
+
+/* ==================== UNIVERSAL BOX-SIZING FIX ==================== */
+
+/* Apply box-sizing to ALL inputs, selects, textareas to prevent overflow */
+input,
+select,
+textarea,
+button {
+    box-sizing: border-box !important;
+}
+
+/* ==================== FORM GROUP STANDARDIZATION ==================== */
+
+/* Ensure all form groups have proper spacing */
+.form-group,
+.modal-content .form-group,
+.registration-form .form-group {
+    margin-bottom: 1.5rem !important;
+    display: block !important;
+}
+
+/* Ensure labels are always visible and properly spaced */
+.form-group label,
+.modal-content .form-group label,
+.registration-form .form-group label {
+    display: block !important;
+    margin-bottom: 0.5rem !important;
+    font-weight: 600 !important;
+    color: #374151 !important;
+    font-size: 0.875rem !important;
+    line-height: 1.5 !important;
+}
+
+/* ==================== INPUT STANDARDIZATION ==================== */
+
+/* Prevent inputs from overlapping */
+.form-group input,
+.form-group select,
+.form-group textarea,
+.modal-content input,
+.modal-content select,
+.modal-content textarea {
+    display: block !important;
+    width: 100% !important;
+    padding: 0.75rem 1rem !important;
+    border: 1px solid #d1d5db !important;
+    border-radius: 8px !important;
+    font-size: 1rem !important;
+    line-height: 1.5 !important;
+    background-color: white !important;
+    box-sizing: border-box !important;
+    margin-top: 0 !important;
+    position: relative !important;
+    z-index: 1 !important;
+}
+
+/* Input with icons - ensure proper padding */
+.form-group input[type="text"]+.icon,
+.form-group input[type="email"]+.icon,
+.form-group input[type="tel"]+.icon,
+.form-group input[type="date"]+.icon {
+    padding-left: 2.5rem !important;
+}
+
+/* ==================== GRID LAYOUT FIXES ==================== */
+
+/* Tour Search Form - Fix overlapping inputs */
+.tour-search-labels-row {
+    display: grid !important;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)) !important;
+    gap: 1rem !important;
+    margin-bottom: 0.75rem !important;
+}
+
+.tour-search-inputs-row {
+    display: grid !important;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)) !important;
+    gap: 1rem !important;
+    align-items: start !important;
+}
+
+.tour-search-input-wrapper {
+    position: relative !important;
+    display: flex !important;
+    flex-direction: column !important;
+}
+
+/* Fix icon positioning in tour search */
+.tour-search-icon {
+    position: absolute !important;
+    left: 12px !important;
+    top: 50% !important;
+    transform: translateY(-50%) !important;
+    color: #9ca3af !important;
+    pointer-events: none !important;
+    z-index: 2 !important;
+}
+
+/* Ensure input is on top of icon */
+.tour-search-input,
+.tour-search-select {
+    width: 100% !important;
+    padding: 12px 16px 12px 40px !important;
+    position: relative !important;
+    z-index: 1 !important;
+    box-sizing: border-box !important;
+}
+
+/* ==================== REGISTRATION FORM FIXES ==================== */
+
+/* Fix two-column grid layout */
+.registration-form .form-row {
+    display: grid !important;
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 1.5rem !important;
+    margin-bottom: 1.5rem !important;
+}
+
+.registration-form .form-row.single {
+    grid-template-columns: 1fr !important;
+}
+
+/* Ensure form fields in registration don't overlap */
+.registration-form .form-group {
+    margin-bottom: 0 !important;
+}
+
+/* ==================== MODAL FIXES ==================== */
+
+/* Prevent modal inputs from overlapping */
+.modal-content {
+    position: relative !important;
+    z-index: 1001 !important;
+}
+
+.modal-overlay {
+    z-index: 1000 !important;
+}
+
+/* ==================== SELECT DROPDOWN FIXES ==================== */
+
+/* Ensure select dropdowns don't get cut off */
+select {
+    appearance: none !important;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23374151' d='M6 9L1 4h10z'/%3E%3C/svg%3E") !important;
+    background-repeat: no-repeat !important;
+    background-position: right 1rem center !important;
+    background-size: 12px !important;
+    padding-right: 2.5rem !important;
+}
+
+/* ==================== RESPONSIVE FIXES ==================== */
+
+@media (max-width: 768px) {
+
+    /* Stack form fields vertically on mobile */
+    .tour-search-labels-row,
+    .tour-search-inputs-row {
+        grid-template-columns: 1fr !important;
+    }
+
+    .registration-form .form-row {
+        grid-template-columns: 1fr !important;
+        gap: 1rem !important;
+    }
+
+    /* Reduce padding on mobile */
+    .form-group input,
+    .form-group select,
+    .form-group textarea {
+        padding: 0.625rem 0.875rem !important;
+    }
+
+    /* Adjust icon position for mobile */
+    .tour-search-input,
+    .tour-search-select {
+        padding: 10px 14px 10px 36px !important;
+    }
+
+    .tour-search-icon {
+        left: 10px !important;
+    }
+}
+
+/* ==================== DATE INPUT FIXES ==================== */
+
+/* Fix date input overlapping with label */
+input[type="date"],
+input[type="datetime-local"],
+input[type="time"] {
+    padding-right: 0.5rem !important;
+    min-height: 42px !important;
+}
+
+/* ==================== NUMBER INPUT SPINNER FIXES ==================== */
+
+/* Ensure number input spinners don't overlap */
+input[type="number"] {
+    appearance: textfield !important;
+    -moz-appearance: textfield !important;
+    -webkit-appearance: textfield !important;
+}
+
+input[type="number"]::-webkit-outer-spin-button,
+input[type="number"]::-webkit-inner-spin-button {
+    -webkit-appearance: none !important;
+    appearance: none !important;
+    margin: 0 !important;
+}
+
+/* ==================== FOCUS STATES ==================== */
+
+/* Ensure focused inputs are always visible */
+.form-group input:focus,
+.form-group select:focus,
+.form-group textarea:focus {
+    outline: none !important;
+    border-color: #14b8a6 !important;
+    box-shadow: 0 0 0 3px rgba(20, 184, 166, 0.1) !important;
+    z-index: 2 !important;
+}
+
+/* ==================== ERROR STATES ==================== */
+
+/* Error message positioning */
+.form-group .error-message,
+.modal-error {
+    display: block !important;
+    margin-top: 0.5rem !important;
+    font-size: 0.875rem !important;
+    color: #dc2626 !important;
+    line-height: 1.4 !important;
+}
+
+/* Error input styling */
+.form-group input.error,
+.form-group select.error,
+.form-group textarea.error {
+    border-color: #dc2626 !important;
+}
+
+/* ==================== PLACEHOLDER FIXES ==================== */
+
+/* Ensure placeholders are visible */
+input::placeholder,
+select::placeholder,
+textarea::placeholder {
+    color: #9ca3af !important;
+    opacity: 1 !important;
+}
+
+/* ==================== BUTTON FIXES ==================== */
+
+/* Prevent buttons from being hidden behind inputs */
+.form-group button,
+.modal-actions button,
+.tour-search-button {
+    position: relative !important;
+    z-index: 1 !important;
+    margin-top: 0.5rem !important;
+}
+
+/* ==================== FLEX LAYOUT FIXES ==================== */
+
+/* Fix flex container issues */
+.form-flex-row {
+    display: flex !important;
+    gap: 1rem !important;
+    align-items: flex-start !important;
+}
+
+.form-flex-row>* {
+    flex: 1 !important;
+    min-width: 0 !important;
+}
+
+/* ==================== CHECKBOX AND RADIO FIXES ==================== */
+
+/* Ensure checkboxes and radios don't overlap labels */
+input[type="checkbox"],
+input[type="radio"] {
+    width: auto !important;
+    margin-right: 0.5rem !important;
+    position: relative !important;
+    top: 2px !important;
+}
+
+label:has(input[type="checkbox"]),
+label:has(input[type="radio"]) {
+    display: flex !important;
+    align-items: center !important;
+    gap: 0.5rem !important;
+}
+
+/* ==================== FILE INPUT FIXES ==================== */
+
+/* Fix file input styling */
+input[type="file"] {
+    padding: 0.5rem !important;
+    font-size: 0.875rem !important;
+}
+
+/* ==================== CLEAR FLOAT ==================== */
+
+/* Clear floats in forms */
+.form-group::after {
+    content: "" !important;
+    display: table !important;
+    clear: both !important;
+}
+
+/* ==================== PROVIDER FORMS SPECIFIC FIXES ==================== */
+
+/* Fix for inline-styled provider forms (RoomForm, HotelForm, etc.) */
+/* Only apply to forms WITHOUT specific form classes */
+form:not(.basic-info-form):not(.itinerary-form):not(.budget-form) div:has(> label:not([class])) {
+    margin-bottom: 1.5rem !important;
+}
+
+form:not(.basic-info-form):not(.itinerary-form):not(.budget-form) div>label:not([class]) {
+    display: block !important;
+    margin-bottom: 0.5rem !important;
+    font-weight: 600 !important;
+    color: #374151 !important;
+    font-size: 0.875rem !important;
+}
+
+form:not(.basic-info-form):not(.itinerary-form):not(.budget-form) div>input:not([class]),
+form:not(.basic-info-form):not(.itinerary-form):not(.budget-form) div>select:not([class]),
+form:not(.basic-info-form):not(.itinerary-form):not(.budget-form) div>textarea:not([class]) {
+    display: block !important;
+    width: 100% !important;
+    padding: 0.75rem 1rem !important;
+    border: 1px solid #d1d5db !important;
+    border-radius: 8px !important;
+    font-size: 1rem !important;
+    background-color: white !important;
+    box-sizing: border-box !important;
+}
+
+/* Grid layouts in forms */
+form>div[style*="display: grid"],
+form>div[style*="grid-template-columns"] {
+    gap: 1.5rem !important;
+}
+
+form>div[style*="display: grid"]>div:not([class]) {
+    display: flex !important;
+    flex-direction: column !important;
+}
+
+/* Section spacing */
+form>section,
+form>div[style*="background"],
+form>div[style*="padding"] {
+    margin-bottom: 2rem !important;
+}
+
+/* Provider dashboard forms */
+.service-provider-dashboard form div:has(> label:not([class])) {
+    margin-bottom: 1.5rem !important;
+}
+
+.service-provider-dashboard form label:not([class]) {
+    display: block !important;
+    margin-bottom: 0.5rem !important;
+}
+
+.service-provider-dashboard form input:not([class]),
+.service-provider-dashboard form select:not([class]),
+.service-provider-dashboard form textarea:not([class]) {
+    width: 100% !important;
+    box-sizing: border-box !important;
+}
+
+/* ==================== PRINT STYLES ==================== */
+
+@media print {
+
+    .form-group input,
+    .form-group select,
+    .form-group textarea {
+        border: 1px solid #000 !important;
+        background: white !important;
+    }
+}

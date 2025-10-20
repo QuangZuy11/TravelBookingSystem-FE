@@ -80,6 +80,11 @@ const ServiceProviderDashboard = () => {
     const hotelLicenses = getLicensesByType(provider.licenses, 'hotel');
     const tourLicense = provider.licenses.find(l => l.service_type === 'tour');
 
+    // Get provider types from licenses (since provider.type may not exist)
+    const providerTypes = [...new Set(provider.licenses.map(l => l.service_type))];
+    const hasHotel = hotelLicenses.length > 0;
+    const hasTour = !!tourLicense;
+
     return (
         <div className="service-provider-dashboard">
             {/* Header */}
@@ -102,7 +107,7 @@ const ServiceProviderDashboard = () => {
             <div className="service-types-overview">
                 <h3>Loại hình dịch vụ đã đăng ký:</h3>
                 <div className="service-badges">
-                    {provider.type.map(type => (
+                    {providerTypes.map(type => (
                         <span key={type} className="service-badge">
                             {getServiceTypeDisplay(type)}
                         </span>
@@ -111,7 +116,7 @@ const ServiceProviderDashboard = () => {
             </div>
 
             {/* ====== HOTEL SECTION - Nhiều licenses ====== */}
-            {provider.type.includes('hotel') && (
+            {hasHotel && (
                 <section className="service-section hotel-section">
                     <div className="section-header">
                         <h2>🏨 Danh sách Khách sạn ({hotelLicenses.length})</h2>
@@ -145,7 +150,7 @@ const ServiceProviderDashboard = () => {
             )}
 
             {/* ====== TOUR SECTION - 1 license duy nhất ====== */}
-            {provider.type.includes('tour') && tourLicense && (
+            {hasTour && (
                 <section className="service-section tour-section">
                     <div className="section-header">
                         <h2>🗺️ Giấy phép Tour</h2>
