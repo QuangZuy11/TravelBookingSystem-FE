@@ -8,7 +8,7 @@ const HotelDetailPage = () => {
         <>
             <TopBar />
             <Header />
-            {/* <HotelDetail /> */}
+            <HotelDetail />
             <Footer />
         </>
     );

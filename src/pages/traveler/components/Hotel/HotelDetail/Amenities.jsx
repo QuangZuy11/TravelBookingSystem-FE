@@ -72,22 +72,22 @@ export default function Amenities() {
     ]
 
     return (
-        <section id="amenities" className="content-section amenities-section">
-            <div className="section-header">
-                <h2 className="section-title">Tiện Ích & Dịch Vụ</h2>
-                <p className="section-description">Tất cả những gì bạn cần cho một kỳ nghỉ hoàn hảo</p>
+        <section id="amenities" className="hotel-detail-content-section amenities-section">
+            <div className="hotel-detail-section-header">
+                <h2 className="hotel-detail-section-title">Tiện Ích & Dịch Vụ</h2>
+                <p className="hotel-detail-section-description">Tất cả những gì bạn cần cho một kỳ nghỉ hoàn hảo</p>
             </div>
 
-            <div className="amenities-grid">
+            <div className="hotel-detail-amenities-grid">
                 {amenityCategories.map((category, index) => (
-                    <div key={index} className="amenity-category">
-                        <div className="category-header">
-                            <div className="category-icon">{category.icon}</div>
-                            <h3 className="category-title">{category.title}</h3>
+                    <div key={index} className="hotel-detail-amenity-category">
+                        <div className="hotel-detail-category-header">
+                            <div className="hotel-detail-category-icon">{category.icon}</div>
+                            <h3 className="hotel-detail-category-title">{category.title}</h3>
                         </div>
-                        <ul className="category-items">
+                        <ul className="hotel-detail-category-items">
                             {category.items.map((item, itemIndex) => (
-                                <li key={itemIndex} className="category-item">
+                                <li key={itemIndex} className="hotel-detail-category-item">
                                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                                         <polyline points="20 6 9 17 4 12"></polyline>
                                     </svg>

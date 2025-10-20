@@ -49,36 +49,36 @@ export default function Reviews() {
     ]
 
     return (
-        <section id="reviews" className="content-section reviews-section">
-            <div className="section-header">
-                <h2 className="section-title">Đánh Giá Từ Khách Hàng</h2>
-                <p className="section-description">Xem những trải nghiệm thực tế từ khách đã lưu trú</p>
+        <section id="reviews" className="hotel-detail-content-section reviews-section">
+            <div className="hotel-detail-section-header">
+                <h2 className="hotel-detail-section-title">Đánh Giá Từ Khách Hàng</h2>
+                <p className="hotel-detail-section-description">Xem những trải nghiệm thực tế từ khách đã lưu trú</p>
             </div>
 
-            <div className="reviews-container">
-                <div className="reviews-summary">
-                    <div className="overall-rating">
-                        <div className="rating-score">8.4</div>
-                        <div className="rating-info">
-                            <div className="rating-stars">★★★★☆</div>
-                            <div className="rating-text">Rất tốt</div>
-                            <div className="rating-count">Dựa trên 60 đánh giá</div>
+            <div className="hotel-detail-reviews-container">
+                <div className="hotel-detail-reviews-summary">
+                    <div className="hotel-detail-overall-rating">
+                        <div className="hotel-detail-rating-score">8.4</div>
+                        <div className="hotel-detail-rating-info">
+                            <div className="hotel-detail-rating-stars">★★★★☆</div>
+                            <div className="hotel-detail-rating-text">Rất tốt</div>
+                            <div className="hotel-detail-rating-count">Dựa trên 60 đánh giá</div>
                         </div>
                     </div>
 
-                    <div className="rating-breakdown">
+                    <div className="hotel-detail-rating-breakdown">
                         {ratingStats.map((stat) => (
-                            <div key={stat.stars} className="rating-bar-item">
-                                <span className="rating-label">{stat.stars} sao</span>
-                                <div className="rating-bar">
-                                    <div className="rating-bar-fill" style={{ width: `${stat.percentage}%` }}></div>
+                            <div key={stat.stars} className="hotel-detail-rating-bar-item">
+                                <span className="hotel-detail-rating-label">{stat.stars} sao</span>
+                                <div className="hotel-detail-rating-bar">
+                                    <div className="hotel-detail-rating-bar-fill" style={{ width: `${stat.percentage}%` }}></div>
                                 </div>
-                                <span className="rating-count">{stat.count}</span>
+                                <span className="hotel-detail-rating-count">{stat.count}</span>
                             </div>
                         ))}
                     </div>
 
-                    <button className="write-review-btn">
+                    <button className="hotel-detail-write-review-btn">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                             <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
                             <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
@@ -87,25 +87,25 @@ export default function Reviews() {
                     </button>
                 </div>
 
-                <div className="reviews-list">
+                <div className="hotel-detail-reviews-list">
                     {reviews.map((review) => (
-                        <div key={review.id} className="review-card">
-                            <div className="review-header">
-                                <img src={review.avatar || "/placeholder.svg"} alt={review.name} className="reviewer-avatar" />
-                                <div className="reviewer-info">
-                                    <h4 className="reviewer-name">{review.name}</h4>
-                                    <div className="review-meta">
-                                        <div className="review-rating">
+                        <div key={review.id} className="hotel-detail-review-card">
+                            <div className="hotel-detail-review-header">
+                                <img src={review.avatar || "/placeholder.svg"} alt={review.name} className="hotel-detail-reviewer-avatar" />
+                                <div className="hotel-detail-reviewer-info">
+                                    <h4 className="hotel-detail-reviewer-name">{review.name}</h4>
+                                    <div className="hotel-detail-review-meta">
+                                        <div className="hotel-detail-review-rating">
                                             {"★".repeat(review.rating)}
                                             {"☆".repeat(5 - review.rating)}
                                         </div>
-                                        <span className="review-date">{review.date}</span>
+                                        <span className="hotel-detail-review-date">{review.date}</span>
                                     </div>
                                 </div>
                             </div>
-                            <p className="review-comment">{review.comment}</p>
-                            <div className="review-footer">
-                                <button className="helpful-btn">
+                            <p className="hotel-detail-review-comment">{review.comment}</p>
+                            <div className="hotel-detail-review-footer">
+                                <button className="hotel-detail-helpful-btn">
                                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                                         <path d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3zM7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3"></path>
                                     </svg>

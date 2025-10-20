@@ -33,13 +33,13 @@ export default function Rooms() {
     ]
 
     return (
-        <section id="rooms" className="content-section rooms-section">
-            <div className="section-header">
-                <h2 className="section-title">Các Loại Phòng</h2>
-                <p className="section-description">Chọn phòng phù hợp với nhu cầu của bạn</p>
+        <section id="rooms" className="hotel-detail-content-section rooms-section">
+            <div className="hotel-detail-section-header">
+                <h2 className="hotel-detail-section-title">Các Loại Phòng</h2>
+                <p className="hotel-detail-section-description">Lựa chọn phòng phù hợp với nhu cầu của bạn</p>
             </div>
 
-            <div className="rooms-grid">
+            <div className="hotel-detail-rooms-grid">
                 {rooms.map((room) => (
                     <div key={room.id} className="room-card">
                         <div className="room-image">

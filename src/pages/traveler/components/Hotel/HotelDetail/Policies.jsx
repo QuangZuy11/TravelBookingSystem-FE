@@ -98,24 +98,24 @@ export default function Policies() {
     ]
 
     return (
-        <section id="policies" className="content-section policies-section">
-            <div className="section-header">
-                <h2 className="section-title">Chính Sách Khách Sạn</h2>
-                <p className="section-description">Vui lòng đọc kỹ các chính sách trước khi đặt phòng</p>
+        <section id="policies" className="hotel-detail-content-section policies-section">
+            <div className="hotel-detail-section-header">
+                <h2 className="hotel-detail-section-title">Chính Sách Khách Sạn</h2>
+                <p className="hotel-detail-section-description">Vui lòng đọc kỹ các chính sách trước khi đặt phòng</p>
             </div>
 
-            <div className="policies-grid">
+            <div className="hotel-detail-policies-grid">
                 {policies.map((policy, index) => (
-                    <div key={index} className="policy-card">
-                        <div className="policy-header">
-                            <div className="policy-icon">{policy.icon}</div>
-                            <h3 className="policy-title">{policy.title}</h3>
+                    <div key={index} className="hotel-detail-policy-card">
+                        <div className="hotel-detail-policy-header">
+                            <div className="hotel-detail-policy-icon">{policy.icon}</div>
+                            <h3 className="hotel-detail-policy-title">{policy.title}</h3>
                         </div>
-                        <div className="policy-content">
+                        <div className="hotel-detail-policy-content">
                             {policy.items.map((item, itemIndex) => (
-                                <div key={itemIndex} className="policy-item">
-                                    <span className="policy-label">{item.label}:</span>
-                                    <span className="policy-value">{item.value}</span>
+                                <div key={itemIndex} className="hotel-detail-policy-item">
+                                    <span className="hotel-detail-policy-label">{item.label}:</span>
+                                    <span className="hotel-detail-policy-value">{item.value}</span>
                                 </div>
                             ))}
                         </div>
