@@ -44,8 +44,8 @@ const AMENITY_LABEL_MAP = {
     parking: 'Chỗ Đậu Xe',
 };
 
-// Cố định khoảng giá filter: 300.000 - 10.000.000
-const DEFAULT_MIN = 300000;
+// Cố định khoảng giá filter: 100.000 - 10.000.000
+const DEFAULT_MIN = 100000;
 const DEFAULT_MAX = 10000000;
 
 // Chuẩn hóa format số, không có phần thập phân

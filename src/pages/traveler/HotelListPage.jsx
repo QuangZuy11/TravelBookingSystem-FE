@@ -8,7 +8,7 @@ import HotelResult from "./components/Hotel/HotelList/HotelResult";
 import Footer from "../../components/layout/Footer/Footer";
 
 function HotelListPage() {
-    const [priceRange, setPriceRange] = useState([0, 49300000]);
+    const [priceRange, setPriceRange] = useState([100000, 10000000]);
     const [selectedAmenities, setSelectedAmenities] = useState([]);
     const [selectedRatings, setSelectedRatings] = useState([]);
 
@@ -51,7 +51,7 @@ function HotelListPage() {
     const clearAll = () => {
         setSelectedAmenities([]);
         setSelectedRatings([]);
-        setPriceRange([0, 49300000]);
+        setPriceRange([100000, 10000000]);
         // Giữ nguyên searchParams hiện tại ở Result; nếu muốn reset kết quả luôn,
         // bạn có thể điều hướng xóa query: navigate('/hotel-list') trong SearchSection Clear
         // hoặc setSearchParams(null) ở đây nếu cần reset khi bấm Clear ở Filter.
