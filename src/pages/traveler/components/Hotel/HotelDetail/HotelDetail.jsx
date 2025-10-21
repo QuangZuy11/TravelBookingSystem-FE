@@ -197,7 +197,7 @@ const HotelDetail = () => {
             />
             <Location />
             <Amenities />
-            <Policies />
+            <Policies hotelData={hotelData} />
             <Reviews />
         </div>
     )

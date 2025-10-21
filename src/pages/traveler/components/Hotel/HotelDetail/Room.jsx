@@ -84,14 +84,19 @@ export default function Rooms({ roomsData, loading, error }) {
 
     // Chuyển đổi dữ liệu từ backend thành format hiển thị
     const rooms = Object.values(roomsData.roomsByType).map((roomType) => {
-        // Lấy phòng đầu tiên làm mẫu để hiển thị thông tin
-        const sampleRoom = roomType.rooms[0];
+        // Lấy phòng đầu tiên trong list phòng làm mẫu để hiển thị thông tin loại phòng
+        const sampleRoom = roomType.rooms && roomType.rooms.length > 0 ? roomType.rooms[0] : null;
+
+        // Lấy ảnh đầu tiên của phòng đầu tiên trong list phòng để hiển thị cho loại phòng này
+        const roomImage = sampleRoom?.images && sampleRoom.images.length > 0
+            ? sampleRoom.images[0]
+            : "/placeholder.svg";
 
         return {
             id: roomType.type,
             name: getRoomTypeName(roomType.type),
             price: formatPrice(roomType.avgPrice),
-            image: sampleRoom?.images?.[0] || "/placeholder.svg",
+            image: roomImage,
             size: `${sampleRoom?.area || 25}m²`,
             bed: getBedType(roomType.type),
             guests: `${roomType.avgCapacity} người`,
