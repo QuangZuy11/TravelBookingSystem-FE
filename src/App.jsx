@@ -28,6 +28,8 @@ import EditHotelPage from "./pages/provider/hotel/EditHotelPage";
 import RoomFormPage from "./pages/provider/hotel/RoomFormPage";
 import BookingManagementPage from "./pages/provider/hotel/BookingManagementPage";
 import RoomListPage from "./pages/provider/hotel/RoomListPage";
+import PromotionListPage from "./pages/provider/promotions/PromotionListPage";
+import PromotionCreatePage from "./pages/provider/promotions/PromotionCreatePage";
 
 
 // Provider Layout
@@ -219,6 +221,11 @@ function App() {
                     path=":hotelId/rooms/:roomId/edit"
                     element={<RoomFormPage />}
                   />
+                </Route>
+
+                <Route path="promotions">
+                  <Route index element={<PromotionListPage />} />
+                  <Route path="create" element={<PromotionCreatePage />} />
                 </Route>
               </Route>
             </Route>
