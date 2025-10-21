@@ -25,11 +25,15 @@ export const AuthProvider = ({ children }) => {
       console.error('Error parsing provider:', error);
     }
 
-    // If providerId is missing but provider exists, sync it from provider._id
-    if (!providerId && provider && provider._id) {
-      providerId = provider._id;
-      localStorage.setItem('providerId', providerId);
-      console.log('✅ Synced providerId from provider object:', providerId);
+    // IMPORTANT: providerId should be provider._id, not user_id
+    // If providerId is missing or incorrect, sync it from provider._id
+    if (provider && provider._id) {
+      if (!providerId || providerId === provider.user_id) {
+        // Fix: Use provider._id instead of user_id
+        providerId = provider._id;
+        localStorage.setItem('providerId', providerId);
+        console.log('✅ Fixed providerId to use provider._id:', providerId);
+      }
     }
 
     // If we have a token and basic user info, restore the user state
@@ -48,9 +52,12 @@ export const AuthProvider = ({ children }) => {
   }, []);
 
   const login = (data) => {
+    // Extract correct providerId from provider object
+    const providerId = data.provider?._id || data.id;
+
     const userToSet = {
       name: data.fullName,
-      providerId: data.id,
+      providerId: providerId,
       role: data.role,
       token: data.token,
       provider: data.provider || null
@@ -59,7 +66,7 @@ export const AuthProvider = ({ children }) => {
     // Store all relevant data
     localStorage.setItem('token', data.token);
     localStorage.setItem('fullName', data.fullName);
-    localStorage.setItem('providerId', data.id);
+    localStorage.setItem('providerId', providerId); // Store provider._id, not user_id
     localStorage.setItem('role', data.role);
     localStorage.setItem('user', JSON.stringify(userToSet));
 
