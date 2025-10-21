@@ -1,4 +1,5 @@
 import React, { useEffect, useMemo, useState, useEffect as ReactUseEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import {
     Box,
     Card,
@@ -68,6 +69,7 @@ function HotelResult({
     selectedAmenities = [],
     selectedRatings = [], // FE "rating" = số sao, map từ BE.category
 }) {
+    const navigate = useNavigate();
     const [hotels, setHotels] = useState([]);
     const [favorites, setFavorites] = useState(new Set());
     const [page, setPage] = useState(1);
@@ -259,7 +261,8 @@ function HotelResult({
     };
 
     const handleBook = (hotel) => {
-        console.log(`Đặt: ${hotel.name}`);
+        console.log(`Điều hướng đến chi tiết: ${hotel.name}`);
+        navigate(`/hotel-detail/${hotel.id}`);
     };
 
     return (
@@ -366,6 +369,7 @@ function HotelResult({
 }
 
 function HotelCard({ hotel, isFavorite, onToggleFavorite, onBook }) {
+    const navigate = useNavigate();
     const discountPrice =
         hotel.discount > 0 ? Math.round(hotel.price * (1 - hotel.discount / 100)) : hotel.price;
 
@@ -385,6 +389,11 @@ function HotelCard({ hotel, isFavorite, onToggleFavorite, onBook }) {
             : `Còn ${rooms} phòng trống`;
     const availabilityClass = isNone ? 'error' : isLow ? 'warning' : 'success';
 
+    // Handle click vào tên khách sạn hoặc ảnh
+    const handleHotelClick = () => {
+        navigate(`/hotel-detail/${hotel.id}`);
+    };
+
     return (
         <Card className="hotel-card hotel-card-list" elevation={2}>
             <Grid container spacing={0} alignItems="stretch" className="hotel-card-grid" wrap="nowrap">
@@ -397,7 +406,14 @@ function HotelCard({ hotel, isFavorite, onToggleFavorite, onBook }) {
                             anchorOrigin={{ vertical: 'top', horizontal: 'left' }}
                             className="discount-badge"
                         >
-                            <CardMedia component="img" image={hotel.image} alt={hotel.name} className="hotel-image" />
+                            <CardMedia
+                                component="img"
+                                image={hotel.image}
+                                alt={hotel.name}
+                                className="hotel-image"
+                                onClick={handleHotelClick}
+                                sx={{ cursor: 'pointer' }}
+                            />
                         </Badge>
 
                         <Tooltip title={isFavorite ? 'Bỏ yêu thích' : 'Thêm yêu thích'}>
@@ -420,7 +436,18 @@ function HotelCard({ hotel, isFavorite, onToggleFavorite, onBook }) {
                         <Box className="hotel-content-grid list">
                             {/* Thông tin */}
                             <Box className="hotel-info">
-                                <Typography variant="h5" className="hotel-name">
+                                <Typography
+                                    variant="h5"
+                                    className="hotel-name"
+                                    onClick={handleHotelClick}
+                                    sx={{
+                                        cursor: 'pointer',
+                                        '&:hover': {
+                                            color: '#1565c0',
+                                            textDecoration: 'underline'
+                                        }
+                                    }}
+                                >
                                     {hotel.name}
                                 </Typography>
 
@@ -507,8 +534,14 @@ function HotelCard({ hotel, isFavorite, onToggleFavorite, onBook }) {
                                     )}
                                 </Stack>
 
-                                <Button variant="contained" size="medium" className="book-button" onClick={onBook}>
-                                    Đặt Ngay
+                                <Button
+                                    variant="contained"
+                                    size="medium"
+                                    className="book-button"
+                                    onClick={onBook}
+                                    disabled={rooms <= 0}
+                                >
+                                    {rooms <= 0 ? 'Hết phòng' : 'Đặt Ngay'}
                                 </Button>
                             </Stack>
                         </Box>

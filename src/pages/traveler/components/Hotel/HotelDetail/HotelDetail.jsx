@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react"
+import { useParams } from "react-router-dom"
 import Overview from "../HotelDetail/Overview";
 import Rooms from "../HotelDetail/Room";
 import Location from "../HotelDetail/Location";
@@ -8,7 +9,48 @@ import Reviews from "../HotelDetail/Reviews";
 import "../HotelDetail/HotelDetail.css"
 
 const HotelDetail = () => {
+    const { id } = useParams()
     const [activeSection, setActiveSection] = useState("overview")
+    const [hotelData, setHotelData] = useState(null)
+    const [loading, setLoading] = useState(true)
+    const [error, setError] = useState(null)
+
+    // Fetch hotel data from API
+    useEffect(() => {
+        const fetchHotelData = async () => {
+            if (!id) return
+
+            try {
+                setLoading(true)
+                setError(null)
+
+                // Gọi API search để lấy thông tin khách sạn theo ID
+                const response = await fetch(`http://localhost:3000/api/traveler/hotels/search?hotelId=${id}`)
+
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}`)
+                }
+
+                const data = await response.json()
+
+                // Tìm khách sạn có ID khớp trong kết quả
+                const hotel = data?.data?.hotels?.find(h => h._id === id)
+
+                if (hotel) {
+                    setHotelData(hotel)
+                } else {
+                    throw new Error('Không tìm thấy thông tin khách sạn')
+                }
+            } catch (err) {
+                console.error('Error fetching hotel data:', err)
+                setError(err.message || 'Lỗi tải dữ liệu khách sạn')
+            } finally {
+                setLoading(false)
+            }
+        }
+
+        fetchHotelData()
+    }, [id])
 
     useEffect(() => {
         const handleScroll = () => {
@@ -45,6 +87,46 @@ const HotelDetail = () => {
         }
     }
 
+    if (loading) {
+        return (
+            <div className="hotel-overview">
+                <div style={{
+                    display: 'flex',
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                    height: '50vh',
+                    fontSize: '18px',
+                    color: '#666'
+                }}>
+                    Đang tải thông tin khách sạn...
+                </div>
+            </div>
+        )
+    }
+
+    if (error) {
+        return (
+            <div className="hotel-overview">
+                <div style={{
+                    display: 'flex',
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                    height: '50vh',
+                    fontSize: '18px',
+                    color: '#d32f2f',
+                    textAlign: 'center'
+                }}>
+                    <div>
+                        <div>❌ {error}</div>
+                        <div style={{ fontSize: '14px', marginTop: '10px', color: '#666' }}>
+                            Vui lòng thử lại sau
+                        </div>
+                    </div>
+                </div>
+            </div>
+        )
+    }
+
     return (
         <div className="hotel-overview">
             <nav className="hotel-detail-scroll-navigation">
@@ -68,7 +150,7 @@ const HotelDetail = () => {
                 </button>
             </nav>
 
-            <Overview />
+            <Overview hotelData={hotelData} />
             <Rooms />
             <Location />
             <Amenities />
