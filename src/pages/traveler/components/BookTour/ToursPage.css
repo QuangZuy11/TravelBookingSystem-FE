@@ -50,11 +50,16 @@
   gap: 1rem;
 }
 
+.filter-item {
+  display: flex;
+  flex-direction: column;
+}
+
 .filter-item label {
   display: block;
   font-size: 0.875rem;
   font-weight: 500;
-  margin-bottom: 0.25rem;
+  margin-bottom: 0.5rem;
   color: #374151;
 }
 
@@ -67,6 +72,8 @@
   font-size: 0.875rem;
   outline: none;
   transition: border-color 0.2s;
+  box-sizing: border-box;
+  background-color: white;
 }
 
 .filter-item input:focus,

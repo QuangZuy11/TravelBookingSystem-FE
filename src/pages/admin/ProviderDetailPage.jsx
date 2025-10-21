@@ -133,7 +133,7 @@ const ProviderDetailPage = () => {
     };
 
     const getServiceIcon = (type) => {
-        const icons = { hotel: '🏨', tour: '🗺️'};
+        const icons = { hotel: '🏨', tour: '🗺️' };
         return icons[type] || '📦';
     };
 
@@ -204,7 +204,7 @@ const ProviderDetailPage = () => {
 
                         {/* Service Types */}
                         <div className="service-types">
-                            {provider.type.map(type => (
+                            {(Array.isArray(provider.type) ? provider.type : [provider.type]).map(type => (
                                 <span key={type} className="service-type-badge">
                                     <span>{getServiceIcon(type)}</span>
                                     <span>{type}</span>
@@ -244,12 +244,12 @@ const ProviderDetailPage = () => {
             {/* Licenses Section */}
             <div className="licenses-section">
                 <div className="section-header">
-                    <h2>Giấy phép kinh doanh ({provider.licenses.length})</h2>
+                    <h2>Giấy phép kinh doanh ({(Array.isArray(provider.licenses) ? provider.licenses : []).length})</h2>
                 </div>
 
-                {provider.licenses.length > 0 ? (
+                {(Array.isArray(provider.licenses) ? provider.licenses : []).length > 0 ? (
                     <div className="licenses-grid">
-                        {provider.licenses.map(license => (
+                        {(Array.isArray(provider.licenses) ? provider.licenses : []).map(license => (
                             <div
                                 key={license._id}
                                 className={`license-card ${license.verification_status}`}

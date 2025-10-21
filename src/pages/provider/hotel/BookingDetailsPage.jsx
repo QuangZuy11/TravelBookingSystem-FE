@@ -9,6 +9,7 @@ const BookingDetailsPage = () => {
     const { bookingId } = useParams();
     const navigate = useNavigate();
     const providerId = localStorage.getItem('providerId');
+    const token = localStorage.getItem('token');
     const [booking, setBooking] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
@@ -88,9 +89,9 @@ const BookingDetailsPage = () => {
         fontWeight: '600',
         color: 'white',
         background: booking.status === 'confirmed' ? '#10b981' :
-                   booking.status === 'pending' ? '#f59e0b' :
-                   booking.status === 'cancelled' ? '#ef4444' :
-                   '#3b82f6'
+            booking.status === 'pending' ? '#f59e0b' :
+                booking.status === 'cancelled' ? '#ef4444' :
+                    '#3b82f6'
     };
 
     const sectionStyle = {
@@ -169,13 +170,13 @@ const BookingDetailsPage = () => {
                             <div>
                                 <button
                                     onClick={() => handleUpdateStatus('confirmed')}
-                                    style={{...buttonStyle, background: '#10b981', color: 'white'}}
+                                    style={{ ...buttonStyle, background: '#10b981', color: 'white' }}
                                 >
                                     Confirm Booking
                                 </button>
                                 <button
                                     onClick={() => handleUpdateStatus('cancelled')}
-                                    style={{...buttonStyle, background: '#ef4444', color: 'white'}}
+                                    style={{ ...buttonStyle, background: '#ef4444', color: 'white' }}
                                 >
                                     Cancel Booking
                                 </button>

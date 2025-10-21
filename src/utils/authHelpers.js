@@ -22,7 +22,7 @@ export const clearAuthData = () => {
  */
 export const getProviderId = () => {
   let providerId = localStorage.getItem('providerId');
-  
+
   if (!providerId) {
     const providerStr = localStorage.getItem('provider');
     if (providerStr) {
@@ -34,7 +34,7 @@ export const getProviderId = () => {
       }
     }
   }
-  
+
   return providerId;
 };
 
@@ -44,7 +44,7 @@ export const getProviderId = () => {
 export const getProvider = () => {
   const providerStr = localStorage.getItem('provider');
   if (!providerStr) return null;
-  
+
   try {
     return JSON.parse(providerStr);
   } catch (error) {
@@ -70,13 +70,15 @@ export const isServiceProvider = () => {
 
 /**
  * Check if provider has completed registration
+ * Updated to check provider._id and licenses instead of type field
  */
 export const hasCompletedProviderRegistration = () => {
   const provider = getProvider();
   if (!provider) return false;
-  
-  const hasType = Array.isArray(provider.type) && provider.type.length > 0;
+
+  // Simplified check: provider._id and licenses array
+  const hasProvider = !!provider._id;
   const hasLicenses = Array.isArray(provider.licenses) && provider.licenses.length > 0;
-  
-  return hasType && hasLicenses;
+
+  return hasProvider && hasLicenses;
 };

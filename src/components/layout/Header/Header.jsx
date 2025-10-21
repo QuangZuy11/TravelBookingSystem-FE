@@ -81,22 +81,24 @@ const Header = () => {
       console.error("Error parsing provider:", error);
     }
 
-    // Nếu provider null hoặc chưa có type/licenses -> redirect đến registration
-    if (
-      !provider ||
-      !Array.isArray(provider.type) ||
-      provider.type.length === 0 ||
-      !Array.isArray(provider.licenses) ||
-      provider.licenses.length === 0
-    ) {
+    // Simplified check: If has provider._id and licenses, allow access
+    const hasProvider = !!provider && !!provider._id;
+    const hasLicenses = provider &&
+      Array.isArray(provider.licenses) &&
+      provider.licenses.length > 0;
+
+    if (!hasProvider || !hasLicenses) {
       console.log("Provider chưa đăng ký, redirect to registration");
       navigate("/register/service-provider");
     } else {
-      // Provider đã đăng ký đầy đủ -> route đến dashboard tương ứng với service type
-      console.log("Provider đã đăng ký với types:", provider.type);
+      // Provider đã đăng ký đầy đủ -> cho vào dashboard
+      console.log("Provider đã đăng ký:", {
+        provider_id: provider._id,
+        licenses_count: provider.licenses.length,
+        service_types: provider.licenses.map(l => l.service_type)
+      });
 
       // Tất cả providers đều vào /provider/dashboard
-      // Dashboard sẽ tự động hiển thị các sections tương ứng với provider.type
       navigate("/provider/dashboard");
     }
   };

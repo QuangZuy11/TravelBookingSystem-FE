@@ -37,7 +37,10 @@ const PendingProvidersList = () => {
     // Filter by service type
     const filteredByType = filter === 'all'
         ? providers
-        : providers.filter(p => p.type.includes(filter));
+        : providers.filter(p => {
+            const types = Array.isArray(p.type) ? p.type : [p.type];
+            return types.includes(filter);
+        });
 
     // Filter by search term
     const filteredProviders = searchTerm
@@ -50,7 +53,10 @@ const PendingProvidersList = () => {
 
     const getFilterCount = (type) => {
         if (type === 'all') return providers.length;
-        return providers.filter(p => p.type.includes(type)).length;
+        return providers.filter(p => {
+            const types = Array.isArray(p.type) ? p.type : [p.type];
+            return types.includes(type);
+        }).length;
     };
 
     if (loading) {
@@ -116,9 +122,10 @@ const PendingProvidersList = () => {
             {filteredProviders.length > 0 ? (
                 <div className="providers-grid">
                     {filteredProviders.map(provider => {
-                        const pendingLicenses = provider.licenses.filter(l => l.verification_status === 'pending').length;
-                        const verifiedLicenses = provider.licenses.filter(l => l.verification_status === 'verified').length;
-                        const rejectedLicenses = provider.licenses.filter(l => l.verification_status === 'rejected').length;
+                        const licenses = Array.isArray(provider.licenses) ? provider.licenses : [];
+                        const pendingLicenses = licenses.filter(l => l.verification_status === 'pending').length;
+                        const verifiedLicenses = licenses.filter(l => l.verification_status === 'verified').length;
+                        const rejectedLicenses = licenses.filter(l => l.verification_status === 'rejected').length;
 
                         return (
                             <div key={provider._id} className="provider-card">
@@ -163,7 +170,7 @@ const PendingProvidersList = () => {
                                     </div>
 
                                     <div className="service-types">
-                                        {provider.type.map(type => (
+                                        {(Array.isArray(provider.type) ? provider.type : [provider.type]).map(type => (
                                             <span
                                                 key={type}
                                                 className={`service-badge ${type}`}
@@ -239,19 +246,28 @@ const PendingProvidersList = () => {
                         </div>
                         <div className="stat-item">
                             <div className="stat-value yellow">
-                                {providers.reduce((sum, p) => sum + p.licenses.filter(l => l.verification_status === 'pending').length, 0)}
+                                {providers.reduce((sum, p) => {
+                                    const licenses = Array.isArray(p.licenses) ? p.licenses : [];
+                                    return sum + licenses.filter(l => l.verification_status === 'pending').length;
+                                }, 0)}
                             </div>
                             <div className="stat-label">Licenses chờ duyệt</div>
                         </div>
                         <div className="stat-item">
                             <div className="stat-value green">
-                                {providers.reduce((sum, p) => sum + p.licenses.filter(l => l.verification_status === 'verified').length, 0)}
+                                {providers.reduce((sum, p) => {
+                                    const licenses = Array.isArray(p.licenses) ? p.licenses : [];
+                                    return sum + licenses.filter(l => l.verification_status === 'verified').length;
+                                }, 0)}
                             </div>
                             <div className="stat-label">Licenses đã duyệt</div>
                         </div>
                         <div className="stat-item">
                             <div className="stat-value red">
-                                {providers.reduce((sum, p) => sum + p.licenses.filter(l => l.verification_status === 'rejected').length, 0)}
+                                {providers.reduce((sum, p) => {
+                                    const licenses = Array.isArray(p.licenses) ? p.licenses : [];
+                                    return sum + licenses.filter(l => l.verification_status === 'rejected').length;
+                                }, 0)}
                             </div>
                             <div className="stat-label">Licenses bị từ chối</div>
                         </div>

@@ -47,31 +47,22 @@ const ProtectedProviderRoute = ({ children }) => {
             provider = user.provider;
         }
 
-        // Check if provider has completed registration
-        // Provider must exist and have both type array and licenses array with at least 1 item
-        const hasType = provider &&
-            Array.isArray(provider.type) &&
-            provider.type.length > 0;
+        const hasProvider = !!provider && !!provider._id;
         const hasLicenses = provider &&
             Array.isArray(provider.licenses) &&
             provider.licenses.length > 0;
 
-        if (!hasType || !hasLicenses) {
-            // Registration incomplete -> redirect to registration
-            console.log('Provider registration incomplete:', {
-                provider,
-                hasType,
-                hasLicenses,
-                typeValue: provider?.type,
-                licensesValue: provider?.licenses
-            });
+        // Registration complete = có provider ID + có licenses
+        const isRegistrationComplete = hasProvider && hasLicenses;
+
+        if (!isRegistrationComplete) {
             setShouldRedirect(true);
         } else {
-            // Registration complete -> allow access even if not verified by admin
-            // Provider will see pending verification message in their dashboard
-            console.log('Provider registration complete', {
-                admin_verified: provider?.admin_verified,
-                is_verified: provider?.is_verified
+            // Đã đủ thông tin -> cho vào dashboard
+            console.log('✅ Provider registration complete - allowing access to dashboard', {
+                provider_id: provider._id,
+                licenses_count: provider.licenses.length,
+                service_types: provider.licenses.map(l => l.service_type)
             });
         }
 

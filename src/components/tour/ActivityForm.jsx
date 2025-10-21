@@ -14,7 +14,21 @@ const activitySchema = yup.object().shape({
     description: yup.string().required('Mô tả là bắt buộc'),
     type: yup.string().required('Loại hoạt động là bắt buộc'),
     startTime: yup.string().required('Thời gian bắt đầu là bắt buộc'),
-    endTime: yup.string().required('Thời gian kết thúc là bắt buộc'),
+    endTime: yup
+        .string()
+        .required('Thời gian kết thúc là bắt buộc')
+        .test('is-after-start', 'Giờ kết thúc phải sau giờ bắt đầu', function (value) {
+            const { startTime } = this.parent;
+            if (!startTime || !value) return true;
+
+            // Convert HH:MM to minutes for comparison
+            const [startHour, startMin] = startTime.split(':').map(Number);
+            const [endHour, endMin] = value.split(':').map(Number);
+            const startMinutes = startHour * 60 + startMin;
+            const endMinutes = endHour * 60 + endMin;
+
+            return endMinutes > startMinutes;
+        }),
     destination: yup.string(),
 });
 

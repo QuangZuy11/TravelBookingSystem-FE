@@ -89,13 +89,23 @@ const AdminProvidersList = () => {
                             const pendingCount = provider.licenses?.filter(l => l.verification_status === 'pending').length || 0;
                             const verifiedCount = provider.licenses?.filter(l => l.verification_status === 'verified').length || 0;
 
+                            // Get provider types safely
+                            let providerTypes = [];
+                            if (Array.isArray(provider.type)) {
+                                providerTypes = provider.type;
+                            } else if (typeof provider.type === 'string') {
+                                providerTypes = [provider.type];
+                            } else if (provider.licenses && Array.isArray(provider.licenses)) {
+                                providerTypes = [...new Set(provider.licenses.map(l => l.service_type))];
+                            }
+
                             return (
                                 <tr key={provider._id}>
                                     <td><strong>{provider.company_name}</strong></td>
                                     <td>{provider.email}</td>
                                     <td>
                                         <div className="service-types-cell">
-                                            {provider.type?.map(t => (
+                                            {providerTypes.map(t => (
                                                 <span key={t} className="badge-service">{getServiceTypeDisplay(t)}</span>
                                             ))}
                                         </div>

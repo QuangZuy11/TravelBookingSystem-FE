@@ -171,7 +171,7 @@ const AdminProviderDetail = () => {
             <div className="info-card">
                 <h2>Loại hình dịch vụ đã đăng ký</h2>
                 <div className="service-types-badges">
-                    {provider.type.map(type => (
+                    {(Array.isArray(provider.type) ? provider.type : [provider.type]).map(type => (
                         <span key={type} className="service-type-badge">
                             {getServiceTypeDisplay(type)}
                         </span>
@@ -182,10 +182,10 @@ const AdminProviderDetail = () => {
             {/* Licenses Section */}
             <div className="licenses-section">
                 <div className="section-header">
-                    <h2>Giấy phép kinh doanh ({provider.licenses.length})</h2>
+                    <h2>Giấy phép kinh doanh ({(Array.isArray(provider.licenses) ? provider.licenses : []).length})</h2>
 
                     {/* ⚠️ QUAN TRỌNG: Button ADD CHỈ cho HOTEL */}
-                    {provider.type.includes('hotel') && (
+                    {(Array.isArray(provider.type) ? provider.type : [provider.type]).includes('hotel') && (
                         <button onClick={() => setShowAddModal(true)} className="btn-primary btn-add-license">
                             ➕ Thêm license Hotel
                         </button>
@@ -205,7 +205,7 @@ const AdminProviderDetail = () => {
                             </tr>
                         </thead>
                         <tbody>
-                            {provider.licenses.map(license => (
+                            {(Array.isArray(provider.licenses) ? provider.licenses : []).map(license => (
                                 <tr key={license._id} className={`license-row ${license.verification_status}`}>
                                     <td>
                                         <span className="service-type-cell">

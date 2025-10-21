@@ -16,6 +16,8 @@ const TourDetailsPage = () => {
         ? JSON.parse(localStorage.getItem('user'))?.providerId
         : null;
 
+    const token = localStorage.getItem('token');
+
     useEffect(() => {
         fetchTourDetails();
     }, [tourId]);
@@ -48,8 +50,8 @@ const TourDetailsPage = () => {
                         try {
                             const activitiesResponse = await axios.get(
                                 `http://localhost:3000/api/itineraries/${itinerary._id}/activities`, {
-                headers: { Authorization: `Bearer ${token}` }
-            }
+                                headers: { Authorization: `Bearer ${token}` }
+                            }
                             );
                             return {
                                 ...itinerary,
@@ -63,19 +65,18 @@ const TourDetailsPage = () => {
                 );
 
                 setItineraries(itinerariesWithActivities);
-            }
 
-            // 4. Fetch budget breakdown
-            try {
-                const budgetResponse = await axios.get(
-                    `http://localhost:3000/api/budget-breakdowns/tour/${tourId}`, {
-                headers: { Authorization: `Bearer ${token}` }
-            }
+                // 4. Extract budget items from itineraries
+                const allBudgetItems = itinerariesWithActivities.flatMap(itinerary =>
+                    itinerary.budget_breakdowns || []
                 );
-                setBudgetItems(budgetResponse.data.data?.items || []);
-            } catch (error) {
-                console.error('Error fetching budget:', error);
-                setBudgetItems([]);
+                console.log('🔍 Budget items extracted:', allBudgetItems);
+                console.log('📊 Itineraries with budgets:', itinerariesWithActivities.map(i => ({
+                    id: i._id,
+                    day: i.day_number,
+                    budgets: i.budget_breakdowns
+                })));
+                setBudgetItems(allBudgetItems);
             }
 
         } catch (error) {
