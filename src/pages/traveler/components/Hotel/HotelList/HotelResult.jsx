@@ -37,26 +37,64 @@ import {
     BookmarkAdded,
     Hotel as BedIcon, // dùng cho badge phòng trống
     SearchOff, // NEW: empty state icon
-    DirectionsCar as ParkingIcon
+    DirectionsCar as ParkingIcon,
+    Restaurant as RestaurantIcon,
+    RoomPreferences as RoomServiceIcon, // Thay RoomService bằng RoomPreferences
+    Work as BusinessCenterIcon, // Thay Business bằng Work
+    FlightTakeoff as AirportShuttleIcon,
+    AcUnit as AirConditioningIcon,
+    MeetingRoom as ConferenceRoomIcon,
+    LocalLaundryService as LaundryServiceIcon
 } from '@mui/icons-material';
 import '../../Hotel/HotelList/HotelList.css';
 
 const amenitiesData = [
-    { label: 'Bể bơi', value: 'pool', icon: PoolIcon },
-    { label: 'Spa', value: 'spa', icon: SpaIcon },
-    { label: 'Phòng Gym', value: 'gym', icon: GymIcon },
-    { label: 'Wifi', value: 'wifi', icon: WifiIcon },
-    { label: 'Quầy bar', value: 'bar', icon: BarIcon },
-    { label: 'Chỗ đậu xe', value: 'parking', icon: ParkingIcon },
+    { label: 'Bể bơi', value: 'Pool', icon: PoolIcon },
+    { label: 'Spa', value: 'Spa', icon: SpaIcon },
+    { label: 'Phòng Gym', value: 'Gym', icon: GymIcon },
+    { label: 'Wi-Fi', value: 'Wi-Fi', icon: WifiIcon },
+    { label: 'Quầy bar', value: 'Bar', icon: BarIcon },
+    { label: 'Chỗ đậu xe', value: 'Parking', icon: ParkingIcon },
+    { label: 'Nhà hàng', value: 'Restaurant', icon: RestaurantIcon },
+    { label: 'Dịch vụ phòng', value: 'Room Service', icon: RoomServiceIcon },
+    { label: 'Trung tâm thương mại', value: 'Business Center', icon: BusinessCenterIcon },
+    { label: 'Đưa đón sân bay', value: 'Airport Shuttle', icon: AirportShuttleIcon },
+    { label: 'Điều hòa', value: 'Air Conditioning', icon: AirConditioningIcon },
+    { label: 'Phòng hội nghị', value: 'Conference Room', icon: ConferenceRoomIcon },
+    { label: 'Dịch vụ giặt ủi', value: 'Laundry Service', icon: LaundryServiceIcon },
 ];
 
 const amenityIconMap = {
+    // Lowercase versions (for consistency with old data)
     pool: PoolIcon,
     spa: SpaIcon,
     gym: GymIcon,
     wifi: WifiIcon,
     bar: BarIcon,
     parking: ParkingIcon,
+    restaurant: RestaurantIcon,
+    room_service: RoomServiceIcon,
+    business_center: BusinessCenterIcon,
+    airport_shuttle: AirportShuttleIcon,
+    air_conditioning: AirConditioningIcon,
+    conference_room: ConferenceRoomIcon,
+    laundry_service: LaundryServiceIcon,
+
+    // Backend format (Title Case with spaces)
+    'Pool': PoolIcon,
+    'Spa': SpaIcon,
+    'Gym': GymIcon,
+    'Wifi': WifiIcon,
+    'Wi-Fi': WifiIcon, // Backend trả về Wi-Fi
+    'Bar': BarIcon,
+    'Parking': ParkingIcon,
+    'Restaurant': RestaurantIcon,
+    'Room Service': RoomServiceIcon,
+    'Business Center': BusinessCenterIcon,
+    'Airport Shuttle': AirportShuttleIcon,
+    'Air Conditioning': AirConditioningIcon,
+    'Conference Room': ConferenceRoomIcon,
+    'Laundry Service': LaundryServiceIcon,
 };
 
 const formatPrice = (price) =>
@@ -102,7 +140,7 @@ function HotelResult({
             image: Array.isArray(h.images) && h.images[0]
                 ? h.images[0]
                 : 'https://images.unsplash.com/photo-1566073771259-6a8506099945?w=1200&h=800&fit=crop',
-            amenities: Array.isArray(h.amenities) ? h.amenities.map(a => String(a).toLowerCase()) : [],
+            amenities: Array.isArray(h.amenities) ? h.amenities.map(a => String(a)) : [], // Giữ nguyên format từ backend
             availableRooms: h?.availableRooms != null ? Number(h.availableRooms) : 0, // map số phòng trống
         };
 
@@ -143,8 +181,8 @@ function HotelResult({
                     params.set('priceMax', String(priceRange[1]));
                 }
                 if (selectedAmenities.length) {
-                    // đảm bảo amenity là lower-case
-                    params.set('amenities', selectedAmenities.map(a => String(a).toLowerCase()).join(','));
+                    // Giữ nguyên format amenities từ frontend (Title Case)
+                    params.set('amenities', selectedAmenities.join(','));
                 }
                 if (selectedRatings.length) {
                     params.set('category', selectedRatings.map(n => `${n}_star`).join(','));

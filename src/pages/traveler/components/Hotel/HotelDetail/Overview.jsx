@@ -1,3 +1,20 @@
+import {
+    Pool as PoolIcon,
+    Spa as SpaIcon,
+    FitnessCenter as GymIcon,
+    Wifi as WifiIcon,
+    DirectionsCar as ParkingIcon,
+    Liquor as BarIcon,
+    Restaurant as RestaurantIcon,
+    RoomPreferences as RoomServiceIcon,
+    Work as BusinessCenterIcon,
+    FlightTakeoff as AirportShuttleIcon,
+    AcUnit as AirConditioningIcon,
+    MeetingRoom as ConferenceRoomIcon,
+    LocalLaundryService as LaundryServiceIcon,
+    Star as DefaultIcon
+} from '@mui/icons-material';
+
 export default function Overview({ hotelData }) {
     // Helper function to get star display based on category
     const getStarDisplay = (category) => {
@@ -19,6 +36,7 @@ export default function Overview({ hotelData }) {
     // Helper function to get amenity name in Vietnamese
     const getAmenityName = (amenity) => {
         const amenityMap = {
+            // Lowercase versions (for consistency with old data)
             'pool': 'Hồ bơi',
             'gym': 'Phòng tập',
             'spa': 'Spa',
@@ -27,41 +45,70 @@ export default function Overview({ hotelData }) {
             'bar': 'Quầy bar',
             'restaurant': 'Nhà hàng',
             'ac': 'Máy lạnh',
-            'reception_24h': 'Lễ tân 24/7'
+            'reception_24h': 'Lễ tân 24/7',
+            'room_service': 'Dịch vụ phòng',
+            'business_center': 'Trung tâm thương mại',
+            'airport_shuttle': 'Đưa đón sân bay',
+            'air_conditioning': 'Máy lạnh',
+            'conference_room': 'Phòng hội nghị',
+            'laundry_service': 'Dịch vụ giặt ủi',
+
+            // Backend format (Title Case with spaces)
+            'Pool': 'Hồ bơi',
+            'Spa': 'Spa',
+            'Gym': 'Phòng tập',
+            'Wifi': 'WiFi miễn phí',
+            'Wi-Fi': 'Wi-Fi',
+            'Bar': 'Quầy bar',
+            'Parking': 'Đỗ xe miễn phí',
+            'Restaurant': 'Nhà hàng',
+            'Room Service': 'Dịch vụ phòng',
+            'Business Center': 'Trung tâm thương mại',
+            'Airport Shuttle': 'Đưa đón sân bay',
+            'Air Conditioning': 'Máy lạnh',
+            'Conference Room': 'Phòng hội nghị',
+            'Laundry Service': 'Dịch vụ giặt ủi',
         };
         return amenityMap[amenity] || amenity;
     };
 
-    // Helper function to get amenity icon
-    const getAmenityIcon = (amenity) => {
+    // Helper function to get amenity icon component
+    const getAmenityIconComponent = (amenity) => {
         const iconMap = {
-            'pool': (
-                <path d="M2 12h20M2 12l4-4M2 12l4 4M22 12l-4-4M22 12l-4 4" />
-            ),
-            'gym': (
-                <path d="M12 2L2 7l10 5 10-5z" />
-            ),
-            'spa': (
-                <circle cx="12" cy="12" r="10" />
-            ),
-            'wifi': (
-                <>
-                    <path d="M5 12.55a11 11 0 0 1 14.08 0" />
-                    <path d="M1.42 9a16 16 0 0 1 21.16 0" />
-                    <path d="M8.53 16.11a6 6 0 0 1 6.95 0" />
-                    <circle cx="12" cy="20" r="1" />
-                </>
-            ),
-            'parking': (
-                <path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z" />
-            ),
-            'bar': (
-                <path d="M5 12V7a1 1 0 0 1 1-1h12a1 1 0 0 1 1 1v5M5 12l6 6 6-6" />
-            )
+            // Lowercase versions (for consistency with old data)
+            'pool': PoolIcon,
+            'gym': GymIcon,
+            'spa': SpaIcon,
+            'wifi': WifiIcon,
+            'parking': ParkingIcon,
+            'bar': BarIcon,
+            'restaurant': RestaurantIcon,
+            'ac': AirConditioningIcon,
+            'reception_24h': RoomServiceIcon,
+            'room_service': RoomServiceIcon,
+            'business_center': BusinessCenterIcon,
+            'airport_shuttle': AirportShuttleIcon,
+            'air_conditioning': AirConditioningIcon,
+            'conference_room': ConferenceRoomIcon,
+            'laundry_service': LaundryServiceIcon,
+
+            // Backend format (Title Case with spaces)
+            'Pool': PoolIcon,
+            'Spa': SpaIcon,
+            'Gym': GymIcon,
+            'Wifi': WifiIcon,
+            'Wi-Fi': WifiIcon,
+            'Bar': BarIcon,
+            'Parking': ParkingIcon,
+            'Restaurant': RestaurantIcon,
+            'Room Service': RoomServiceIcon,
+            'Business Center': BusinessCenterIcon,
+            'Airport Shuttle': AirportShuttleIcon,
+            'Air Conditioning': AirConditioningIcon,
+            'Conference Room': ConferenceRoomIcon,
+            'Laundry Service': LaundryServiceIcon,
         };
-        return iconMap[amenity] || (
-            <path d="M12 2L2 7l10 5 10-5z" />
-        );
+        return iconMap[amenity] || DefaultIcon;
     };
 
     if (!hotelData) {
@@ -148,20 +195,18 @@ export default function Overview({ hotelData }) {
                     </h3>
                     <div className="hotel-detail-amenity-list">
                         {hotelData.amenities && hotelData.amenities.length > 0 ? (
-                            hotelData.amenities.map((amenity, index) => (
-                                <div key={index} className="hotel-detail-amenity-item">
-                                    <svg className="hotel-detail-amenity-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                                        {getAmenityIcon(amenity)}
-                                    </svg>
-                                    <span>{getAmenityName(amenity)}</span>
-                                </div>
-                            ))
+                            hotelData.amenities.map((amenity, index) => {
+                                const IconComponent = getAmenityIconComponent(amenity);
+                                return (
+                                    <div key={index} className="hotel-detail-amenity-item">
+                                        <IconComponent className="hotel-detail-amenity-icon" />
+                                        <span>{getAmenityName(amenity)}</span>
+                                    </div>
+                                );
+                            })
                         ) : (
                             <div className="hotel-detail-amenity-item">
-                                <svg className="hotel-detail-amenity-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                                    <path d="M12 2L2 7l10 5 10-5z"></path>
-                                    <path d="M2 17l10 5 10-5M2 12l10 5 10-5"></path>
-                                </svg>
+                                <DefaultIcon className="hotel-detail-amenity-icon" />
                                 <span>Không có thông tin tiện ích</span>
                             </div>
                         )}
