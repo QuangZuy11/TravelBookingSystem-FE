@@ -447,6 +447,20 @@
   font-weight: 700;
   color: #1f2937;
   margin: 0 0 18px 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.room-availability {
+  font-size: 14px;
+  font-weight: 500;
+  color: #6b7280;
+  background-color: #f3f4f6;
+  padding: 4px 8px;
+  border-radius: 12px;
 }
 
 .room-details {

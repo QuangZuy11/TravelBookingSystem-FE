@@ -1,36 +1,105 @@
-export default function Rooms() {
-    const rooms = [
-        {
-            id: 1,
-            name: "Phòng Deluxe",
-            price: "500.000",
-            image: "/luxury-hotel-room.png",
-            size: "25m²",
-            bed: "1 giường đôi",
-            guests: "2 người",
-            amenities: ["Wifi miễn phí", "Máy lạnh", "TV màn hình phẳng", "Minibar"],
-        },
-        {
-            id: 2,
-            name: "Phòng Superior",
-            price: "700.000",
-            image: "/hotel-bedroom.png",
-            size: "30m²",
-            bed: "1 giường King",
-            guests: "2-3 người",
-            amenities: ["Wifi miễn phí", "Máy lạnh", "TV màn hình phẳng", "Minibar", "Ban công"],
-        },
-        {
-            id: 3,
-            name: "Phòng Suite",
-            price: "1.200.000",
-            image: "/elegant-hotel-lobby.png",
-            size: "45m²",
-            bed: "1 giường King + Sofa",
-            guests: "3-4 người",
-            amenities: ["Wifi miễn phí", "Máy lạnh", "TV màn hình phẳng", "Minibar", "Ban công", "Bồn tắm"],
-        },
-    ]
+import './HotelDetail.css';
+
+export default function Rooms({ roomsData, loading, error }) {
+    // Debug log để kiểm tra dữ liệu nhận được
+    console.log('Rooms component received:', { roomsData, loading, error });
+
+    const formatPrice = (price) => {
+        return new Intl.NumberFormat('vi-VN').format(price);
+    };
+
+    const getBedType = (type) => {
+        // Fix cứng theo yêu cầu: type single = "1 giường đôi"
+        if (type === 'single') return '1 giường đôi';
+        if (type === 'double') return '2 giường đôi';
+        if (type === 'suite') return '1 giường King + Sofa';
+        return '1 giường đôi';
+    };
+
+    const getRoomTypeName = (type) => {
+        if (type === 'single') return 'Phòng Đơn';
+        if (type === 'double') return 'Phòng Đôi';
+        if (type === 'suite') return 'Phòng Suite';
+        return 'Phòng Tiêu Chuẩn';
+    };
+
+    const translateAmenity = (amenity) => {
+        const translations = {
+            'Wi-Fi': 'Wifi miễn phí',
+            'TV': 'TV',
+            'Air Conditioning': 'Điều hòa',
+            'Mini Bar': 'Minibar',
+            'Balcony': 'Ban công',
+            'Safe Box': 'Safe Box',
+            'Pool': 'Hồ bơi',
+            'Spa': 'Spa',
+            'Gym': 'Phòng tập gym',
+            'Restaurant': 'Nhà hàng',
+            'Room Service': 'Dịch vụ phòng',
+            'Business Center': 'Trung tâm thương mại'
+        };
+        return translations[amenity] || amenity;
+    };
+
+    if (loading) {
+        return (
+            <section id="rooms" className="hotel-detail-content-section rooms-section">
+                <div className="hotel-detail-section-header">
+                    <h2 className="hotel-detail-section-title">Các Loại Phòng</h2>
+                    <p className="hotel-detail-section-description">Đang tải dữ liệu phòng...</p>
+                    <p style={{ fontSize: '12px', color: '#666' }}>Loading: {loading ? 'true' : 'false'}</p>
+                </div>
+            </section>
+        );
+    }
+
+    if (error) {
+        return (
+            <section id="rooms" className="hotel-detail-content-section rooms-section">
+                <div className="hotel-detail-section-header">
+                    <h2 className="hotel-detail-section-title">Các Loại Phòng</h2>
+                    <p className="hotel-detail-section-description" style={{ color: 'red' }}>{error}</p>
+                </div>
+            </section>
+        );
+    }
+
+    if (!roomsData || !roomsData.roomsByType) {
+        return (
+            <section id="rooms" className="hotel-detail-content-section rooms-section">
+                <div className="hotel-detail-section-header">
+                    <h2 className="hotel-detail-section-title">Các Loại Phòng</h2>
+                    <p className="hotel-detail-section-description">Không có dữ liệu phòng</p>
+                    <p style={{ fontSize: '12px', color: '#666' }}>
+                        Debug - roomsData: {roomsData ? 'có dữ liệu' : 'null'},
+                        roomsByType: {roomsData?.roomsByType ? 'có' : 'không có'}
+                    </p>
+                    <pre style={{ fontSize: '10px', background: '#f5f5f5', padding: '10px', overflow: 'auto' }}>
+                        {JSON.stringify(roomsData, null, 2)}
+                    </pre>
+                </div>
+            </section>
+        );
+    }
+
+    // Chuyển đổi dữ liệu từ backend thành format hiển thị
+    const rooms = Object.values(roomsData.roomsByType).map((roomType) => {
+        // Lấy phòng đầu tiên làm mẫu để hiển thị thông tin
+        const sampleRoom = roomType.rooms[0];
+
+        return {
+            id: roomType.type,
+            name: getRoomTypeName(roomType.type),
+            price: formatPrice(roomType.avgPrice),
+            image: sampleRoom?.images?.[0] || "/placeholder.svg",
+            size: `${sampleRoom?.area || 25}m²`,
+            bed: getBedType(roomType.type),
+            guests: `${roomType.avgCapacity} người`,
+            amenities: sampleRoom?.amenities?.map(translateAmenity) || [],
+            availableCount: roomType.availableCount, // Số lượng phòng trống
+            totalCount: roomType.count // Tổng số phòng
+        };
+    });
 
     return (
         <section id="rooms" className="hotel-detail-content-section rooms-section">
@@ -44,10 +113,20 @@ export default function Rooms() {
                     <div key={room.id} className="room-card">
                         <div className="room-image">
                             <img src={room.image || "/placeholder.svg"} alt={room.name} />
-                            <div className="room-badge">Phổ biến</div>
+                            <div className="room-badge">
+                                {room.availableCount > 0
+                                    ? `${room.availableCount} phòng trống`
+                                    : 'Hết phòng'
+                                }
+                            </div>
                         </div>
                         <div className="room-content">
-                            <h3 className="room-name">{room.name}</h3>
+                            <h3 className="room-name">
+                                {room.name}
+                                <span className="room-availability">
+                                    ({room.availableCount}/{room.totalCount} phòng)
+                                </span>
+                            </h3>
                             <div className="room-details">
                                 <div className="room-detail-item">
                                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
@@ -85,7 +164,16 @@ export default function Rooms() {
                                     <span className="price-amount">{room.price}</span>
                                     <span className="price-unit">VNĐ/đêm</span>
                                 </div>
-                                <button className="room-book-btn">Đặt ngay</button>
+                                <button
+                                    className="room-book-btn"
+                                    disabled={room.availableCount === 0}
+                                    style={{
+                                        opacity: room.availableCount === 0 ? 0.5 : 1,
+                                        cursor: room.availableCount === 0 ? 'not-allowed' : 'pointer'
+                                    }}
+                                >
+                                    {room.availableCount > 0 ? 'Đặt ngay' : 'Hết phòng'}
+                                </button>
                             </div>
                         </div>
                     </div>

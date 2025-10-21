@@ -12,8 +12,11 @@ const HotelDetail = () => {
     const { id } = useParams()
     const [activeSection, setActiveSection] = useState("overview")
     const [hotelData, setHotelData] = useState(null)
+    const [roomsData, setRoomsData] = useState(null)
     const [loading, setLoading] = useState(true)
+    const [roomsLoading, setRoomsLoading] = useState(true)
     const [error, setError] = useState(null)
+    const [roomsError, setRoomsError] = useState(null)
 
     // Fetch hotel data from API
     useEffect(() => {
@@ -50,6 +53,42 @@ const HotelDetail = () => {
         }
 
         fetchHotelData()
+    }, [id])
+
+    // Fetch rooms data from API
+    useEffect(() => {
+        const fetchRoomsData = async () => {
+            if (!id) return
+
+            try {
+                setRoomsLoading(true)
+                setRoomsError(null)
+
+                // Gọi API lấy thông tin phòng
+                const response = await fetch(`http://localhost:3000/api/traveler/hotels/${id}/rooms`)
+
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}`)
+                }
+
+                const data = await response.json()
+                console.log('Rooms API response:', data) // Debug log
+                console.log('Rooms data structure:', data.data) // Debug structure
+
+                if (data.success && data.data) {
+                    setRoomsData(data.data)
+                } else {
+                    throw new Error('Không có dữ liệu phòng')
+                }
+            } catch (err) {
+                console.error('Error fetching rooms data:', err)
+                setRoomsError(err.message || 'Lỗi tải dữ liệu phòng')
+            } finally {
+                setRoomsLoading(false)
+            }
+        }
+
+        fetchRoomsData()
     }, [id])
 
     useEffect(() => {
@@ -151,7 +190,11 @@ const HotelDetail = () => {
             </nav>
 
             <Overview hotelData={hotelData} />
-            <Rooms />
+            <Rooms
+                roomsData={roomsData}
+                loading={roomsLoading}
+                error={roomsError}
+            />
             <Location />
             <Amenities />
             <Policies />
