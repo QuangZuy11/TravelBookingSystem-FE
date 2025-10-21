@@ -13,9 +13,21 @@ export const AuthProvider = ({ children }) => {
     // Check token and other stored data
     const token = localStorage.getItem('token');
     const fullName = localStorage.getItem('fullName');
+    const email = localStorage.getItem('email');
+    const phone = localStorage.getItem('phone');
     let providerId = localStorage.getItem('providerId');
     const role = localStorage.getItem('role');
     const providerStr = localStorage.getItem('provider');
+
+    // Debug localStorage
+    console.log('🔍 AuthContext Debug - localStorage data:', {
+      token: !!token,
+      fullName,
+      email,
+      phone,
+      providerId,
+      role
+    });
 
     // Parse provider object
     let provider = null;
@@ -36,6 +48,9 @@ export const AuthProvider = ({ children }) => {
     if (token && fullName) {
       const restoredUser = {
         name: fullName,
+        fullName: fullName,
+        email: email,
+        phone: phone,
         providerId: providerId,
         role: role,
         token: token,
@@ -50,6 +65,9 @@ export const AuthProvider = ({ children }) => {
   const login = (data) => {
     const userToSet = {
       name: data.fullName,
+      fullName: data.fullName,
+      email: data.email,
+      phone: data.phone,
       providerId: data.id,
       role: data.role,
       token: data.token,
@@ -59,6 +77,8 @@ export const AuthProvider = ({ children }) => {
     // Store all relevant data
     localStorage.setItem('token', data.token);
     localStorage.setItem('fullName', data.fullName);
+    localStorage.setItem('email', data.email || '');
+    localStorage.setItem('phone', data.phone || '');
     localStorage.setItem('providerId', data.id);
     localStorage.setItem('role', data.role);
     localStorage.setItem('user', JSON.stringify(userToSet));
@@ -80,8 +100,26 @@ export const AuthProvider = ({ children }) => {
     navigate('/');
   };
 
+  // Function để update user info (email, phone từ profile)
+  const updateUserInfo = (updatedInfo) => {
+    if (user) {
+      const updatedUser = {
+        ...user,
+        ...updatedInfo
+      };
+
+      // Update localStorage
+      if (updatedInfo.email) localStorage.setItem('email', updatedInfo.email);
+      if (updatedInfo.phone) localStorage.setItem('phone', updatedInfo.phone);
+      if (updatedInfo.fullName) localStorage.setItem('fullName', updatedInfo.fullName);
+
+      setUser(updatedUser);
+      console.log('✅ Updated user info:', updatedUser);
+    }
+  };
+
   return (
-    <AuthContext.Provider value={{ user, login, logout, loading }}>
+    <AuthContext.Provider value={{ user, login, logout, loading, updateUserInfo }}>
       {children}
     </AuthContext.Provider>
   );
@@ -90,3 +128,5 @@ export const AuthProvider = ({ children }) => {
 export const useAuth = () => {
   return useContext(AuthContext);
 };
+
+export { AuthContext };
