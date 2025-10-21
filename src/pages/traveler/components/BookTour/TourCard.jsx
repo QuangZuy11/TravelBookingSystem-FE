@@ -1,18 +1,19 @@
 import React from "react";
 import "./TourCard.css";
 import { Star } from "lucide-react";
+import { getProxiedGoogleDriveUrl } from '../../../../utils/googleDriveImageHelper';
 
 export function TourCard({ tour }) {
   // Đảm bảo highlights là mảng
   const highlights = Array.isArray(tour.highlights)
     ? tour.highlights
     : typeof tour.highlights === "string"
-    ? [tour.highlights]
-    : [];
+      ? [tour.highlights]
+      : [];
 
   return (
     <div className="tour-card">
-      <img src={tour.image} alt={tour.name} className="tour-image" />
+      <img src={getProxiedGoogleDriveUrl(tour.image)} alt={tour.name} className="tour-image" />
 
       <div className="tour-info">
         <h3 className="tour-name">{tour.name}</h3>

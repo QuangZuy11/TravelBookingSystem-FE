@@ -7,6 +7,7 @@ import ErrorAlert from '../../../components/shared/ErrorAlert';
 import HotelForm from '../../../components/provider/forms/HotelForm';
 import RoomForm from '../../../components/provider/forms/RoomForm';
 import Modal from '../../../components/shared/Modal';
+import { getProxiedGoogleDriveUrl } from '../../../utils/googleDriveImageHelper';
 
 const HotelDetailsPage = () => {
     const providerId = localStorage.getItem('providerId');
@@ -121,8 +122,8 @@ const HotelDetailsPage = () => {
         try {
             if (editingRoom) {
                 await axios.put(`/api/hotel/provider/${providerId}/hotels/${hotelId}/rooms/${editingRoom._id}`, formData, {
-                headers: { Authorization: `Bearer ${token}` }
-            });
+                    headers: { Authorization: `Bearer ${token}` }
+                });
                 alert('Room type updated successfully!');
             } else {
                 await axios.post(`/api/hotel/provider/${providerId}/hotels/${hotelId}/rooms`, formData, {
@@ -360,7 +361,7 @@ const HotelDetailsPage = () => {
             pending: 'linear-gradient(135deg, #f59e0b 0%, #d97706 100%)',
             cancelled: 'linear-gradient(135deg, #ef4444 0%, #dc2626 100%)'
         };
-        
+
         return {
             padding: '0.5rem 1rem',
             borderRadius: '20px',
@@ -415,7 +416,7 @@ const HotelDetailsPage = () => {
                 <div style={gridStyle}>
                     <div>
                         {hotel.images && hotel.images.length > 0 ? (
-                            <img src={hotel.images[0]} alt={hotel.name} style={imageStyle} />
+                            <img src={getProxiedGoogleDriveUrl(hotel.images[0])} alt={hotel.name} style={imageStyle} />
                         ) : (
                             <div style={{
                                 ...imageStyle,
@@ -428,7 +429,7 @@ const HotelDetailsPage = () => {
                                 🏨
                             </div>
                         )}
-                        <div style={{display: 'flex', alignItems: 'center', gap: '1rem'}}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
                             <h2 style={sectionTitleStyle}>{hotel.name}</h2>
                             <p style={{ color: '#6b7280', marginTop: '0.5rem' }}>
                                 {'⭐'.repeat(hotel.starRating || 3)} {hotel.starRating || 3} Stars
@@ -441,14 +442,14 @@ const HotelDetailsPage = () => {
                             </p>
                         </div>
                         <div>
-                            
+
                         </div>
                         <div style={infoBlockStyle}>
                             <p style={labelStyle}>Description</p>
                             <p style={valueStyle}>{hotel.description}</p>
                         </div>
                     </div>
-                    
+
                     <div>
                         <div style={buttonGroupStyle}>
                             <button
@@ -492,18 +493,18 @@ const HotelDetailsPage = () => {
                                 </p>
                             )}
                         </div>
-                        
+
                         <div style={infoBlockStyle}>
                             <p style={labelStyle}>⏰ Check-in / Check-out</p>
                             <p style={valueStyle}>Check-in: {hotel.policies.checkInTime}</p>
                             <p style={valueStyle}>Check-out: {hotel.policies.checkOutTime}</p>
                         </div>
-                        
+
                         <div style={infoBlockStyle}>
                             <p style={labelStyle}>📋 Cancellation Policy</p>
                             <p style={valueStyle}>{hotel.policies.cancellationPolicy || 'Not specified'}</p>
                         </div>
-                        
+
                         <div style={infoBlockStyle}>
                             <p style={labelStyle}>💳 Payment Options</p>
                             <div>
@@ -512,12 +513,12 @@ const HotelDetailsPage = () => {
                                 ))}
                             </div>
                         </div>
-                        
+
                         <div style={infoBlockStyle}>
                             <p style={labelStyle}>🐾 Pets</p>
                             <p style={valueStyle}>{hotel.policies.petsAllowed ? '✅ Allowed' : '❌ Not Allowed'}</p>
                         </div>
-                        
+
                         <div style={infoBlockStyle}>
                             <p style={labelStyle}>✨ Amenities</p>
                             <div>
@@ -588,7 +589,7 @@ const HotelDetailsPage = () => {
                         >
                             + Add New Room
                         </button>
-                        
+
                         {rooms.length === 0 ? (
                             <div style={emptyStateStyle}>
                                 <div style={{ fontSize: '4rem', marginBottom: '1rem' }}>🛏️</div>

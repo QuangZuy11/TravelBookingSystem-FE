@@ -48,11 +48,6 @@ const CreateHotelPage = () => {
       }
 
       try {
-        console.log('=== Sending Create Hotel Request ===');
-        console.log('providerId:', providerId);
-        console.log('Full provider object:', JSON.parse(providerStr));
-        console.log('Request URL:', `${import.meta.env.VITE_API_BASE_URL || 'http://localhost:3000/api'}/hotel/provider/${providerId}/hotels`);
-
         const response = await hotelService.createHotel(providerId, formData);
         toast.success('Hotel added successfully!');
         navigate('/provider/hotels');

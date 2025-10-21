@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import Breadcrumb from '../../shared/Breadcrumb';
+import { getProxiedGoogleDriveUrl, isGoogleDriveUrl, getShareUrl } from '../../../utils/googleDriveImageHelper';
 
 export const HotelForm = ({ initialData, onSubmit }) => {
     const [formData, setFormData] = useState({
@@ -40,7 +41,7 @@ export const HotelForm = ({ initialData, onSubmit }) => {
 
     const handleChange = (e) => {
         const { name, value, type, checked } = e.target;
-        
+
         if (name.includes('.')) {
             const [parent, child] = name.split('.');
             setFormData(prev => ({
@@ -291,7 +292,7 @@ export const HotelForm = ({ initialData, onSubmit }) => {
     return (
         <div style={containerStyle}>
             <Breadcrumb items={breadcrumbItems} />
-            
+
             <form onSubmit={handleSubmit} style={formContainerStyle}>
                 <div style={headerStyle}>
                     <h1 style={titleStyle}>
@@ -301,7 +302,7 @@ export const HotelForm = ({ initialData, onSubmit }) => {
                 </div>
 
                 {/* Basic Information */}
-                <div 
+                <div
                     style={activeSection === 'basic' ? sectionActiveStyle : sectionStyle}
                     onFocus={() => setActiveSection('basic')}
                 >
@@ -375,7 +376,7 @@ export const HotelForm = ({ initialData, onSubmit }) => {
                 </div>
 
                 {/* Address Information */}
-                <div 
+                <div
                     style={activeSection === 'address' ? sectionActiveStyle : sectionStyle}
                     onFocus={() => setActiveSection('address')}
                 >
@@ -456,7 +457,7 @@ export const HotelForm = ({ initialData, onSubmit }) => {
                 </div>
 
                 {/* Room & Price Information */}
-                <div 
+                <div
                     style={activeSection === 'rooms' ? sectionActiveStyle : sectionStyle}
                     onFocus={() => setActiveSection('rooms')}
                 >
@@ -530,7 +531,7 @@ export const HotelForm = ({ initialData, onSubmit }) => {
                 </div>
 
                 {/* Policies */}
-                <div 
+                <div
                     style={activeSection === 'policies' ? sectionActiveStyle : sectionStyle}
                     onFocus={() => setActiveSection('policies')}
                 >
@@ -583,10 +584,10 @@ export const HotelForm = ({ initialData, onSubmit }) => {
                         <label style={labelStyle}>Payment Options</label>
                         <div style={checkboxContainerStyle}>
                             {paymentOptionsList.map(option => (
-                                <label 
+                                <label
                                     key={option}
-                                    style={formData.policies.paymentOptions.includes(option) 
-                                        ? checkboxLabelActiveStyle 
+                                    style={formData.policies.paymentOptions.includes(option)
+                                        ? checkboxLabelActiveStyle
                                         : checkboxLabelStyle}
                                 >
                                     <input
@@ -603,7 +604,7 @@ export const HotelForm = ({ initialData, onSubmit }) => {
                         </div>
                     </div>
                     <div>
-                        <label 
+                        <label
                             style={{
                                 ...checkboxLabelStyle,
                                 display: 'inline-flex',
@@ -623,7 +624,7 @@ export const HotelForm = ({ initialData, onSubmit }) => {
                 </div>
 
                 {/* Contact Information */}
-                <div 
+                <div
                     style={activeSection === 'contact' ? sectionActiveStyle : sectionStyle}
                     onFocus={() => setActiveSection('contact')}
                 >
@@ -675,7 +676,7 @@ export const HotelForm = ({ initialData, onSubmit }) => {
                 </div>
 
                 {/* Amenities */}
-                <div 
+                <div
                     style={activeSection === 'amenities' ? sectionActiveStyle : sectionStyle}
                     onFocus={() => setActiveSection('amenities')}
                 >
@@ -685,10 +686,10 @@ export const HotelForm = ({ initialData, onSubmit }) => {
                     </h2>
                     <div style={checkboxContainerStyle}>
                         {amenitiesList.map(amenity => (
-                            <label 
+                            <label
                                 key={amenity}
-                                style={formData.amenities.includes(amenity) 
-                                    ? checkboxLabelActiveStyle 
+                                style={formData.amenities.includes(amenity)
+                                    ? checkboxLabelActiveStyle
                                     : checkboxLabelStyle}
                             >
                                 <input
@@ -706,7 +707,7 @@ export const HotelForm = ({ initialData, onSubmit }) => {
                 </div>
 
                 {/* Images */}
-                <div 
+                <div
                     style={activeSection === 'images' ? sectionActiveStyle : sectionStyle}
                     onFocus={() => setActiveSection('images')}
                 >
@@ -727,16 +728,56 @@ export const HotelForm = ({ initialData, onSubmit }) => {
                     />
                     {formData.images.length > 0 && (
                         <div style={imageGridStyle}>
-                            {formData.images.map((image, index) => (
-                                <img
-                                    key={index}
-                                    src={image}
-                                    alt={`Hotel preview ${index + 1}`}
-                                    style={imagePreviewStyle}
-                                    onMouseEnter={(e) => e.target.style.transform = 'scale(1.05)'}
-                                    onMouseLeave={(e) => e.target.style.transform = 'scale(1)'}
-                                />
-                            ))}
+                            {formData.images.map((image, index) => {
+                                // Determine image URL (handle both file objects and strings)
+                                const imageUrl = typeof image === 'string' ? image : (image.preview || '');
+
+                                // 🔍 DEBUG LOGS
+                                console.log('=== Image Debug ===');
+                                console.log('Index:', index);
+                                console.log('Raw image:', image);
+                                console.log('Image URL:', imageUrl);
+                                console.log('Is Google Drive?', isGoogleDriveUrl(imageUrl));
+
+                                // Use proxy for Google Drive URLs
+                                const displayUrl = isGoogleDriveUrl(imageUrl)
+                                    ? getProxiedGoogleDriveUrl(imageUrl)
+                                    : imageUrl;
+
+                                console.log('Display URL:', displayUrl);
+                                console.log('==================');
+
+                                return (
+                                    <div key={index} style={{ position: 'relative' }}>
+                                        <img
+                                            src={displayUrl}
+                                            alt={`Hotel preview ${index + 1}`}
+                                            style={imagePreviewStyle}
+                                            onMouseEnter={(e) => e.target.style.transform = 'scale(1.05)'}
+                                            onMouseLeave={(e) => e.target.style.transform = 'scale(1)'}
+                                            onError={(e) => {
+                                                console.error('Failed to load image:', displayUrl);
+                                                e.target.style.opacity = '0.5';
+                                                e.target.alt = 'Failed to load';
+                                            }}
+                                        />
+                                        {isGoogleDriveUrl(imageUrl) && (
+                                            <span style={{
+                                                position: 'absolute',
+                                                top: '5px',
+                                                right: '5px',
+                                                background: 'rgba(102, 126, 234, 0.9)',
+                                                color: 'white',
+                                                padding: '2px 6px',
+                                                borderRadius: '4px',
+                                                fontSize: '0.7rem'
+                                            }}>
+                                                🔗 GDrive
+                                            </span>
+                                        )}
+                                    </div>
+                                );
+                            })}
                         </div>
                     )}
                 </div>

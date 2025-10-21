@@ -4,6 +4,7 @@ import { tourApi } from '@api/tourApi';
 import { formatCurrency } from '@utils/tourHelpers';
 import toast from 'react-hot-toast';
 import './TourDetails.css';
+import { getProxiedGoogleDriveUrl } from '../../../utils/googleDriveImageHelper';
 
 const TourDetails = () => {
   const { tourId } = useParams();
@@ -576,7 +577,7 @@ const TourDetails = () => {
                 />
                 {formData.image && (
                   <img
-                    src={formData.image}
+                    src={getProxiedGoogleDriveUrl(formData.image)}
                     alt="Tour preview"
                     style={{
                       width: '100%',

@@ -3,6 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import toast from 'react-hot-toast';
 import './TourDetailsPage.css';
+import { getProxiedGoogleDriveUrl } from '../../../utils/googleDriveImageHelper';
 
 const TourDetailsPage = () => {
     const { tourId } = useParams();
@@ -188,7 +189,7 @@ const TourDetailsPage = () => {
 
                 {tour.image && (
                     <div className="tour-image">
-                        <img src={tour.image} alt={tour.title} />
+                        <img src={getProxiedGoogleDriveUrl(tour.image)} alt={tour.title} />
                     </div>
                 )}
             </div>

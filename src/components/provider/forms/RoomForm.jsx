@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { getProxiedGoogleDriveUrl } from '../../../utils/googleDriveImageHelper';
 
 export const RoomForm = ({ initialData, onSubmit, hotelId }) => {
     const [formData, setFormData] = useState({
@@ -30,7 +31,7 @@ export const RoomForm = ({ initialData, onSubmit, hotelId }) => {
 
     const handleChange = (e) => {
         const { name, value, type, checked } = e.target;
-        
+
         if (name === 'amenities') {
             setFormData(prev => ({
                 ...prev,
@@ -47,16 +48,72 @@ export const RoomForm = ({ initialData, onSubmit, hotelId }) => {
     };
 
     const handleImageUpload = (e) => {
-        const files = Array.from(e.target.files).map(file => URL.createObjectURL(file));
+        const newFiles = Array.from(e.target.files);
+
+        // Create preview URLs for display
+        const previewUrls = newFiles.map(file => ({
+            file: file,
+            preview: URL.createObjectURL(file),
+            name: file.name
+        }));
+
         setFormData(prev => ({
             ...prev,
-            images: [...prev.images, ...files]
+            images: [...prev.images, ...previewUrls]
         }));
     };
 
-    const handleSubmit = (e) => {
+    // Cleanup blob URLs when component unmounts
+    React.useEffect(() => {
+        return () => {
+            // Revoke all blob URLs
+            formData.images.forEach(img => {
+                if (img.preview && img.preview.startsWith('blob:')) {
+                    URL.revokeObjectURL(img.preview);
+                }
+            });
+        };
+    }, [formData.images]);
+
+    const handleSubmit = async (e) => {
         e.preventDefault();
-        onSubmit(formData);
+
+        // Prepare FormData to send files
+        const formDataToSend = new FormData();
+
+        // Add all form fields except images
+        Object.keys(formData).forEach(key => {
+            if (key !== 'images') {
+                if (typeof formData[key] === 'object' && formData[key] !== null && !Array.isArray(formData[key])) {
+                    // Handle nested objects
+                    formDataToSend.append(key, JSON.stringify(formData[key]));
+                } else if (Array.isArray(formData[key])) {
+                    // Handle arrays (amenities, etc)
+                    formDataToSend.append(key, JSON.stringify(formData[key]));
+                } else {
+                    formDataToSend.append(key, formData[key]);
+                }
+            }
+        });
+
+        // Add image files (new uploads) and existing URLs separately
+        const existingImages = [];
+        formData.images.forEach((img, index) => {
+            if (typeof img === 'string') {
+                // Existing image URL (edit mode)
+                existingImages.push(img);
+            } else if (img.file) {
+                // New file upload - append to FormData
+                formDataToSend.append('images', img.file);
+            }
+        });
+
+        // If there are existing images, send them as JSON
+        if (existingImages.length > 0) {
+            formDataToSend.append('existing_images', JSON.stringify(existingImages));
+        }
+
+        onSubmit(formDataToSend);
     };
 
     const roomTypes = [
@@ -273,7 +330,7 @@ export const RoomForm = ({ initialData, onSubmit, hotelId }) => {
                 </div>
 
                 {/* Basic Information */}
-                <div 
+                <div
                     style={activeSection === 'basic' ? sectionActiveStyle : sectionStyle}
                     onFocus={() => setActiveSection('basic')}
                 >
@@ -281,7 +338,7 @@ export const RoomForm = ({ initialData, onSubmit, hotelId }) => {
                         <span style={{ fontSize: '1.75rem' }}>🏠</span>
                         Basic Information
                     </h2>
-                    
+
                     <div style={gridStyle}>
                         <div>
                             <label style={labelStyle}>Room Number</label>
@@ -345,7 +402,7 @@ export const RoomForm = ({ initialData, onSubmit, hotelId }) => {
                 </div>
 
                 {/* Room Type */}
-                <div 
+                <div
                     style={activeSection === 'type' ? sectionActiveStyle : sectionStyle}
                     onFocus={() => setActiveSection('type')}
                 >
@@ -353,7 +410,7 @@ export const RoomForm = ({ initialData, onSubmit, hotelId }) => {
                         <span style={{ fontSize: '1.75rem' }}>🛏️</span>
                         Room Type & Capacity
                     </h2>
-                    
+
                     <div style={{ ...gridStyle, gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))' }}>
                         {roomTypes.map(roomType => (
                             <div
@@ -407,7 +464,7 @@ export const RoomForm = ({ initialData, onSubmit, hotelId }) => {
                 </div>
 
                 {/* Pricing & Status */}
-                <div 
+                <div
                     style={activeSection === 'pricing' ? sectionActiveStyle : sectionStyle}
                     onFocus={() => setActiveSection('pricing')}
                 >
@@ -415,7 +472,7 @@ export const RoomForm = ({ initialData, onSubmit, hotelId }) => {
                         <span style={{ fontSize: '1.75rem' }}>💰</span>
                         Pricing & Status
                     </h2>
-                    
+
                     <div style={gridStyle}>
                         <div>
                             <label style={labelStyle}>Price Per Night (VND)</label>
@@ -453,7 +510,7 @@ export const RoomForm = ({ initialData, onSubmit, hotelId }) => {
                 </div>
 
                 {/* Amenities */}
-                <div 
+                <div
                     style={activeSection === 'amenities' ? sectionActiveStyle : sectionStyle}
                     onFocus={() => setActiveSection('amenities')}
                 >
@@ -461,13 +518,13 @@ export const RoomForm = ({ initialData, onSubmit, hotelId }) => {
                         <span style={{ fontSize: '1.75rem' }}>✨</span>
                         Room Amenities
                     </h2>
-                    
+
                     <div style={checkboxContainerStyle}>
                         {roomAmenities.map(amenity => (
-                            <label 
+                            <label
                                 key={amenity}
-                                style={formData.amenities.includes(amenity) 
-                                    ? checkboxLabelActiveStyle 
+                                style={formData.amenities.includes(amenity)
+                                    ? checkboxLabelActiveStyle
                                     : checkboxLabelStyle}
                             >
                                 <input
@@ -485,7 +542,7 @@ export const RoomForm = ({ initialData, onSubmit, hotelId }) => {
                 </div>
 
                 {/* Images */}
-                <div 
+                <div
                     style={activeSection === 'images' ? sectionActiveStyle : sectionStyle}
                     onFocus={() => setActiveSection('images')}
                 >
@@ -493,7 +550,7 @@ export const RoomForm = ({ initialData, onSubmit, hotelId }) => {
                         <span style={{ fontSize: '1.75rem' }}>📸</span>
                         Room Images
                     </h2>
-                    
+
                     <input
                         type="file"
                         multiple
@@ -505,19 +562,22 @@ export const RoomForm = ({ initialData, onSubmit, hotelId }) => {
                             cursor: 'pointer'
                         }}
                     />
-                    
+
                     {formData.images.length > 0 && (
                         <div style={imageGridStyle}>
-                            {formData.images.map((image, index) => (
-                                <img
-                                    key={index}
-                                    src={image}
-                                    alt={`Room preview ${index + 1}`}
-                                    style={imagePreviewStyle}
-                                    onMouseEnter={(e) => e.target.style.transform = 'scale(1.05)'}
-                                    onMouseLeave={(e) => e.target.style.transform = 'scale(1)'}
-                                />
-                            ))}
+                            {formData.images.map((image, index) => {
+                                const imageUrl = typeof image === 'string' ? image : image.preview;
+                                return (
+                                    <img
+                                        key={index}
+                                        src={getProxiedGoogleDriveUrl(imageUrl)}
+                                        alt={`Room preview ${index + 1}`}
+                                        style={imagePreviewStyle}
+                                        onMouseEnter={(e) => e.target.style.transform = 'scale(1.05)'}
+                                        onMouseLeave={(e) => e.target.style.transform = 'scale(1)'}
+                                    />
+                                );
+                            })}
                         </div>
                     )}
                 </div>
