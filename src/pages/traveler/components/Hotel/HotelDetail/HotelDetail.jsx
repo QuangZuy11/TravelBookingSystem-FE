@@ -194,6 +194,7 @@ const HotelDetail = () => {
                 roomsData={roomsData}
                 loading={roomsLoading}
                 error={roomsError}
+                hotelData={hotelData}
             />
             <Location />
             <Amenities />
