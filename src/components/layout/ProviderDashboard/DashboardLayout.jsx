@@ -17,11 +17,9 @@ const DashboardLayout = () => {
         if (provider && provider.licenses && Array.isArray(provider.licenses)) {
           // Get provider types from licenses (since provider.type may not exist)
           const types = [...new Set(provider.licenses.map(l => l.service_type))];
-          console.log('📋 Provider types from licenses:', types);
           setProviderTypes(types);
         } else if (provider && Array.isArray(provider.type)) {
           // Fallback to provider.type if it exists (backward compatibility)
-          console.log('📋 Provider types from type field:', provider.type);
           setProviderTypes(provider.type);
         }
       } catch (error) {

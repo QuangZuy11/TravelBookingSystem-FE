@@ -9,6 +9,7 @@ import {
     Fade,
     Skeleton,
 } from '@mui/material';
+import { getProxiedGoogleDriveUrl } from '../../../../../utils/googleDriveImageHelper';
 import {
     LocationOn,
     Wifi,
@@ -193,7 +194,7 @@ const HotelHighlight = ({ hotels = [], loading = false }) => {
                             <Fade key={hotel.id} in timeout={800 + index * 150}>
                                 <StyledCard>
                                     <StyledCardMedia>
-                                        <img src={hotel.image} alt={hotel.name} loading="lazy" />
+                                        <img src={getProxiedGoogleDriveUrl(hotel.image)} alt={hotel.name} loading="lazy" />
                                         {!!hotel.discount && <DiscountBadge label={`-${hotel.discount}%`} />}
                                         {hotel.isPopular && <PopularBadge label="🔥 Phổ biến" />}
                                         <ImageOverlay />

@@ -7,11 +7,12 @@ import Modal from '../../../components/shared/Modal';
 import RoomForm from '../../../components/provider/forms/RoomForm';
 import PricingRuleForm from '../../../components/provider/forms/PricingRuleForm';
 import MaintenanceRecordForm from '../../../components/provider/forms/MaintenanceRecordForm';
+import { getProxiedGoogleDriveUrl } from '../../../utils/googleDriveImageHelper';
 
 const RoomTypeDetailsPage = () => {
     const { providerId, hotelId, roomId } = useParams();
     const navigate = useNavigate();
-    
+
     const token = localStorage.getItem('token');
     // State management
     const [room, setRoom] = useState(null);
@@ -21,7 +22,7 @@ const RoomTypeDetailsPage = () => {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [activeTab, setActiveTab] = useState('pricing');
-    
+
     // Modal states
     const [isEditModalOpen, setIsEditModalOpen] = useState(false);
     const [isPricingModalOpen, setIsPricingModalOpen] = useState(false);
@@ -99,8 +100,12 @@ const RoomTypeDetailsPage = () => {
 
     const handleUpdateRoomSubmit = async (formData) => {
         try {
-            await axios.put(`/api/provider/${providerId}/hotels/${hotelId}/rooms/${roomId}`, formData,
-                { headers: { Authorization: `Bearer ${token}` } });
+            await axios.put(`/api/provider/${providerId}/hotels/${hotelId}/rooms/${roomId}`, formData, {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                    'Content-Type': 'multipart/form-data'
+                }
+            });
             alert('Room type updated successfully!');
             setIsEditModalOpen(false);
             fetchRoomDetails();
@@ -138,8 +143,8 @@ const RoomTypeDetailsPage = () => {
         try {
             if (editingPricingRule) {
                 await axios.put(`/api/room-prices/${editingPricingRule._id}`, formData, {
-                headers: { Authorization: `Bearer ${token}` }
-            });
+                    headers: { Authorization: `Bearer ${token}` }
+                });
                 alert('Pricing rule updated successfully!');
             } else {
                 await axios.post('/api/room-prices', { ...formData, roomId }, {
@@ -219,7 +224,7 @@ const RoomTypeDetailsPage = () => {
                         {room.images && room.images.length > 0 ? (
                             <div className="relative h-64 mb-4">
                                 <img
-                                    src={room.images[0]}
+                                    src={getProxiedGoogleDriveUrl(room.images[0])}
                                     alt={room.room_type_name}
                                     className="w-full h-full object-cover rounded-md"
                                 />
@@ -275,25 +280,22 @@ const RoomTypeDetailsPage = () => {
             <div className="bg-white p-6 rounded-lg shadow-md">
                 <div className="flex border-b border-gray-200 mb-4">
                     <button
-                        className={`px-4 py-2 text-sm font-medium ${
-                            activeTab === 'pricing' ? 'border-b-2 border-blue-600 text-blue-600' : 'text-gray-500 hover:text-gray-700'
-                        }`}
+                        className={`px-4 py-2 text-sm font-medium ${activeTab === 'pricing' ? 'border-b-2 border-blue-600 text-blue-600' : 'text-gray-500 hover:text-gray-700'
+                            }`}
                         onClick={() => setActiveTab('pricing')}
                     >
                         Pricing Rules
                     </button>
                     <button
-                        className={`px-4 py-2 text-sm font-medium ${
-                            activeTab === 'bookings' ? 'border-b-2 border-blue-600 text-blue-600' : 'text-gray-500 hover:text-gray-700'
-                        }`}
+                        className={`px-4 py-2 text-sm font-medium ${activeTab === 'bookings' ? 'border-b-2 border-blue-600 text-blue-600' : 'text-gray-500 hover:text-gray-700'
+                            }`}
                         onClick={() => setActiveTab('bookings')}
                     >
                         Bookings
                     </button>
                     <button
-                        className={`px-4 py-2 text-sm font-medium ${
-                            activeTab === 'maintenance' ? 'border-b-2 border-blue-600 text-blue-600' : 'text-gray-500 hover:text-gray-700'
-                        }`}
+                        className={`px-4 py-2 text-sm font-medium ${activeTab === 'maintenance' ? 'border-b-2 border-blue-600 text-blue-600' : 'text-gray-500 hover:text-gray-700'
+                            }`}
                         onClick={() => setActiveTab('maintenance')}
                     >
                         Maintenance Records
@@ -398,11 +400,10 @@ const RoomTypeDetailsPage = () => {
                                                         ${booking.totalPrice}
                                                     </td>
                                                     <td className="px-6 py-4 whitespace-nowrap">
-                                                        <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
-                                                            booking.status === 'confirmed' ? 'bg-green-100 text-green-800' :
+                                                        <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${booking.status === 'confirmed' ? 'bg-green-100 text-green-800' :
                                                             booking.status === 'pending' ? 'bg-yellow-100 text-yellow-800' :
-                                                            'bg-red-100 text-red-800'
-                                                        }`}>
+                                                                'bg-red-100 text-red-800'
+                                                            }`}>
                                                             {booking.status}
                                                         </span>
                                                     </td>
@@ -448,11 +449,10 @@ const RoomTypeDetailsPage = () => {
                                                         {record.description}
                                                     </td>
                                                     <td className="px-6 py-4 whitespace-nowrap">
-                                                        <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
-                                                            record.status === 'completed' ? 'bg-green-100 text-green-800' :
+                                                        <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${record.status === 'completed' ? 'bg-green-100 text-green-800' :
                                                             record.status === 'in-progress' ? 'bg-yellow-100 text-yellow-800' :
-                                                            'bg-red-100 text-red-800'
-                                                        }`}>
+                                                                'bg-red-100 text-red-800'
+                                                            }`}>
                                                             {record.status}
                                                         </span>
                                                     </td>

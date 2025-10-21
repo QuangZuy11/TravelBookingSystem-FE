@@ -58,12 +58,7 @@ const ProtectedProviderRoute = ({ children }) => {
         if (!isRegistrationComplete) {
             setShouldRedirect(true);
         } else {
-            // Đã đủ thông tin -> cho vào dashboard
-            console.log('✅ Provider registration complete - allowing access to dashboard', {
-                provider_id: provider._id,
-                licenses_count: provider.licenses.length,
-                service_types: provider.licenses.map(l => l.service_type)
-            });
+
         }
 
         setIsChecking(false);

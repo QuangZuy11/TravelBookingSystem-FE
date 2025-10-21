@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import "./FeaturedTours.css";
 import { Clock, MapPin, Star } from "lucide-react";
 import { Link } from "react-router-dom";
+import { getProxiedGoogleDriveUrl } from '../../../utils/googleDriveImageHelper';
 
 export default function FeaturedTours() {
   const [tours, setTours] = useState([]);
@@ -48,7 +49,7 @@ export default function FeaturedTours() {
                 <div className="tour-card-image-wrapper">
                   <img
                     className="tour-card-image"
-                    src={tour.image || "/placeholder.svg"}
+                    src={getProxiedGoogleDriveUrl(tour.image || "/placeholder.svg")}
                     alt={tour.title}
                   />
                   <div className="tour-card-badge">Nổi bật</div>
