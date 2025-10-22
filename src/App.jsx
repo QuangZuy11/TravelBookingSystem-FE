@@ -29,7 +29,6 @@ import RoomFormPage from "./pages/provider/hotel/RoomFormPage";
 import BookingManagementPage from "./pages/provider/hotel/BookingManagementPage";
 import RoomListPage from "./pages/provider/hotel/RoomListPage";
 
-
 // Provider Layout
 import ProviderLayout from "./pages/provider/ProviderLayout";
 import ProviderGeneralDashboard from "./pages/provider/ProviderGeneralDashboard";
@@ -43,7 +42,7 @@ import HotelPage from "./pages/traveler/HotelPage";
 import HotelListPage from "./pages/traveler/HotelListPage";
 import Profile from "./pages/traveler/components/Hotel/Profile/Profile";
 import BookTourPage from "./pages/traveler/BookTourPage";
-
+import DetailTour from "./pages/traveler/components/BookTour/DetailTour";
 // Admin Pages
 import PendingProvidersList from "./pages/admin/PendingProvidersList";
 import ProviderDetailPage from "./pages/admin/ProviderDetailPage";
@@ -109,7 +108,7 @@ function App() {
             <Route path="/auth" element={<AuthPage />} />
             {/* Trang List Tour cho Traveler*/}
             <Route path="/tour" element={<BookTourPage />} />
-
+            <Route path="/tour/:id" element={<DetailTour />} />
             {/* Provider Registration - Must be accessible without full authentication */}
             <Route
               path="/register/service-provider"
@@ -137,7 +136,10 @@ function App() {
 
             <Route path="/ai-itinerary" element={<AIItineraryGenerator />} />
             <Route path="/my-itineraries" element={<MyItineraries />} />
-            <Route path="/ai-itinerary/:itineraryId" element={<ItineraryDetail />} />
+            <Route
+              path="/ai-itinerary/:itineraryId"
+              element={<ItineraryDetail />}
+            />
 
             {/* Protected Routes - Admin */}
             <Route

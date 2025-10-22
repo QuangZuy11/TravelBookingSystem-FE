@@ -70,20 +70,24 @@ export default function FeaturedTours() {
                     <span>{tour.duration_hours}</span>
                   </div>
 
-                  {/* Description */}
-                  {tour.description && tour.description.length > 0 && (
-                    <ul className="tour-card-description">
-                      {tour.description.slice(0, 3).map((item, i) => (
-                        <li key={i}>{item}</li>
-                      ))}
-                    </ul>
-                  )}
-
+                  {/* Highlights */}
+                  {Array.isArray(tour.highlights) &&
+                    tour.highlights.length > 0 && (
+                      <ul className="tour-card-description">
+                        {tour.highlights.slice(0, 3).map((item, i) => (
+                          <li key={i}>{item}</li>
+                        ))}
+                      </ul>
+                    )}
+                  {/* Rating */}
                   {/* Rating */}
                   <div className="tour-card-rating">
                     <Star className="tour-card-star-icon" />
-                    <span>
-                      {tour.rating} ({tour.total_rating} đánh giá)
+                    <span className="tour-card-rating-value">
+                      {tour.rating}
+                    </span>
+                    <span className="tour-card-rating-reviews">
+                      ({tour.total_rating} đánh giá)
                     </span>
                   </div>
 
