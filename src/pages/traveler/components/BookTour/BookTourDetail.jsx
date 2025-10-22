@@ -34,6 +34,8 @@ const BookTourDetail = () => {
         const result = await response.json();
 
         if (result.success && result.data) {
+          console.log("🔍 Tour data received:", result.data);
+          console.log("🔍 Itineraries:", result.data.itineraries);
           setTour(result.data);
         } else {
           throw new Error("Dữ liệu tour không hợp lệ");
@@ -271,6 +273,71 @@ const BookTourDetail = () => {
                 )}
               </div>
             </div>
+
+            {/* Itinerary Card */}
+            <div className="tour-card">
+              <h2 className="card-title">Lịch trình tour</h2>
+              <div className="itinerary">
+                {tour.itineraries && tour.itineraries.length > 0 ? (
+                  tour.itineraries.map((day, index) => (
+                    <div key={day._id || index} className="itinerary-day">
+                      <h3 className="day-title">
+                        Ngày {day.day}: {day.title}
+                      </h3>
+                      {day.description && (
+                        <p
+                          className="tour-description"
+                          style={{ marginBottom: "12px" }}
+                        >
+                          {day.description}
+                        </p>
+                      )}
+                      {day.activities && day.activities.length > 0 && (
+                        <ul className="activity-list">
+                          {day.activities.map((activity, actIndex) => (
+                            <li key={actIndex} className="activity-item">
+                              <span className="activity-bullet"></span>
+                              <span>{activity}</span>
+                            </li>
+                          ))}
+                        </ul>
+                      )}
+                      {index < tour.itineraries.length - 1 && (
+                        <div className="separator"></div>
+                      )}
+                    </div>
+                  ))
+                ) : (
+                  <div style={{ 
+                    textAlign: 'center', 
+                    padding: '40px 20px',
+                    color: '#6b7280',
+                    fontStyle: 'italic'
+                  }}>
+                    <p>Lịch trình chi tiết sẽ được cập nhật sớm nhất.</p>
+                    <p style={{ fontSize: '14px', marginTop: '8px' }}>
+                      Vui lòng liên hệ hotline để biết thêm thông tin.
+                    </p>
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {/* Debug section - Remove this after fixing */}
+            {process.env.NODE_ENV === 'development' && (
+              <div className="tour-card" style={{ background: '#f0f9ff', border: '1px solid #0ea5e9' }}>
+                <h2 className="card-title" style={{ color: '#0c4a6e' }}>Debug Info</h2>
+                <div style={{ padding: '16px', fontSize: '12px', fontFamily: 'monospace' }}>
+                  <p><strong>Tour ID:</strong> {tour.id}</p>
+                  <p><strong>Itineraries exists:</strong> {tour.itineraries ? 'Yes' : 'No'}</p>
+                  <p><strong>Itineraries length:</strong> {tour.itineraries ? tour.itineraries.length : 'N/A'}</p>
+                  <p><strong>Itineraries data:</strong></p>
+                  <pre style={{ background: '#f8fafc', padding: '8px', borderRadius: '4px', overflow: 'auto' }}>
+                    {JSON.stringify(tour.itineraries, null, 2)}
+                  </pre>
+                </div>
+              </div>
+            )}
 
             {/* What's Included Card */}
             {tour.included_services && tour.included_services.length > 0 && (
