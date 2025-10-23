@@ -34,8 +34,6 @@ const BookTourDetail = () => {
         const result = await response.json();
 
         if (result.success && result.data) {
-          console.log("🔍 Tour data received:", result.data);
-          console.log("🔍 Itineraries:", result.data.itineraries);
           setTour(result.data);
         } else {
           throw new Error("Dữ liệu tour không hợp lệ");
@@ -59,7 +57,9 @@ const BookTourDetail = () => {
       tourId: tour.id,
       tourName: tour.title,
       ...bookingData,
-      totalPrice: tour.price * bookingData.guests,
+      totalPrice: tour.discount
+        ? (tour.price * bookingData.guests * (100 - tour.discount)) / 100
+        : tour.price * bookingData.guests,
       bookingDate: new Date().toISOString(),
       status: "pending",
     };
@@ -81,7 +81,7 @@ const BookTourDetail = () => {
                 width: "50px",
                 height: "50px",
                 border: "4px solid #e5e7eb",
-                borderTopColor: "#0891b2",
+                borderTopColor: "#06b6d4",
                 borderRadius: "50%",
                 margin: "0 auto 20px",
                 animation: "spin 1s linear infinite",
@@ -105,8 +105,8 @@ const BookTourDetail = () => {
               textAlign: "center",
               padding: "60px 20px",
               background: "white",
-              borderRadius: "12px",
-              boxShadow: "0 1px 3px rgba(0,0,0,0.1)",
+              borderRadius: "16px",
+              boxShadow: "0 2px 8px rgba(0,0,0,0.08)",
             }}
           >
             <svg
@@ -143,10 +143,10 @@ const BookTourDetail = () => {
             <button
               onClick={() => window.location.reload()}
               style={{
-                backgroundColor: "#0891b2",
+                backgroundColor: "#06b6d4",
                 color: "white",
                 border: "none",
-                borderRadius: "6px",
+                borderRadius: "8px",
                 padding: "12px 24px",
                 fontSize: "16px",
                 fontWeight: "600",
@@ -162,7 +162,7 @@ const BookTourDetail = () => {
   }
 
   const totalPrice = tour.price * bookingData.guests;
-  const maxGuests = 20; // Default max guests
+  const maxGuests = 20;
 
   return (
     <div className="book-tour-page">
@@ -185,6 +185,9 @@ const BookTourDetail = () => {
                       "https://images.unsplash.com/photo-1559592413-7cec4d0cae2b?w=800";
                   }}
                 />
+                {tour.discount && (
+                  <div className="discount-badge">Giảm {tour.discount}%</div>
+                )}
               </div>
 
               <div className="tour-details">
@@ -263,7 +266,7 @@ const BookTourDetail = () => {
                 <p className="tour-description">{tour.description}</p>
 
                 {tour.highlights && tour.highlights.length > 0 && (
-                  <div className="tour-highlights">
+                  <div className="tour-highlights-detail">
                     {tour.highlights.map((highlight, index) => (
                       <span key={index} className="highlight-badge">
                         {highlight}
@@ -277,67 +280,75 @@ const BookTourDetail = () => {
             {/* Itinerary Card */}
             <div className="tour-card">
               <h2 className="card-title">Lịch trình tour</h2>
-              <div className="itinerary">
-                {tour.itineraries && tour.itineraries.length > 0 ? (
-                  tour.itineraries.map((day, index) => (
+              {tour.itineraries && tour.itineraries.length > 0 ? (
+                <div className="itinerary-list">
+                  {tour.itineraries.map((day, index) => (
                     <div key={day._id || index} className="itinerary-day">
                       <h3 className="day-title">
-                        Ngày {day.day}: {day.title}
+                        Ngày {day.day}
+                        {day.title && (
+                          <span className="day-subtitle"> - {day.title}</span>
+                        )}
                       </h3>
-                      {day.description && (
-                        <p
-                          className="tour-description"
-                          style={{ marginBottom: "12px" }}
-                        >
-                          {day.description}
-                        </p>
-                      )}
                       {day.activities && day.activities.length > 0 && (
-                        <ul className="activity-list">
-                          {day.activities.map((activity, actIndex) => (
-                            <li key={actIndex} className="activity-item">
+                        <div>
+                          {day.activities.map((activity, activityIndex) => (
+                            <div key={activityIndex} className="activity-item">
                               <span className="activity-bullet"></span>
-                              <span>{activity}</span>
-                            </li>
+                              <span className="activity-text">{activity}</span>
+                            </div>
                           ))}
-                        </ul>
-                      )}
-                      {index < tour.itineraries.length - 1 && (
-                        <div className="separator"></div>
+                        </div>
                       )}
                     </div>
-                  ))
-                ) : (
-                  <div style={{ 
-                    textAlign: 'center', 
-                    padding: '40px 20px',
-                    color: '#6b7280',
-                    fontStyle: 'italic'
-                  }}>
-                    <p>Lịch trình chi tiết sẽ được cập nhật sớm nhất.</p>
-                    <p style={{ fontSize: '14px', marginTop: '8px' }}>
-                      Vui lòng liên hệ hotline để biết thêm thông tin.
+                  ))}
+                </div>
+              ) : (
+                <div className="no-itinerary">
+                  <div
+                    style={{
+                      textAlign: "center",
+                      padding: "40px 20px",
+                      color: "#6b7280",
+                    }}
+                  >
+                    <svg
+                      style={{
+                        width: "48px",
+                        height: "48px",
+                        margin: "0 auto 16px",
+                        color: "#d1d5db",
+                      }}
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"
+                      />
+                    </svg>
+                    <h3
+                      style={{
+                        fontSize: "18px",
+                        fontWeight: "600",
+                        color: "#374151",
+                        marginBottom: "8px",
+                      }}
+                    >
+                      Lịch trình đang được cập nhật
+                    </h3>
+                    <p style={{ fontSize: "14px", marginBottom: "0" }}>
+                      Lịch trình chi tiết của tour này sẽ được cập nhật sớm
+                      nhất. Vui lòng liên hệ với chúng tôi để biết thêm thông
+                      tin.
                     </p>
                   </div>
-                )}
-              </div>
-            </div>
-
-            {/* Debug section - Remove this after fixing */}
-            {process.env.NODE_ENV === 'development' && (
-              <div className="tour-card" style={{ background: '#f0f9ff', border: '1px solid #0ea5e9' }}>
-                <h2 className="card-title" style={{ color: '#0c4a6e' }}>Debug Info</h2>
-                <div style={{ padding: '16px', fontSize: '12px', fontFamily: 'monospace' }}>
-                  <p><strong>Tour ID:</strong> {tour.id}</p>
-                  <p><strong>Itineraries exists:</strong> {tour.itineraries ? 'Yes' : 'No'}</p>
-                  <p><strong>Itineraries length:</strong> {tour.itineraries ? tour.itineraries.length : 'N/A'}</p>
-                  <p><strong>Itineraries data:</strong></p>
-                  <pre style={{ background: '#f8fafc', padding: '8px', borderRadius: '4px', overflow: 'auto' }}>
-                    {JSON.stringify(tour.itineraries, null, 2)}
-                  </pre>
                 </div>
-              </div>
-            )}
+              )}
+            </div>
 
             {/* What's Included Card */}
             {tour.included_services && tour.included_services.length > 0 && (
@@ -526,18 +537,36 @@ const BookTourDetail = () => {
                   />
                 </div>
 
-                <div className="separator"></div>
-
                 {/* Price Summary */}
                 <div className="price-summary">
                   <div className="price-row">
                     <span>Giá tour ({bookingData.guests} khách)</span>
                     <span>{formatPrice(tour.price * bookingData.guests)}</span>
                   </div>
+                  {tour.discount && (
+                    <div className="price-row discount">
+                      <span>Giảm giá</span>
+                      <span>
+                        -
+                        {formatPrice(
+                          (tour.price * bookingData.guests * tour.discount) /
+                            100
+                        )}
+                      </span>
+                    </div>
+                  )}
+                  <div className="separator"></div>
                   <div className="price-row total">
                     <span>Tổng cộng</span>
                     <span className="total-price">
-                      {formatPrice(totalPrice)}
+                      {formatPrice(
+                        tour.discount
+                          ? (tour.price *
+                              bookingData.guests *
+                              (100 - tour.discount)) /
+                              100
+                          : totalPrice
+                      )}
                     </span>
                   </div>
                 </div>

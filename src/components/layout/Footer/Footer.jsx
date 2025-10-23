@@ -82,11 +82,11 @@ export default function Footer() {
             <h3 className="footer-title">Liên Hệ</h3>
             <div className="footer-contact">
               <div className="contact-item">
-                <Phone className="contact-icon" />
+                <Phone className="contact-icon-footer" />
                 <span>1900-1234</span>
               </div>
               <div className="contact-item">
-                <Mail className="contact-icon" />
+                <Mail className="contact-icon-footer" />
                 <span>info@viettravel.com</span>
               </div>
             </div>
