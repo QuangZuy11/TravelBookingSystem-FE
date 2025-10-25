@@ -217,8 +217,8 @@ const ItineraryForm = ({ tourId, basicInfo, existingItineraries = [], isEditMode
                         description: formData.description,
                         meals: formData.meals
                     }, {
-                headers: { Authorization: `Bearer ${token}` }
-            }
+                    headers: { Authorization: `Bearer ${token}` }
+                }
                 );
                 itineraryId = existingItinerary._id;
 
@@ -252,7 +252,9 @@ const ItineraryForm = ({ tourId, basicInfo, existingItineraries = [], isEditMode
                     try {
                         const deleteUrl = `http://localhost:3000/api/itineraries/${item.itineraryId}/activities/${item.activityId}`;
                         console.log('🔥 Deleting activity:', deleteUrl);
-                        await axios.delete(deleteUrl);
+                        await axios.delete(deleteUrl, {
+                            headers: { Authorization: `Bearer ${token}` }
+                        });
                         console.log('✅ Successfully deleted activity:', item.activityId);
                     } catch (error) {
                         console.error('❌ Error deleting activity:', error);
@@ -279,7 +281,7 @@ const ItineraryForm = ({ tourId, basicInfo, existingItineraries = [], isEditMode
                             description: activity.description,
                             location: activity.location
                         },
-                { headers: { Authorization: `Bearer ${token}` } }
+                        { headers: { Authorization: `Bearer ${token}` } }
                     );
                 } else {
                     // CREATE new activity
@@ -406,7 +408,9 @@ const ItineraryForm = ({ tourId, basicInfo, existingItineraries = [], isEditMode
         try {
             setLoading(true);
             // Delete itinerary from backend
-            await axios.delete(`http://localhost:3000/api/itineraries/${itinerary._id}`);
+            await axios.delete(`http://localhost:3000/api/itineraries/${itinerary._id}`, {
+                headers: { Authorization: `Bearer ${token}` }
+            });
 
             // Remove from state
             setItineraries(prev => prev.filter(it => it.day_number !== dayNumber));

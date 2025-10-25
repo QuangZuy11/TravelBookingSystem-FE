@@ -38,8 +38,13 @@ const EditHotelPage = () => {
 
     const handleSubmit = async (formData) => {
         try {
-            await axios.put(`/api/hotel/provider/${providerId}/hotels/${hotelId}`, formData,
-                { headers: { Authorization: `Bearer ${token}` } });
+            console.log('📤 UPDATE: Sending FormData to backend...');
+            await axios.put(`/api/hotel/provider/${providerId}/hotels/${hotelId}`, formData, {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                    'Content-Type': 'multipart/form-data'
+                }
+            });
             alert('Hotel updated successfully!');
             navigate(`/provider/hotels/${hotelId}`);
         } catch (err) {

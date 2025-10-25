@@ -63,7 +63,61 @@ export const RoomForm = ({ initialData, onSubmit, hotelId }) => {
         }));
     };
 
-    // Cleanup blob URLs when component unmounts
+    // 🗑️ Remove image by index
+    const handleRemoveImage = (indexToRemove) => {
+        setFormData(prev => {
+            const updatedImages = prev.images.filter((_, index) => index !== indexToRemove);
+
+            // Cleanup blob URL if it's a new upload
+            const imageToRemove = prev.images[indexToRemove];
+            if (imageToRemove && imageToRemove.preview && imageToRemove.preview.startsWith('blob:')) {
+                URL.revokeObjectURL(imageToRemove.preview);
+            }
+
+            return {
+                ...prev,
+                images: updatedImages
+            };
+        });
+    };
+
+    // ⬆️ Move image up
+    const handleMoveImageUp = (index) => {
+        if (index === 0) return;
+
+        setFormData(prev => {
+            const newImages = [...prev.images];
+            console.log('🔼 Moving image up from index', index, 'to', index - 1);
+            console.log('Before swap:', newImages[index - 1], newImages[index]);
+
+            [newImages[index - 1], newImages[index]] = [newImages[index], newImages[index - 1]];
+
+            console.log('After swap:', newImages[index - 1], newImages[index]);
+            return {
+                ...prev,
+                images: newImages
+            };
+        });
+    };
+
+    // ⬇️ Move image down
+    const handleMoveImageDown = (index) => {
+        if (index === formData.images.length - 1) return;
+
+        setFormData(prev => {
+            const newImages = [...prev.images];
+            console.log('🔽 Moving image down from index', index, 'to', index + 1);
+            console.log('Before swap:', newImages[index], newImages[index + 1]);
+
+            [newImages[index], newImages[index + 1]] = [newImages[index + 1], newImages[index]];
+
+            console.log('After swap:', newImages[index], newImages[index + 1]);
+            return {
+                ...prev,
+                images: newImages
+            };
+        });
+    };    // Cleanup blob URLs when component unmounts
     React.useEffect(() => {
         return () => {
             // Revoke all blob URLs
@@ -567,15 +621,171 @@ export const RoomForm = ({ initialData, onSubmit, hotelId }) => {
                         <div style={imageGridStyle}>
                             {formData.images.map((image, index) => {
                                 const imageUrl = typeof image === 'string' ? image : image.preview;
+                                const displayUrl = getProxiedGoogleDriveUrl(imageUrl);
+                                const isGDrive = imageUrl && imageUrl.includes('drive.google.com');
+
+                                // Generate unique key (use URL or preview as key instead of index)
+                                const uniqueKey = typeof image === 'string'
+                                    ? image
+                                    : (image.preview || image.name || `img-${index}`);
+
                                 return (
-                                    <img
-                                        key={index}
-                                        src={getProxiedGoogleDriveUrl(imageUrl)}
-                                        alt={`Room preview ${index + 1}`}
-                                        style={imagePreviewStyle}
-                                        onMouseEnter={(e) => e.target.style.transform = 'scale(1.05)'}
-                                        onMouseLeave={(e) => e.target.style.transform = 'scale(1)'}
-                                    />
+                                    <div key={uniqueKey} style={{
+                                        position: 'relative',
+                                        borderRadius: '12px',
+                                        overflow: 'hidden',
+                                        boxShadow: '0 4px 12px rgba(0,0,0,0.1)'
+                                    }}>
+                                        <img
+                                            src={displayUrl}
+                                            alt={`Room preview ${index + 1}`}
+                                            style={imagePreviewStyle}
+                                            onError={(e) => {
+                                                e.target.style.opacity = '0.5';
+                                                e.target.alt = 'Failed to load';
+                                            }}
+                                        />
+
+                                        {/* Image Controls Overlay */}
+                                        <div style={{
+                                            position: 'absolute',
+                                            top: 0,
+                                            left: 0,
+                                            right: 0,
+                                            background: 'linear-gradient(180deg, rgba(0,0,0,0.7) 0%, transparent 100%)',
+                                            padding: '8px',
+                                            display: 'flex',
+                                            justifyContent: 'space-between',
+                                            alignItems: 'flex-start'
+                                        }}>
+                                            {/* Image Number */}
+                                            <span style={{
+                                                background: 'rgba(102, 126, 234, 0.95)',
+                                                color: 'white',
+                                                padding: '4px 10px',
+                                                borderRadius: '6px',
+                                                fontSize: '0.85rem',
+                                                fontWeight: '600'
+                                            }}>
+                                                #{index + 1}
+                                            </span>
+
+                                            {/* Control Buttons */}
+                                            <div style={{ display: 'flex', gap: '4px' }}>
+                                                {/* Move Up */}
+                                                {index > 0 && (
+                                                    <button
+                                                        type="button"
+                                                        onClick={() => handleMoveImageUp(index)}
+                                                        style={{
+                                                            background: 'rgba(255, 255, 255, 0.95)',
+                                                            border: 'none',
+                                                            borderRadius: '6px',
+                                                            width: '32px',
+                                                            height: '32px',
+                                                            cursor: 'pointer',
+                                                            display: 'flex',
+                                                            alignItems: 'center',
+                                                            justifyContent: 'center',
+                                                            fontSize: '1.1rem',
+                                                            transition: 'all 0.2s'
+                                                        }}
+                                                        onMouseEnter={(e) => {
+                                                            e.currentTarget.style.background = '#667eea';
+                                                            e.currentTarget.style.transform = 'scale(1.1)';
+                                                        }}
+                                                        onMouseLeave={(e) => {
+                                                            e.currentTarget.style.background = 'rgba(255, 255, 255, 0.95)';
+                                                            e.currentTarget.style.transform = 'scale(1)';
+                                                        }}
+                                                        title="Move up"
+                                                    >
+                                                        ⬆️
+                                                    </button>
+                                                )}
+
+                                                {/* Move Down */}
+                                                {index < formData.images.length - 1 && (
+                                                    <button
+                                                        type="button"
+                                                        onClick={() => handleMoveImageDown(index)}
+                                                        style={{
+                                                            background: 'rgba(255, 255, 255, 0.95)',
+                                                            border: 'none',
+                                                            borderRadius: '6px',
+                                                            width: '32px',
+                                                            height: '32px',
+                                                            cursor: 'pointer',
+                                                            display: 'flex',
+                                                            alignItems: 'center',
+                                                            justifyContent: 'center',
+                                                            fontSize: '1.1rem',
+                                                            transition: 'all 0.2s'
+                                                        }}
+                                                        onMouseEnter={(e) => {
+                                                            e.currentTarget.style.background = '#667eea';
+                                                            e.currentTarget.style.transform = 'scale(1.1)';
+                                                        }}
+                                                        onMouseLeave={(e) => {
+                                                            e.currentTarget.style.background = 'rgba(255, 255, 255, 0.95)';
+                                                            e.currentTarget.style.transform = 'scale(1)';
+                                                        }}
+                                                        title="Move down"
+                                                    >
+                                                        ⬇️
+                                                    </button>
+                                                )}
+
+                                                {/* Delete */}
+                                                <button
+                                                    type="button"
+                                                    onClick={() => handleRemoveImage(index)}
+                                                    style={{
+                                                        background: 'rgba(239, 68, 68, 0.95)',
+                                                        border: 'none',
+                                                        borderRadius: '6px',
+                                                        width: '32px',
+                                                        height: '32px',
+                                                        cursor: 'pointer',
+                                                        display: 'flex',
+                                                        alignItems: 'center',
+                                                        justifyContent: 'center',
+                                                        fontSize: '1.1rem',
+                                                        color: 'white',
+                                                        transition: 'all 0.2s'
+                                                    }}
+                                                    onMouseEnter={(e) => {
+                                                        e.currentTarget.style.background = '#dc2626';
+                                                        e.currentTarget.style.transform = 'scale(1.1)';
+                                                    }}
+                                                    onMouseLeave={(e) => {
+                                                        e.currentTarget.style.background = 'rgba(239, 68, 68, 0.95)';
+                                                        e.currentTarget.style.transform = 'scale(1)';
+                                                    }}
+                                                    title="Delete image"
+                                                >
+                                                    🗑️
+                                                </button>
+                                            </div>
+                                        </div>
+
+                                        {/* Google Drive Badge */}
+                                        {isGDrive && (
+                                            <span style={{
+                                                position: 'absolute',
+                                                bottom: '8px',
+                                                left: '8px',
+                                                background: 'rgba(102, 126, 234, 0.95)',
+                                                color: 'white',
+                                                padding: '4px 8px',
+                                                borderRadius: '6px',
+                                                fontSize: '0.75rem',
+                                                fontWeight: '600'
+                                            }}>
+                                                🔗 Google Drive
+                                            </span>
+                                        )}
+                                    </div>
                                 );
                             })}
                         </div>

@@ -43,8 +43,8 @@ const BudgetForm = ({ tourId, itineraries, existingBudgetItems = [], isEditMode,
                 // Fetch itineraries cho tour này
                 const itinerariesResponse = await axios.get(
                     `http://localhost:3000/api/itineraries/tour/${tourId}`, {
-                headers: { Authorization: `Bearer ${token}` }
-            }
+                    headers: { Authorization: `Bearer ${token}` }
+                }
                 );
 
                 const itinerariesData = itinerariesResponse.data.data || [];
@@ -55,8 +55,8 @@ const BudgetForm = ({ tourId, itineraries, existingBudgetItems = [], isEditMode,
                         try {
                             const activitiesResponse = await axios.get(
                                 `http://localhost:3000/api/itineraries/${itinerary._id}/activities`, {
-                headers: { Authorization: `Bearer ${token}` }
-            }
+                                headers: { Authorization: `Bearer ${token}` }
+                            }
                             );
                             return {
                                 ...itinerary,
@@ -186,7 +186,9 @@ const BudgetForm = ({ tourId, itineraries, existingBudgetItems = [], isEditMode,
                     if (item.itinerary_id) {
                         try {
                             // Delete by itinerary_id instead of tour_id
-                            await axios.delete(`http://localhost:3000/api/budget-breakdowns/itinerary/${item.itinerary_id}`);
+                            await axios.delete(`http://localhost:3000/api/budget-breakdowns/itinerary/${item.itinerary_id}`, {
+                                headers: { Authorization: `Bearer ${token}` }
+                            });
                         } catch (error) {
                             console.log('No existing budget to delete or delete failed');
                         }
@@ -214,8 +216,8 @@ const BudgetForm = ({ tourId, itineraries, existingBudgetItems = [], isEditMode,
                     console.log('📤 Sending budget item:', payload);
 
                     await axios.post('http://localhost:3000/api/budget-breakdowns', payload, {
-                headers: { Authorization: `Bearer ${token}` }
-            });
+                        headers: { Authorization: `Bearer ${token}` }
+                    });
                 }
             }
 
