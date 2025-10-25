@@ -39,6 +39,7 @@ import {
     RestartAlt as RestartAltIcon,
 } from '@mui/icons-material';
 import '../HotelList/HotelList.css';
+import { getProxiedGoogleDriveUrl } from '../../../../../utils/googleDriveImageHelper';
 
 // Danh sách tiện nghi (để render checkbox + icon)
 const amenitiesData = [
@@ -431,7 +432,12 @@ function HotelCard({ hotel, isFavorite, onToggleFavorite, onBook }) {
                             anchorOrigin={{ vertical: 'top', horizontal: 'left' }}
                             className="discount-badge"
                         >
-                            <CardMedia component="img" image={hotel.image} alt={hotel.name} className="hotel-image" />
+                            <CardMedia
+                                component="img"
+                                image={getProxiedGoogleDriveUrl(hotel.image)}
+                                alt={hotel.name}
+                                className="hotel-image"
+                            />
                         </Badge>
 
                         <Tooltip title={isFavorite ? 'Bỏ yêu thích' : 'Thêm yêu thích'}>

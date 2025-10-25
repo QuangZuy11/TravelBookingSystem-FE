@@ -1,11 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import Breadcrumb from '../../shared/Breadcrumb';
+import DestinationSelector from '../../common/DestinationSelector';
 import { getProxiedGoogleDriveUrl, isGoogleDriveUrl, getShareUrl } from '../../../utils/googleDriveImageHelper';
 
 export const HotelForm = ({ initialData, onSubmit }) => {
     const [formData, setFormData] = useState({
         name: '',
         description: '',
+        destination_id: '', // 📍 Thêm field mới cho destination
         address: {
             street: '',
             city: '',
@@ -32,6 +34,80 @@ export const HotelForm = ({ initialData, onSubmit }) => {
     });
 
     const [activeSection, setActiveSection] = useState(null);
+    const [googleMapsLink, setGoogleMapsLink] = useState('');
+    const [coordinateError, setCoordinateError] = useState('');
+
+    // Function to extract coordinates from Google Maps link
+    const extractCoordinatesFromLink = (link) => {
+        try {
+            setCoordinateError('');
+
+            // Pattern 1: /@lat,lng,zoom format
+            const pattern1 = /@(-?\d+\.\d+),(-?\d+\.\d+)/;
+            const match1 = link.match(pattern1);
+
+            if (match1) {
+                return {
+                    latitude: parseFloat(match1[1]),
+                    longitude: parseFloat(match1[2])
+                };
+            }
+
+            // Pattern 2: /place/name/@lat,lng format
+            const pattern2 = /place\/[^/]+\/@(-?\d+\.\d+),(-?\d+\.\d+)/;
+            const match2 = link.match(pattern2);
+
+            if (match2) {
+                return {
+                    latitude: parseFloat(match2[1]),
+                    longitude: parseFloat(match2[2])
+                };
+            }
+
+            // Pattern 3: !3d (latitude) !4d (longitude) format
+            const latPattern = /!3d(-?\d+\.\d+)/;
+            const lngPattern = /!4d(-?\d+\.\d+)/;
+            const latMatch = link.match(latPattern);
+            const lngMatch = link.match(lngPattern);
+
+            if (latMatch && lngMatch) {
+                return {
+                    latitude: parseFloat(latMatch[1]),
+                    longitude: parseFloat(lngMatch[1])
+                };
+            }
+
+            setCoordinateError('❌ Không tìm thấy tọa độ trong link. Vui lòng kiểm tra lại.');
+            return null;
+        } catch (error) {
+            setCoordinateError('❌ Lỗi khi xử lý link Google Maps.');
+            console.error('Error extracting coordinates:', error);
+            return null;
+        }
+    };
+
+    // Handle Google Maps link input
+    const handleGoogleMapsLinkChange = (e) => {
+        const link = e.target.value;
+        setGoogleMapsLink(link);
+
+        if (link.trim() === '') {
+            setCoordinateError('');
+            return;
+        }
+
+        const coords = extractCoordinatesFromLink(link);
+        if (coords) {
+            setFormData(prev => ({
+                ...prev,
+                address: {
+                    ...prev.address,
+                    coordinates: coords
+                }
+            }));
+            setCoordinateError('✅ Đã lấy tọa độ thành công!');
+        }
+    };
 
     useEffect(() => {
         if (initialData) {
@@ -451,6 +527,20 @@ export const HotelForm = ({ initialData, onSubmit }) => {
                             placeholder="Describe your hotel"
                         />
                     </div>
+
+                    {/* Destination Selector */}
+                    <div style={{ marginBottom: '1.5rem' }}>
+                        <DestinationSelector
+                            selectedId={formData.destination_id}
+                            onChange={(destinationId) => {
+                                setFormData(prev => ({
+                                    ...prev,
+                                    destination_id: destinationId
+                                }));
+                            }}
+                        />
+                    </div>
+
                     <div style={gridStyle}>
                         <div>
                             <label style={labelStyle}>Category</label>
@@ -566,6 +656,62 @@ export const HotelForm = ({ initialData, onSubmit }) => {
                                 placeholder="70000"
                             />
                         </div>
+                    </div>
+
+                    {/* Google Maps Link Input */}
+                    <div style={{ marginTop: '2rem', padding: '1.5rem', background: 'linear-gradient(135deg, #e0e7ff 0%, #f3e8ff 100%)', borderRadius: '12px', border: '2px solid #667eea' }}>
+                        <h3 style={{ fontSize: '1.1rem', fontWeight: '600', color: '#667eea', marginBottom: '1rem', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                            <span style={{ fontSize: '1.5rem' }}>🗺️</span>
+                            Vị Trí Google Maps (Tự động lấy tọa độ)
+                        </h3>
+                        <label style={{ ...labelStyle, color: '#667eea' }}>
+                            Dán link Google Maps của khách sạn
+                        </label>
+                        <input
+                            type="text"
+                            value={googleMapsLink}
+                            onChange={handleGoogleMapsLinkChange}
+                            style={{
+                                ...inputStyle,
+                                width: '100%',
+                                borderColor: coordinateError.includes('✅') ? '#10b981' : coordinateError.includes('❌') ? '#ef4444' : '#667eea'
+                            }}
+                            placeholder="https://www.google.com/maps/place/..."
+                        />
+                        {coordinateError && (
+                            <p style={{
+                                marginTop: '0.5rem',
+                                fontSize: '0.875rem',
+                                fontWeight: '600',
+                                color: coordinateError.includes('✅') ? '#10b981' : '#ef4444'
+                            }}>
+                                {coordinateError}
+                            </p>
+                        )}
+                        {formData.address.coordinates.latitude !== 0 && formData.address.coordinates.longitude !== 0 && (
+                            <div style={{ marginTop: '1rem', padding: '1rem', background: 'white', borderRadius: '8px', border: '2px solid #10b981' }}>
+                                <p style={{ fontSize: '0.875rem', color: '#059669', marginBottom: '0.5rem', fontWeight: '600' }}>
+                                    📍 Tọa độ hiện tại:
+                                </p>
+                                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
+                                    <div>
+                                        <span style={{ fontSize: '0.75rem', color: '#6b7280', fontWeight: '600' }}>Latitude:</span>
+                                        <p style={{ fontSize: '1rem', color: '#111827', fontWeight: '700', marginTop: '4px' }}>
+                                            {formData.address.coordinates.latitude}
+                                        </p>
+                                    </div>
+                                    <div>
+                                        <span style={{ fontSize: '0.75rem', color: '#6b7280', fontWeight: '600' }}>Longitude:</span>
+                                        <p style={{ fontSize: '1rem', color: '#111827', fontWeight: '700', marginTop: '4px' }}>
+                                            {formData.address.coordinates.longitude}
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                        )}
+                        <p style={{ fontSize: '0.75rem', color: '#6b7280', marginTop: '1rem', lineHeight: '1.5' }}>
+                            💡 <strong>Hướng dẫn:</strong> Mở Google Maps → Tìm vị trí khách sạn → Click "Chia sẻ" → Sao chép link → Dán vào ô trên
+                        </p>
                     </div>
                 </div>
 

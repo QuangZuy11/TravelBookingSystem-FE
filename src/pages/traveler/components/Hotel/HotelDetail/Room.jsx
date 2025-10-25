@@ -1,6 +1,7 @@
 import { useState, useContext, useEffect } from 'react';
 import { FaHotel, FaMapMarkerAlt, FaUser, FaPhone, FaEnvelope, FaCalendarAlt, FaBed, FaCreditCard, FaQrcode } from 'react-icons/fa';
 import { AuthContext } from '../../../../../contexts/AuthContext';
+import { getProxiedGoogleDriveUrl } from '../../../../../utils/googleDriveImageHelper';
 import './HotelDetail.css';
 
 export default function Rooms({ roomsData, loading, error, hotelData }) {
@@ -415,7 +416,7 @@ export default function Rooms({ roomsData, loading, error, hotelData }) {
 
         // Lấy ảnh đầu tiên của phòng đầu tiên trong list phòng để hiển thị cho loại phòng này
         const roomImage = sampleRoom?.images && sampleRoom.images.length > 0
-            ? sampleRoom.images[0]
+            ? getProxiedGoogleDriveUrl(sampleRoom.images[0])
             : "/placeholder.svg";
 
         return {

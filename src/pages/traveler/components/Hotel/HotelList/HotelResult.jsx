@@ -47,6 +47,7 @@ import {
     LocalLaundryService as LaundryServiceIcon
 } from '@mui/icons-material';
 import '../../Hotel/HotelList/HotelList.css';
+import { getProxiedGoogleDriveUrl } from '../../../../../utils/googleDriveImageHelper';
 
 const amenitiesData = [
     { label: 'Bể bơi', value: 'Pool', icon: PoolIcon },
@@ -138,7 +139,7 @@ function HotelResult({
             discount: 0, // chưa có trường discount ở BE
             freeCancel: false, // có thể map từ policies nếu có quy ước
             image: Array.isArray(h.images) && h.images[0]
-                ? h.images[0]
+                ? getProxiedGoogleDriveUrl(h.images[0])
                 : 'https://images.unsplash.com/photo-1566073771259-6a8506099945?w=1200&h=800&fit=crop',
             amenities: Array.isArray(h.amenities) ? h.amenities.map(a => String(a)) : [], // Giữ nguyên format từ backend
             availableRooms: h?.availableRooms != null ? Number(h.availableRooms) : 0, // map số phòng trống
