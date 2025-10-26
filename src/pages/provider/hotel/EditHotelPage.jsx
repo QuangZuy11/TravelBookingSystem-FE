@@ -8,7 +8,11 @@ import { ErrorAlert } from '../../../components/shared/ErrorAlert';
 const EditHotelPage = () => {
     const navigate = useNavigate();
     const { hotelId } = useParams();
-    const providerId = localStorage.getItem('providerId');
+
+    // Get provider _id from localStorage
+    const provider = localStorage.getItem('provider');
+    const providerId = provider ? JSON.parse(provider)._id : null;
+
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [hotel, setHotel] = useState(null);

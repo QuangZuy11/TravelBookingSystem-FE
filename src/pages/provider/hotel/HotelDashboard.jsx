@@ -21,7 +21,18 @@ const HotelDashboard = () => {
   const [hoveredRow, setHoveredRow] = useState(null);
 
   const getProviderId = () => {
-    return providerId || localStorage.getItem('providerId');
+    if (providerId) return providerId;
+
+    // Get provider _id from localStorage
+    const provider = localStorage.getItem('provider');
+    if (provider) {
+      try {
+        return JSON.parse(provider)._id;
+      } catch (e) {
+        console.error('Error parsing provider:', e);
+      }
+    }
+    return null;
   };
 
   const fetchHotels = async () => {
@@ -32,10 +43,10 @@ const HotelDashboard = () => {
         setError('Provider ID not found');
         return;
       }
-      
+
       const response = await axios.get(`/api/hotel/provider/${currentProviderId}/hotels`, {
-                headers: { Authorization: `Bearer ${token}` }
-            });
+        headers: { Authorization: `Bearer ${token}` }
+      });
       const hotelList = response.data.data || [];
       setHotels(hotelList);
 
@@ -251,8 +262,8 @@ const HotelDashboard = () => {
   const occupancyFillStyle = (percent) => ({
     height: '100%',
     background: percent > 80 ? 'linear-gradient(90deg, #10b981 0%, #059669 100%)' :
-                percent > 50 ? 'linear-gradient(90deg, #f59e0b 0%, #d97706 100%)' :
-                'linear-gradient(90deg, #ef4444 0%, #dc2626 100%)',
+      percent > 50 ? 'linear-gradient(90deg, #f59e0b 0%, #d97706 100%)' :
+        'linear-gradient(90deg, #ef4444 0%, #dc2626 100%)',
     borderRadius: '4px',
     transition: 'width 0.3s ease'
   });
@@ -392,16 +403,16 @@ const HotelDashboard = () => {
               </thead>
               <tbody>
                 {hotels.map((hotel, index) => {
-                  const occupancyPercent = (hotel.occupiedRooms && hotel.totalRooms) 
-                    ? (hotel.occupiedRooms / hotel.totalRooms) * 100 
+                  const occupancyPercent = (hotel.occupiedRooms && hotel.totalRooms)
+                    ? (hotel.occupiedRooms / hotel.totalRooms) * 100
                     : 0;
-                  
+
                   return (
                     <tr
                       key={hotel._id}
                       style={{
                         ...trStyle,
-                        ...(hoveredRow === index ? { 
+                        ...(hoveredRow === index ? {
                           background: 'white',
                           boxShadow: '0 4px 15px rgba(0,0,0,0.1)'
                         } : {})
