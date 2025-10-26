@@ -21,11 +21,20 @@ const CreateTourWizard = () => {
         budgetItems: []
     });
 
-    const providerId = localStorage.getItem('user')
-        ? JSON.parse(localStorage.getItem('user'))?.providerId
+    // Get provider _id from localStorage
+    const provider = localStorage.getItem('provider')
+        ? JSON.parse(localStorage.getItem('provider'))
         : null;
+    const providerId = provider?._id || null;
 
     const token = localStorage.getItem('token');
+
+    console.log('🔐 CreateTourWizard - Provider Info:', {
+        provider,
+        providerId,
+        isEditMode,
+        editTourId
+    });
 
     // Load tour data for edit mode
     useEffect(() => {
@@ -51,6 +60,8 @@ const CreateTourWizard = () => {
                 );
                 const itinerariesData = itinerariesResponse.data.data || [];
 
+                console.log('📋 Loaded itineraries:', itinerariesData);
+
                 // Load activities for each itinerary
                 const itinerariesWithActivities = await Promise.all(
                     itinerariesData.map(async (itinerary) => {
@@ -74,6 +85,8 @@ const CreateTourWizard = () => {
                     })
                 );
 
+                console.log('✅ Itineraries with activities:', itinerariesWithActivities);
+
                 // 3. Extract budget items from itineraries (already included in response)
                 const budgetData = itinerariesWithActivities.flatMap(itinerary =>
                     itinerary.budget_breakdowns || []
@@ -86,6 +99,13 @@ const CreateTourWizard = () => {
                     basicInfo: tourInfo,
                     itineraries: itinerariesWithActivities,
                     budgetItems: budgetData
+                });
+
+                console.log('💾 Final tourData set:', {
+                    tourId: editTourId,
+                    basicInfo: tourInfo,
+                    itinerariesCount: itinerariesWithActivities.length,
+                    budgetItemsCount: budgetData.length
                 });
 
                 toast.success('Đã tải dữ liệu tour!');
@@ -137,6 +157,7 @@ const CreateTourWizard = () => {
     const handleBack = () => {
         if (currentStep > 1) {
             setCurrentStep(currentStep - 1);
+            // Data is preserved in tourData state, no need to reset
         }
     };
 

@@ -10,7 +10,10 @@ import Modal from '../../../components/shared/Modal';
 import { getProxiedGoogleDriveUrl } from '../../../utils/googleDriveImageHelper';
 
 const HotelDetailsPage = () => {
-    const providerId = localStorage.getItem('providerId');
+    // Get provider _id from localStorage
+    const provider = localStorage.getItem('provider');
+    const providerId = provider ? JSON.parse(provider)._id : null;
+
     const { hotelId } = useParams();
     const navigate = useNavigate();
     const [hotel, setHotel] = useState(null);

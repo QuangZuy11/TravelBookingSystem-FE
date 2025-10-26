@@ -14,8 +14,12 @@ import {
     LocalLaundryService as LaundryServiceIcon,
     Star as DefaultIcon
 } from '@mui/icons-material';
+import { useState } from 'react';
+import { getProxiedGoogleDriveUrl } from '../../../../../utils/googleDriveImageHelper';
 
-export default function Overview({ hotelData }) {
+export default function Overview({ hotelData, destination }) {
+    // State for image carousel
+    const [currentImageIndex, setCurrentImageIndex] = useState(0);
     // Helper function to get star display based on category
     const getStarDisplay = (category) => {
         const starMap = {
@@ -115,35 +119,181 @@ export default function Overview({ hotelData }) {
         return <div>Đang tải thông tin khách sạn...</div>;
     }
 
-    const mainImage = hotelData.images && hotelData.images.length > 0 ? hotelData.images[0] : "/luxury-hotel-room.png";
-    const thumbnailImages = hotelData.images && hotelData.images.length > 1 ? hotelData.images.slice(1) : [];
+    // Chỉ lấy ảnh có sẵn từ backend, không dùng placeholder
+    const hotelImages = hotelData.images && hotelData.images.length > 0
+        ? hotelData.images.map(img => getProxiedGoogleDriveUrl(img))
+        : [];
+
+    const hasMultipleImages = hotelImages.length > 1;
+
+    // Handlers for carousel navigation
+    const handlePrevImage = () => {
+        setCurrentImageIndex(prev =>
+            prev === 0 ? hotelImages.length - 1 : prev - 1
+        );
+    };
+
+    const handleNextImage = () => {
+        setCurrentImageIndex(prev =>
+            prev === hotelImages.length - 1 ? 0 : prev + 1
+        );
+    };
 
     return (
         <section id="overview">
-            {/* Gallery Section */}
-            <div className="hotel-detail-gallery-section">
-                <div className="hotel-detail-gallery-container">
-                    <div className="hotel-detail-main-image">
-                        <img src={mainImage} alt={`${hotelData.name} - Phòng khách sạn chính`} />
-                    </div>
-                    <div className="hotel-detail-thumbnail-grid">
-                        {thumbnailImages.map((image, index) => (
-                            <img key={index} src={image} alt={`${hotelData.name} - Hình ${index + 2}`} />
-                        ))}
-                        {/* Fallback images if not enough images from API */}
-                        {thumbnailImages.length < 6 && (
-                            <>
-                                <img src="/hotel-bedroom.png" alt="Phòng ngủ" />
-                                <img src="/modern-hotel-bathroom.png" alt="Phòng tắm" />
-                                <img src="/hotel-balcony-ocean-view.png" alt="Tầm nhìn" />
-                                <img src="/elegant-hotel-lobby.png" alt="Sảnh khách sạn" />
-                                <img src="/hotel-restaurant.png" alt="Nhà hàng" />
-                                <img src="/hotel-pool.png" alt="Hồ bơi" />
-                            </>
+            {/* Gallery Section with Carousel */}
+            {hotelImages.length > 0 && (
+                <div className="hotel-detail-gallery-section">
+                    <div className="hotel-detail-gallery-container">
+                        <div className="hotel-detail-main-image" style={{ position: 'relative' }}>
+                            <img
+                                src={hotelImages[currentImageIndex]}
+                                alt={`${hotelData.name} - Hình ${currentImageIndex + 1}`}
+                                style={{
+                                    width: '100%',
+                                    height: '100%',
+                                    objectFit: 'cover',
+                                    transition: 'opacity 0.3s ease'
+                                }}
+                            />
+
+                            {/* Carousel Controls */}
+                            {hasMultipleImages && (
+                                <>
+                                    {/* Previous Button */}
+                                    <button
+                                        onClick={handlePrevImage}
+                                        style={{
+                                            position: 'absolute',
+                                            left: '20px',
+                                            top: '50%',
+                                            transform: 'translateY(-50%)',
+                                            background: 'rgba(0, 0, 0, 0.6)',
+                                            color: 'white',
+                                            border: 'none',
+                                            borderRadius: '50%',
+                                            width: '48px',
+                                            height: '48px',
+                                            cursor: 'pointer',
+                                            display: 'flex',
+                                            alignItems: 'center',
+                                            justifyContent: 'center',
+                                            fontSize: '24px',
+                                            transition: 'all 0.2s ease',
+                                            zIndex: 10
+                                        }}
+                                        onMouseEnter={(e) => {
+                                            e.currentTarget.style.background = 'rgba(0, 0, 0, 0.8)';
+                                            e.currentTarget.style.transform = 'translateY(-50%) scale(1.1)';
+                                        }}
+                                        onMouseLeave={(e) => {
+                                            e.currentTarget.style.background = 'rgba(0, 0, 0, 0.6)';
+                                            e.currentTarget.style.transform = 'translateY(-50%) scale(1)';
+                                        }}
+                                    >
+                                        ◀
+                                    </button>
+
+                                    {/* Next Button */}
+                                    <button
+                                        onClick={handleNextImage}
+                                        style={{
+                                            position: 'absolute',
+                                            right: '20px',
+                                            top: '50%',
+                                            transform: 'translateY(-50%)',
+                                            background: 'rgba(0, 0, 0, 0.6)',
+                                            color: 'white',
+                                            border: 'none',
+                                            borderRadius: '50%',
+                                            width: '48px',
+                                            height: '48px',
+                                            cursor: 'pointer',
+                                            display: 'flex',
+                                            alignItems: 'center',
+                                            justifyContent: 'center',
+                                            fontSize: '24px',
+                                            transition: 'all 0.2s ease',
+                                            zIndex: 10
+                                        }}
+                                        onMouseEnter={(e) => {
+                                            e.currentTarget.style.background = 'rgba(0, 0, 0, 0.8)';
+                                            e.currentTarget.style.transform = 'translateY(-50%) scale(1.1)';
+                                        }}
+                                        onMouseLeave={(e) => {
+                                            e.currentTarget.style.background = 'rgba(0, 0, 0, 0.6)';
+                                            e.currentTarget.style.transform = 'translateY(-50%) scale(1)';
+                                        }}
+                                    >
+                                        ▶
+                                    </button>
+
+                                    {/* Image Counter Badge */}
+                                    <div style={{
+                                        position: 'absolute',
+                                        bottom: '20px',
+                                        right: '20px',
+                                        background: 'rgba(0, 0, 0, 0.7)',
+                                        color: 'white',
+                                        padding: '8px 16px',
+                                        borderRadius: '20px',
+                                        fontSize: '14px',
+                                        fontWeight: '600',
+                                        zIndex: 10
+                                    }}>
+                                        {currentImageIndex + 1} / {hotelImages.length}
+                                    </div>
+                                </>
+                            )}
+                        </div>
+
+                        {/* Thumbnail Navigation */}
+                        {hasMultipleImages && (
+                            <div className="hotel-detail-thumbnail-grid" style={{
+                                display: 'grid',
+                                gridTemplateColumns: 'repeat(auto-fill, minmax(120px, 1fr))',
+                                gap: '12px',
+                                marginTop: '16px',
+                                maxHeight: '160px',
+                                overflowY: 'auto'
+                            }}>
+                                {hotelImages.map((image, index) => (
+                                    <img
+                                        key={index}
+                                        src={image}
+                                        alt={`${hotelData.name} - Thumbnail ${index + 1}`}
+                                        onClick={() => setCurrentImageIndex(index)}
+                                        style={{
+                                            width: '100%',
+                                            height: '100px',
+                                            objectFit: 'cover',
+                                            borderRadius: '8px',
+                                            cursor: 'pointer',
+                                            border: currentImageIndex === index
+                                                ? '3px solid #0a5757'
+                                                : '3px solid transparent',
+                                            opacity: currentImageIndex === index ? 1 : 0.6,
+                                            transition: 'all 0.3s ease'
+                                        }}
+                                        onMouseEnter={(e) => {
+                                            if (currentImageIndex !== index) {
+                                                e.currentTarget.style.opacity = '0.9';
+                                                e.currentTarget.style.transform = 'scale(1.05)';
+                                            }
+                                        }}
+                                        onMouseLeave={(e) => {
+                                            if (currentImageIndex !== index) {
+                                                e.currentTarget.style.opacity = '0.6';
+                                                e.currentTarget.style.transform = 'scale(1)';
+                                            }
+                                        }}
+                                    />
+                                ))}
+                            </div>
                         )}
                     </div>
                 </div>
-            </div>
+            )}
 
             {/* Hotel Info Section */}
             <div className="hotel-detail-info-wrapper">
@@ -151,6 +301,14 @@ export default function Overview({ hotelData }) {
                     <div className="hotel-detail-header">
                         <div className="hotel-detail-title-section">
                             <h1 className="hotel-detail-name">{hotelData.name}</h1>
+
+                            {/* Destination Badge */}
+                            {destination && (
+                                <div className="destination-badge">
+                                    📍 {destination.name}, {destination.country}
+                                </div>
+                            )}
+
                             <div className="hotel-detail-rating">
                                 <span className="hotel-detail-stars">{getStarDisplay(hotelData.category)}</span>
                             </div>

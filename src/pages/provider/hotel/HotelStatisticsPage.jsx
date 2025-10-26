@@ -6,7 +6,11 @@ import { ErrorAlert } from '../../../components/shared/ErrorAlert';
 
 const HotelStatisticsPage = () => {
     const { hotelId } = useParams();
-    const providerId = localStorage.getItem('providerId');
+
+    // Get provider _id from localStorage
+    const provider = localStorage.getItem('provider');
+    const providerId = provider ? JSON.parse(provider)._id : null;
+
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [statistics, setStatistics] = useState(null);
@@ -22,14 +26,14 @@ const HotelStatisticsPage = () => {
             setLoading(true);
             const [statsRes, availRes, bookingsRes] = await Promise.all([
                 axios.get(`/api/provider/${providerId}/hotel-statistics`, {
-                headers: { Authorization: `Bearer ${token}` }
-            }),
+                    headers: { Authorization: `Bearer ${token}` }
+                }),
                 axios.get(`/api/provider/${providerId}/hotels/${hotelId}/availability`, {
-                headers: { Authorization: `Bearer ${token}` }
-            }),
+                    headers: { Authorization: `Bearer ${token}` }
+                }),
                 axios.get(`/api/provider/${providerId}/hotels/${hotelId}/bookings`, {
-                headers: { Authorization: `Bearer ${token}` }
-            })
+                    headers: { Authorization: `Bearer ${token}` }
+                })
             ]);
 
             setStatistics(statsRes.data.data);
@@ -136,7 +140,7 @@ const HotelStatisticsPage = () => {
                             background: room.availableRooms > 0 ? '#f0fdf4' : '#fef2f2'
                         }}>
                             <h3 style={{ color: '#374151', marginBottom: '0.5rem' }}>{room.roomType}</h3>
-                            <p style={{ 
+                            <p style={{
                                 color: room.availableRooms > 0 ? '#10b981' : '#ef4444',
                                 fontWeight: '600'
                             }}>
@@ -178,10 +182,10 @@ const HotelStatisticsPage = () => {
                                             borderRadius: '20px',
                                             fontSize: '0.875rem',
                                             color: 'white',
-                                            background: 
+                                            background:
                                                 booking.status === 'confirmed' ? '#10b981' :
-                                                booking.status === 'pending' ? '#f59e0b' :
-                                                booking.status === 'cancelled' ? '#ef4444' : '#3b82f6'
+                                                    booking.status === 'pending' ? '#f59e0b' :
+                                                        booking.status === 'cancelled' ? '#ef4444' : '#3b82f6'
                                         }}>
                                             {booking.status.charAt(0).toUpperCase() + booking.status.slice(1)}
                                         </span>

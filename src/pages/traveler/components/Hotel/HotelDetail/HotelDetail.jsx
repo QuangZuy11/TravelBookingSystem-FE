@@ -13,12 +13,14 @@ const HotelDetail = () => {
     const [activeSection, setActiveSection] = useState("overview")
     const [hotelData, setHotelData] = useState(null)
     const [roomsData, setRoomsData] = useState(null)
+    const [nearbyPOIs, setNearbyPOIs] = useState([])
+    const [destination, setDestination] = useState(null)
     const [loading, setLoading] = useState(true)
     const [roomsLoading, setRoomsLoading] = useState(true)
     const [error, setError] = useState(null)
     const [roomsError, setRoomsError] = useState(null)
 
-    // Fetch hotel data from API
+    // Fetch hotel data + POIs from new unified endpoint
     useEffect(() => {
         const fetchHotelData = async () => {
             if (!id) return
@@ -27,20 +29,26 @@ const HotelDetail = () => {
                 setLoading(true)
                 setError(null)
 
-                // Gọi API search để lấy thông tin khách sạn theo ID
-                const response = await fetch(`http://localhost:3000/api/traveler/hotels/search?hotelId=${id}`)
+                // Use new endpoint: GET /api/hotel/:hotelId/details
+                const response = await fetch(`http://localhost:3000/api/hotel/${id}/details`)
 
                 if (!response.ok) {
                     throw new Error(`HTTP ${response.status}`)
                 }
 
                 const data = await response.json()
+                console.log('Hotel details API response:', data) // Debug log
 
-                // Tìm khách sạn có ID khớp trong kết quả
-                const hotel = data?.data?.hotels?.find(h => h._id === id)
+                if (data.success && data.data) {
+                    const { hotel, nearbyPOIs, destination } = data.data
 
-                if (hotel) {
                     setHotelData(hotel)
+                    setNearbyPOIs(nearbyPOIs || [])
+                    setDestination(destination)
+
+                    console.log('Hotel:', hotel)
+                    console.log('Nearby POIs:', nearbyPOIs)
+                    console.log('Destination:', destination)
                 } else {
                     throw new Error('Không tìm thấy thông tin khách sạn')
                 }
@@ -176,7 +184,7 @@ const HotelDetail = () => {
                     Phòng
                 </button>
                 <button className={activeSection === "location" ? "active" : ""} onClick={() => scrollToSection("location")}>
-                    Vị trí
+                    Vị trí & Địa điểm gần
                 </button>
                 <button className={activeSection === "amenities" ? "active" : ""} onClick={() => scrollToSection("amenities")}>
                     Tiện ích
@@ -189,14 +197,14 @@ const HotelDetail = () => {
                 </button>
             </nav>
 
-            <Overview hotelData={hotelData} />
+            <Overview hotelData={hotelData} destination={destination} />
             <Rooms
                 roomsData={roomsData}
                 loading={roomsLoading}
                 error={roomsError}
                 hotelData={hotelData}
             />
-            <Location />
+            <Location hotelData={hotelData} nearbyPOIs={nearbyPOIs} destination={destination} />
             <Amenities />
             <Policies hotelData={hotelData} />
             <Reviews />

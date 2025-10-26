@@ -29,10 +29,17 @@ const CreateHotelPage = () => {
         }
       }
 
-      // Fallback to localStorage (but this was wrong before the fix)
+      // Fallback to localStorage - get from provider object
       if (!providerId) {
-        providerId = localStorage.getItem('providerId');
-        console.warn('⚠️ Fallback to localStorage providerId (may be incorrect):', providerId);
+        const provider = localStorage.getItem('provider');
+        if (provider) {
+          try {
+            providerId = JSON.parse(provider)._id;
+            console.log('✅ Got providerId from provider object:', providerId);
+          } catch (e) {
+            console.error('Error parsing provider:', e);
+          }
+        }
       }
 
       if (!providerId) {

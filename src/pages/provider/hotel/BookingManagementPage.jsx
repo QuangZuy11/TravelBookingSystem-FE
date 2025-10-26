@@ -7,7 +7,10 @@ import Breadcrumb from '../../../components/shared/Breadcrumb';
 
 const BookingManagementPage = () => {
     const navigate = useNavigate();
-    const providerId = localStorage.getItem('providerId');
+
+    // Get provider _id from localStorage
+    const provider = localStorage.getItem('provider');
+    const providerId = provider ? JSON.parse(provider)._id : null;
     const [bookings, setBookings] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);

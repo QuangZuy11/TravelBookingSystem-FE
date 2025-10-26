@@ -18,9 +18,11 @@ const TourDashboard = () => {
     const [hoveredRow, setHoveredRow] = useState(null);
     const [openDropdown, setOpenDropdown] = useState(null); // New state for dropdown
 
-    const providerId = localStorage.getItem('user')
-        ? JSON.parse(localStorage.getItem('user'))?.providerId
+    // Get provider _id from localStorage
+    const provider = localStorage.getItem('provider')
+        ? JSON.parse(localStorage.getItem('provider'))
         : null;
+    const providerId = provider?._id || null;
 
     const fetchTours = async () => {
         try {
