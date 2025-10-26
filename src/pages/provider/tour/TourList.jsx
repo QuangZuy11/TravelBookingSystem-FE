@@ -17,9 +17,11 @@ const TourList = () => {
     const [searchTerm, setSearchTerm] = useState('');
     const [deleteModal, setDeleteModal] = useState({ isOpen: false, tour: null });
 
-    const providerId = localStorage.getItem('user')
-        ? JSON.parse(localStorage.getItem('user'))?.providerId
+    // Get provider _id from localStorage
+    const provider = localStorage.getItem('provider')
+        ? JSON.parse(localStorage.getItem('provider'))
         : null;
+    const providerId = provider?._id || null;
 
     useEffect(() => {
         if (providerId) {
@@ -118,9 +120,9 @@ const TourList = () => {
                                     </td>
                                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                                         <span className={`px-2 py-1 text-xs font-semibold rounded-full ${tour.difficulty === 'easy' ? 'bg-green-100 text-green-800' :
-                                                tour.difficulty === 'moderate' ? 'bg-yellow-100 text-yellow-800' :
-                                                    tour.difficulty === 'challenging' ? 'bg-orange-100 text-orange-800' :
-                                                        'bg-red-100 text-red-800'
+                                            tour.difficulty === 'moderate' ? 'bg-yellow-100 text-yellow-800' :
+                                                tour.difficulty === 'challenging' ? 'bg-orange-100 text-orange-800' :
+                                                    'bg-red-100 text-red-800'
                                             }`}>
                                             {tour.difficulty === 'easy' ? 'Dễ' :
                                                 tour.difficulty === 'moderate' ? 'Trung bình' :
@@ -130,8 +132,8 @@ const TourList = () => {
                                     </td>
                                     <td className="px-6 py-4 whitespace-nowrap text-sm">
                                         <span className={`px-2 py-1 text-xs font-semibold rounded-full ${tour.status === 'active' ? 'bg-green-100 text-green-800' :
-                                                tour.status === 'draft' ? 'bg-gray-100 text-gray-800' :
-                                                    'bg-red-100 text-red-800'
+                                            tour.status === 'draft' ? 'bg-gray-100 text-gray-800' :
+                                                'bg-red-100 text-red-800'
                                             }`}>
                                             {tour.status === 'active' ? 'Hoạt động' :
                                                 tour.status === 'draft' ? 'Bản nháp' :

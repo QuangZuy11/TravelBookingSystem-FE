@@ -13,11 +13,19 @@ const TourDetailsPage = () => {
     const [itineraries, setItineraries] = useState([]);
     const [budgetItems, setBudgetItems] = useState([]);
 
-    const providerId = localStorage.getItem('user')
-        ? JSON.parse(localStorage.getItem('user'))?.providerId
+    // Get provider _id from localStorage
+    const provider = localStorage.getItem('provider')
+        ? JSON.parse(localStorage.getItem('provider'))
         : null;
+    const providerId = provider?._id || null;
 
     const token = localStorage.getItem('token');
+
+    console.log('🔐 TourDetailsPage - Provider Info:', {
+        provider,
+        providerId,
+        tourId
+    });
 
     useEffect(() => {
         fetchTourDetails();
@@ -161,11 +169,13 @@ const TourDetailsPage = () => {
                 <div className="info-grid">
                     <div className="info-item">
                         <span className="info-label">Địa điểm:</span>
-                        <span className="info-value">{tour.location}</span>
+                        <span className="info-value">
+                            {tour.destination_id?.name || tour.location || 'Chưa có thông tin'}
+                        </span>
                     </div>
                     <div className="info-item">
                         <span className="info-label">Thời gian:</span>
-                        <span className="info-value">{tour.duration_hours} giờ ({maxDays} ngày)</span>
+                        <span className="info-value">{tour.duration || `${tour.duration_hours} giờ`}</span>
                     </div>
                     <div className="info-item">
                         <span className="info-label">Độ khó:</span>
@@ -184,7 +194,9 @@ const TourDetailsPage = () => {
 
                 <div className="info-item full-width">
                     <span className="info-label">Mô tả:</span>
-                    <p className="info-description">{tour.description}</p>
+                    <p className="info-description">
+                        {Array.isArray(tour.description) ? tour.description.join(', ') : tour.description}
+                    </p>
                 </div>
 
                 {tour.image && (
@@ -198,11 +210,13 @@ const TourDetailsPage = () => {
             <div className="details-section">
                 <h2 className="section-title">📍 Điểm tập trung</h2>
                 <div className="info-item">
+                    <span className="info-label">Địa chỉ:</span>
                     <span className="info-value">{tour.meeting_point?.address || 'Chưa có thông tin'}</span>
                 </div>
-                {tour.meeting_point?.lat && tour.meeting_point?.lng && (
-                    <div className="coordinates">
-                        <span>📌 {tour.meeting_point.lat}, {tour.meeting_point.lng}</span>
+                {tour.meeting_point?.instructions && (
+                    <div className="info-item">
+                        <span className="info-label">Hướng dẫn:</span>
+                        <span className="info-value">{tour.meeting_point.instructions}</span>
                     </div>
                 )}
             </div>
@@ -211,24 +225,28 @@ const TourDetailsPage = () => {
             <div className="details-section">
                 <h2 className="section-title">💰 Giá Tour</h2>
                 <div className="pricing-grid">
-                    <div className="price-card">
-                        <span className="price-label">Giá chính</span>
-                        <span className="price-value">{tour.price?.toLocaleString('vi-VN')} VNĐ</span>
-                    </div>
-                    <div className="price-card">
-                        <span className="price-label">Người lớn</span>
-                        <span className="price-value">{tour.pricing?.adult?.toLocaleString('vi-VN')} VNĐ</span>
-                    </div>
-                    <div className="price-card">
-                        <span className="price-label">Trẻ em</span>
-                        <span className="price-value">{tour.pricing?.child?.toLocaleString('vi-VN')} VNĐ</span>
-                    </div>
-                    <div className="price-card">
-                        <span className="price-label">Em bé</span>
-                        <span className="price-value">{tour.pricing?.infant?.toLocaleString('vi-VN')} VNĐ</span>
+                    <div className="price-card" style={{ gridColumn: '1 / -1', textAlign: 'center' }}>
+                        <span className="price-label">Giá tour</span>
+                        <span className="price-value" style={{ fontSize: '28px', fontWeight: 'bold', color: '#2563eb' }}>
+                            {tour.price?.toLocaleString('vi-VN')} VNĐ
+                        </span>
                     </div>
                 </div>
             </div>
+
+            {/* Highlights */}
+            {tour.highlights && tour.highlights.length > 0 && (
+                <div className="details-section">
+                    <h2 className="section-title">⭐ Điểm nổi bật</h2>
+                    <div className="services-list">
+                        {tour.highlights.map((highlight, index) => (
+                            <div key={index} className="service-item" style={{ color: '#f59e0b' }}>
+                                ⭐ {highlight}
+                            </div>
+                        ))}
+                    </div>
+                </div>
+            )}
 
             {/* Services */}
             {tour.services && tour.services.length > 0 && (

@@ -1,30 +1,27 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import toast from 'react-hot-toast';
+import DestinationSelector from '../../../../components/common/DestinationSelector';
 import './BasicInfoForm.css';
 
 const BasicInfoForm = ({ providerId, initialData, isEditMode, onNext, onCancel }) => {
     const [formData, setFormData] = useState({
         title: '',
         description: '',
-        location: '',
+        destination_id: '', // Destination ID instead of location text
         meeting_point: {
             address: '',
-            lat: 0,
-            lng: 0
+            instructions: '' // Optional instructions
         },
-        duration_hours: 24,
+        duration: '', // Changed to string "X ngày Y đêm"
         difficulty: 'easy',
         capacity: {
             max_participants: 20,
             min_participants: 5
         },
-        pricing: {
-            adult: 0,
-            child: 0,
-            infant: 0
-        },
+        price: 0, // Single price field
         image: '',
+        highlights: [], // Điểm nổi bật của tour
         services: [],
         available_dates: [],
         status: 'draft'
@@ -33,32 +30,52 @@ const BasicInfoForm = ({ providerId, initialData, isEditMode, onNext, onCancel }
     const [errors, setErrors] = useState({});
     const [loading, setLoading] = useState(false);
     const [newService, setNewService] = useState('');
+    const [newHighlight, setNewHighlight] = useState('');
     const [newDate, setNewDate] = useState('');
+
     const token = localStorage.getItem('token');
+
+    // Get provider _id from localStorage (current logged in user)
+    const provider = localStorage.getItem('provider') ? JSON.parse(localStorage.getItem('provider')) : null;
+    const currentProviderId = provider?._id || providerId; // Use provider's _id, fallback to prop
+
+    console.log('🔐 Auth Check:', {
+        fromProps: providerId,
+        providerFromStorage: provider,
+        providerIdUsing: currentProviderId
+    });
     // Load initial data in edit mode
     useEffect(() => {
         if (isEditMode && initialData) {
+            // Handle destination_id - can be string (ID) or object (populated)
+            let destinationId = '';
+            if (initialData.destination_id) {
+                if (typeof initialData.destination_id === 'string') {
+                    // Already an ID
+                    destinationId = initialData.destination_id;
+                } else if (typeof initialData.destination_id === 'object' && initialData.destination_id._id) {
+                    // Populated object from backend
+                    destinationId = initialData.destination_id._id;
+                }
+            }
+
             setFormData({
                 title: initialData.title || '',
                 description: initialData.description || '',
-                location: initialData.location || '',
+                destination_id: destinationId,
                 meeting_point: {
                     address: initialData.meeting_point?.address || '',
-                    lat: initialData.meeting_point?.lat || 0,
-                    lng: initialData.meeting_point?.lng || 0
+                    instructions: initialData.meeting_point?.instructions || ''
                 },
-                duration_hours: initialData.duration_hours || 24,
+                duration: initialData.duration || '',
                 difficulty: initialData.difficulty || 'easy',
                 capacity: {
                     max_participants: initialData.capacity?.max_participants || 20,
                     min_participants: initialData.capacity?.min_participants || 5
                 },
-                pricing: {
-                    adult: initialData.pricing?.adult || 0,
-                    child: initialData.pricing?.child || 0,
-                    infant: initialData.pricing?.infant || 0
-                },
+                price: initialData.price || 0,
                 image: initialData.image || '',
+                highlights: Array.isArray(initialData.highlights) ? initialData.highlights : [],
                 services: Array.isArray(initialData.services) ? initialData.services : [],
                 available_dates: Array.isArray(initialData.available_dates) ? initialData.available_dates : [],
                 status: initialData.status || 'draft'
@@ -75,17 +92,15 @@ const BasicInfoForm = ({ providerId, initialData, isEditMode, onNext, onCancel }
                 ...prev,
                 [parent]: {
                     ...prev[parent],
-                    [child]: name === 'meeting_point.lat' || name === 'meeting_point.lng'
-                        ? parseFloat(value) || 0
-                        : (name.startsWith('pricing.') || name.startsWith('capacity.'))
-                            ? Number(value) || 0
-                            : value
+                    [child]: name.startsWith('capacity.')
+                        ? Number(value) || 0
+                        : value
                 }
             }));
         } else {
             setFormData(prev => ({
                 ...prev,
-                [name]: name === 'duration_hours' ? Number(value) || 0 : value
+                [name]: name === 'price' ? Number(value) || 0 : value
             }));
         }
 
@@ -112,6 +127,23 @@ const BasicInfoForm = ({ providerId, initialData, isEditMode, onNext, onCancel }
         setFormData(prev => ({
             ...prev,
             services: (Array.isArray(prev.services) ? prev.services : []).filter((_, i) => i !== index)
+        }));
+    };
+
+    const addHighlight = () => {
+        if (newHighlight.trim()) {
+            setFormData(prev => ({
+                ...prev,
+                highlights: [...(Array.isArray(prev.highlights) ? prev.highlights : []), newHighlight.trim()]
+            }));
+            setNewHighlight('');
+        }
+    };
+
+    const removeHighlight = (index) => {
+        setFormData(prev => ({
+            ...prev,
+            highlights: (Array.isArray(prev.highlights) ? prev.highlights : []).filter((_, i) => i !== index)
         }));
     };
 
@@ -143,19 +175,16 @@ const BasicInfoForm = ({ providerId, initialData, isEditMode, onNext, onCancel }
         const title = String(formData.title || '');
         if (!title.trim()) {
             newErrors.title = 'Vui lòng nhập tên tour';
-        } else if (title.trim().length < 10) {
-            newErrors.title = 'Tên tour phải có ít nhất 10 ký tự';
         }
 
+        // Description is optional - no minimum length required
+        // Just check if it exists
         const description = String(formData.description || '');
-        // Description is optional, but if provided must be at least 50 characters
-        if (description.trim() && description.trim().length < 50) {
-            newErrors.description = 'Mô tả phải có ít nhất 50 ký tự';
-        }
+        // No validation needed for description
 
-        const location = String(formData.location || '');
-        if (!location.trim()) {
-            newErrors.location = 'Vui lòng nhập địa điểm';
+        const destinationId = String(formData.destination_id || '');
+        if (!destinationId.trim()) {
+            newErrors.destination_id = 'Vui lòng chọn địa điểm';
         }
 
         const address = String(formData.meeting_point?.address || '');
@@ -163,12 +192,13 @@ const BasicInfoForm = ({ providerId, initialData, isEditMode, onNext, onCancel }
             newErrors.meeting_point = 'Vui lòng nhập địa chỉ điểm tập trung';
         }
 
-        if (formData.duration_hours < 1) {
-            newErrors.duration_hours = 'Thời gian tour phải lớn hơn 0';
+        const duration = String(formData.duration || '');
+        if (!duration.trim()) {
+            newErrors.duration = 'Vui lòng nhập thời gian tour (VD: 3 ngày 2 đêm)';
         }
 
-        if (formData.pricing.adult <= 0) {
-            newErrors.pricing = 'Giá người lớn phải lớn hơn 0';
+        if (formData.price <= 0) {
+            newErrors.price = 'Giá tour phải lớn hơn 0';
         }
 
         if (formData.capacity.min_participants >= formData.capacity.max_participants) {
@@ -194,44 +224,67 @@ const BasicInfoForm = ({ providerId, initialData, isEditMode, onNext, onCancel }
         setLoading(true);
 
         try {
-            // Prepare data with price field from adult pricing
-            const tourData = {
-                ...formData,
-                price: formData.pricing.adult // Backend requires price as Number
-            };
+            const tourData = { ...formData };
+
+            console.log('🔍 Debug Info:');
+            console.log('- Provider ID (prop):', providerId);
+            console.log('- Provider ID (using):', currentProviderId);
+            console.log('- Token exists:', !!token);
+            console.log('- Token preview:', token ? token.substring(0, 20) + '...' : 'No token');
+            console.log('- Tour Data:', tourData);
 
             let response;
             let tourId;
 
             if (isEditMode && initialData?._id) {
                 // Update existing tour
+                console.log('📝 Updating tour:', initialData._id);
                 response = await axios.put(
-                    `http://localhost:3000/api/tour/provider/${providerId}/tours/${initialData._id}`,
-                    tourData, {
-                    headers: { Authorization: `Bearer ${token}` }
-                }
+                    `http://localhost:3000/api/tour/provider/${currentProviderId}/tours/${initialData._id}`,
+                    tourData,
+                    {
+                        headers: {
+                            'Authorization': `Bearer ${token}`,
+                            'Content-Type': 'application/json'
+                        }
+                    }
                 );
                 tourId = initialData._id;
                 toast.success('Cập nhật thông tin tour thành công!');
             } else {
                 // Create new tour
+                console.log('✨ Creating new tour');
                 response = await axios.post(
-                    `http://localhost:3000/api/tour/provider/${providerId}/tours`,
-                    tourData, {
-                    headers: { Authorization: `Bearer ${token}` }
-                }
+                    `http://localhost:3000/api/tour/provider/${currentProviderId}/tours`,
+                    tourData,
+                    {
+                        headers: {
+                            'Authorization': `Bearer ${token}`,
+                            'Content-Type': 'application/json'
+                        }
+                    }
                 );
                 tourId = response.data.data._id;
                 toast.success('Tạo tour mới thành công!');
             }
 
+            console.log('✅ Response:', response.data);
+
             if (response.data.success) {
                 onNext({ tourId, basicInfo: formData });
             }
         } catch (error) {
-            console.error('Error saving tour:', error);
+            console.error('❌ Error saving tour:', error);
+            console.error('Error response:', error.response?.data);
+            console.error('Error status:', error.response?.status);
+            console.error('Error headers:', error.response?.headers);
+
             if (error.response?.data?.message) {
                 toast.error(error.response.data.message);
+            } else if (error.response?.status === 403) {
+                toast.error('Không có quyền thực hiện thao tác này. Vui lòng đăng nhập lại.');
+            } else if (error.response?.status === 401) {
+                toast.error('Phiên đăng nhập hết hạn. Vui lòng đăng nhập lại.');
             } else {
                 toast.error(`Không thể ${isEditMode ? 'cập nhật' : 'tạo'} tour. Vui lòng thử lại!`);
             }
@@ -263,7 +316,7 @@ const BasicInfoForm = ({ providerId, initialData, isEditMode, onNext, onCancel }
             {/* Description */}
             <div className="form-group">
                 <label className="form-label">
-                    Mô tả <span className="optional">(Tùy chọn - tối thiểu 50 ký tự nếu nhập)</span>
+                    Mô tả <span className="optional">(Tùy chọn)</span>
                 </label>
                 <textarea
                     name="description"
@@ -273,27 +326,27 @@ const BasicInfoForm = ({ providerId, initialData, isEditMode, onNext, onCancel }
                     className={`form-textarea ${errors.description ? 'error' : ''}`}
                     placeholder="Mô tả chi tiết về tour, các điểm đến, hoạt động..."
                 />
-                <div className="char-count">
-                    {formData.description.length} ký tự {formData.description.length > 0 && formData.description.length < 50 ? '(tối thiểu 50)' : ''}
-                </div>
                 {errors.description && <span className="error-message">{errors.description}</span>}
             </div>
 
-            {/* Location */}
-            <div className="form-group">
-                <label className="form-label">
-                    Địa điểm <span className="required">*</span>
-                </label>
-                <input
-                    type="text"
-                    name="location"
-                    value={formData.location}
-                    onChange={handleChange}
-                    className={`form-input ${errors.location ? 'error' : ''}`}
-                    placeholder="VD: Đà Nẵng, Việt Nam"
-                />
-                {errors.location && <span className="error-message">{errors.location}</span>}
-            </div>
+            {/* Destination Selector */}
+            <DestinationSelector
+                selectedId={formData.destination_id}
+                onChange={(destinationId) => {
+                    setFormData(prev => ({
+                        ...prev,
+                        destination_id: destinationId
+                    }));
+                    // Clear error when selected
+                    if (errors.destination_id) {
+                        setErrors(prev => ({
+                            ...prev,
+                            destination_id: null
+                        }));
+                    }
+                }}
+                error={errors.destination_id}
+            />
 
             {/* Meeting Point */}
             <div className="form-group">
@@ -311,49 +364,38 @@ const BasicInfoForm = ({ providerId, initialData, isEditMode, onNext, onCancel }
                 {errors.meeting_point && <span className="error-message">{errors.meeting_point}</span>}
             </div>
 
-            {/* Meeting Point Coordinates (Optional) */}
-            <div className="form-row">
-                <div className="form-group">
-                    <label className="form-label">Vĩ độ (Latitude)</label>
-                    <input
-                        type="number"
-                        name="meeting_point.lat"
-                        value={formData.meeting_point.lat}
-                        onChange={handleChange}
-                        step="0.000001"
-                        className="form-input"
-                        placeholder="16.0544"
-                    />
-                </div>
-                <div className="form-group">
-                    <label className="form-label">Kinh độ (Longitude)</label>
-                    <input
-                        type="number"
-                        name="meeting_point.lng"
-                        value={formData.meeting_point.lng}
-                        onChange={handleChange}
-                        step="0.000001"
-                        className="form-input"
-                        placeholder="108.2022"
-                    />
-                </div>
+            {/* Meeting Point Instructions */}
+            <div className="form-group">
+                <label className="form-label">
+                    Hướng dẫn tập trung <span className="optional">(Tùy chọn)</span>
+                </label>
+                <textarea
+                    name="meeting_point.instructions"
+                    value={formData.meeting_point.instructions}
+                    onChange={handleChange}
+                    rows={2}
+                    className="form-textarea"
+                    placeholder="VD: Gặp tại cổng A, mang theo CMND/Passport..."
+                />
+                <small className="form-hint">💡 Hướng dẫn chi tiết để khách dễ tìm điểm tập trung</small>
             </div>
 
             {/* Duration & Difficulty */}
             <div className="form-row">
                 <div className="form-group">
                     <label className="form-label">
-                        Thời gian (giờ) <span className="required">*</span>
+                        Thời gian <span className="required">*</span>
                     </label>
                     <input
-                        type="number"
-                        name="duration_hours"
-                        value={formData.duration_hours}
+                        type="text"
+                        name="duration"
+                        value={formData.duration}
                         onChange={handleChange}
-                        min="1"
-                        className="form-input"
+                        className={`form-input ${errors.duration ? 'error' : ''}`}
+                        placeholder="VD: 3 ngày 2 đêm"
                     />
-                    {errors.duration_hours && <span className="error-message">{errors.duration_hours}</span>}
+                    {errors.duration && <span className="error-message">{errors.duration}</span>}
+                    <small className="form-hint">💡 Nhập theo định dạng: X ngày Y đêm</small>
                 </div>
 
                 <div className="form-group">
@@ -428,45 +470,20 @@ const BasicInfoForm = ({ providerId, initialData, isEditMode, onNext, onCancel }
             {/* Pricing */}
             <div className="pricing-section">
                 <h3 className="subsection-title">Giá Tour <span className="required">*</span></h3>
-                <div className="form-row">
-                    <div className="form-group">
-                        <label className="form-label">Người lớn (VNĐ)</label>
-                        <input
-                            type="number"
-                            name="pricing.adult"
-                            value={formData.pricing.adult}
-                            onChange={handleChange}
-                            min="0"
-                            className="form-input"
-                            placeholder="0"
-                        />
-                    </div>
-                    <div className="form-group">
-                        <label className="form-label">Trẻ em (VNĐ)</label>
-                        <input
-                            type="number"
-                            name="pricing.child"
-                            value={formData.pricing.child}
-                            onChange={handleChange}
-                            min="0"
-                            className="form-input"
-                            placeholder="0"
-                        />
-                    </div>
-                    <div className="form-group">
-                        <label className="form-label">Em bé (VNĐ)</label>
-                        <input
-                            type="number"
-                            name="pricing.infant"
-                            value={formData.pricing.infant}
-                            onChange={handleChange}
-                            min="0"
-                            className="form-input"
-                            placeholder="0"
-                        />
-                    </div>
+                <div className="form-group">
+                    <label className="form-label">Giá Tour (VNĐ/người)</label>
+                    <input
+                        type="number"
+                        name="price"
+                        value={formData.price}
+                        onChange={handleChange}
+                        min="0"
+                        className={`form-input ${errors.price ? 'error' : ''}`}
+                        placeholder="VD: 5000000"
+                    />
+                    {errors.price && <span className="error-message">{errors.price}</span>}
+                    <small className="form-hint">💡 Giá áp dụng chung cho mọi độ tuổi</small>
                 </div>
-                {errors.pricing && <span className="error-message">{errors.pricing}</span>}
             </div>
 
             {/* Image URL */}
@@ -480,6 +497,34 @@ const BasicInfoForm = ({ providerId, initialData, isEditMode, onNext, onCancel }
                     className="form-input"
                     placeholder="https://example.com/image.jpg"
                 />
+            </div>
+
+            {/* Highlights */}
+            <div className="services-section">
+                <h3 className="subsection-title">Điểm nổi bật</h3>
+                <div className="add-item-group">
+                    <input
+                        type="text"
+                        value={newHighlight}
+                        onChange={(e) => setNewHighlight(e.target.value)}
+                        onKeyPress={(e) => e.key === 'Enter' && (e.preventDefault(), addHighlight())}
+                        className="form-input"
+                        placeholder="VD: Ngắm hoàng hôn tại Bãi Đá Nhảy, Khám phá làng cổ Hội An..."
+                    />
+                    <button type="button" onClick={addHighlight} className="btn-add">
+                        + Thêm
+                    </button>
+                </div>
+                <div className="items-list">
+                    {(Array.isArray(formData.highlights) ? formData.highlights : []).map((highlight, index) => (
+                        <div key={index} className="item-tag">
+                            <span>⭐ {highlight}</span>
+                            <button type="button" onClick={() => removeHighlight(index)} className="btn-remove">
+                                ×
+                            </button>
+                        </div>
+                    ))}
+                </div>
             </div>
 
             {/* Services */}

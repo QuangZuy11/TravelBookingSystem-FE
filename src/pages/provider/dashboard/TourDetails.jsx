@@ -52,9 +52,11 @@ const TourDetails = () => {
     languages_offered: []
   });
 
-  const providerId = localStorage.getItem('user')
-    ? JSON.parse(localStorage.getItem('user'))?.providerId
+  // Get provider _id from localStorage
+  const provider = localStorage.getItem('provider')
+    ? JSON.parse(localStorage.getItem('provider'))
     : null;
+  const providerId = provider?._id || null;
 
   // Fetch tour details
   const fetchTourDetails = async () => {
