@@ -244,6 +244,12 @@ export const HotelForm = ({ initialData, onSubmit }) => {
     const handleSubmit = (e) => {
         e.preventDefault();
 
+        // Validate minimum 7 images
+        if (formData.images.length < 7) {
+            alert('⚠️ Vui lòng tải lên ít nhất 7 ảnh khách sạn!');
+            return;
+        }
+
         // Prepare FormData to send files
         const formDataToSend = new FormData();
 
@@ -973,6 +979,17 @@ export const HotelForm = ({ initialData, onSubmit }) => {
                     <h2 style={sectionTitleStyle}>
                         <span style={iconStyle}>📸</span>
                         Images
+                        <span style={{
+                            marginLeft: 'auto',
+                            fontSize: '1rem',
+                            fontWeight: '600',
+                            color: formData.images.length >= 7 ? '#10b981' : '#ef4444',
+                            background: formData.images.length >= 7 ? '#d1fae5' : '#fee2e2',
+                            padding: '0.5rem 1rem',
+                            borderRadius: '8px'
+                        }}>
+                            {formData.images.length}/7 ảnh {formData.images.length >= 7 ? '✓' : '(Tối thiểu 7 ảnh)'}
+                        </span>
                     </h2>
                     <input
                         type="file"
@@ -1182,14 +1199,23 @@ export const HotelForm = ({ initialData, onSubmit }) => {
                     </button>
                     <button
                         type="submit"
-                        style={submitButtonStyle}
+                        disabled={formData.images.length < 7}
+                        style={{
+                            ...submitButtonStyle,
+                            opacity: formData.images.length < 7 ? 0.5 : 1,
+                            cursor: formData.images.length < 7 ? 'not-allowed' : 'pointer'
+                        }}
                         onMouseEnter={(e) => {
-                            e.currentTarget.style.transform = 'translateY(-2px)';
-                            e.currentTarget.style.boxShadow = '0 6px 20px rgba(102, 126, 234, 0.5)';
+                            if (formData.images.length >= 7) {
+                                e.currentTarget.style.transform = 'translateY(-2px)';
+                                e.currentTarget.style.boxShadow = '0 6px 20px rgba(102, 126, 234, 0.5)';
+                            }
                         }}
                         onMouseLeave={(e) => {
-                            e.currentTarget.style.transform = 'translateY(0)';
-                            e.currentTarget.style.boxShadow = '0 4px 15px rgba(102, 126, 234, 0.4)';
+                            if (formData.images.length >= 7) {
+                                e.currentTarget.style.transform = 'translateY(0)';
+                                e.currentTarget.style.boxShadow = '0 4px 15px rgba(102, 126, 234, 0.4)';
+                            }
                         }}
                     >
                         {initialData ? '✅ Update Hotel' : '✨ Create Hotel'}
