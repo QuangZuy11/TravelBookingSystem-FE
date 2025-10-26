@@ -1,8 +1,7 @@
-import { useState, useEffect, useRef } from 'react';
+// import { useRef } from 'react';
 import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
-import { getProxiedGoogleDriveUrl } from '../../../../../utils/googleDriveImageHelper';
 import { MAP_CONFIG } from '../../../../../config/mapConfig';
 
 // Helper function for category icons and names
@@ -90,7 +89,7 @@ const createPOIIcon = (emoji = '📍') => {
 };
 
 export default function Location({ hotelData, nearbyPOIs, destination }) {
-    const mapRef = useRef(null);
+    // const mapRef = useRef(null);
 
     // Get hotel coordinates or use default
     const coordinates = hotelData?.address?.coordinates || MAP_CONFIG.DEFAULT_CENTER;
@@ -167,10 +166,10 @@ export default function Location({ hotelData, nearbyPOIs, destination }) {
                             url={MAP_CONFIG.ALTERNATIVE_LAYERS.CARTODB_VOYAGER}
                             maxZoom={MAP_CONFIG.MAX_ZOOM}
                         />
-                        
+
                         {/* Hotel Marker */}
-                        <Marker 
-                            position={center} 
+                        <Marker
+                            position={center}
                             icon={createHotelIcon()}
                         >
                             <Popup>
@@ -193,7 +192,7 @@ export default function Location({ hotelData, nearbyPOIs, destination }) {
                                     poi.location.coordinates.latitude,
                                     poi.location.coordinates.longitude
                                 ];
-                                
+
                                 return (
                                     <Marker
                                         key={poi._id || index}

@@ -131,7 +131,7 @@ export default function Rooms({ roomsData, loading, error, hotelData }) {
     };
 
     // Function để gọi preview API (mô phỏng tạm thời)
-    const fetchBookingPreview = async (roomType, hotelId) => {
+    const fetchBookingPreview = async (roomType, hotelId, roomObj) => {
         setPreviewLoading(true);
         setPreviewError(null);
 
@@ -141,6 +141,14 @@ export default function Rooms({ roomsData, loading, error, hotelData }) {
             console.log('Fetching preview for room:', roomType, 'hotel:', hotelId);
             await new Promise(resolve => setTimeout(resolve, 1000)); // Simulate API delay
 
+            // Lấy giá/phòng chi tiết từ roomObj nếu có, fallback về avgPrice của loại phòng, sau đó mới đến 300000
+            const derivedPrice = Number(
+                (roomObj && roomObj.pricePerNight) ??
+                roomsData?.roomsByType?.[roomType]?.avgPrice ??
+                selectedRoom?.rawPrice ??
+                300000
+            );
+
             const mockPreviewData = {
                 hotel: {
                     name: hotelData?.name || "Grand Hotel Saigon",
@@ -148,11 +156,11 @@ export default function Rooms({ roomsData, loading, error, hotelData }) {
                 },
                 room: {
                     type: roomType,
-                    roomNumber: "101", // Sẽ được backend assign
-                    floor: 1,
-                    area: 25,
-                    capacity: 2,
-                    pricePerNight: 300000
+                    roomNumber: roomObj?.roomNumber || "TBA", // Sẽ được backend assign
+                    floor: roomObj?.floor ?? 1,
+                    area: roomObj?.area ?? 25,
+                    capacity: roomObj?.capacity ?? roomsData?.roomsByType?.[roomType]?.avgCapacity ?? 2,
+                    pricePerNight: derivedPrice
                 },
                 guest: {
                     name: user?.fullName || user?.name || "Hoàng", // Fallback từ profile
@@ -169,7 +177,7 @@ export default function Rooms({ roomsData, loading, error, hotelData }) {
                     paymentStatus: "pending"
                 },
                 pricing: {
-                    pricePerNight: 300000,
+                    pricePerNight: derivedPrice,
                     nights: 0,
                     totalAmount: 0,
                     calculation: "Chưa chọn ngày lưu trú"
@@ -202,7 +210,7 @@ export default function Rooms({ roomsData, loading, error, hotelData }) {
         setSelectedRoomNumber(availableRoomFromType);
 
         // Gọi preview API để lấy thông tin đầy đủ
-        await fetchBookingPreview(room.id, hotelData?.id);
+        await fetchBookingPreview(room.id, hotelData?.id, availableRoomFromType);
 
         setIsModalOpen(true);
     };
@@ -738,7 +746,7 @@ export default function Rooms({ roomsData, loading, error, hotelData }) {
                                             <div className="payment-item">
                                                 <span>
                                                     <FaBed size={16} />
-                                                    {selectedRoom?.price} VNĐ × {calculateNights()} đêm
+                                                    {formatPrice(previewData?.room?.pricePerNight || selectedRoom?.rawPrice || 0)} VNĐ × {calculateNights()} đêm
                                                 </span>
                                                 <span>{formatPrice(calculateSubtotal())} VNĐ</span>
                                             </div>

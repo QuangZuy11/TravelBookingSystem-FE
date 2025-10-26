@@ -15,9 +15,9 @@ import {
     Star as DefaultIcon
 } from '@mui/icons-material';
 import { useState } from 'react';
-import { getProxiedGoogleDriveUrl } from '../../../../../utils/googleDriveImageHelper';
+import SmartImage from '../../../../../components/common/SmartImage';
 
-export default function Overview({ hotelData, destination }) {
+export default function Overview({ hotelData }) {
     // State for image carousel
     const [currentImageIndex, setCurrentImageIndex] = useState(0);
     // Helper function to get star display based on category
@@ -119,10 +119,8 @@ export default function Overview({ hotelData, destination }) {
         return <div>Đang tải thông tin khách sạn...</div>;
     }
 
-    // Chỉ lấy ảnh có sẵn từ backend, không dùng placeholder
-    const hotelImages = hotelData.images && hotelData.images.length > 0
-        ? hotelData.images.map(img => getProxiedGoogleDriveUrl(img))
-        : [];
+    // Chỉ lấy ảnh có sẵn từ backend (SmartImage sẽ tự xử lý Google Drive/CORS)
+    const hotelImages = Array.isArray(hotelData.images) ? hotelData.images : [];
 
     const hasMultipleImages = hotelImages.length > 1;
 
@@ -144,17 +142,31 @@ export default function Overview({ hotelData, destination }) {
             {/* Gallery Section with Carousel */}
             {hotelImages.length > 0 && (
                 <div className="hotel-detail-gallery-section">
-                    <div className="hotel-detail-gallery-container">
-                        <div className="hotel-detail-main-image" style={{ position: 'relative' }}>
-                            <img
+                    <div
+                        className="hotel-detail-gallery-container"
+                        style={{
+                            display: 'grid',
+                            gridTemplateColumns: '2fr 1fr',
+                            gap: '16px',
+                            alignItems: 'stretch'
+                        }}
+                    >
+                        {/* Left: Main Image */}
+                        <div
+                            className="hotel-detail-main-image"
+                            style={{
+                                position: 'relative',
+                                height: '380px',
+                                borderRadius: '8px',
+                                overflow: 'hidden',
+                                border: '1px solid #e5e7eb',
+                                backgroundColor: '#f8fafc'
+                            }}
+                        >
+                            <SmartImage
                                 src={hotelImages[currentImageIndex]}
                                 alt={`${hotelData.name} - Hình ${currentImageIndex + 1}`}
-                                style={{
-                                    width: '100%',
-                                    height: '100%',
-                                    objectFit: 'cover',
-                                    transition: 'opacity 0.3s ease'
-                                }}
+                                style={{ width: '100%', height: '100%', objectFit: 'cover' }}
                             />
 
                             {/* Carousel Controls */}
@@ -165,31 +177,32 @@ export default function Overview({ hotelData, destination }) {
                                         onClick={handlePrevImage}
                                         style={{
                                             position: 'absolute',
-                                            left: '20px',
+                                            left: '16px',
                                             top: '50%',
                                             transform: 'translateY(-50%)',
                                             background: 'rgba(0, 0, 0, 0.6)',
                                             color: 'white',
                                             border: 'none',
                                             borderRadius: '50%',
-                                            width: '48px',
-                                            height: '48px',
+                                            width: '40px',
+                                            height: '40px',
                                             cursor: 'pointer',
                                             display: 'flex',
                                             alignItems: 'center',
                                             justifyContent: 'center',
-                                            fontSize: '24px',
+                                            fontSize: '20px',
                                             transition: 'all 0.2s ease',
                                             zIndex: 10
                                         }}
                                         onMouseEnter={(e) => {
                                             e.currentTarget.style.background = 'rgba(0, 0, 0, 0.8)';
-                                            e.currentTarget.style.transform = 'translateY(-50%) scale(1.1)';
+                                            e.currentTarget.style.transform = 'translateY(-50%) scale(1.08)';
                                         }}
                                         onMouseLeave={(e) => {
                                             e.currentTarget.style.background = 'rgba(0, 0, 0, 0.6)';
                                             e.currentTarget.style.transform = 'translateY(-50%) scale(1)';
                                         }}
+                                        aria-label="Ảnh trước"
                                     >
                                         ◀
                                     </button>
@@ -199,31 +212,32 @@ export default function Overview({ hotelData, destination }) {
                                         onClick={handleNextImage}
                                         style={{
                                             position: 'absolute',
-                                            right: '20px',
+                                            right: '16px',
                                             top: '50%',
                                             transform: 'translateY(-50%)',
                                             background: 'rgba(0, 0, 0, 0.6)',
                                             color: 'white',
                                             border: 'none',
                                             borderRadius: '50%',
-                                            width: '48px',
-                                            height: '48px',
+                                            width: '40px',
+                                            height: '40px',
                                             cursor: 'pointer',
                                             display: 'flex',
                                             alignItems: 'center',
                                             justifyContent: 'center',
-                                            fontSize: '24px',
+                                            fontSize: '20px',
                                             transition: 'all 0.2s ease',
                                             zIndex: 10
                                         }}
                                         onMouseEnter={(e) => {
                                             e.currentTarget.style.background = 'rgba(0, 0, 0, 0.8)';
-                                            e.currentTarget.style.transform = 'translateY(-50%) scale(1.1)';
+                                            e.currentTarget.style.transform = 'translateY(-50%) scale(1.08)';
                                         }}
                                         onMouseLeave={(e) => {
                                             e.currentTarget.style.background = 'rgba(0, 0, 0, 0.6)';
                                             e.currentTarget.style.transform = 'translateY(-50%) scale(1)';
                                         }}
+                                        aria-label="Ảnh tiếp theo"
                                     >
                                         ▶
                                     </button>
@@ -231,14 +245,14 @@ export default function Overview({ hotelData, destination }) {
                                     {/* Image Counter Badge */}
                                     <div style={{
                                         position: 'absolute',
-                                        bottom: '20px',
-                                        right: '20px',
+                                        bottom: '16px',
+                                        right: '16px',
                                         background: 'rgba(0, 0, 0, 0.7)',
                                         color: 'white',
-                                        padding: '8px 16px',
-                                        borderRadius: '20px',
-                                        fontSize: '14px',
-                                        fontWeight: '600',
+                                        padding: '6px 12px',
+                                        borderRadius: '16px',
+                                        fontSize: '13px',
+                                        fontWeight: 600,
                                         zIndex: 10
                                     }}>
                                         {currentImageIndex + 1} / {hotelImages.length}
@@ -247,47 +261,38 @@ export default function Overview({ hotelData, destination }) {
                             )}
                         </div>
 
-                        {/* Thumbnail Navigation */}
+                        {/* Right: 2x3 Thumbnail Grid */}
                         {hasMultipleImages && (
-                            <div className="hotel-detail-thumbnail-grid" style={{
-                                display: 'grid',
-                                gridTemplateColumns: 'repeat(auto-fill, minmax(120px, 1fr))',
-                                gap: '12px',
-                                marginTop: '16px',
-                                maxHeight: '160px',
-                                overflowY: 'auto'
-                            }}>
-                                {hotelImages.map((image, index) => (
-                                    <img
+                            <div
+                                className="hotel-detail-thumbnail-grid side"
+                                style={{
+                                    display: 'grid',
+                                    gridTemplateColumns: '1fr 1fr',
+                                    gridTemplateRows: 'repeat(3, 1fr)',
+                                    gap: '12px',
+                                    height: '380px'
+                                }}
+                            >
+                                {hotelImages.slice(0, 6).map((image, index) => (
+                                    <button
                                         key={index}
-                                        src={image}
-                                        alt={`${hotelData.name} - Thumbnail ${index + 1}`}
                                         onClick={() => setCurrentImageIndex(index)}
                                         style={{
-                                            width: '100%',
-                                            height: '100px',
-                                            objectFit: 'cover',
+                                            padding: 0,
+                                            border: currentImageIndex === index ? '3px solid #0a5757' : '1px solid #e5e7eb',
                                             borderRadius: '8px',
+                                            overflow: 'hidden',
                                             cursor: 'pointer',
-                                            border: currentImageIndex === index
-                                                ? '3px solid #0a5757'
-                                                : '3px solid transparent',
-                                            opacity: currentImageIndex === index ? 1 : 0.6,
-                                            transition: 'all 0.3s ease'
+                                            background: 'transparent'
                                         }}
-                                        onMouseEnter={(e) => {
-                                            if (currentImageIndex !== index) {
-                                                e.currentTarget.style.opacity = '0.9';
-                                                e.currentTarget.style.transform = 'scale(1.05)';
-                                            }
-                                        }}
-                                        onMouseLeave={(e) => {
-                                            if (currentImageIndex !== index) {
-                                                e.currentTarget.style.opacity = '0.6';
-                                                e.currentTarget.style.transform = 'scale(1)';
-                                            }
-                                        }}
-                                    />
+                                        aria-label={`Chọn ảnh ${index + 1}`}
+                                    >
+                                        <SmartImage
+                                            src={image}
+                                            alt={`${hotelData.name} - Thumbnail ${index + 1}`}
+                                            style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
+                                        />
+                                    </button>
                                 ))}
                             </div>
                         )}
@@ -303,11 +308,11 @@ export default function Overview({ hotelData, destination }) {
                             <h1 className="hotel-detail-name">{hotelData.name}</h1>
 
                             {/* Destination Badge */}
-                            {destination && (
+                            {/* {destination && (
                                 <div className="destination-badge">
                                     📍 {destination.name}, {destination.country}
                                 </div>
-                            )}
+                            )} */}
 
                             <div className="hotel-detail-rating">
                                 <span className="hotel-detail-stars">{getStarDisplay(hotelData.category)}</span>
