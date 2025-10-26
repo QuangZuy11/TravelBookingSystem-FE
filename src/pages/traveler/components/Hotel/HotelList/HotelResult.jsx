@@ -22,6 +22,7 @@ import {
     Skeleton,
     Alert,
 } from '@mui/material';
+import SmartImage from '../../../../../components/common/SmartImage';
 import {
     Favorite as FavoriteIcon,
     FavoriteBorder as FavoriteBorderIcon,
@@ -444,13 +445,12 @@ function HotelCard({ hotel, isFavorite, onToggleFavorite, onBook }) {
                             anchorOrigin={{ vertical: 'top', horizontal: 'left' }}
                             className="discount-badge"
                         >
-                            <CardMedia
-                                component="img"
-                                image={hotel.image}
+                            <SmartImage
+                                src={hotel.image}
                                 alt={hotel.name}
                                 className="hotel-image"
                                 onClick={handleHotelClick}
-                                sx={{ cursor: 'pointer' }}
+                                style={{ cursor: 'pointer' }}
                             />
                         </Badge>
 

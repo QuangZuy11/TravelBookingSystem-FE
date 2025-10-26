@@ -1,6 +1,7 @@
 import { useState, useContext, useEffect } from 'react';
 import { FaHotel, FaMapMarkerAlt, FaUser, FaPhone, FaEnvelope, FaCalendarAlt, FaBed, FaCreditCard, FaQrcode } from 'react-icons/fa';
 import { AuthContext } from '../../../../../contexts/AuthContext';
+import SmartImage from '../../../../../components/common/SmartImage';
 import './HotelDetail.css';
 
 export default function Rooms({ roomsData, loading, error, hotelData }) {
@@ -444,7 +445,7 @@ export default function Rooms({ roomsData, loading, error, hotelData }) {
                 {rooms.map((room) => (
                     <div key={room.id} className="room-card">
                         <div className="room-image">
-                            <img src={room.image || "/placeholder.svg"} alt={room.name} />
+                            <SmartImage src={room.image || "/placeholder.svg"} alt={room.name} />
                             <div className="room-badge">
                                 {room.availableCount > 0
                                     ? `${room.availableCount} phòng trống`
