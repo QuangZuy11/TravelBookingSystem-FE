@@ -22,6 +22,7 @@ const RoomTypeDetailsPage = () => {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [activeTab, setActiveTab] = useState('pricing');
+    const [currentImageIndex, setCurrentImageIndex] = useState(0);
 
     // Modal states
     const [isEditModalOpen, setIsEditModalOpen] = useState(false);
@@ -118,7 +119,9 @@ const RoomTypeDetailsPage = () => {
     const handleDeleteRoom = async () => {
         if (window.confirm('Are you sure you want to delete this room type? This action cannot be undone.')) {
             try {
-                await axios.delete(`/api/provider/${providerId}/hotels/${hotelId}/rooms/${roomId}`);
+                await axios.delete(`/api/provider/${providerId}/hotels/${hotelId}/rooms/${roomId}`, {
+                    headers: { Authorization: `Bearer ${token}` }
+                });
                 alert('Room type deleted successfully!');
                 navigate(`/provider/${providerId}/hotels/${hotelId}`);
             } catch (err) {
@@ -163,7 +166,9 @@ const RoomTypeDetailsPage = () => {
     const handleDeletePricingRule = async (ruleId) => {
         if (window.confirm('Are you sure you want to delete this pricing rule?')) {
             try {
-                await axios.delete(`/api/room-prices/${ruleId}`);
+                await axios.delete(`/api/room-prices/${ruleId}`, {
+                    headers: { Authorization: `Bearer ${token}` }
+                });
                 alert('Pricing rule deleted successfully!');
                 fetchPricingRules();
             } catch (err) {
@@ -190,6 +195,23 @@ const RoomTypeDetailsPage = () => {
             alert('Failed to add maintenance record');
             console.error(err);
         }
+    };
+
+    // Image carousel controls
+    const handleNextImage = () => {
+        if (room.images && room.images.length > 0) {
+            setCurrentImageIndex((prev) => (prev + 1) % room.images.length);
+        }
+    };
+
+    const handlePrevImage = () => {
+        if (room.images && room.images.length > 0) {
+            setCurrentImageIndex((prev) => (prev - 1 + room.images.length) % room.images.length);
+        }
+    };
+
+    const handleThumbnailClick = (index) => {
+        setCurrentImageIndex(index);
     };
 
     if (loading) return <LoadingSpinner />;
@@ -221,13 +243,65 @@ const RoomTypeDetailsPage = () => {
             <div className="bg-white p-6 rounded-lg shadow-md mb-6">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div>
+                        {/* Image Carousel */}
                         {room.images && room.images.length > 0 ? (
-                            <div className="relative h-64 mb-4">
-                                <img
-                                    src={getProxiedGoogleDriveUrl(room.images[0])}
-                                    alt={room.room_type_name}
-                                    className="w-full h-full object-cover rounded-md"
-                                />
+                            <div className="mb-4">
+                                {/* Main Image */}
+                                <div className="relative h-64 mb-3">
+                                    <img
+                                        src={getProxiedGoogleDriveUrl(room.images[currentImageIndex])}
+                                        alt={`${room.room_type_name} - Image ${currentImageIndex + 1}`}
+                                        className="w-full h-full object-cover rounded-lg"
+                                    />
+
+                                    {/* Image Counter */}
+                                    <div className="absolute top-3 right-3 bg-black bg-opacity-70 text-white px-3 py-1 rounded-full text-sm font-semibold">
+                                        {currentImageIndex + 1} / {room.images.length}
+                                    </div>
+
+                                    {/* Navigation Arrows - Only show if more than 1 image */}
+                                    {room.images.length > 1 && (
+                                        <>
+                                            <button
+                                                onClick={handlePrevImage}
+                                                className="absolute left-3 top-1/2 transform -translate-y-1/2 bg-white bg-opacity-95 hover:bg-purple-600 rounded-full w-10 h-10 flex items-center justify-center shadow-lg transition-all z-10"
+                                            >
+                                                <span className="text-xl">◀</span>
+                                            </button>
+                                            <button
+                                                onClick={handleNextImage}
+                                                className="absolute right-3 top-1/2 transform -translate-y-1/2 bg-white bg-opacity-95 hover:bg-purple-600 rounded-full w-10 h-10 flex items-center justify-center shadow-lg transition-all z-10"
+                                            >
+                                                <span className="text-xl">▶</span>
+                                            </button>
+                                        </>
+                                    )}
+                                </div>
+
+                                {/* Thumbnails - Only show if more than 1 image */}
+                                {room.images.length > 1 && (
+                                    <div className="flex gap-2 overflow-x-auto pb-2">
+                                        {room.images.map((image, index) => (
+                                            <div
+                                                key={index}
+                                                onClick={() => handleThumbnailClick(index)}
+                                                className={`flex-shrink-0 w-20 h-16 rounded-md overflow-hidden cursor-pointer transition-all ${currentImageIndex === index
+                                                        ? 'border-3 border-purple-600 opacity-100'
+                                                        : 'border-3 border-transparent opacity-60 hover:opacity-80'
+                                                    }`}
+                                                style={{
+                                                    border: currentImageIndex === index ? '3px solid #9333ea' : '3px solid transparent'
+                                                }}
+                                            >
+                                                <img
+                                                    src={getProxiedGoogleDriveUrl(image)}
+                                                    alt={`Thumbnail ${index + 1}`}
+                                                    className="w-full h-full object-cover"
+                                                />
+                                            </div>
+                                        ))}
+                                    </div>
+                                )}
                             </div>
                         ) : (
                             <div className="h-64 bg-gray-200 flex items-center justify-center rounded-md mb-4">

@@ -23,6 +23,7 @@ const HotelDetailsPage = () => {
     const [isRoomFormModalOpen, setIsRoomFormModalOpen] = useState(false);
     const [editingRoom, setEditingRoom] = useState(null);
     const [hoveredRow, setHoveredRow] = useState(null);
+    const [currentImageIndex, setCurrentImageIndex] = useState(0);
     const token = localStorage.getItem('token');
 
     const fetchHotelDetails = async () => {
@@ -100,7 +101,9 @@ const HotelDetailsPage = () => {
     const handleDeleteHotel = async () => {
         if (window.confirm('Are you sure you want to delete this hotel and all its associated data?')) {
             try {
-                await axios.delete(`/api/hotel/provider/${providerId}/hotels/${hotelId}`);
+                await axios.delete(`/api/hotel/provider/${providerId}/hotels/${hotelId}`, {
+                    headers: { Authorization: `Bearer ${token}` }
+                });
                 alert('Hotel deleted successfully!');
                 navigate(`/provider/${providerId}/hotels`);
             } catch (err) {
@@ -142,7 +145,9 @@ const HotelDetailsPage = () => {
     const handleDeleteRoomType = async (roomId) => {
         if (window.confirm('Are you sure you want to delete this room type?')) {
             try {
-                await axios.delete(`/api/hotel/provider/${providerId}/hotels/${hotelId}/rooms/${roomId}`);
+                await axios.delete(`/api/hotel/provider/${providerId}/hotels/${hotelId}/rooms/${roomId}`, {
+                    headers: { Authorization: `Bearer ${token}` }
+                });
                 alert('Room type deleted successfully!');
                 fetchRoomsForHotel();
             } catch (err) {
@@ -150,6 +155,23 @@ const HotelDetailsPage = () => {
                 console.error(err);
             }
         }
+    };
+
+    // Image carousel controls
+    const handleNextImage = () => {
+        if (hotel.images && hotel.images.length > 0) {
+            setCurrentImageIndex((prev) => (prev + 1) % hotel.images.length);
+        }
+    };
+
+    const handlePrevImage = () => {
+        if (hotel.images && hotel.images.length > 0) {
+            setCurrentImageIndex((prev) => (prev - 1 + hotel.images.length) % hotel.images.length);
+        }
+    };
+
+    const handleThumbnailClick = (index) => {
+        setCurrentImageIndex(index);
     };
 
     if (loading) return <LoadingSpinner />;
@@ -415,8 +437,162 @@ const HotelDetailsPage = () => {
             <div style={summaryCardStyle}>
                 <div style={gridStyle}>
                     <div>
+                        {/* Image Carousel */}
                         {hotel.images && hotel.images.length > 0 ? (
-                            <img src={getProxiedGoogleDriveUrl(hotel.images[0])} alt={hotel.name} style={imageStyle} />
+                            <div style={{ position: 'relative', marginBottom: '1.5rem' }}>
+                                {/* Main Image */}
+                                <div style={{ position: 'relative', ...imageStyle }}>
+                                    <img
+                                        src={getProxiedGoogleDriveUrl(hotel.images[currentImageIndex])}
+                                        alt={`${hotel.name} - Image ${currentImageIndex + 1}`}
+                                        style={{
+                                            width: '100%',
+                                            height: '100%',
+                                            objectFit: 'cover',
+                                            borderRadius: '16px'
+                                        }}
+                                    />
+
+                                    {/* Image Counter Badge */}
+                                    <div style={{
+                                        position: 'absolute',
+                                        top: '16px',
+                                        right: '16px',
+                                        background: 'rgba(0, 0, 0, 0.7)',
+                                        color: 'white',
+                                        padding: '6px 12px',
+                                        borderRadius: '20px',
+                                        fontSize: '0.875rem',
+                                        fontWeight: '600'
+                                    }}>
+                                        {currentImageIndex + 1} / {hotel.images.length}
+                                    </div>
+
+                                    {/* Navigation Arrows - Only show if more than 1 image */}
+                                    {hotel.images.length > 1 && (
+                                        <>
+                                            {/* Previous Button */}
+                                            <button
+                                                onClick={handlePrevImage}
+                                                style={{
+                                                    position: 'absolute',
+                                                    left: '16px',
+                                                    top: '50%',
+                                                    transform: 'translateY(-50%)',
+                                                    background: 'rgba(255, 255, 255, 0.95)',
+                                                    border: 'none',
+                                                    borderRadius: '50%',
+                                                    width: '48px',
+                                                    height: '48px',
+                                                    cursor: 'pointer',
+                                                    display: 'flex',
+                                                    alignItems: 'center',
+                                                    justifyContent: 'center',
+                                                    fontSize: '1.5rem',
+                                                    boxShadow: '0 4px 12px rgba(0,0,0,0.2)',
+                                                    transition: 'all 0.3s',
+                                                    zIndex: 10
+                                                }}
+                                                onMouseEnter={(e) => {
+                                                    e.currentTarget.style.background = '#667eea';
+                                                    e.currentTarget.style.transform = 'translateY(-50%) scale(1.1)';
+                                                }}
+                                                onMouseLeave={(e) => {
+                                                    e.currentTarget.style.background = 'rgba(255, 255, 255, 0.95)';
+                                                    e.currentTarget.style.transform = 'translateY(-50%) scale(1)';
+                                                }}
+                                            >
+                                                ◀
+                                            </button>
+
+                                            {/* Next Button */}
+                                            <button
+                                                onClick={handleNextImage}
+                                                style={{
+                                                    position: 'absolute',
+                                                    right: '16px',
+                                                    top: '50%',
+                                                    transform: 'translateY(-50%)',
+                                                    background: 'rgba(255, 255, 255, 0.95)',
+                                                    border: 'none',
+                                                    borderRadius: '50%',
+                                                    width: '48px',
+                                                    height: '48px',
+                                                    cursor: 'pointer',
+                                                    display: 'flex',
+                                                    alignItems: 'center',
+                                                    justifyContent: 'center',
+                                                    fontSize: '1.5rem',
+                                                    boxShadow: '0 4px 12px rgba(0,0,0,0.2)',
+                                                    transition: 'all 0.3s',
+                                                    zIndex: 10
+                                                }}
+                                                onMouseEnter={(e) => {
+                                                    e.currentTarget.style.background = '#667eea';
+                                                    e.currentTarget.style.transform = 'translateY(-50%) scale(1.1)';
+                                                }}
+                                                onMouseLeave={(e) => {
+                                                    e.currentTarget.style.background = 'rgba(255, 255, 255, 0.95)';
+                                                    e.currentTarget.style.transform = 'translateY(-50%) scale(1)';
+                                                }}
+                                            >
+                                                ▶
+                                            </button>
+                                        </>
+                                    )}
+                                </div>
+
+                                {/* Thumbnail Navigation - Only show if more than 1 image */}
+                                {hotel.images.length > 1 && (
+                                    <div style={{
+                                        display: 'flex',
+                                        gap: '8px',
+                                        marginTop: '12px',
+                                        overflowX: 'auto',
+                                        padding: '4px'
+                                    }}>
+                                        {hotel.images.map((image, index) => (
+                                            <div
+                                                key={index}
+                                                onClick={() => handleThumbnailClick(index)}
+                                                style={{
+                                                    width: '80px',
+                                                    height: '60px',
+                                                    borderRadius: '8px',
+                                                    overflow: 'hidden',
+                                                    cursor: 'pointer',
+                                                    border: currentImageIndex === index
+                                                        ? '3px solid #667eea'
+                                                        : '3px solid transparent',
+                                                    opacity: currentImageIndex === index ? 1 : 0.6,
+                                                    transition: 'all 0.3s',
+                                                    flexShrink: 0
+                                                }}
+                                                onMouseEnter={(e) => {
+                                                    if (currentImageIndex !== index) {
+                                                        e.currentTarget.style.opacity = '0.8';
+                                                    }
+                                                }}
+                                                onMouseLeave={(e) => {
+                                                    if (currentImageIndex !== index) {
+                                                        e.currentTarget.style.opacity = '0.6';
+                                                    }
+                                                }}
+                                            >
+                                                <img
+                                                    src={getProxiedGoogleDriveUrl(image)}
+                                                    alt={`Thumbnail ${index + 1}`}
+                                                    style={{
+                                                        width: '100%',
+                                                        height: '100%',
+                                                        objectFit: 'cover'
+                                                    }}
+                                                />
+                                            </div>
+                                        ))}
+                                    </div>
+                                )}
+                            </div>
                         ) : (
                             <div style={{
                                 ...imageStyle,
