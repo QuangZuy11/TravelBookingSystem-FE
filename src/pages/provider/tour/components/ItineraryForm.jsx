@@ -475,6 +475,34 @@ const ItineraryForm = ({ tourId, basicInfo, existingItineraries = [], isEditMode
         }
     };
 
+    // Lưu current form data vào itineraries (draft mode - không validate)
+    const saveDraftItinerary = () => {
+        // Tìm itinerary đang edit
+        const existingIndex = itineraries.findIndex(it => it.day_number === currentDay);
+
+        if (existingIndex >= 0) {
+            // Update existing
+            const updated = [...itineraries];
+            updated[existingIndex] = {
+                ...updated[existingIndex],
+                ...formData
+            };
+            return updated;
+        } else if (formData.title.trim() || formData.activities.length > 0) {
+            // Add new nếu có data
+            return [...itineraries, formData];
+        }
+
+        return itineraries;
+    };
+
+    // Handler khi nhấn "Quay lại"
+    const handleBackClick = () => {
+        const updatedItineraries = saveDraftItinerary();
+        console.log('⬅️ Saving draft before going back:', updatedItineraries);
+        onBack(updatedItineraries);
+    };
+
     return (
         <div className="itinerary-form">
             <div className="form-header">
@@ -719,38 +747,6 @@ const ItineraryForm = ({ tourId, basicInfo, existingItineraries = [], isEditMode
                                             placeholder="Mô tả chi tiết về hoạt động..."
                                         />
                                     </div>
-
-                                    {/* Cost & Options */}
-                                    <div className="form-row">
-                                        <div className="form-group">
-                                            <label className="form-label">Chi phí (VNĐ)</label>
-                                            <input
-                                                type="number"
-                                                value={activity.cost}
-                                                onChange={(e) => handleActivityChange(index, 'cost', Number(e.target.value))}
-                                                className="form-input"
-                                                min="0"
-                                            />
-                                        </div>
-                                        <div className="form-group checkboxes-group">
-                                            <label className="checkbox-label">
-                                                <input
-                                                    type="checkbox"
-                                                    checked={activity.included_in_tour}
-                                                    onChange={(e) => handleActivityChange(index, 'included_in_tour', e.target.checked)}
-                                                />
-                                                <span>Bao gồm trong tour</span>
-                                            </label>
-                                            <label className="checkbox-label">
-                                                <input
-                                                    type="checkbox"
-                                                    checked={activity.optional}
-                                                    onChange={(e) => handleActivityChange(index, 'optional', e.target.checked)}
-                                                />
-                                                <span>Tùy chọn</span>
-                                            </label>
-                                        </div>
-                                    </div>
                                 </div>
                             </div>
                         ))}
@@ -776,7 +772,11 @@ const ItineraryForm = ({ tourId, basicInfo, existingItineraries = [], isEditMode
 
             {/* Form Actions */}
             <div className="form-actions">
-                <button type="button" onClick={onBack} className="btn-cancel">
+                <button
+                    type="button"
+                    onClick={handleBackClick}
+                    className="btn-cancel"
+                >
                     ← Quay lại
                 </button>
 
