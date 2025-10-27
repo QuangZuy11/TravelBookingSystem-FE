@@ -70,6 +70,21 @@
     color: #ef4444;
     font-size: 0.75rem;
     margin-top: 0.25rem;
+    font-weight: 500;
+}
+
+.success-message {
+    display: block;
+    color: #10b981;
+    font-size: 0.75rem;
+    margin-top: 0.25rem;
+    font-weight: 500;
+}
+
+.optional {
+    color: #9ca3af;
+    font-weight: normal;
+    font-size: 0.8rem;
 }
 
 .form-row {

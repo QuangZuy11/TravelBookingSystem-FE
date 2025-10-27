@@ -103,7 +103,12 @@ const TourDetailsPage = () => {
 
         try {
             await axios.delete(
-                `http://localhost:3000/api/tour/provider/${providerId}/tours/${tourId}`
+                `http://localhost:3000/api/tour/provider/${providerId}/tours/${tourId}`,
+                {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                }
             );
             toast.success('Đã xóa tour thành công!');
             navigate('/provider/tours');
@@ -170,7 +175,10 @@ const TourDetailsPage = () => {
                     <div className="info-item">
                         <span className="info-label">Địa điểm:</span>
                         <span className="info-value">
-                            {tour.destination_id?.name || tour.location || 'Chưa có thông tin'}
+                            {tour.destinations && tour.destinations.length > 0
+                                ? tour.destinations.map(dest => dest.name).join(', ')
+                                : (tour.destination_id?.name || tour.location || 'Chưa có thông tin')
+                            }
                         </span>
                     </div>
                     <div className="info-item">

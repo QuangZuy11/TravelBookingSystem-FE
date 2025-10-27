@@ -22,12 +22,13 @@ const BudgetForm = ({ tourId, itineraries, existingBudgetItems = [], isEditMode,
     });
     const [loading, setLoading] = useState(false);
 
-    // Load existing budget items in edit mode
+    // Load existing budget items when prop changes (edit mode or coming back)
     useEffect(() => {
-        if (isEditMode && existingBudgetItems.length > 0) {
+        if (existingBudgetItems && existingBudgetItems.length > 0) {
+            console.log('📥 Loading existing budget items:', existingBudgetItems);
             setBudgetItems(existingBudgetItems);
         }
-    }, [isEditMode, existingBudgetItems]);
+    }, [existingBudgetItems]);
 
     // Load itineraries và activities từ backend
     useEffect(() => {
@@ -252,7 +253,11 @@ const BudgetForm = ({ tourId, itineraries, existingBudgetItems = [], isEditMode,
                 <div className="empty-state">
                     <p>⚠️ Không có lịch trình nào. Vui lòng quay lại bước 2 để thêm lịch trình.</p>
                     <div className="form-actions">
-                        <button type="button" onClick={onBack} className="btn-secondary">
+                        <button
+                            type="button"
+                            onClick={() => onBack(budgetItems)}
+                            className="btn-secondary"
+                        >
                             ← Quay lại
                         </button>
                     </div>
@@ -525,7 +530,11 @@ const BudgetForm = ({ tourId, itineraries, existingBudgetItems = [], isEditMode,
 
                     {/* Form Actions */}
                     <div className="form-actions">
-                        <button type="button" onClick={onBack} className="btn-cancel">
+                        <button
+                            type="button"
+                            onClick={() => onBack(budgetItems)}
+                            className="btn-cancel"
+                        >
                             ← Quay lại
                         </button>
 

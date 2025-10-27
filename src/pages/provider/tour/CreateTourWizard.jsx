@@ -122,6 +122,7 @@ const CreateTourWizard = () => {
     }, [isEditMode, editTourId, providerId, navigate]);
 
     const handleBasicInfoComplete = (data) => {
+        console.log('💾 Saving basic info:', data);
         setTourData(prev => ({
             ...prev,
             tourId: data.tourId,
@@ -132,6 +133,7 @@ const CreateTourWizard = () => {
     };
 
     const handleItineraryComplete = (data) => {
+        console.log('💾 Saving itinerary:', data);
         setTourData(prev => ({
             ...prev,
             itineraries: data.itineraries
@@ -157,8 +159,36 @@ const CreateTourWizard = () => {
     const handleBack = () => {
         if (currentStep > 1) {
             setCurrentStep(currentStep - 1);
-            // Data is preserved in tourData state, no need to reset
+            // Data is preserved in tourData state via callbacks
         }
+    };
+
+    const handleBackFromItinerary = (currentItineraries) => {
+        // Save current itineraries before going back
+        console.log('⬅️ Going back from itinerary. Current itineraries:', currentItineraries);
+        setTourData(prev => {
+            const updated = {
+                ...prev,
+                itineraries: currentItineraries
+            };
+            console.log('💾 Updated tourData:', updated);
+            return updated;
+        });
+        setCurrentStep(1);
+    };
+
+    const handleBackFromBudget = (currentBudgetItems) => {
+        // Save current budget items before going back
+        console.log('⬅️ Going back from budget. Current budget items:', currentBudgetItems);
+        setTourData(prev => {
+            const updated = {
+                ...prev,
+                budgetItems: currentBudgetItems
+            };
+            console.log('💾 Updated tourData:', updated);
+            return updated;
+        });
+        setCurrentStep(2);
     };
 
     const steps = [
@@ -217,7 +247,7 @@ const CreateTourWizard = () => {
                     {currentStep === 1 && (
                         <BasicInfoForm
                             providerId={providerId}
-                            initialData={isEditMode ? tourData.basicInfo : null}
+                            initialData={tourData.basicInfo}
                             isEditMode={isEditMode}
                             onNext={handleBasicInfoComplete}
                             onCancel={() => navigate('/provider/tours')}
@@ -231,7 +261,7 @@ const CreateTourWizard = () => {
                             existingItineraries={tourData.itineraries}
                             isEditMode={isEditMode}
                             onNext={handleItineraryComplete}
-                            onBack={handleBack}
+                            onBack={handleBackFromItinerary}
                         />
                     )}
 
@@ -242,7 +272,7 @@ const CreateTourWizard = () => {
                             existingBudgetItems={tourData.budgetItems}
                             isEditMode={isEditMode}
                             onComplete={handleBudgetComplete}
-                            onBack={handleBack}
+                            onBack={handleBackFromBudget}
                         />
                     )}
                 </div>
