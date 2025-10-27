@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import "./FeaturedTours.css";
 import { Clock, MapPin, Star } from "lucide-react";
 import { Link } from "react-router-dom";
-import { getProxiedGoogleDriveUrl } from '../../../utils/googleDriveImageHelper';
+import { getProxiedGoogleDriveUrl } from "../../../utils/googleDriveImageHelper";
 
 export default function FeaturedTours() {
   const [tours, setTours] = useState([]);
@@ -49,7 +49,9 @@ export default function FeaturedTours() {
                 <div className="tour-card-image-wrapper">
                   <img
                     className="tour-card-image"
-                    src={getProxiedGoogleDriveUrl(tour.image || "/placeholder.svg")}
+                    src={getProxiedGoogleDriveUrl(
+                      tour.image || "/placeholder.svg"
+                    )}
                     alt={tour.title}
                   />
                   <div className="tour-card-badge">Nổi bật</div>
@@ -81,7 +83,10 @@ export default function FeaturedTours() {
                           ))}
                         </ul>
                       ) : (
-                        <p>{tour.description.slice(0, 150)}{tour.description.length > 150 ? '...' : ''}</p>
+                        <p>
+                          {tour.description.slice(0, 150)}
+                          {tour.description.length > 150 ? "..." : ""}
+                        </p>
                       )}
                     </div>
                   )}
@@ -99,7 +104,10 @@ export default function FeaturedTours() {
                     <span className="tour-card-price">
                       {formatPrice(tour.price)}
                     </span>
-                    <Link to={`/book/${tour._id}`} className="tour-card-button">
+                    <Link
+                      to={`/tour/${tour?._id || tour?.id}`}
+                      className="tour-card-button"
+                    >
                       Đặt Ngay
                     </Link>
                   </div>

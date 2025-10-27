@@ -13,7 +13,7 @@ export default function ToursPage() {
   const [tours, setTours] = useState([]);
   const [loading, setLoading] = useState(false);
 
-  // Hàm fetch tour từ backend
+  // 🧭 Hàm fetch tour từ backend
   const fetchTours = async () => {
     setLoading(true);
     let url = "http://localhost:3000/api/traveler/tours?";
@@ -22,19 +22,70 @@ export default function ToursPage() {
       url += `destination=${encodeURIComponent(filterDestination)}&`;
     if (filterPrice !== "all") url += `price=${filterPrice}&`;
     if (sortBy !== "popular") url += `sortBy=${sortBy}&`;
+
     try {
       const res = await fetch(url);
       const data = await res.json();
       setTours(data.data || []);
     } catch (err) {
-      console.error("Lỗi khi fetch tour:", err); // Thêm dòng này để xem lỗi chi tiết
+      console.error("Lỗi khi fetch tour:", err);
       setTours([]);
     }
     setLoading(false);
   };
 
+  // ✅ Khi component mount, kiểm tra có dữ liệu tìm kiếm từ sessionStorage không
   useEffect(() => {
-    fetchTours();
+    // Chỉ chạy 1 lần khi component mount, không remount
+    let mounted = true;
+
+    const storedTours = sessionStorage.getItem("searchTours");
+    const storedDestination = sessionStorage.getItem("searchDestination");
+
+    console.log("🔄 ToursPage mounted");
+    console.log("📦 sessionStorage searchTours:", storedTours);
+    console.log("📦 sessionStorage searchDestination:", storedDestination);
+
+    if (storedTours && storedTours !== "null" && storedTours !== "[]") {
+      try {
+        const parsedTours = JSON.parse(storedTours);
+
+        console.log("🔍 Parsed tours:", parsedTours);
+        console.log("🔍 Number of tours:", parsedTours.length);
+        console.log("📍 Destination:", storedDestination);
+
+        if (Array.isArray(parsedTours) && parsedTours.length > 0 && mounted) {
+          // ✅ Dùng dữ liệu lưu trong sessionStorage
+          console.log("✅ Setting tours from sessionStorage");
+
+          // Set state trước
+          setTours(parsedTours);
+          setFilterDestination(storedDestination || "all");
+          setSearchQuery(storedDestination || "");
+
+          // Xóa sessionStorage SAU KHI set state
+          setTimeout(() => {
+            sessionStorage.removeItem("searchTours");
+            sessionStorage.removeItem("searchDestination");
+          }, 100);
+
+          return; // Không fetch từ API
+        }
+      } catch (error) {
+        console.error("❌ Error parsing tours from sessionStorage:", error);
+      }
+    }
+
+    // Nếu không có dữ liệu trong sessionStorage, fetch từ API
+    if (mounted) {
+      console.log("🌐 Fetching tours from API");
+      fetchTours();
+    }
+
+    // Cleanup function
+    return () => {
+      mounted = false;
+    };
     // eslint-disable-next-line
   }, []);
 
@@ -45,11 +96,13 @@ export default function ToursPage() {
   return (
     <div className="tours-page">
       <div className="tours-container">
+        {/* Tiêu đề trang */}
         <div className="page-header">
           <h1>Tất cả tour du lịch</h1>
           <p>Khám phá những điểm đến tuyệt vời trên khắp Việt Nam</p>
         </div>
 
+        {/* Khung lọc và tìm kiếm */}
         <div className="filter-card">
           <div className="filter-card-header">
             <Filter size={20} />
@@ -61,7 +114,7 @@ export default function ToursPage() {
               <label>Tìm kiếm</label>
               <input
                 type="text"
-                placeholder="Nhập tên tour..."
+                placeholder="Nhập tên tour hoặc địa điểm..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
               />
@@ -120,18 +173,27 @@ export default function ToursPage() {
           </div>
         </div>
 
+        {/* Đếm số tour */}
         <div className="tour-count">
           Hiển thị <span>{tours.length}</span> tour
         </div>
 
+        {/* Lưới tour */}
         <div className="tour-grid">
           {loading ? (
             <div>Đang tải...</div>
+          ) : tours.length > 0 ? (
+            tours.map((tour) => {
+              return <TourCard key={tour._id || tour.id} tour={tour} />;
+            })
           ) : (
-            tours.map((tour) => <TourCard key={tour.id} tour={tour} />)
+            <div className="no-results">
+              <p>Không có tour nào để hiển thị</p>
+            </div>
           )}
         </div>
 
+        {/* Không tìm thấy kết quả */}
         {tours.length === 0 && !loading && (
           <div className="no-results">
             <p>Không tìm thấy tour phù hợp</p>

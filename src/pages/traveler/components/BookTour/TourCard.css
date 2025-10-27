@@ -7,6 +7,7 @@
   box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
   transition: all 0.3s ease;
   height: 100%;
+  max-width: 100%; /* Ngăn card mở rộng quá mức */
 }
 
 .tour-card:hover {
@@ -34,11 +35,12 @@
 }
 
 .tour-card .tour-info {
-  padding: 20px;
+  padding: 16px; /* Giảm padding từ 20px xuống 16px */
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 6px; /* Giảm gap xuống 6px */
   flex: 1;
+  min-height: 0; /* Cho phép flexbox co lại */
 }
 
 .tour-card .tour-name {
@@ -81,7 +83,9 @@
   margin: 0;
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 6px; /* Giảm gap xuống 6px */
+  max-height: 72px; /* Giảm từ 90px xuống 72px */
+  overflow: hidden; /* Ẩn phần dư */
 }
 
 .tour-card .tour-highlights li {
@@ -90,6 +94,10 @@
   padding-left: 18px;
   position: relative;
   line-height: 1.5;
+  display: -webkit-box;
+  -webkit-line-clamp: 1; /* Chỉ hiển thị 1 dòng */
+  -webkit-box-orient: vertical;
+  overflow: hidden;
 }
 
 .tour-card .tour-highlights li::before {
@@ -106,7 +114,7 @@
   align-items: center;
   gap: 6px;
   font-size: 14px;
-  margin-top: 4px;
+  margin-top: 2px; /* Giảm margin-top từ 4px xuống 2px */
 }
 
 .tour-card .rating-value {
@@ -124,7 +132,7 @@
   justify-content: space-between;
   align-items: center;
   margin-top: auto;
-  padding-top: 16px;
+  padding-top: 12px; /* Giảm padding-top từ 16px xuống 12px */
   border-top: 2px solid #f0f0f0;
 }
 

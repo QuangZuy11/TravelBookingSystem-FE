@@ -126,8 +126,22 @@
 
 .tour-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(330px, 1fr));
+  grid-template-columns: repeat(3, 1fr); /* Cố định 3 cột */
   gap: 1.5rem;
+}
+
+/* Responsive cho tablet */
+@media (max-width: 1024px) {
+  .tour-grid {
+    grid-template-columns: repeat(2, 1fr); /* 2 cột trên tablet */
+  }
+}
+
+/* Responsive cho mobile */
+@media (max-width: 768px) {
+  .tour-grid {
+    grid-template-columns: 1fr; /* 1 cột trên mobile */
+  }
 }
 
 .no-results {
