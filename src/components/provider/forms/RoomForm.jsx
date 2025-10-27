@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { getProxiedGoogleDriveUrl } from '../../../utils/googleDriveImageHelper';
 
 export const RoomForm = ({ initialData, onSubmit, hotelId }) => {
     const [formData, setFormData] = useState({
@@ -30,7 +31,7 @@ export const RoomForm = ({ initialData, onSubmit, hotelId }) => {
 
     const handleChange = (e) => {
         const { name, value, type, checked } = e.target;
-        
+
         if (name === 'amenities') {
             setFormData(prev => ({
                 ...prev,
@@ -47,16 +48,126 @@ export const RoomForm = ({ initialData, onSubmit, hotelId }) => {
     };
 
     const handleImageUpload = (e) => {
-        const files = Array.from(e.target.files).map(file => URL.createObjectURL(file));
+        const newFiles = Array.from(e.target.files);
+
+        // Create preview URLs for display
+        const previewUrls = newFiles.map(file => ({
+            file: file,
+            preview: URL.createObjectURL(file),
+            name: file.name
+        }));
+
         setFormData(prev => ({
             ...prev,
-            images: [...prev.images, ...files]
+            images: [...prev.images, ...previewUrls]
         }));
     };
 
-    const handleSubmit = (e) => {
+    // 🗑️ Remove image by index
+    const handleRemoveImage = (indexToRemove) => {
+        setFormData(prev => {
+            const updatedImages = prev.images.filter((_, index) => index !== indexToRemove);
+
+            // Cleanup blob URL if it's a new upload
+            const imageToRemove = prev.images[indexToRemove];
+            if (imageToRemove && imageToRemove.preview && imageToRemove.preview.startsWith('blob:')) {
+                URL.revokeObjectURL(imageToRemove.preview);
+            }
+
+            return {
+                ...prev,
+                images: updatedImages
+            };
+        });
+    };
+
+    // ⬆️ Move image up
+    const handleMoveImageUp = (index) => {
+        if (index === 0) return;
+
+        setFormData(prev => {
+            const newImages = [...prev.images];
+            console.log('🔼 Moving image up from index', index, 'to', index - 1);
+            console.log('Before swap:', newImages[index - 1], newImages[index]);
+
+            [newImages[index - 1], newImages[index]] = [newImages[index], newImages[index - 1]];
+
+            console.log('After swap:', newImages[index - 1], newImages[index]);
+            return {
+                ...prev,
+                images: newImages
+            };
+        });
+    };
+
+    // ⬇️ Move image down
+    const handleMoveImageDown = (index) => {
+        if (index === formData.images.length - 1) return;
+
+        setFormData(prev => {
+            const newImages = [...prev.images];
+            console.log('🔽 Moving image down from index', index, 'to', index + 1);
+            console.log('Before swap:', newImages[index], newImages[index + 1]);
+
+            [newImages[index], newImages[index + 1]] = [newImages[index + 1], newImages[index]];
+
+            console.log('After swap:', newImages[index], newImages[index + 1]);
+            return {
+                ...prev,
+                images: newImages
+            };
+        });
+    };    // Cleanup blob URLs when component unmounts
+    React.useEffect(() => {
+        return () => {
+            // Revoke all blob URLs
+            formData.images.forEach(img => {
+                if (img.preview && img.preview.startsWith('blob:')) {
+                    URL.revokeObjectURL(img.preview);
+                }
+            });
+        };
+    }, [formData.images]);
+
+    const handleSubmit = async (e) => {
         e.preventDefault();
-        onSubmit(formData);
+
+        // Prepare FormData to send files
+        const formDataToSend = new FormData();
+
+        // Add all form fields except images
+        Object.keys(formData).forEach(key => {
+            if (key !== 'images') {
+                if (typeof formData[key] === 'object' && formData[key] !== null && !Array.isArray(formData[key])) {
+                    // Handle nested objects
+                    formDataToSend.append(key, JSON.stringify(formData[key]));
+                } else if (Array.isArray(formData[key])) {
+                    // Handle arrays (amenities, etc)
+                    formDataToSend.append(key, JSON.stringify(formData[key]));
+                } else {
+                    formDataToSend.append(key, formData[key]);
+                }
+            }
+        });
+
+        // Add image files (new uploads) and existing URLs separately
+        const existingImages = [];
+        formData.images.forEach((img, index) => {
+            if (typeof img === 'string') {
+                // Existing image URL (edit mode)
+                existingImages.push(img);
+            } else if (img.file) {
+                // New file upload - append to FormData
+                formDataToSend.append('images', img.file);
+            }
+        });
+
+        // If there are existing images, send them as JSON
+        if (existingImages.length > 0) {
+            formDataToSend.append('existing_images', JSON.stringify(existingImages));
+        }
+
+        onSubmit(formDataToSend);
     };
 
     const roomTypes = [
@@ -273,7 +384,7 @@ export const RoomForm = ({ initialData, onSubmit, hotelId }) => {
                 </div>
 
                 {/* Basic Information */}
-                <div 
+                <div
                     style={activeSection === 'basic' ? sectionActiveStyle : sectionStyle}
                     onFocus={() => setActiveSection('basic')}
                 >
@@ -281,7 +392,7 @@ export const RoomForm = ({ initialData, onSubmit, hotelId }) => {
                         <span style={{ fontSize: '1.75rem' }}>🏠</span>
                         Basic Information
                     </h2>
-                    
+
                     <div style={gridStyle}>
                         <div>
                             <label style={labelStyle}>Room Number</label>
@@ -345,7 +456,7 @@ export const RoomForm = ({ initialData, onSubmit, hotelId }) => {
                 </div>
 
                 {/* Room Type */}
-                <div 
+                <div
                     style={activeSection === 'type' ? sectionActiveStyle : sectionStyle}
                     onFocus={() => setActiveSection('type')}
                 >
@@ -353,7 +464,7 @@ export const RoomForm = ({ initialData, onSubmit, hotelId }) => {
                         <span style={{ fontSize: '1.75rem' }}>🛏️</span>
                         Room Type & Capacity
                     </h2>
-                    
+
                     <div style={{ ...gridStyle, gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))' }}>
                         {roomTypes.map(roomType => (
                             <div
@@ -407,7 +518,7 @@ export const RoomForm = ({ initialData, onSubmit, hotelId }) => {
                 </div>
 
                 {/* Pricing & Status */}
-                <div 
+                <div
                     style={activeSection === 'pricing' ? sectionActiveStyle : sectionStyle}
                     onFocus={() => setActiveSection('pricing')}
                 >
@@ -415,7 +526,7 @@ export const RoomForm = ({ initialData, onSubmit, hotelId }) => {
                         <span style={{ fontSize: '1.75rem' }}>💰</span>
                         Pricing & Status
                     </h2>
-                    
+
                     <div style={gridStyle}>
                         <div>
                             <label style={labelStyle}>Price Per Night (VND)</label>
@@ -453,7 +564,7 @@ export const RoomForm = ({ initialData, onSubmit, hotelId }) => {
                 </div>
 
                 {/* Amenities */}
-                <div 
+                <div
                     style={activeSection === 'amenities' ? sectionActiveStyle : sectionStyle}
                     onFocus={() => setActiveSection('amenities')}
                 >
@@ -461,13 +572,13 @@ export const RoomForm = ({ initialData, onSubmit, hotelId }) => {
                         <span style={{ fontSize: '1.75rem' }}>✨</span>
                         Room Amenities
                     </h2>
-                    
+
                     <div style={checkboxContainerStyle}>
                         {roomAmenities.map(amenity => (
-                            <label 
+                            <label
                                 key={amenity}
-                                style={formData.amenities.includes(amenity) 
-                                    ? checkboxLabelActiveStyle 
+                                style={formData.amenities.includes(amenity)
+                                    ? checkboxLabelActiveStyle
                                     : checkboxLabelStyle}
                             >
                                 <input
@@ -485,7 +596,7 @@ export const RoomForm = ({ initialData, onSubmit, hotelId }) => {
                 </div>
 
                 {/* Images */}
-                <div 
+                <div
                     style={activeSection === 'images' ? sectionActiveStyle : sectionStyle}
                     onFocus={() => setActiveSection('images')}
                 >
@@ -493,7 +604,7 @@ export const RoomForm = ({ initialData, onSubmit, hotelId }) => {
                         <span style={{ fontSize: '1.75rem' }}>📸</span>
                         Room Images
                     </h2>
-                    
+
                     <input
                         type="file"
                         multiple
@@ -505,19 +616,178 @@ export const RoomForm = ({ initialData, onSubmit, hotelId }) => {
                             cursor: 'pointer'
                         }}
                     />
-                    
+
                     {formData.images.length > 0 && (
                         <div style={imageGridStyle}>
-                            {formData.images.map((image, index) => (
-                                <img
-                                    key={index}
-                                    src={image}
-                                    alt={`Room preview ${index + 1}`}
-                                    style={imagePreviewStyle}
-                                    onMouseEnter={(e) => e.target.style.transform = 'scale(1.05)'}
-                                    onMouseLeave={(e) => e.target.style.transform = 'scale(1)'}
-                                />
-                            ))}
+                            {formData.images.map((image, index) => {
+                                const imageUrl = typeof image === 'string' ? image : image.preview;
+                                const displayUrl = getProxiedGoogleDriveUrl(imageUrl);
+                                const isGDrive = imageUrl && imageUrl.includes('drive.google.com');
+
+                                // Generate unique key (use URL or preview as key instead of index)
+                                const uniqueKey = typeof image === 'string'
+                                    ? image
+                                    : (image.preview || image.name || `img-${index}`);
+
+                                return (
+                                    <div key={uniqueKey} style={{
+                                        position: 'relative',
+                                        borderRadius: '12px',
+                                        overflow: 'hidden',
+                                        boxShadow: '0 4px 12px rgba(0,0,0,0.1)'
+                                    }}>
+                                        <img
+                                            src={displayUrl}
+                                            alt={`Room preview ${index + 1}`}
+                                            style={imagePreviewStyle}
+                                            onError={(e) => {
+                                                e.target.style.opacity = '0.5';
+                                                e.target.alt = 'Failed to load';
+                                            }}
+                                        />
+
+                                        {/* Image Controls Overlay */}
+                                        <div style={{
+                                            position: 'absolute',
+                                            top: 0,
+                                            left: 0,
+                                            right: 0,
+                                            background: 'linear-gradient(180deg, rgba(0,0,0,0.7) 0%, transparent 100%)',
+                                            padding: '8px',
+                                            display: 'flex',
+                                            justifyContent: 'space-between',
+                                            alignItems: 'flex-start'
+                                        }}>
+                                            {/* Image Number */}
+                                            <span style={{
+                                                background: 'rgba(102, 126, 234, 0.95)',
+                                                color: 'white',
+                                                padding: '4px 10px',
+                                                borderRadius: '6px',
+                                                fontSize: '0.85rem',
+                                                fontWeight: '600'
+                                            }}>
+                                                #{index + 1}
+                                            </span>
+
+                                            {/* Control Buttons */}
+                                            <div style={{ display: 'flex', gap: '4px' }}>
+                                                {/* Move Up */}
+                                                {index > 0 && (
+                                                    <button
+                                                        type="button"
+                                                        onClick={() => handleMoveImageUp(index)}
+                                                        style={{
+                                                            background: 'rgba(255, 255, 255, 0.95)',
+                                                            border: 'none',
+                                                            borderRadius: '6px',
+                                                            width: '32px',
+                                                            height: '32px',
+                                                            cursor: 'pointer',
+                                                            display: 'flex',
+                                                            alignItems: 'center',
+                                                            justifyContent: 'center',
+                                                            fontSize: '1.1rem',
+                                                            transition: 'all 0.2s'
+                                                        }}
+                                                        onMouseEnter={(e) => {
+                                                            e.currentTarget.style.background = '#667eea';
+                                                            e.currentTarget.style.transform = 'scale(1.1)';
+                                                        }}
+                                                        onMouseLeave={(e) => {
+                                                            e.currentTarget.style.background = 'rgba(255, 255, 255, 0.95)';
+                                                            e.currentTarget.style.transform = 'scale(1)';
+                                                        }}
+                                                        title="Move up"
+                                                    >
+                                                        ⬆️
+                                                    </button>
+                                                )}
+
+                                                {/* Move Down */}
+                                                {index < formData.images.length - 1 && (
+                                                    <button
+                                                        type="button"
+                                                        onClick={() => handleMoveImageDown(index)}
+                                                        style={{
+                                                            background: 'rgba(255, 255, 255, 0.95)',
+                                                            border: 'none',
+                                                            borderRadius: '6px',
+                                                            width: '32px',
+                                                            height: '32px',
+                                                            cursor: 'pointer',
+                                                            display: 'flex',
+                                                            alignItems: 'center',
+                                                            justifyContent: 'center',
+                                                            fontSize: '1.1rem',
+                                                            transition: 'all 0.2s'
+                                                        }}
+                                                        onMouseEnter={(e) => {
+                                                            e.currentTarget.style.background = '#667eea';
+                                                            e.currentTarget.style.transform = 'scale(1.1)';
+                                                        }}
+                                                        onMouseLeave={(e) => {
+                                                            e.currentTarget.style.background = 'rgba(255, 255, 255, 0.95)';
+                                                            e.currentTarget.style.transform = 'scale(1)';
+                                                        }}
+                                                        title="Move down"
+                                                    >
+                                                        ⬇️
+                                                    </button>
+                                                )}
+
+                                                {/* Delete */}
+                                                <button
+                                                    type="button"
+                                                    onClick={() => handleRemoveImage(index)}
+                                                    style={{
+                                                        background: 'rgba(239, 68, 68, 0.95)',
+                                                        border: 'none',
+                                                        borderRadius: '6px',
+                                                        width: '32px',
+                                                        height: '32px',
+                                                        cursor: 'pointer',
+                                                        display: 'flex',
+                                                        alignItems: 'center',
+                                                        justifyContent: 'center',
+                                                        fontSize: '1.1rem',
+                                                        color: 'white',
+                                                        transition: 'all 0.2s'
+                                                    }}
+                                                    onMouseEnter={(e) => {
+                                                        e.currentTarget.style.background = '#dc2626';
+                                                        e.currentTarget.style.transform = 'scale(1.1)';
+                                                    }}
+                                                    onMouseLeave={(e) => {
+                                                        e.currentTarget.style.background = 'rgba(239, 68, 68, 0.95)';
+                                                        e.currentTarget.style.transform = 'scale(1)';
+                                                    }}
+                                                    title="Delete image"
+                                                >
+                                                    🗑️
+                                                </button>
+                                            </div>
+                                        </div>
+
+                                        {/* Google Drive Badge */}
+                                        {isGDrive && (
+                                            <span style={{
+                                                position: 'absolute',
+                                                bottom: '8px',
+                                                left: '8px',
+                                                background: 'rgba(102, 126, 234, 0.95)',
+                                                color: 'white',
+                                                padding: '4px 8px',
+                                                borderRadius: '6px',
+                                                fontSize: '0.75rem',
+                                                fontWeight: '600'
+                                            }}>
+                                                🔗 Google Drive
+                                            </span>
+                                        )}
+                                    </div>
+                                );
+                            })}
                         </div>
                     )}
                 </div>

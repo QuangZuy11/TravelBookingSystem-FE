@@ -1,4 +1,5 @@
 import React, { useEffect, useMemo, useState, useEffect as ReactUseEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import {
     Box,
     Card,
@@ -21,6 +22,7 @@ import {
     Skeleton,
     Alert,
 } from '@mui/material';
+import SmartImage from '../../../../../components/common/SmartImage';
 import {
     Favorite as FavoriteIcon,
     FavoriteBorder as FavoriteBorderIcon,
@@ -36,26 +38,65 @@ import {
     BookmarkAdded,
     Hotel as BedIcon, // dùng cho badge phòng trống
     SearchOff, // NEW: empty state icon
-    DirectionsCar as ParkingIcon
+    DirectionsCar as ParkingIcon,
+    Restaurant as RestaurantIcon,
+    RoomPreferences as RoomServiceIcon, // Thay RoomService bằng RoomPreferences
+    Work as BusinessCenterIcon, // Thay Business bằng Work
+    FlightTakeoff as AirportShuttleIcon,
+    AcUnit as AirConditioningIcon,
+    MeetingRoom as ConferenceRoomIcon,
+    LocalLaundryService as LaundryServiceIcon
 } from '@mui/icons-material';
 import '../../Hotel/HotelList/HotelList.css';
+import { getProxiedGoogleDriveUrl } from '../../../../../utils/googleDriveImageHelper';
 
 const amenitiesData = [
-    { label: 'Bể bơi', value: 'pool', icon: PoolIcon },
-    { label: 'Spa', value: 'spa', icon: SpaIcon },
-    { label: 'Phòng Gym', value: 'gym', icon: GymIcon },
-    { label: 'Wifi', value: 'wifi', icon: WifiIcon },
-    { label: 'Quầy bar', value: 'bar', icon: BarIcon },
-    { label: 'Chỗ đậu xe', value: 'parking', icon: ParkingIcon },
+    { label: 'Bể bơi', value: 'Pool', icon: PoolIcon },
+    { label: 'Spa', value: 'Spa', icon: SpaIcon },
+    { label: 'Phòng Gym', value: 'Gym', icon: GymIcon },
+    { label: 'Wi-Fi', value: 'Wi-Fi', icon: WifiIcon },
+    { label: 'Quầy bar', value: 'Bar', icon: BarIcon },
+    { label: 'Chỗ đậu xe', value: 'Parking', icon: ParkingIcon },
+    { label: 'Nhà hàng', value: 'Restaurant', icon: RestaurantIcon },
+    { label: 'Dịch vụ phòng', value: 'Room Service', icon: RoomServiceIcon },
+    { label: 'Trung tâm thương mại', value: 'Business Center', icon: BusinessCenterIcon },
+    { label: 'Đưa đón sân bay', value: 'Airport Shuttle', icon: AirportShuttleIcon },
+    { label: 'Điều hòa', value: 'Air Conditioning', icon: AirConditioningIcon },
+    { label: 'Phòng hội nghị', value: 'Conference Room', icon: ConferenceRoomIcon },
+    { label: 'Dịch vụ giặt ủi', value: 'Laundry Service', icon: LaundryServiceIcon },
 ];
 
 const amenityIconMap = {
+    // Lowercase versions (for consistency with old data)
     pool: PoolIcon,
     spa: SpaIcon,
     gym: GymIcon,
     wifi: WifiIcon,
     bar: BarIcon,
     parking: ParkingIcon,
+    restaurant: RestaurantIcon,
+    room_service: RoomServiceIcon,
+    business_center: BusinessCenterIcon,
+    airport_shuttle: AirportShuttleIcon,
+    air_conditioning: AirConditioningIcon,
+    conference_room: ConferenceRoomIcon,
+    laundry_service: LaundryServiceIcon,
+
+    // Backend format (Title Case with spaces)
+    'Pool': PoolIcon,
+    'Spa': SpaIcon,
+    'Gym': GymIcon,
+    'Wifi': WifiIcon,
+    'Wi-Fi': WifiIcon, // Backend trả về Wi-Fi
+    'Bar': BarIcon,
+    'Parking': ParkingIcon,
+    'Restaurant': RestaurantIcon,
+    'Room Service': RoomServiceIcon,
+    'Business Center': BusinessCenterIcon,
+    'Airport Shuttle': AirportShuttleIcon,
+    'Air Conditioning': AirConditioningIcon,
+    'Conference Room': ConferenceRoomIcon,
+    'Laundry Service': LaundryServiceIcon,
 };
 
 const formatPrice = (price) =>
@@ -68,6 +109,7 @@ function HotelResult({
     selectedAmenities = [],
     selectedRatings = [], // FE "rating" = số sao, map từ BE.category
 }) {
+    const navigate = useNavigate();
     const [hotels, setHotels] = useState([]);
     const [favorites, setFavorites] = useState(new Set());
     const [page, setPage] = useState(1);
@@ -98,9 +140,9 @@ function HotelResult({
             discount: 0, // chưa có trường discount ở BE
             freeCancel: false, // có thể map từ policies nếu có quy ước
             image: Array.isArray(h.images) && h.images[0]
-                ? h.images[0]
+                ? getProxiedGoogleDriveUrl(h.images[0])
                 : 'https://images.unsplash.com/photo-1566073771259-6a8506099945?w=1200&h=800&fit=crop',
-            amenities: Array.isArray(h.amenities) ? h.amenities.map(a => String(a).toLowerCase()) : [],
+            amenities: Array.isArray(h.amenities) ? h.amenities.map(a => String(a)) : [], // Giữ nguyên format từ backend
             availableRooms: h?.availableRooms != null ? Number(h.availableRooms) : 0, // map số phòng trống
         };
 
@@ -141,8 +183,8 @@ function HotelResult({
                     params.set('priceMax', String(priceRange[1]));
                 }
                 if (selectedAmenities.length) {
-                    // đảm bảo amenity là lower-case
-                    params.set('amenities', selectedAmenities.map(a => String(a).toLowerCase()).join(','));
+                    // Giữ nguyên format amenities từ frontend (Title Case)
+                    params.set('amenities', selectedAmenities.join(','));
                 }
                 if (selectedRatings.length) {
                     params.set('category', selectedRatings.map(n => `${n}_star`).join(','));
@@ -259,7 +301,8 @@ function HotelResult({
     };
 
     const handleBook = (hotel) => {
-        console.log(`Đặt: ${hotel.name}`);
+        console.log(`Điều hướng đến chi tiết: ${hotel.name}`);
+        navigate(`/hotel-detail/${hotel.id}`);
     };
 
     return (
@@ -325,7 +368,7 @@ function HotelResult({
                                 <Card key={`sk-${i}`} className="hotel-card hotel-card-list" elevation={2}>
                                     <Grid container spacing={0}>
                                         <Grid item xs={12} sm={4}>
-                                            <Skeleton variant="rectangular" className="hotel-image" />
+                                            <Skeleton variant="rectangular" className="hotel-result-image" />
                                         </Grid>
                                         <Grid item xs={12} sm={8}>
                                             <CardContent>
@@ -366,6 +409,7 @@ function HotelResult({
 }
 
 function HotelCard({ hotel, isFavorite, onToggleFavorite, onBook }) {
+    const navigate = useNavigate();
     const discountPrice =
         hotel.discount > 0 ? Math.round(hotel.price * (1 - hotel.discount / 100)) : hotel.price;
 
@@ -385,6 +429,11 @@ function HotelCard({ hotel, isFavorite, onToggleFavorite, onBook }) {
             : `Còn ${rooms} phòng trống`;
     const availabilityClass = isNone ? 'error' : isLow ? 'warning' : 'success';
 
+    // Handle click vào tên khách sạn hoặc ảnh
+    const handleHotelClick = () => {
+        navigate(`/hotel-detail/${hotel.id}`);
+    };
+
     return (
         <Card className="hotel-card hotel-card-list" elevation={2}>
             <Grid container spacing={0} alignItems="stretch" className="hotel-card-grid" wrap="nowrap">
@@ -395,9 +444,15 @@ function HotelCard({ hotel, isFavorite, onToggleFavorite, onBook }) {
                             color="error"
                             badgeContent={hotel.discount > 0 ? `-${hotel.discount}%` : null}
                             anchorOrigin={{ vertical: 'top', horizontal: 'left' }}
-                            className="discount-badge"
+                            className="hotel-result-badge"
                         >
-                            <CardMedia component="img" image={hotel.image} alt={hotel.name} className="hotel-image" />
+                            <SmartImage
+                                src={hotel.image}
+                                alt={hotel.name}
+                                className="hotel-result-image"
+                                onClick={handleHotelClick}
+                                style={{ cursor: 'pointer' }}
+                            />
                         </Badge>
 
                         <Tooltip title={isFavorite ? 'Bỏ yêu thích' : 'Thêm yêu thích'}>
@@ -420,7 +475,18 @@ function HotelCard({ hotel, isFavorite, onToggleFavorite, onBook }) {
                         <Box className="hotel-content-grid list">
                             {/* Thông tin */}
                             <Box className="hotel-info">
-                                <Typography variant="h5" className="hotel-name">
+                                <Typography
+                                    variant="h5"
+                                    className="hotel-name"
+                                    onClick={handleHotelClick}
+                                    sx={{
+                                        cursor: 'pointer',
+                                        '&:hover': {
+                                            color: '#1565c0',
+                                            textDecoration: 'underline'
+                                        }
+                                    }}
+                                >
                                     {hotel.name}
                                 </Typography>
 
@@ -507,8 +573,14 @@ function HotelCard({ hotel, isFavorite, onToggleFavorite, onBook }) {
                                     )}
                                 </Stack>
 
-                                <Button variant="contained" size="medium" className="book-button" onClick={onBook}>
-                                    Đặt Ngay
+                                <Button
+                                    variant="contained"
+                                    size="medium"
+                                    className="book-button"
+                                    onClick={onBook}
+                                    disabled={rooms <= 0}
+                                >
+                                    {rooms <= 0 ? 'Hết phòng' : 'Đặt Ngay'}
                                 </Button>
                             </Stack>
                         </Box>

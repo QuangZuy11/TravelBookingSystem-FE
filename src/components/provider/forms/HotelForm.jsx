@@ -1,10 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import Breadcrumb from '../../shared/Breadcrumb';
+import DestinationSelector from '../../common/DestinationSelector';
+import { getProxiedGoogleDriveUrl, isGoogleDriveUrl, getShareUrl } from '../../../utils/googleDriveImageHelper';
 
 export const HotelForm = ({ initialData, onSubmit }) => {
     const [formData, setFormData] = useState({
         name: '',
         description: '',
+        destination_id: '', // 📍 Thêm field mới cho destination
         address: {
             street: '',
             city: '',
@@ -31,6 +34,80 @@ export const HotelForm = ({ initialData, onSubmit }) => {
     });
 
     const [activeSection, setActiveSection] = useState(null);
+    const [googleMapsLink, setGoogleMapsLink] = useState('');
+    const [coordinateError, setCoordinateError] = useState('');
+
+    // Function to extract coordinates from Google Maps link
+    const extractCoordinatesFromLink = (link) => {
+        try {
+            setCoordinateError('');
+
+            // Pattern 1: /@lat,lng,zoom format
+            const pattern1 = /@(-?\d+\.\d+),(-?\d+\.\d+)/;
+            const match1 = link.match(pattern1);
+
+            if (match1) {
+                return {
+                    latitude: parseFloat(match1[1]),
+                    longitude: parseFloat(match1[2])
+                };
+            }
+
+            // Pattern 2: /place/name/@lat,lng format
+            const pattern2 = /place\/[^/]+\/@(-?\d+\.\d+),(-?\d+\.\d+)/;
+            const match2 = link.match(pattern2);
+
+            if (match2) {
+                return {
+                    latitude: parseFloat(match2[1]),
+                    longitude: parseFloat(match2[2])
+                };
+            }
+
+            // Pattern 3: !3d (latitude) !4d (longitude) format
+            const latPattern = /!3d(-?\d+\.\d+)/;
+            const lngPattern = /!4d(-?\d+\.\d+)/;
+            const latMatch = link.match(latPattern);
+            const lngMatch = link.match(lngPattern);
+
+            if (latMatch && lngMatch) {
+                return {
+                    latitude: parseFloat(latMatch[1]),
+                    longitude: parseFloat(lngMatch[1])
+                };
+            }
+
+            setCoordinateError('❌ Không tìm thấy tọa độ trong link. Vui lòng kiểm tra lại.');
+            return null;
+        } catch (error) {
+            setCoordinateError('❌ Lỗi khi xử lý link Google Maps.');
+            console.error('Error extracting coordinates:', error);
+            return null;
+        }
+    };
+
+    // Handle Google Maps link input
+    const handleGoogleMapsLinkChange = (e) => {
+        const link = e.target.value;
+        setGoogleMapsLink(link);
+
+        if (link.trim() === '') {
+            setCoordinateError('');
+            return;
+        }
+
+        const coords = extractCoordinatesFromLink(link);
+        if (coords) {
+            setFormData(prev => ({
+                ...prev,
+                address: {
+                    ...prev.address,
+                    coordinates: coords
+                }
+            }));
+            setCoordinateError('✅ Đã lấy tọa độ thành công!');
+        }
+    };
 
     useEffect(() => {
         if (initialData) {
@@ -40,7 +117,7 @@ export const HotelForm = ({ initialData, onSubmit }) => {
 
     const handleChange = (e) => {
         const { name, value, type, checked } = e.target;
-        
+
         if (name.includes('.')) {
             const [parent, child] = name.split('.');
             setFormData(prev => ({
@@ -81,16 +158,135 @@ export const HotelForm = ({ initialData, onSubmit }) => {
     };
 
     const handleImageUpload = (e) => {
-        const files = Array.from(e.target.files).map(file => URL.createObjectURL(file));
+        const newFiles = Array.from(e.target.files);
+
+        // Create preview URLs for display (keep file object for upload)
+        const previewUrls = newFiles.map(file => ({
+            file: file,
+            preview: URL.createObjectURL(file),
+            name: file.name
+        }));
+
         setFormData(prev => ({
             ...prev,
-            images: [...prev.images, ...files]
+            images: [...prev.images, ...previewUrls]
         }));
     };
 
+    // 🗑️ Remove image by index
+    const handleRemoveImage = (indexToRemove) => {
+        setFormData(prev => {
+            const updatedImages = prev.images.filter((_, index) => index !== indexToRemove);
+
+            // Cleanup blob URL if it's a new upload
+            const imageToRemove = prev.images[indexToRemove];
+            if (imageToRemove && imageToRemove.preview && imageToRemove.preview.startsWith('blob:')) {
+                URL.revokeObjectURL(imageToRemove.preview);
+            }
+
+            return {
+                ...prev,
+                images: updatedImages
+            };
+        });
+    };
+
+    // ⬆️ Move image up
+    const handleMoveImageUp = (index) => {
+        if (index === 0) return; // Already at top
+
+        setFormData(prev => {
+            const newImages = [...prev.images];
+            console.log('🔼 Moving image up from index', index, 'to', index - 1);
+            console.log('Before swap:', newImages[index - 1], newImages[index]);
+
+            // Swap images
+            [newImages[index - 1], newImages[index]] = [newImages[index], newImages[index - 1]];
+
+            console.log('After swap:', newImages[index - 1], newImages[index]);
+            return {
+                ...prev,
+                images: newImages
+            };
+        });
+    };
+
+    // ⬇️ Move image down
+    const handleMoveImageDown = (index) => {
+        if (index === formData.images.length - 1) return; // Already at bottom
+
+        setFormData(prev => {
+            const newImages = [...prev.images];
+            console.log('🔽 Moving image down from index', index, 'to', index + 1);
+            console.log('Before swap:', newImages[index], newImages[index + 1]);
+
+            // Swap images
+            [newImages[index], newImages[index + 1]] = [newImages[index + 1], newImages[index]];
+
+            console.log('After swap:', newImages[index], newImages[index + 1]);
+            return {
+                ...prev,
+                images: newImages
+            };
+        });
+    };    // Cleanup blob URLs when component unmounts
+    React.useEffect(() => {
+        return () => {
+            // Revoke all blob URLs
+            formData.images.forEach(img => {
+                if (img.preview && img.preview.startsWith('blob:')) {
+                    URL.revokeObjectURL(img.preview);
+                }
+            });
+        };
+    }, [formData.images]);
+
     const handleSubmit = (e) => {
         e.preventDefault();
-        onSubmit(formData);
+
+        // Validate minimum 7 images
+        if (formData.images.length < 7) {
+            alert('⚠️ Vui lòng tải lên ít nhất 7 ảnh khách sạn!');
+            return;
+        }
+
+        // Prepare FormData to send files
+        const formDataToSend = new FormData();
+
+        // Add all form fields except images
+        Object.keys(formData).forEach(key => {
+            if (key !== 'images') {
+                if (typeof formData[key] === 'object' && formData[key] !== null && !Array.isArray(formData[key])) {
+                    // Handle nested objects (address, policies, contactInfo, priceRange)
+                    formDataToSend.append(key, JSON.stringify(formData[key]));
+                } else if (Array.isArray(formData[key])) {
+                    // Handle arrays (amenities, etc)
+                    formDataToSend.append(key, JSON.stringify(formData[key]));
+                } else {
+                    formDataToSend.append(key, formData[key]);
+                }
+            }
+        });
+
+        // Add image files (new uploads) and existing URLs separately
+        const existingImages = [];
+        formData.images.forEach((img) => {
+            if (typeof img === 'string') {
+                // Existing image URL (edit mode)
+                existingImages.push(img);
+            } else if (img.file) {
+                // New file upload - append to FormData
+                formDataToSend.append('images', img.file);
+            }
+        });
+
+        // If there are existing images, send them as JSON
+        if (existingImages.length > 0) {
+            formDataToSend.append('existing_images', JSON.stringify(existingImages));
+        }
+
+        console.log('📤 Submitting hotel FormData with', formDataToSend.getAll('images').length, 'new images');
+        onSubmit(formDataToSend);
     };
 
     const amenitiesList = [
@@ -291,7 +487,7 @@ export const HotelForm = ({ initialData, onSubmit }) => {
     return (
         <div style={containerStyle}>
             <Breadcrumb items={breadcrumbItems} />
-            
+
             <form onSubmit={handleSubmit} style={formContainerStyle}>
                 <div style={headerStyle}>
                     <h1 style={titleStyle}>
@@ -301,7 +497,7 @@ export const HotelForm = ({ initialData, onSubmit }) => {
                 </div>
 
                 {/* Basic Information */}
-                <div 
+                <div
                     style={activeSection === 'basic' ? sectionActiveStyle : sectionStyle}
                     onFocus={() => setActiveSection('basic')}
                 >
@@ -337,6 +533,20 @@ export const HotelForm = ({ initialData, onSubmit }) => {
                             placeholder="Describe your hotel"
                         />
                     </div>
+
+                    {/* Destination Selector */}
+                    <div style={{ marginBottom: '1.5rem' }}>
+                        <DestinationSelector
+                            selectedId={formData.destination_id}
+                            onChange={(destinationId) => {
+                                setFormData(prev => ({
+                                    ...prev,
+                                    destination_id: destinationId
+                                }));
+                            }}
+                        />
+                    </div>
+
                     <div style={gridStyle}>
                         <div>
                             <label style={labelStyle}>Category</label>
@@ -375,7 +585,7 @@ export const HotelForm = ({ initialData, onSubmit }) => {
                 </div>
 
                 {/* Address Information */}
-                <div 
+                <div
                     style={activeSection === 'address' ? sectionActiveStyle : sectionStyle}
                     onFocus={() => setActiveSection('address')}
                 >
@@ -453,10 +663,66 @@ export const HotelForm = ({ initialData, onSubmit }) => {
                             />
                         </div>
                     </div>
+
+                    {/* Google Maps Link Input */}
+                    <div style={{ marginTop: '2rem', padding: '1.5rem', background: 'linear-gradient(135deg, #e0e7ff 0%, #f3e8ff 100%)', borderRadius: '12px', border: '2px solid #667eea' }}>
+                        <h3 style={{ fontSize: '1.1rem', fontWeight: '600', color: '#667eea', marginBottom: '1rem', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                            <span style={{ fontSize: '1.5rem' }}>🗺️</span>
+                            Vị Trí Google Maps (Tự động lấy tọa độ)
+                        </h3>
+                        <label style={{ ...labelStyle, color: '#667eea' }}>
+                            Dán link Google Maps của khách sạn
+                        </label>
+                        <input
+                            type="text"
+                            value={googleMapsLink}
+                            onChange={handleGoogleMapsLinkChange}
+                            style={{
+                                ...inputStyle,
+                                width: '100%',
+                                borderColor: coordinateError.includes('✅') ? '#10b981' : coordinateError.includes('❌') ? '#ef4444' : '#667eea'
+                            }}
+                            placeholder="https://www.google.com/maps/place/..."
+                        />
+                        {coordinateError && (
+                            <p style={{
+                                marginTop: '0.5rem',
+                                fontSize: '0.875rem',
+                                fontWeight: '600',
+                                color: coordinateError.includes('✅') ? '#10b981' : '#ef4444'
+                            }}>
+                                {coordinateError}
+                            </p>
+                        )}
+                        {formData.address.coordinates.latitude !== 0 && formData.address.coordinates.longitude !== 0 && (
+                            <div style={{ marginTop: '1rem', padding: '1rem', background: 'white', borderRadius: '8px', border: '2px solid #10b981' }}>
+                                <p style={{ fontSize: '0.875rem', color: '#059669', marginBottom: '0.5rem', fontWeight: '600' }}>
+                                    📍 Tọa độ hiện tại:
+                                </p>
+                                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
+                                    <div>
+                                        <span style={{ fontSize: '0.75rem', color: '#6b7280', fontWeight: '600' }}>Latitude:</span>
+                                        <p style={{ fontSize: '1rem', color: '#111827', fontWeight: '700', marginTop: '4px' }}>
+                                            {formData.address.coordinates.latitude}
+                                        </p>
+                                    </div>
+                                    <div>
+                                        <span style={{ fontSize: '0.75rem', color: '#6b7280', fontWeight: '600' }}>Longitude:</span>
+                                        <p style={{ fontSize: '1rem', color: '#111827', fontWeight: '700', marginTop: '4px' }}>
+                                            {formData.address.coordinates.longitude}
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                        )}
+                        <p style={{ fontSize: '0.75rem', color: '#6b7280', marginTop: '1rem', lineHeight: '1.5' }}>
+                            💡 <strong>Hướng dẫn:</strong> Mở Google Maps → Tìm vị trí khách sạn → Click "Chia sẻ" → Sao chép link → Dán vào ô trên
+                        </p>
+                    </div>
                 </div>
 
                 {/* Room & Price Information */}
-                <div 
+                <div
                     style={activeSection === 'rooms' ? sectionActiveStyle : sectionStyle}
                     onFocus={() => setActiveSection('rooms')}
                 >
@@ -530,7 +796,7 @@ export const HotelForm = ({ initialData, onSubmit }) => {
                 </div>
 
                 {/* Policies */}
-                <div 
+                <div
                     style={activeSection === 'policies' ? sectionActiveStyle : sectionStyle}
                     onFocus={() => setActiveSection('policies')}
                 >
@@ -583,10 +849,10 @@ export const HotelForm = ({ initialData, onSubmit }) => {
                         <label style={labelStyle}>Payment Options</label>
                         <div style={checkboxContainerStyle}>
                             {paymentOptionsList.map(option => (
-                                <label 
+                                <label
                                     key={option}
-                                    style={formData.policies.paymentOptions.includes(option) 
-                                        ? checkboxLabelActiveStyle 
+                                    style={formData.policies.paymentOptions.includes(option)
+                                        ? checkboxLabelActiveStyle
                                         : checkboxLabelStyle}
                                 >
                                     <input
@@ -603,7 +869,7 @@ export const HotelForm = ({ initialData, onSubmit }) => {
                         </div>
                     </div>
                     <div>
-                        <label 
+                        <label
                             style={{
                                 ...checkboxLabelStyle,
                                 display: 'inline-flex',
@@ -623,7 +889,7 @@ export const HotelForm = ({ initialData, onSubmit }) => {
                 </div>
 
                 {/* Contact Information */}
-                <div 
+                <div
                     style={activeSection === 'contact' ? sectionActiveStyle : sectionStyle}
                     onFocus={() => setActiveSection('contact')}
                 >
@@ -675,7 +941,7 @@ export const HotelForm = ({ initialData, onSubmit }) => {
                 </div>
 
                 {/* Amenities */}
-                <div 
+                <div
                     style={activeSection === 'amenities' ? sectionActiveStyle : sectionStyle}
                     onFocus={() => setActiveSection('amenities')}
                 >
@@ -685,10 +951,10 @@ export const HotelForm = ({ initialData, onSubmit }) => {
                     </h2>
                     <div style={checkboxContainerStyle}>
                         {amenitiesList.map(amenity => (
-                            <label 
+                            <label
                                 key={amenity}
-                                style={formData.amenities.includes(amenity) 
-                                    ? checkboxLabelActiveStyle 
+                                style={formData.amenities.includes(amenity)
+                                    ? checkboxLabelActiveStyle
                                     : checkboxLabelStyle}
                             >
                                 <input
@@ -706,13 +972,24 @@ export const HotelForm = ({ initialData, onSubmit }) => {
                 </div>
 
                 {/* Images */}
-                <div 
+                <div
                     style={activeSection === 'images' ? sectionActiveStyle : sectionStyle}
                     onFocus={() => setActiveSection('images')}
                 >
                     <h2 style={sectionTitleStyle}>
                         <span style={iconStyle}>📸</span>
                         Images
+                        <span style={{
+                            marginLeft: 'auto',
+                            fontSize: '1rem',
+                            fontWeight: '600',
+                            color: formData.images.length >= 7 ? '#10b981' : '#ef4444',
+                            background: formData.images.length >= 7 ? '#d1fae5' : '#fee2e2',
+                            padding: '0.5rem 1rem',
+                            borderRadius: '8px'
+                        }}>
+                            {formData.images.length}/7 ảnh {formData.images.length >= 7 ? '✓' : '(Tối thiểu 7 ảnh)'}
+                        </span>
                     </h2>
                     <input
                         type="file"
@@ -727,16 +1004,180 @@ export const HotelForm = ({ initialData, onSubmit }) => {
                     />
                     {formData.images.length > 0 && (
                         <div style={imageGridStyle}>
-                            {formData.images.map((image, index) => (
-                                <img
-                                    key={index}
-                                    src={image}
-                                    alt={`Hotel preview ${index + 1}`}
-                                    style={imagePreviewStyle}
-                                    onMouseEnter={(e) => e.target.style.transform = 'scale(1.05)'}
-                                    onMouseLeave={(e) => e.target.style.transform = 'scale(1)'}
-                                />
-                            ))}
+                            {formData.images.map((image, index) => {
+                                // Determine image URL (handle both file objects and strings)
+                                const imageUrl = typeof image === 'string' ? image : (image.preview || '');
+
+                                // Use proxy for Google Drive URLs
+                                const displayUrl = isGoogleDriveUrl(imageUrl)
+                                    ? getProxiedGoogleDriveUrl(imageUrl)
+                                    : imageUrl;
+
+                                // Generate unique key (use URL or preview as key instead of index)
+                                const uniqueKey = typeof image === 'string'
+                                    ? image
+                                    : (image.preview || image.name || `img-${index}`);
+
+                                return (
+                                    <div key={uniqueKey} style={{
+                                        position: 'relative',
+                                        borderRadius: '12px',
+                                        overflow: 'hidden',
+                                        boxShadow: '0 4px 12px rgba(0,0,0,0.1)'
+                                    }}>
+                                        <img
+                                            src={displayUrl}
+                                            alt={`Hotel preview ${index + 1}`}
+                                            style={imagePreviewStyle}
+                                            onError={(e) => {
+                                                console.error('Failed to load image:', displayUrl);
+                                                e.target.style.opacity = '0.5';
+                                                e.target.alt = 'Failed to load';
+                                            }}
+                                        />
+
+                                        {/* Image Controls Overlay */}
+                                        <div style={{
+                                            position: 'absolute',
+                                            top: 0,
+                                            left: 0,
+                                            right: 0,
+                                            background: 'linear-gradient(180deg, rgba(0,0,0,0.7) 0%, transparent 100%)',
+                                            padding: '8px',
+                                            display: 'flex',
+                                            justifyContent: 'space-between',
+                                            alignItems: 'flex-start'
+                                        }}>
+                                            {/* Image Number Badge */}
+                                            <span style={{
+                                                background: 'rgba(102, 126, 234, 0.95)',
+                                                color: 'white',
+                                                padding: '4px 10px',
+                                                borderRadius: '6px',
+                                                fontSize: '0.85rem',
+                                                fontWeight: '600'
+                                            }}>
+                                                #{index + 1}
+                                            </span>
+
+                                            {/* Control Buttons */}
+                                            <div style={{ display: 'flex', gap: '4px' }}>
+                                                {/* Move Up */}
+                                                {index > 0 && (
+                                                    <button
+                                                        type="button"
+                                                        onClick={() => handleMoveImageUp(index)}
+                                                        style={{
+                                                            background: 'rgba(255, 255, 255, 0.95)',
+                                                            border: 'none',
+                                                            borderRadius: '6px',
+                                                            width: '32px',
+                                                            height: '32px',
+                                                            cursor: 'pointer',
+                                                            display: 'flex',
+                                                            alignItems: 'center',
+                                                            justifyContent: 'center',
+                                                            fontSize: '1.1rem',
+                                                            transition: 'all 0.2s'
+                                                        }}
+                                                        onMouseEnter={(e) => {
+                                                            e.currentTarget.style.background = '#667eea';
+                                                            e.currentTarget.style.transform = 'scale(1.1)';
+                                                        }}
+                                                        onMouseLeave={(e) => {
+                                                            e.currentTarget.style.background = 'rgba(255, 255, 255, 0.95)';
+                                                            e.currentTarget.style.transform = 'scale(1)';
+                                                        }}
+                                                        title="Move up"
+                                                    >
+                                                        ⬆️
+                                                    </button>
+                                                )}
+
+                                                {/* Move Down */}
+                                                {index < formData.images.length - 1 && (
+                                                    <button
+                                                        type="button"
+                                                        onClick={() => handleMoveImageDown(index)}
+                                                        style={{
+                                                            background: 'rgba(255, 255, 255, 0.95)',
+                                                            border: 'none',
+                                                            borderRadius: '6px',
+                                                            width: '32px',
+                                                            height: '32px',
+                                                            cursor: 'pointer',
+                                                            display: 'flex',
+                                                            alignItems: 'center',
+                                                            justifyContent: 'center',
+                                                            fontSize: '1.1rem',
+                                                            transition: 'all 0.2s'
+                                                        }}
+                                                        onMouseEnter={(e) => {
+                                                            e.currentTarget.style.background = '#667eea';
+                                                            e.currentTarget.style.transform = 'scale(1.1)';
+                                                        }}
+                                                        onMouseLeave={(e) => {
+                                                            e.currentTarget.style.background = 'rgba(255, 255, 255, 0.95)';
+                                                            e.currentTarget.style.transform = 'scale(1)';
+                                                        }}
+                                                        title="Move down"
+                                                    >
+                                                        ⬇️
+                                                    </button>
+                                                )}
+
+                                                {/* Delete Button */}
+                                                <button
+                                                    type="button"
+                                                    onClick={() => handleRemoveImage(index)}
+                                                    style={{
+                                                        background: 'rgba(239, 68, 68, 0.95)',
+                                                        border: 'none',
+                                                        borderRadius: '6px',
+                                                        width: '32px',
+                                                        height: '32px',
+                                                        cursor: 'pointer',
+                                                        display: 'flex',
+                                                        alignItems: 'center',
+                                                        justifyContent: 'center',
+                                                        fontSize: '1.1rem',
+                                                        color: 'white',
+                                                        transition: 'all 0.2s'
+                                                    }}
+                                                    onMouseEnter={(e) => {
+                                                        e.currentTarget.style.background = '#dc2626';
+                                                        e.currentTarget.style.transform = 'scale(1.1)';
+                                                    }}
+                                                    onMouseLeave={(e) => {
+                                                        e.currentTarget.style.background = 'rgba(239, 68, 68, 0.95)';
+                                                        e.currentTarget.style.transform = 'scale(1)';
+                                                    }}
+                                                    title="Delete image"
+                                                >
+                                                    🗑️
+                                                </button>
+                                            </div>
+                                        </div>
+
+                                        {/* Google Drive Badge */}
+                                        {isGoogleDriveUrl(imageUrl) && (
+                                            <span style={{
+                                                position: 'absolute',
+                                                bottom: '8px',
+                                                left: '8px',
+                                                background: 'rgba(102, 126, 234, 0.95)',
+                                                color: 'white',
+                                                padding: '4px 8px',
+                                                borderRadius: '6px',
+                                                fontSize: '0.75rem',
+                                                fontWeight: '600'
+                                            }}>
+                                                🔗 Google Drive
+                                            </span>
+                                        )}
+                                    </div>
+                                );
+                            })}
                         </div>
                     )}
                 </div>
@@ -758,14 +1199,23 @@ export const HotelForm = ({ initialData, onSubmit }) => {
                     </button>
                     <button
                         type="submit"
-                        style={submitButtonStyle}
+                        disabled={formData.images.length < 7}
+                        style={{
+                            ...submitButtonStyle,
+                            opacity: formData.images.length < 7 ? 0.5 : 1,
+                            cursor: formData.images.length < 7 ? 'not-allowed' : 'pointer'
+                        }}
                         onMouseEnter={(e) => {
-                            e.currentTarget.style.transform = 'translateY(-2px)';
-                            e.currentTarget.style.boxShadow = '0 6px 20px rgba(102, 126, 234, 0.5)';
+                            if (formData.images.length >= 7) {
+                                e.currentTarget.style.transform = 'translateY(-2px)';
+                                e.currentTarget.style.boxShadow = '0 6px 20px rgba(102, 126, 234, 0.5)';
+                            }
                         }}
                         onMouseLeave={(e) => {
-                            e.currentTarget.style.transform = 'translateY(0)';
-                            e.currentTarget.style.boxShadow = '0 4px 15px rgba(102, 126, 234, 0.4)';
+                            if (formData.images.length >= 7) {
+                                e.currentTarget.style.transform = 'translateY(0)';
+                                e.currentTarget.style.boxShadow = '0 4px 15px rgba(102, 126, 234, 0.4)';
+                            }
                         }}
                     >
                         {initialData ? '✅ Update Hotel' : '✨ Create Hotel'}

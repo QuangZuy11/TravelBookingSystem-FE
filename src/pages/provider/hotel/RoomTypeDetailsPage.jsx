@@ -7,11 +7,12 @@ import Modal from '../../../components/shared/Modal';
 import RoomForm from '../../../components/provider/forms/RoomForm';
 import PricingRuleForm from '../../../components/provider/forms/PricingRuleForm';
 import MaintenanceRecordForm from '../../../components/provider/forms/MaintenanceRecordForm';
+import { getProxiedGoogleDriveUrl } from '../../../utils/googleDriveImageHelper';
 
 const RoomTypeDetailsPage = () => {
     const { providerId, hotelId, roomId } = useParams();
     const navigate = useNavigate();
-    
+
     const token = localStorage.getItem('token');
     // State management
     const [room, setRoom] = useState(null);
@@ -21,7 +22,8 @@ const RoomTypeDetailsPage = () => {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [activeTab, setActiveTab] = useState('pricing');
-    
+    const [currentImageIndex, setCurrentImageIndex] = useState(0);
+
     // Modal states
     const [isEditModalOpen, setIsEditModalOpen] = useState(false);
     const [isPricingModalOpen, setIsPricingModalOpen] = useState(false);
@@ -99,8 +101,12 @@ const RoomTypeDetailsPage = () => {
 
     const handleUpdateRoomSubmit = async (formData) => {
         try {
-            await axios.put(`/api/provider/${providerId}/hotels/${hotelId}/rooms/${roomId}`, formData,
-                { headers: { Authorization: `Bearer ${token}` } });
+            await axios.put(`/api/provider/${providerId}/hotels/${hotelId}/rooms/${roomId}`, formData, {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                    'Content-Type': 'multipart/form-data'
+                }
+            });
             alert('Room type updated successfully!');
             setIsEditModalOpen(false);
             fetchRoomDetails();
@@ -113,7 +119,9 @@ const RoomTypeDetailsPage = () => {
     const handleDeleteRoom = async () => {
         if (window.confirm('Are you sure you want to delete this room type? This action cannot be undone.')) {
             try {
-                await axios.delete(`/api/provider/${providerId}/hotels/${hotelId}/rooms/${roomId}`);
+                await axios.delete(`/api/provider/${providerId}/hotels/${hotelId}/rooms/${roomId}`, {
+                    headers: { Authorization: `Bearer ${token}` }
+                });
                 alert('Room type deleted successfully!');
                 navigate(`/provider/${providerId}/hotels/${hotelId}`);
             } catch (err) {
@@ -138,8 +146,8 @@ const RoomTypeDetailsPage = () => {
         try {
             if (editingPricingRule) {
                 await axios.put(`/api/room-prices/${editingPricingRule._id}`, formData, {
-                headers: { Authorization: `Bearer ${token}` }
-            });
+                    headers: { Authorization: `Bearer ${token}` }
+                });
                 alert('Pricing rule updated successfully!');
             } else {
                 await axios.post('/api/room-prices', { ...formData, roomId }, {
@@ -158,7 +166,9 @@ const RoomTypeDetailsPage = () => {
     const handleDeletePricingRule = async (ruleId) => {
         if (window.confirm('Are you sure you want to delete this pricing rule?')) {
             try {
-                await axios.delete(`/api/room-prices/${ruleId}`);
+                await axios.delete(`/api/room-prices/${ruleId}`, {
+                    headers: { Authorization: `Bearer ${token}` }
+                });
                 alert('Pricing rule deleted successfully!');
                 fetchPricingRules();
             } catch (err) {
@@ -185,6 +195,23 @@ const RoomTypeDetailsPage = () => {
             alert('Failed to add maintenance record');
             console.error(err);
         }
+    };
+
+    // Image carousel controls
+    const handleNextImage = () => {
+        if (room.images && room.images.length > 0) {
+            setCurrentImageIndex((prev) => (prev + 1) % room.images.length);
+        }
+    };
+
+    const handlePrevImage = () => {
+        if (room.images && room.images.length > 0) {
+            setCurrentImageIndex((prev) => (prev - 1 + room.images.length) % room.images.length);
+        }
+    };
+
+    const handleThumbnailClick = (index) => {
+        setCurrentImageIndex(index);
     };
 
     if (loading) return <LoadingSpinner />;
@@ -216,13 +243,65 @@ const RoomTypeDetailsPage = () => {
             <div className="bg-white p-6 rounded-lg shadow-md mb-6">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div>
+                        {/* Image Carousel */}
                         {room.images && room.images.length > 0 ? (
-                            <div className="relative h-64 mb-4">
-                                <img
-                                    src={room.images[0]}
-                                    alt={room.room_type_name}
-                                    className="w-full h-full object-cover rounded-md"
-                                />
+                            <div className="mb-4">
+                                {/* Main Image */}
+                                <div className="relative h-64 mb-3">
+                                    <img
+                                        src={getProxiedGoogleDriveUrl(room.images[currentImageIndex])}
+                                        alt={`${room.room_type_name} - Image ${currentImageIndex + 1}`}
+                                        className="w-full h-full object-cover rounded-lg"
+                                    />
+
+                                    {/* Image Counter */}
+                                    <div className="absolute top-3 right-3 bg-black bg-opacity-70 text-white px-3 py-1 rounded-full text-sm font-semibold">
+                                        {currentImageIndex + 1} / {room.images.length}
+                                    </div>
+
+                                    {/* Navigation Arrows - Only show if more than 1 image */}
+                                    {room.images.length > 1 && (
+                                        <>
+                                            <button
+                                                onClick={handlePrevImage}
+                                                className="absolute left-3 top-1/2 transform -translate-y-1/2 bg-white bg-opacity-95 hover:bg-purple-600 rounded-full w-10 h-10 flex items-center justify-center shadow-lg transition-all z-10"
+                                            >
+                                                <span className="text-xl">◀</span>
+                                            </button>
+                                            <button
+                                                onClick={handleNextImage}
+                                                className="absolute right-3 top-1/2 transform -translate-y-1/2 bg-white bg-opacity-95 hover:bg-purple-600 rounded-full w-10 h-10 flex items-center justify-center shadow-lg transition-all z-10"
+                                            >
+                                                <span className="text-xl">▶</span>
+                                            </button>
+                                        </>
+                                    )}
+                                </div>
+
+                                {/* Thumbnails - Only show if more than 1 image */}
+                                {room.images.length > 1 && (
+                                    <div className="flex gap-2 overflow-x-auto pb-2">
+                                        {room.images.map((image, index) => (
+                                            <div
+                                                key={index}
+                                                onClick={() => handleThumbnailClick(index)}
+                                                className={`flex-shrink-0 w-20 h-16 rounded-md overflow-hidden cursor-pointer transition-all ${currentImageIndex === index
+                                                        ? 'border-3 border-purple-600 opacity-100'
+                                                        : 'border-3 border-transparent opacity-60 hover:opacity-80'
+                                                    }`}
+                                                style={{
+                                                    border: currentImageIndex === index ? '3px solid #9333ea' : '3px solid transparent'
+                                                }}
+                                            >
+                                                <img
+                                                    src={getProxiedGoogleDriveUrl(image)}
+                                                    alt={`Thumbnail ${index + 1}`}
+                                                    className="w-full h-full object-cover"
+                                                />
+                                            </div>
+                                        ))}
+                                    </div>
+                                )}
                             </div>
                         ) : (
                             <div className="h-64 bg-gray-200 flex items-center justify-center rounded-md mb-4">
@@ -275,25 +354,22 @@ const RoomTypeDetailsPage = () => {
             <div className="bg-white p-6 rounded-lg shadow-md">
                 <div className="flex border-b border-gray-200 mb-4">
                     <button
-                        className={`px-4 py-2 text-sm font-medium ${
-                            activeTab === 'pricing' ? 'border-b-2 border-blue-600 text-blue-600' : 'text-gray-500 hover:text-gray-700'
-                        }`}
+                        className={`px-4 py-2 text-sm font-medium ${activeTab === 'pricing' ? 'border-b-2 border-blue-600 text-blue-600' : 'text-gray-500 hover:text-gray-700'
+                            }`}
                         onClick={() => setActiveTab('pricing')}
                     >
                         Pricing Rules
                     </button>
                     <button
-                        className={`px-4 py-2 text-sm font-medium ${
-                            activeTab === 'bookings' ? 'border-b-2 border-blue-600 text-blue-600' : 'text-gray-500 hover:text-gray-700'
-                        }`}
+                        className={`px-4 py-2 text-sm font-medium ${activeTab === 'bookings' ? 'border-b-2 border-blue-600 text-blue-600' : 'text-gray-500 hover:text-gray-700'
+                            }`}
                         onClick={() => setActiveTab('bookings')}
                     >
                         Bookings
                     </button>
                     <button
-                        className={`px-4 py-2 text-sm font-medium ${
-                            activeTab === 'maintenance' ? 'border-b-2 border-blue-600 text-blue-600' : 'text-gray-500 hover:text-gray-700'
-                        }`}
+                        className={`px-4 py-2 text-sm font-medium ${activeTab === 'maintenance' ? 'border-b-2 border-blue-600 text-blue-600' : 'text-gray-500 hover:text-gray-700'
+                            }`}
                         onClick={() => setActiveTab('maintenance')}
                     >
                         Maintenance Records
@@ -398,11 +474,10 @@ const RoomTypeDetailsPage = () => {
                                                         ${booking.totalPrice}
                                                     </td>
                                                     <td className="px-6 py-4 whitespace-nowrap">
-                                                        <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
-                                                            booking.status === 'confirmed' ? 'bg-green-100 text-green-800' :
+                                                        <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${booking.status === 'confirmed' ? 'bg-green-100 text-green-800' :
                                                             booking.status === 'pending' ? 'bg-yellow-100 text-yellow-800' :
-                                                            'bg-red-100 text-red-800'
-                                                        }`}>
+                                                                'bg-red-100 text-red-800'
+                                                            }`}>
                                                             {booking.status}
                                                         </span>
                                                     </td>
@@ -448,11 +523,10 @@ const RoomTypeDetailsPage = () => {
                                                         {record.description}
                                                     </td>
                                                     <td className="px-6 py-4 whitespace-nowrap">
-                                                        <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
-                                                            record.status === 'completed' ? 'bg-green-100 text-green-800' :
+                                                        <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${record.status === 'completed' ? 'bg-green-100 text-green-800' :
                                                             record.status === 'in-progress' ? 'bg-yellow-100 text-yellow-800' :
-                                                            'bg-red-100 text-red-800'
-                                                        }`}>
+                                                                'bg-red-100 text-red-800'
+                                                            }`}>
                                                             {record.status}
                                                         </span>
                                                     </td>

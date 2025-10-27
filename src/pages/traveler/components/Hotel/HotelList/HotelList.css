@@ -79,14 +79,14 @@
 }
 
 /* Để Badge (bao bọc ảnh) cũng giãn full khung ảnh */
-.discount-badge {        /* Thẻ badge bao quanh ảnh */
+.hotel-result-badge {        /* Thẻ badge bao quanh ảnh (đổi tên để tránh conflict) */
   display: block;        /* Cho phép set width/height */
   width: 100%;           /* Tràn full khung */
   height: 100%;          /* Tràn full khung */
 }
 
 /* Ảnh */
-.hotel-image {
+.hotel-result-image {
   width: 100%;           /* Ảnh rộng full khung */
   height: 100%;          /* Ảnh cao full khung */
   object-fit: cover;     /* Cắt ảnh để phủ kín mà không méo */
@@ -95,7 +95,7 @@
 }
 
 /* Hover phóng ảnh nhẹ */
-.image-wrap:hover .hotel-image { 
+.image-wrap:hover .hotel-result-image { 
   transform: scale(1.02); /* Phóng nhẹ khi hover */
 }
 
@@ -116,7 +116,7 @@
 }
 
 /* Badge giảm giá */
-.discount-badge .MuiBadge-badge {
+.hotel-result-badge .MuiBadge-badge {
   left: 12px; top: 12px;           /* Đặt góc trái trên */
   padding: 6px 8px; border-radius: 8px; /* Đệm + bo góc badge */
 }
@@ -243,13 +243,13 @@
 
 @media (max-width: 600px) {
   .content-header { padding: 16px !important; }          /* Giảm đệm header trên mobile */
-  .image-wrap .hotel-image { height: 180px !important; } /* Ảnh thấp hơn để gọn */
+  .image-wrap .hotel-result-image { height: 180px !important; } /* Ảnh thấp hơn để gọn */
   .price-amount { font-size: 1.55rem !important; }       /* Thu nhỏ giá trên mobile */
   .hotel-name { font-size: 1.1rem !important; }          /* Thu nhỏ tên trên mobile */
 }
 
 /* Skeleton cho ảnh khi loading */
-.MuiSkeleton-root.hotel-image {
+.MuiSkeleton-root.hotel-result-image {
   width: 100%; height: 200px !important; border-radius: 0 !important; /* Skeleton ảnh đồng bộ kích thước */
 }
 
@@ -297,7 +297,7 @@
 .book-button { padding: 8px 16px !important; min-width: 120px; }
 
 /* Skeleton ảnh khi loading */
-.MuiSkeleton-root.hotel-image { height: 160px !important; }
+.MuiSkeleton-root.hotel-result-image { height: 160px !important; }
 
 /* ===== Availability Pill (Professional) ===== */
 /* Base */

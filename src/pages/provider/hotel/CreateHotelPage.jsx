@@ -29,10 +29,17 @@ const CreateHotelPage = () => {
         }
       }
 
-      // Fallback to localStorage (but this was wrong before the fix)
+      // Fallback to localStorage - get from provider object
       if (!providerId) {
-        providerId = localStorage.getItem('providerId');
-        console.warn('⚠️ Fallback to localStorage providerId (may be incorrect):', providerId);
+        const provider = localStorage.getItem('provider');
+        if (provider) {
+          try {
+            providerId = JSON.parse(provider)._id;
+            console.log('✅ Got providerId from provider object:', providerId);
+          } catch (e) {
+            console.error('Error parsing provider:', e);
+          }
+        }
       }
 
       if (!providerId) {
@@ -48,11 +55,6 @@ const CreateHotelPage = () => {
       }
 
       try {
-        console.log('=== Sending Create Hotel Request ===');
-        console.log('providerId:', providerId);
-        console.log('Full provider object:', JSON.parse(providerStr));
-        console.log('Request URL:', `${import.meta.env.VITE_API_BASE_URL || 'http://localhost:3000/api'}/hotel/provider/${providerId}/hotels`);
-
         const response = await hotelService.createHotel(providerId, formData);
         toast.success('Hotel added successfully!');
         navigate('/provider/hotels');

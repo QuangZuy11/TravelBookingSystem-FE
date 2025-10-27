@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import "./FeaturedTours.css";
 import { Clock, MapPin, Star } from "lucide-react";
 import { Link } from "react-router-dom";
+import { getProxiedGoogleDriveUrl } from '../../../utils/googleDriveImageHelper';
 
 export default function FeaturedTours() {
   const [tours, setTours] = useState([]);
@@ -48,7 +49,7 @@ export default function FeaturedTours() {
                 <div className="tour-card-image-wrapper">
                   <img
                     className="tour-card-image"
-                    src={tour.image || "/placeholder.svg"}
+                    src={getProxiedGoogleDriveUrl(tour.image || "/placeholder.svg")}
                     alt={tour.title}
                   />
                   <div className="tour-card-badge">Nổi bật</div>
@@ -70,24 +71,26 @@ export default function FeaturedTours() {
                     <span>{tour.duration_hours}</span>
                   </div>
 
-                  {/* Highlights */}
-                  {Array.isArray(tour.highlights) &&
-                    tour.highlights.length > 0 && (
-                      <ul className="tour-card-description">
-                        {tour.highlights.slice(0, 3).map((item, i) => (
-                          <li key={i}>{item}</li>
-                        ))}
-                      </ul>
-                    )}
-                  {/* Rating */}
+                  {/* Description */}
+                  {tour.description && (
+                    <div className="tour-card-description">
+                      {Array.isArray(tour.description) ? (
+                        <ul>
+                          {tour.description.slice(0, 3).map((item, i) => (
+                            <li key={i}>{item}</li>
+                          ))}
+                        </ul>
+                      ) : (
+                        <p>{tour.description.slice(0, 150)}{tour.description.length > 150 ? '...' : ''}</p>
+                      )}
+                    </div>
+                  )}
+
                   {/* Rating */}
                   <div className="tour-card-rating">
                     <Star className="tour-card-star-icon" />
-                    <span className="tour-card-rating-value">
-                      {tour.rating}
-                    </span>
-                    <span className="tour-card-rating-reviews">
-                      ({tour.total_rating} đánh giá)
+                    <span>
+                      {tour.rating} ({tour.total_rating} đánh giá)
                     </span>
                   </div>
 

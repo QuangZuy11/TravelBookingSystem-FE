@@ -4,6 +4,7 @@ import { tourApi } from '@api/tourApi';
 import { formatCurrency } from '@utils/tourHelpers';
 import toast from 'react-hot-toast';
 import './TourDetails.css';
+import { getProxiedGoogleDriveUrl } from '../../../utils/googleDriveImageHelper';
 
 const TourDetails = () => {
   const { tourId } = useParams();
@@ -51,9 +52,11 @@ const TourDetails = () => {
     languages_offered: []
   });
 
-  const providerId = localStorage.getItem('user')
-    ? JSON.parse(localStorage.getItem('user'))?.providerId
+  // Get provider _id from localStorage
+  const provider = localStorage.getItem('provider')
+    ? JSON.parse(localStorage.getItem('provider'))
     : null;
+  const providerId = provider?._id || null;
 
   // Fetch tour details
   const fetchTourDetails = async () => {
@@ -576,7 +579,7 @@ const TourDetails = () => {
                 />
                 {formData.image && (
                   <img
-                    src={formData.image}
+                    src={getProxiedGoogleDriveUrl(formData.image)}
                     alt="Tour preview"
                     style={{
                       width: '100%',

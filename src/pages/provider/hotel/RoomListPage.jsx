@@ -8,7 +8,10 @@ import Breadcrumb from '../../../components/shared/Breadcrumb';
 const RoomListPage = () => {
     const { hotelId } = useParams();
     const navigate = useNavigate();
-    const providerId = localStorage.getItem('providerId');
+
+    // Get provider _id from localStorage
+    const provider = localStorage.getItem('provider');
+    const providerId = provider ? JSON.parse(provider)._id : null;
     const [rooms, setRooms] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
@@ -172,18 +175,18 @@ const RoomListPage = () => {
                         <table style={tableStyle}>
                             <thead style={theadStyle}>
                                 <tr>
-                                    <th style={{...thStyle, borderTopLeftRadius: '12px', borderBottomLeftRadius: '12px'}}>Room Number</th>
+                                    <th style={{ ...thStyle, borderTopLeftRadius: '12px', borderBottomLeftRadius: '12px' }}>Room Number</th>
                                     <th style={thStyle}>Type</th>
                                     <th style={thStyle}>Floor</th>
                                     <th style={thStyle}>Capacity</th>
                                     <th style={thStyle}>Price/Night</th>
                                     <th style={thStyle}>Status</th>
-                                    <th style={{...thStyle, borderTopRightRadius: '12px', borderBottomRightRadius: '12px'}}>Actions</th>
+                                    <th style={{ ...thStyle, borderTopRightRadius: '12px', borderBottomRightRadius: '12px' }}>Actions</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 {rooms.map((room, index) => (
-                                    <tr 
+                                    <tr
                                         key={room._id}
                                         onMouseEnter={() => setHoveredRow(index)}
                                         onMouseLeave={() => setHoveredRow(null)}
@@ -193,11 +196,11 @@ const RoomListPage = () => {
                                             boxShadow: hoveredRow === index ? '0 4px 15px rgba(0,0,0,0.1)' : 'none'
                                         }}
                                     >
-                                        <td style={{...tdStyle, fontWeight: '600'}}>{room.roomNumber}</td>
+                                        <td style={{ ...tdStyle, fontWeight: '600' }}>{room.roomNumber}</td>
                                         <td style={tdStyle}>{room.type}</td>
                                         <td style={tdStyle}>{room.floor}</td>
                                         <td style={tdStyle}>{room.capacity} persons</td>
-                                        <td style={{...tdStyle, fontWeight: '600', color: '#10b981'}}>
+                                        <td style={{ ...tdStyle, fontWeight: '600', color: '#10b981' }}>
                                             {room.pricePerNight.toLocaleString()}đ
                                         </td>
                                         <td style={tdStyle}>
@@ -208,13 +211,13 @@ const RoomListPage = () => {
                                         <td style={tdStyle}>
                                             <button
                                                 onClick={() => navigate(`/provider/hotels/${hotelId}/rooms/${room._id}/edit`)}
-                                                style={{...actionButtonStyle, background: '#667eea', color: 'white'}}
+                                                style={{ ...actionButtonStyle, background: '#667eea', color: 'white' }}
                                             >
                                                 View Details
                                             </button>
                                             <button
                                                 onClick={() => navigate(`/provider/hotels/${hotelId}/rooms/${room._id}/edit`)}
-                                                style={{...actionButtonStyle, background: '#10b981', color: 'white'}}
+                                                style={{ ...actionButtonStyle, background: '#10b981', color: 'white' }}
                                             >
                                                 Edit
                                             </button>

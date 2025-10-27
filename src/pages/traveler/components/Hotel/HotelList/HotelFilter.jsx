@@ -21,27 +21,83 @@ import {
     Wifi as WifiIcon,
     RestartAlt as RestartAltIcon,
     Liquor as BarIcon,
-    DirectionsCar as ParkingIcon
+    DirectionsCar as ParkingIcon,
+    Restaurant as RestaurantIcon,
+    RoomPreferences as RoomServiceIcon,
+    Work as BusinessCenterIcon,
+    FlightTakeoff as AirportShuttleIcon,
+    AcUnit as AirConditioningIcon,
+    MeetingRoom as ConferenceRoomIcon,
+    LocalLaundryService as LaundryServiceIcon
 } from '@mui/icons-material';
+
 import '../HotelList/HotelList.css';
 
 // Map icon & nhãn (đồng bộ với Hotel List)
 const AMENITY_ICON_MAP = {
+    // Lowercase versions (for consistency with old data)
     pool: PoolIcon,
     spa: SpaIcon,
     gym: GymIcon,
     wifi: WifiIcon,
     bar: BarIcon,
     parking: ParkingIcon,
+    restaurant: RestaurantIcon,
+    room_service: RoomServiceIcon,
+    business_center: BusinessCenterIcon,
+    airport_shuttle: AirportShuttleIcon,
+    air_conditioning: AirConditioningIcon,
+    conference_room: ConferenceRoomIcon,
+    laundry_service: LaundryServiceIcon,
+
+    // Backend format (Title Case with spaces)
+    'Pool': PoolIcon,
+    'Spa': SpaIcon,
+    'Gym': GymIcon,
+    'Wifi': WifiIcon,
+    'Wi-Fi': WifiIcon, // Backend trả về Wi-Fi
+    'Bar': BarIcon,
+    'Parking': ParkingIcon,
+    'Restaurant': RestaurantIcon,
+    'Room Service': RoomServiceIcon,
+    'Business Center': BusinessCenterIcon,
+    'Airport Shuttle': AirportShuttleIcon,
+    'Air Conditioning': AirConditioningIcon,
+    'Conference Room': ConferenceRoomIcon,
+    'Laundry Service': LaundryServiceIcon,
 };
 
 const AMENITY_LABEL_MAP = {
+    // Lowercase versions (for consistency with old data)
     pool: 'Bể bơi',
     spa: 'Spa',
     gym: 'Phòng Gym',
     wifi: 'Wifi',
     bar: 'Quầy Bar',
     parking: 'Chỗ Đậu Xe',
+    restaurant: 'Nhà hàng',
+    room_service: 'Dịch vụ phòng',
+    business_center: 'Trung tâm thương mại',
+    airport_shuttle: 'Đưa đón sân bay',
+    air_conditioning: 'Máy lạnh',
+    conference_room: 'Phòng hội nghị',
+    laundry_service: 'Dịch vụ giặt ủi',
+
+    // Backend format (Title Case with spaces)
+    'Pool': 'Bể bơi',
+    'Spa': 'Spa',
+    'Gym': 'Phòng Gym',
+    'Wifi': 'Wifi',
+    'Wi-Fi': 'Wi-Fi', // Backend trả về Wi-Fi
+    'Bar': 'Quầy Bar',
+    'Parking': 'Chỗ Đậu Xe',
+    'Restaurant': 'Nhà hàng',
+    'Room Service': 'Dịch vụ phòng',
+    'Business Center': 'Trung tâm thương mại',
+    'Airport Shuttle': 'Đưa đón sân bay',
+    'Air Conditioning': 'Máy lạnh',
+    'Conference Room': 'Phòng hội nghị',
+    'Laundry Service': 'Dịch vụ giặt ủi',
 };
 
 // Cố định khoảng giá filter: 100.000 - 10.000.000
@@ -132,7 +188,7 @@ function HotelFilter({
                 const json = await res.json();
                 const list = (json?.data || [])
                     .filter((x) => typeof x === 'string' && x.trim() !== '')
-                    .map((x) => x.trim().toLowerCase());
+                    .map((x) => x.trim()); // Giữ nguyên format từ backend (Title Case)
                 if (!aborted) setAmenities(list);
             } catch (e) {
                 if (!aborted) setErrorAmenities(e.message || 'Lỗi tải tiện nghi');

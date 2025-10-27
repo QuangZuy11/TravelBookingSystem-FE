@@ -28,6 +28,9 @@ import EditHotelPage from "./pages/provider/hotel/EditHotelPage";
 import RoomFormPage from "./pages/provider/hotel/RoomFormPage";
 import BookingManagementPage from "./pages/provider/hotel/BookingManagementPage";
 import RoomListPage from "./pages/provider/hotel/RoomListPage";
+import PromotionListPage from "./pages/provider/promotions/PromotionListPage";
+import PromotionCreatePage from "./pages/provider/promotions/PromotionCreatePage";
+
 
 // Provider Layout
 import ProviderLayout from "./pages/provider/ProviderLayout";
@@ -42,7 +45,10 @@ import HotelPage from "./pages/traveler/HotelPage";
 import HotelListPage from "./pages/traveler/HotelListPage";
 import Profile from "./pages/traveler/components/Hotel/Profile/Profile";
 import BookTourPage from "./pages/traveler/BookTourPage";
+import HotelDetailPage from "./pages/traveler/HotelDetailPage";
 import BookTourDetailPage from "./pages/traveler/BookTourDetailPage";
+
+
 // Admin Pages
 import PendingProvidersList from "./pages/admin/PendingProvidersList";
 import ProviderDetailPage from "./pages/admin/ProviderDetailPage";
@@ -105,6 +111,7 @@ function App() {
             <Route path="/" element={<Homepage />} />
             <Route path="/hotel-page" element={<HotelPage />} />
             <Route path="/hotel-list" element={<HotelListPage />} />
+            <Route path="/hotel-detail/:id" element={<HotelDetailPage />} />
             <Route path="/auth" element={<AuthPage />} />
             {/* Trang List Tour cho Traveler*/}
             <Route path="/tour" element={<BookTourPage />} />
@@ -136,10 +143,7 @@ function App() {
 
             <Route path="/ai-itinerary" element={<AIItineraryGenerator />} />
             <Route path="/my-itineraries" element={<MyItineraries />} />
-            <Route
-              path="/ai-itinerary/:itineraryId"
-              element={<ItineraryDetail />}
-            />
+            <Route path="/ai-itinerary/:itineraryId" element={<ItineraryDetail />} />
 
             {/* Protected Routes - Admin */}
             <Route
@@ -221,6 +225,11 @@ function App() {
                     path=":hotelId/rooms/:roomId/edit"
                     element={<RoomFormPage />}
                   />
+                </Route>
+
+                <Route path="promotions">
+                  <Route index element={<PromotionListPage />} />
+                  <Route path="create" element={<PromotionCreatePage />} />
                 </Route>
               </Route>
             </Route>

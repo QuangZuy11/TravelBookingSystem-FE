@@ -13,12 +13,20 @@ const hotelService = {
 
   // Create new hotel
   createHotel: (providerId, hotelData) => {
-    return apiClient.post(`/hotel/provider/${providerId}/hotels`, hotelData);
+    return apiClient.post(`/hotel/provider/${providerId}/hotels`, hotelData, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+    });
   },
 
   // Update hotel
   updateHotel: (providerId, hotelId, hotelData) => {
-    return apiClient.put(`/hotel/provider/${providerId}/hotels/${hotelId}`, hotelData);
+    return apiClient.put(`/hotel/provider/${providerId}/hotels/${hotelId}`, hotelData, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+    });
   },
 
   // Delete hotel

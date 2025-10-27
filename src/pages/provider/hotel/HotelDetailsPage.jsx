@@ -7,9 +7,13 @@ import ErrorAlert from '../../../components/shared/ErrorAlert';
 import HotelForm from '../../../components/provider/forms/HotelForm';
 import RoomForm from '../../../components/provider/forms/RoomForm';
 import Modal from '../../../components/shared/Modal';
+import { getProxiedGoogleDriveUrl } from '../../../utils/googleDriveImageHelper';
 
 const HotelDetailsPage = () => {
-    const providerId = localStorage.getItem('providerId');
+    // Get provider _id from localStorage
+    const provider = localStorage.getItem('provider');
+    const providerId = provider ? JSON.parse(provider)._id : null;
+
     const { hotelId } = useParams();
     const navigate = useNavigate();
     const [hotel, setHotel] = useState(null);
@@ -22,6 +26,7 @@ const HotelDetailsPage = () => {
     const [isRoomFormModalOpen, setIsRoomFormModalOpen] = useState(false);
     const [editingRoom, setEditingRoom] = useState(null);
     const [hoveredRow, setHoveredRow] = useState(null);
+    const [currentImageIndex, setCurrentImageIndex] = useState(0);
     const token = localStorage.getItem('token');
 
     const fetchHotelDetails = async () => {
@@ -99,7 +104,9 @@ const HotelDetailsPage = () => {
     const handleDeleteHotel = async () => {
         if (window.confirm('Are you sure you want to delete this hotel and all its associated data?')) {
             try {
-                await axios.delete(`/api/hotel/provider/${providerId}/hotels/${hotelId}`);
+                await axios.delete(`/api/hotel/provider/${providerId}/hotels/${hotelId}`, {
+                    headers: { Authorization: `Bearer ${token}` }
+                });
                 alert('Hotel deleted successfully!');
                 navigate(`/provider/${providerId}/hotels`);
             } catch (err) {
@@ -121,8 +128,8 @@ const HotelDetailsPage = () => {
         try {
             if (editingRoom) {
                 await axios.put(`/api/hotel/provider/${providerId}/hotels/${hotelId}/rooms/${editingRoom._id}`, formData, {
-                headers: { Authorization: `Bearer ${token}` }
-            });
+                    headers: { Authorization: `Bearer ${token}` }
+                });
                 alert('Room type updated successfully!');
             } else {
                 await axios.post(`/api/hotel/provider/${providerId}/hotels/${hotelId}/rooms`, formData, {
@@ -141,7 +148,9 @@ const HotelDetailsPage = () => {
     const handleDeleteRoomType = async (roomId) => {
         if (window.confirm('Are you sure you want to delete this room type?')) {
             try {
-                await axios.delete(`/api/hotel/provider/${providerId}/hotels/${hotelId}/rooms/${roomId}`);
+                await axios.delete(`/api/hotel/provider/${providerId}/hotels/${hotelId}/rooms/${roomId}`, {
+                    headers: { Authorization: `Bearer ${token}` }
+                });
                 alert('Room type deleted successfully!');
                 fetchRoomsForHotel();
             } catch (err) {
@@ -149,6 +158,23 @@ const HotelDetailsPage = () => {
                 console.error(err);
             }
         }
+    };
+
+    // Image carousel controls
+    const handleNextImage = () => {
+        if (hotel.images && hotel.images.length > 0) {
+            setCurrentImageIndex((prev) => (prev + 1) % hotel.images.length);
+        }
+    };
+
+    const handlePrevImage = () => {
+        if (hotel.images && hotel.images.length > 0) {
+            setCurrentImageIndex((prev) => (prev - 1 + hotel.images.length) % hotel.images.length);
+        }
+    };
+
+    const handleThumbnailClick = (index) => {
+        setCurrentImageIndex(index);
     };
 
     if (loading) return <LoadingSpinner />;
@@ -360,7 +386,7 @@ const HotelDetailsPage = () => {
             pending: 'linear-gradient(135deg, #f59e0b 0%, #d97706 100%)',
             cancelled: 'linear-gradient(135deg, #ef4444 0%, #dc2626 100%)'
         };
-        
+
         return {
             padding: '0.5rem 1rem',
             borderRadius: '20px',
@@ -414,8 +440,162 @@ const HotelDetailsPage = () => {
             <div style={summaryCardStyle}>
                 <div style={gridStyle}>
                     <div>
+                        {/* Image Carousel */}
                         {hotel.images && hotel.images.length > 0 ? (
-                            <img src={hotel.images[0]} alt={hotel.name} style={imageStyle} />
+                            <div style={{ position: 'relative', marginBottom: '1.5rem' }}>
+                                {/* Main Image */}
+                                <div style={{ position: 'relative', ...imageStyle }}>
+                                    <img
+                                        src={getProxiedGoogleDriveUrl(hotel.images[currentImageIndex])}
+                                        alt={`${hotel.name} - Image ${currentImageIndex + 1}`}
+                                        style={{
+                                            width: '100%',
+                                            height: '100%',
+                                            objectFit: 'cover',
+                                            borderRadius: '16px'
+                                        }}
+                                    />
+
+                                    {/* Image Counter Badge */}
+                                    <div style={{
+                                        position: 'absolute',
+                                        top: '16px',
+                                        right: '16px',
+                                        background: 'rgba(0, 0, 0, 0.7)',
+                                        color: 'white',
+                                        padding: '6px 12px',
+                                        borderRadius: '20px',
+                                        fontSize: '0.875rem',
+                                        fontWeight: '600'
+                                    }}>
+                                        {currentImageIndex + 1} / {hotel.images.length}
+                                    </div>
+
+                                    {/* Navigation Arrows - Only show if more than 1 image */}
+                                    {hotel.images.length > 1 && (
+                                        <>
+                                            {/* Previous Button */}
+                                            <button
+                                                onClick={handlePrevImage}
+                                                style={{
+                                                    position: 'absolute',
+                                                    left: '16px',
+                                                    top: '50%',
+                                                    transform: 'translateY(-50%)',
+                                                    background: 'rgba(255, 255, 255, 0.95)',
+                                                    border: 'none',
+                                                    borderRadius: '50%',
+                                                    width: '48px',
+                                                    height: '48px',
+                                                    cursor: 'pointer',
+                                                    display: 'flex',
+                                                    alignItems: 'center',
+                                                    justifyContent: 'center',
+                                                    fontSize: '1.5rem',
+                                                    boxShadow: '0 4px 12px rgba(0,0,0,0.2)',
+                                                    transition: 'all 0.3s',
+                                                    zIndex: 10
+                                                }}
+                                                onMouseEnter={(e) => {
+                                                    e.currentTarget.style.background = '#667eea';
+                                                    e.currentTarget.style.transform = 'translateY(-50%) scale(1.1)';
+                                                }}
+                                                onMouseLeave={(e) => {
+                                                    e.currentTarget.style.background = 'rgba(255, 255, 255, 0.95)';
+                                                    e.currentTarget.style.transform = 'translateY(-50%) scale(1)';
+                                                }}
+                                            >
+                                                ◀
+                                            </button>
+
+                                            {/* Next Button */}
+                                            <button
+                                                onClick={handleNextImage}
+                                                style={{
+                                                    position: 'absolute',
+                                                    right: '16px',
+                                                    top: '50%',
+                                                    transform: 'translateY(-50%)',
+                                                    background: 'rgba(255, 255, 255, 0.95)',
+                                                    border: 'none',
+                                                    borderRadius: '50%',
+                                                    width: '48px',
+                                                    height: '48px',
+                                                    cursor: 'pointer',
+                                                    display: 'flex',
+                                                    alignItems: 'center',
+                                                    justifyContent: 'center',
+                                                    fontSize: '1.5rem',
+                                                    boxShadow: '0 4px 12px rgba(0,0,0,0.2)',
+                                                    transition: 'all 0.3s',
+                                                    zIndex: 10
+                                                }}
+                                                onMouseEnter={(e) => {
+                                                    e.currentTarget.style.background = '#667eea';
+                                                    e.currentTarget.style.transform = 'translateY(-50%) scale(1.1)';
+                                                }}
+                                                onMouseLeave={(e) => {
+                                                    e.currentTarget.style.background = 'rgba(255, 255, 255, 0.95)';
+                                                    e.currentTarget.style.transform = 'translateY(-50%) scale(1)';
+                                                }}
+                                            >
+                                                ▶
+                                            </button>
+                                        </>
+                                    )}
+                                </div>
+
+                                {/* Thumbnail Navigation - Only show if more than 1 image */}
+                                {hotel.images.length > 1 && (
+                                    <div style={{
+                                        display: 'flex',
+                                        gap: '8px',
+                                        marginTop: '12px',
+                                        overflowX: 'auto',
+                                        padding: '4px'
+                                    }}>
+                                        {hotel.images.map((image, index) => (
+                                            <div
+                                                key={index}
+                                                onClick={() => handleThumbnailClick(index)}
+                                                style={{
+                                                    width: '80px',
+                                                    height: '60px',
+                                                    borderRadius: '8px',
+                                                    overflow: 'hidden',
+                                                    cursor: 'pointer',
+                                                    border: currentImageIndex === index
+                                                        ? '3px solid #667eea'
+                                                        : '3px solid transparent',
+                                                    opacity: currentImageIndex === index ? 1 : 0.6,
+                                                    transition: 'all 0.3s',
+                                                    flexShrink: 0
+                                                }}
+                                                onMouseEnter={(e) => {
+                                                    if (currentImageIndex !== index) {
+                                                        e.currentTarget.style.opacity = '0.8';
+                                                    }
+                                                }}
+                                                onMouseLeave={(e) => {
+                                                    if (currentImageIndex !== index) {
+                                                        e.currentTarget.style.opacity = '0.6';
+                                                    }
+                                                }}
+                                            >
+                                                <img
+                                                    src={getProxiedGoogleDriveUrl(image)}
+                                                    alt={`Thumbnail ${index + 1}`}
+                                                    style={{
+                                                        width: '100%',
+                                                        height: '100%',
+                                                        objectFit: 'cover'
+                                                    }}
+                                                />
+                                            </div>
+                                        ))}
+                                    </div>
+                                )}
+                            </div>
                         ) : (
                             <div style={{
                                 ...imageStyle,
@@ -428,7 +608,7 @@ const HotelDetailsPage = () => {
                                 🏨
                             </div>
                         )}
-                        <div style={{display: 'flex', alignItems: 'center', gap: '1rem'}}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
                             <h2 style={sectionTitleStyle}>{hotel.name}</h2>
                             <p style={{ color: '#6b7280', marginTop: '0.5rem' }}>
                                 {'⭐'.repeat(hotel.starRating || 3)} {hotel.starRating || 3} Stars
@@ -441,14 +621,14 @@ const HotelDetailsPage = () => {
                             </p>
                         </div>
                         <div>
-                            
+
                         </div>
                         <div style={infoBlockStyle}>
                             <p style={labelStyle}>Description</p>
                             <p style={valueStyle}>{hotel.description}</p>
                         </div>
                     </div>
-                    
+
                     <div>
                         <div style={buttonGroupStyle}>
                             <button
@@ -492,18 +672,18 @@ const HotelDetailsPage = () => {
                                 </p>
                             )}
                         </div>
-                        
+
                         <div style={infoBlockStyle}>
                             <p style={labelStyle}>⏰ Check-in / Check-out</p>
                             <p style={valueStyle}>Check-in: {hotel.policies.checkInTime}</p>
                             <p style={valueStyle}>Check-out: {hotel.policies.checkOutTime}</p>
                         </div>
-                        
+
                         <div style={infoBlockStyle}>
                             <p style={labelStyle}>📋 Cancellation Policy</p>
                             <p style={valueStyle}>{hotel.policies.cancellationPolicy || 'Not specified'}</p>
                         </div>
-                        
+
                         <div style={infoBlockStyle}>
                             <p style={labelStyle}>💳 Payment Options</p>
                             <div>
@@ -512,12 +692,12 @@ const HotelDetailsPage = () => {
                                 ))}
                             </div>
                         </div>
-                        
+
                         <div style={infoBlockStyle}>
                             <p style={labelStyle}>🐾 Pets</p>
                             <p style={valueStyle}>{hotel.policies.petsAllowed ? '✅ Allowed' : '❌ Not Allowed'}</p>
                         </div>
-                        
+
                         <div style={infoBlockStyle}>
                             <p style={labelStyle}>✨ Amenities</p>
                             <div>
@@ -588,7 +768,7 @@ const HotelDetailsPage = () => {
                         >
                             + Add New Room
                         </button>
-                        
+
                         {rooms.length === 0 ? (
                             <div style={emptyStateStyle}>
                                 <div style={{ fontSize: '4rem', marginBottom: '1rem' }}>🛏️</div>

@@ -44,8 +44,32 @@ const ItineraryForm = ({ tourId, basicInfo, existingItineraries = [], isEditMode
         }
     }, [existingItineraries]);
 
-    // Tính số ngày tối đa từ duration_hours
-    const maxDays = Math.ceil((basicInfo?.duration_hours || 24) / 24);
+    // Parse số ngày từ duration string "X ngày Y đêm"
+    const parseDaysFromDuration = (durationString) => {
+        if (!durationString) return 1;
+
+        // Tìm số trước chữ "ngày"
+        const match = durationString.match(/(\d+)\s*ngày/i);
+        if (match && match[1]) {
+            return parseInt(match[1], 10);
+        }
+
+        // Fallback: nếu có duration_hours (cho backward compatibility)
+        if (basicInfo?.duration_hours) {
+            return Math.ceil(basicInfo.duration_hours / 24);
+        }
+
+        return 1; // Default
+    };
+
+    // Tính số ngày tối đa từ duration string
+    const maxDays = parseDaysFromDuration(basicInfo?.duration);
+
+    console.log('📅 Duration Info:', {
+        durationString: basicInfo?.duration,
+        maxDays,
+        currentDay
+    });
 
     const handleAddActivity = () => {
         setFormData(prev => ({
@@ -63,6 +87,20 @@ const ItineraryForm = ({ tourId, basicInfo, existingItineraries = [], isEditMode
     };
 
     const handleActivityChange = (index, field, value) => {
+        // Kiểm tra nếu đang ở ngày cuối và đang thay đổi end_time
+        if (field === 'end_time' && currentDay === maxDays) {
+            const endTimeValue = value;
+            // Parse giờ từ string "HH:MM"
+            if (endTimeValue) {
+                const [hours] = endTimeValue.split(':').map(Number);
+                // Không cho nhập giờ kết thúc sau 18:00 (6PM) ở ngày cuối
+                if (hours >= 18) {
+                    toast.error('⚠️ Ngày cuối cùng không thể có hoạt động buổi tối (sau 18:00)');
+                    return; // Không update value
+                }
+            }
+        }
+
         setFormData(prev => ({
             ...prev,
             activities: prev.activities.map((activity, i) =>
@@ -217,8 +255,8 @@ const ItineraryForm = ({ tourId, basicInfo, existingItineraries = [], isEditMode
                         description: formData.description,
                         meals: formData.meals
                     }, {
-                headers: { Authorization: `Bearer ${token}` }
-            }
+                    headers: { Authorization: `Bearer ${token}` }
+                }
                 );
                 itineraryId = existingItinerary._id;
 
@@ -252,7 +290,9 @@ const ItineraryForm = ({ tourId, basicInfo, existingItineraries = [], isEditMode
                     try {
                         const deleteUrl = `http://localhost:3000/api/itineraries/${item.itineraryId}/activities/${item.activityId}`;
                         console.log('🔥 Deleting activity:', deleteUrl);
-                        await axios.delete(deleteUrl);
+                        await axios.delete(deleteUrl, {
+                            headers: { Authorization: `Bearer ${token}` }
+                        });
                         console.log('✅ Successfully deleted activity:', item.activityId);
                     } catch (error) {
                         console.error('❌ Error deleting activity:', error);
@@ -279,7 +319,7 @@ const ItineraryForm = ({ tourId, basicInfo, existingItineraries = [], isEditMode
                             description: activity.description,
                             location: activity.location
                         },
-                { headers: { Authorization: `Bearer ${token}` } }
+                        { headers: { Authorization: `Bearer ${token}` } }
                     );
                 } else {
                     // CREATE new activity
@@ -336,7 +376,7 @@ const ItineraryForm = ({ tourId, basicInfo, existingItineraries = [], isEditMode
 
         // Kiểm tra số ngày tối đa
         if (nextDay > maxDays) {
-            toast.error(`Tour chỉ có ${basicInfo?.duration_hours || 0} giờ (${maxDays} ngày). Không thể thêm ngày mới!`);
+            toast.error(`Tour chỉ có ${maxDays} ngày (${basicInfo?.duration || 'N/A'}). Không thể thêm ngày mới!`);
             return;
         }
 
@@ -406,7 +446,9 @@ const ItineraryForm = ({ tourId, basicInfo, existingItineraries = [], isEditMode
         try {
             setLoading(true);
             // Delete itinerary from backend
-            await axios.delete(`http://localhost:3000/api/itineraries/${itinerary._id}`);
+            await axios.delete(`http://localhost:3000/api/itineraries/${itinerary._id}`, {
+                headers: { Authorization: `Bearer ${token}` }
+            });
 
             // Remove from state
             setItineraries(prev => prev.filter(it => it.day_number !== dayNumber));
@@ -497,7 +539,7 @@ const ItineraryForm = ({ tourId, basicInfo, existingItineraries = [], isEditMode
                     fontSize: '14px',
                     fontWeight: '600'
                 }}>
-                    ⚠️ Đây là ngày cuối cùng (Tour có {basicInfo?.duration_hours || 0} giờ = {maxDays} ngày)
+                    ⚠️ Đây là ngày cuối cùng (Tour: {basicInfo?.duration || 'N/A'} = {maxDays} ngày)
                 </div>
             )}
 
@@ -590,6 +632,25 @@ const ItineraryForm = ({ tourId, basicInfo, existingItineraries = [], isEditMode
                         + Thêm hoạt động
                     </button>
                 </div>
+
+                {/* Warning cho ngày cuối */}
+                {currentDay === maxDays && (
+                    <div style={{
+                        backgroundColor: '#fef3c7',
+                        border: '1px solid #fbbf24',
+                        borderRadius: '8px',
+                        padding: '12px 16px',
+                        marginBottom: '16px',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '8px'
+                    }}>
+                        <span style={{ fontSize: '20px' }}>⚠️</span>
+                        <span style={{ color: '#92400e', fontSize: '14px', fontWeight: '500' }}>
+                            Đây là ngày cuối - Hoạt động không được kết thúc sau 18:00 (không có buổi tối)
+                        </span>
+                    </div>
+                )}
 
                 {formData.activities.length === 0 ? (
                     <div className="empty-state">
