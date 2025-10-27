@@ -368,7 +368,7 @@ function HotelResult({
                                 <Card key={`sk-${i}`} className="hotel-card hotel-card-list" elevation={2}>
                                     <Grid container spacing={0}>
                                         <Grid item xs={12} sm={4}>
-                                            <Skeleton variant="rectangular" className="hotel-image" />
+                                            <Skeleton variant="rectangular" className="hotel-result-image" />
                                         </Grid>
                                         <Grid item xs={12} sm={8}>
                                             <CardContent>
@@ -444,12 +444,12 @@ function HotelCard({ hotel, isFavorite, onToggleFavorite, onBook }) {
                             color="error"
                             badgeContent={hotel.discount > 0 ? `-${hotel.discount}%` : null}
                             anchorOrigin={{ vertical: 'top', horizontal: 'left' }}
-                            className="discount-badge"
+                            className="hotel-result-badge"
                         >
                             <SmartImage
                                 src={hotel.image}
                                 alt={hotel.name}
-                                className="hotel-image"
+                                className="hotel-result-image"
                                 onClick={handleHotelClick}
                                 style={{ cursor: 'pointer' }}
                             />
