@@ -72,12 +72,18 @@ export default function FeaturedTours() {
                   </div>
 
                   {/* Description */}
-                  {tour.description && tour.description.length > 0 && (
-                    <ul className="tour-card-description">
-                      {tour.description.slice(0, 3).map((item, i) => (
-                        <li key={i}>{item}</li>
-                      ))}
-                    </ul>
+                  {tour.description && (
+                    <div className="tour-card-description">
+                      {Array.isArray(tour.description) ? (
+                        <ul>
+                          {tour.description.slice(0, 3).map((item, i) => (
+                            <li key={i}>{item}</li>
+                          ))}
+                        </ul>
+                      ) : (
+                        <p>{tour.description.slice(0, 150)}{tour.description.length > 150 ? '...' : ''}</p>
+                      )}
+                    </div>
                   )}
 
                   {/* Rating */}
