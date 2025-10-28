@@ -18,7 +18,7 @@ export function TourCard({ tour }) {
       </div>
 
       <div className="tour-info">
-        <h3 className="tour-name">{tour.title}</h3>
+        <h3 className="tour-name">{tour.name}</h3>
 
         <div className="tour-meta">
           <div className="tour-destination">

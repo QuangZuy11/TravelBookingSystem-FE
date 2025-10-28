@@ -83,7 +83,8 @@ const Header = () => {
 
     // Simplified check: If has provider._id and licenses, allow access
     const hasProvider = !!provider && !!provider._id;
-    const hasLicenses = provider &&
+    const hasLicenses =
+      provider &&
       Array.isArray(provider.licenses) &&
       provider.licenses.length > 0;
 
@@ -95,7 +96,7 @@ const Header = () => {
       console.log("Provider đã đăng ký:", {
         provider_id: provider._id,
         licenses_count: provider.licenses.length,
-        service_types: provider.licenses.map(l => l.service_type)
+        service_types: provider.licenses.map((l) => l.service_type),
       });
 
       // Tất cả providers đều vào /provider/dashboard
@@ -114,7 +115,7 @@ const Header = () => {
         <a href="/">Trang Chủ</a>
         <a href="/tour">Tour Du Lịch</a>
         <a href="/hotel-page">Khách Sạn</a>
-        <a href="/about">Về Chúng Tôi</a>
+        <a href="/terms-of-service">Điều khoản</a>
         <a href="/contact">Liên Hệ</a>
       </nav>
 

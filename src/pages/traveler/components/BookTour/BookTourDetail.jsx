@@ -7,6 +7,8 @@ const BookTourDetail = () => {
   const [tour, setTour] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [acceptedTerms, setAcceptedTerms] = useState(false);
+  const [errors, setErrors] = useState({});
 
   const [bookingData, setBookingData] = useState({
     guests: 1,
@@ -51,8 +53,46 @@ const BookTourDetail = () => {
     }
   }, [id]);
 
+  const validateForm = () => {
+    const newErrors = {};
+
+    if (!bookingData.startDate) {
+      newErrors.startDate = "Vui lòng chọn ngày khởi hành";
+    }
+
+    if (!bookingData.contactName.trim()) {
+      newErrors.contactName = "Vui lòng nhập họ và tên";
+    }
+
+    if (!bookingData.contactEmail.trim()) {
+      newErrors.contactEmail = "Vui lòng nhập email";
+    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(bookingData.contactEmail)) {
+      newErrors.contactEmail = "Email không hợp lệ";
+    }
+
+    if (!bookingData.contactPhone.trim()) {
+      newErrors.contactPhone = "Vui lòng nhập số điện thoại";
+    } else if (
+      !/^[0-9]{10}$/.test(bookingData.contactPhone.replace(/\s/g, ""))
+    ) {
+      newErrors.contactPhone = "Số điện thoại không hợp lệ";
+    }
+
+    if (!acceptedTerms) {
+      newErrors.terms = "Vui lòng đồng ý với điều khoản dịch vụ";
+    }
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
   const handleBooking = (e) => {
     e.preventDefault();
+
+    if (!validateForm()) {
+      return;
+    }
+
     const booking = {
       tourId: tour.id,
       tourName: tour.title,
@@ -64,6 +104,7 @@ const BookTourDetail = () => {
       status: "pending",
     };
     console.log("Booking:", booking);
+    setErrors({});
     alert("Đặt tour thành công! Chúng tôi sẽ liên hệ với bạn sớm nhất.");
   };
 
@@ -191,7 +232,7 @@ const BookTourDetail = () => {
               </div>
 
               <div className="tour-details">
-                <h1 className="tour-title">{tour.title}</h1>
+                <h1 className="tour-title">{tour.name}</h1>
 
                 <div className="tour-meta">
                   <div className="meta-item">
@@ -402,82 +443,162 @@ const BookTourDetail = () => {
 
                 <div className="form-group">
                   <label htmlFor="startDate" className="form-label">
-                    Ngày khởi hành
+                    Ngày khởi hành <span style={{ color: "#ef4444" }}>*</span>
                   </label>
                   <input
                     id="startDate"
                     type="date"
                     className="form-input"
+                    style={
+                      errors.startDate
+                        ? { borderColor: "#ef4444", borderWidth: "2px" }
+                        : {}
+                    }
                     value={bookingData.startDate}
-                    onChange={(e) =>
+                    onChange={(e) => {
                       setBookingData({
                         ...bookingData,
                         startDate: e.target.value,
-                      })
-                    }
+                      });
+                      if (errors.startDate) {
+                        setErrors({ ...errors, startDate: null });
+                      }
+                    }}
                     min={new Date().toISOString().split("T")[0]}
                     required
                   />
+                  {errors.startDate && (
+                    <span
+                      style={{
+                        color: "#ef4444",
+                        fontSize: "14px",
+                        marginTop: "4px",
+                        display: "block",
+                      }}
+                    >
+                      {errors.startDate}
+                    </span>
+                  )}
                 </div>
 
                 <div className="form-group">
                   <label htmlFor="contactName" className="form-label">
-                    Họ và tên
+                    Họ và tên <span style={{ color: "#ef4444" }}>*</span>
                   </label>
                   <input
                     id="contactName"
                     type="text"
                     className="form-input"
+                    style={
+                      errors.contactName
+                        ? { borderColor: "#ef4444", borderWidth: "2px" }
+                        : {}
+                    }
                     value={bookingData.contactName}
-                    onChange={(e) =>
+                    onChange={(e) => {
                       setBookingData({
                         ...bookingData,
                         contactName: e.target.value,
-                      })
-                    }
+                      });
+                      if (errors.contactName) {
+                        setErrors({ ...errors, contactName: null });
+                      }
+                    }}
                     placeholder="Nhập họ và tên"
                     required
                   />
+                  {errors.contactName && (
+                    <span
+                      style={{
+                        color: "#ef4444",
+                        fontSize: "14px",
+                        marginTop: "4px",
+                        display: "block",
+                      }}
+                    >
+                      {errors.contactName}
+                    </span>
+                  )}
                 </div>
 
                 <div className="form-group">
                   <label htmlFor="contactEmail" className="form-label">
-                    Email
+                    Email <span style={{ color: "#ef4444" }}>*</span>
                   </label>
                   <input
                     id="contactEmail"
                     type="email"
                     className="form-input"
+                    style={
+                      errors.contactEmail
+                        ? { borderColor: "#ef4444", borderWidth: "2px" }
+                        : {}
+                    }
                     value={bookingData.contactEmail}
-                    onChange={(e) =>
+                    onChange={(e) => {
                       setBookingData({
                         ...bookingData,
                         contactEmail: e.target.value,
-                      })
-                    }
+                      });
+                      if (errors.contactEmail) {
+                        setErrors({ ...errors, contactEmail: null });
+                      }
+                    }}
                     placeholder="example@email.com"
                     required
                   />
+                  {errors.contactEmail && (
+                    <span
+                      style={{
+                        color: "#ef4444",
+                        fontSize: "14px",
+                        marginTop: "4px",
+                        display: "block",
+                      }}
+                    >
+                      {errors.contactEmail}
+                    </span>
+                  )}
                 </div>
 
                 <div className="form-group">
                   <label htmlFor="contactPhone" className="form-label">
-                    Số điện thoại
+                    Số điện thoại <span style={{ color: "#ef4444" }}>*</span>
                   </label>
                   <input
                     id="contactPhone"
                     type="tel"
                     className="form-input"
+                    style={
+                      errors.contactPhone
+                        ? { borderColor: "#ef4444", borderWidth: "2px" }
+                        : {}
+                    }
                     value={bookingData.contactPhone}
-                    onChange={(e) =>
+                    onChange={(e) => {
                       setBookingData({
                         ...bookingData,
                         contactPhone: e.target.value,
-                      })
-                    }
+                      });
+                      if (errors.contactPhone) {
+                        setErrors({ ...errors, contactPhone: null });
+                      }
+                    }}
                     placeholder="0912345678"
                     required
                   />
+                  {errors.contactPhone && (
+                    <span
+                      style={{
+                        color: "#ef4444",
+                        fontSize: "14px",
+                        marginTop: "4px",
+                        display: "block",
+                      }}
+                    >
+                      {errors.contactPhone}
+                    </span>
+                  )}
                 </div>
 
                 <div className="form-group">
@@ -535,6 +656,53 @@ const BookTourDetail = () => {
                     }
                     rows={3}
                   />
+                </div>
+
+                {/* Terms and Conditions */}
+                <div className="terms-acceptance-wrapper">
+                  <label className="terms-acceptance-label">
+                    <input
+                      type="checkbox"
+                      className="terms-acceptance-checkbox"
+                      style={
+                        errors.terms
+                          ? { outlineColor: "#ef4444", outline: "2px solid" }
+                          : {}
+                      }
+                      checked={acceptedTerms}
+                      onChange={(e) => {
+                        setAcceptedTerms(e.target.checked);
+                        if (errors.terms) {
+                          setErrors({ ...errors, terms: null });
+                        }
+                      }}
+                      required
+                    />
+                    <span className="terms-acceptance-text">
+                      Tôi đã đọc và đồng ý với{" "}
+                      <a
+                        href="/terms-of-service"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="terms-acceptance-link"
+                      >
+                        Điều khoản dịch vụ
+                      </a>
+                      <span style={{ color: "#ef4444" }}> *</span>
+                    </span>
+                  </label>
+                  {errors.terms && (
+                    <span
+                      style={{
+                        color: "#ef4444",
+                        fontSize: "14px",
+                        marginTop: "4px",
+                        display: "block",
+                      }}
+                    >
+                      {errors.terms}
+                    </span>
+                  )}
                 </div>
 
                 {/* Price Summary */}
@@ -627,6 +795,7 @@ const BookTourDetail = () => {
                   </svg>
                   <span>Hotline: 1900-1234</span>
                 </div>
+
                 <div className="contact-item">
                   <svg
                     className="contact-icon"
