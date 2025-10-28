@@ -1,5 +1,5 @@
 import "./HeroSection.css";
-
+import { Link } from "react-router-dom";
 const HeroSection = () => {
   return (
     <section className="hero">
@@ -15,7 +15,9 @@ const HeroSection = () => {
           </p>
 
           <div className="hero-buttons">
-            <button className="btn primary">Khám Phá Ngay →</button>
+            <Link to="/ai-itinerary" className="btn-primary-HeroSection">
+              Khám Phá Ngay →
+            </Link>
             <button className="btn secondary">▶ Xem Video</button>
           </div>
 
