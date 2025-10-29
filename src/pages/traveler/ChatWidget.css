@@ -1,0 +1,180 @@
+.chat-fab {
+  position: fixed;
+  right: 20px;
+  bottom: 20px;
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: #4f46e5;
+  color: #fff;
+  font-size: 22px;
+  border: none;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.18);
+  cursor: pointer;
+  z-index: 1000;
+}
+
+.chat-panel {
+  position: fixed;
+  right: 20px;
+  bottom: 20px;
+  width: 380px;
+  max-width: calc(100vw - 24px);
+  height: 560px;
+  max-height: calc(100vh - 32px); /* ngăn tràn ra ngoài cửa sổ */
+  background: #fff;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden; /* ẩn mọi tràn */
+  box-shadow: 0 16px 48px rgba(0,0,0,0.22);
+  z-index: 1001;
+}
+
+.chat-panel-header {
+  padding: 8px 10px;
+  border-bottom: 1px solid #eef2f7;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+}
+.chat-panel-header .title { font-weight:600; line-height: 1; }
+.chat-panel-header .subtitle { font-size: 12px; color:#6b7280; margin-top: 2px; }
+.chat-panel-header .right { display:flex; gap:6px; align-items:center; }
+
+.btn-primary { background:#4f46e5; color:#fff; border:none; padding:8px 12px; border-radius:8px; cursor:pointer; }
+.btn-secondary { background:#e5e7eb; color:#111827; border:none; padding:8px 12px; border-radius:8px; cursor:pointer; }
+.btn-icon { background: transparent; border: none; cursor: pointer; }
+.btn-secondary.sm { padding:6px 8px; font-size: 12px; }
+.btn-icon.close { font-size: 18px; }
+
+.chat-panel-context,
+.chat-panel-context * { box-sizing: border-box; }
+
+.chat-panel-context { 
+  display: grid; 
+  grid-template-columns: minmax(0,1fr) 64px minmax(0,1fr); /* tránh tràn ngang */
+  gap: 6px; 
+  padding: 6px 8px; 
+  background:#f8fafc; 
+  border-bottom:1px solid #eef2f7; 
+  overflow: hidden; 
+}
+.chat-panel-context.compact { 
+  grid-template-columns: minmax(0,1fr) 60px minmax(0,1fr);
+}
+.chat-panel-context .field { display:flex; flex-direction:column; gap:2px; min-width: 0; }
+.chat-panel-context .field.short { width: 60px; }
+.chat-panel-context label { font-size: 10.5px; color:#6b7280; white-space: nowrap; }
+.chat-panel-context input { 
+  height: 26px;              /* nhỏ hơn nữa */
+  padding: 3px 8px; 
+  border:1px solid #e5e7eb; 
+  border-radius:8px; 
+  font-size: 12px; 
+  width: 100%;
+  min-width: 0;              /* cho phép co lại trong grid */
+}
+
+/* Body phải có min-height:0 để flex container không đẩy tràn */
+.chat-panel-body { 
+  flex: 1; 
+  min-height: 0;             /* quan trọng để tránh tràn dọc */
+  overflow: auto; 
+  background:#fff; 
+  padding: 10px 12px 0;          /* đệm trong thân chat để chữ không dính khung */
+}
+
+/* Toolbar pill buttons (đẹp hơn, không tràn) */
+.chat-panel-toolbar { 
+  display:flex; 
+  gap:8px; 
+  align-items:center; 
+  justify-content: space-between;
+  flex-wrap: wrap;           /* nếu hẹp sẽ tự xuống dòng */
+  padding:6px 8px; 
+  border-top:1px solid #f1f5f9; 
+  background:#fff; 
+}
+.btn-chip {
+  display:inline-flex; 
+  align-items:center; 
+  gap:6px;
+  padding:6px 10px; 
+  border-radius:999px; 
+  border:1px solid #e5e7eb; 
+  background:#f8fafc; 
+  color:#111827; 
+  font-size:12px; 
+  cursor:pointer;
+  transition: all .15s ease;
+  white-space: nowrap;
+}
+.btn-chip:hover { background:#eef2ff; border-color:#c7d2fe; color:#3730a3; }
+.btn-chip.active { background:#eef2ff; border-color:#c7d2fe; color:#3730a3; }
+
+.messages { padding: 12px 0 14px;          /* giữ đệm dọc, bỏ đệm ngang vì body đã có */
+  display:flex; flex-direction:column; gap: 12px; }
+.msg { display:flex; gap:10px; align-items:flex-start; }
+.msg.user { flex-direction: row-reverse; }
+.avatar { width:28px; height:28px; display:flex; align-items:center; justify-content:center; background:#f3f4f6; border-radius:8px; }
+.bubble { max-width: 75%; background:#f8fafc; border:1px solid #e5e7eb; padding:10px 12px; border-radius:12px; }
+.msg.user .bubble { background:#eef2ff; border-color:#c7d2fe; }
+.content { white-space:pre-wrap; line-height:1.5; }
+.assistant.typing { color:#6b7280; font-style:italic; margin-left:38px; }
+
+.citations { margin-top:8px; display:flex; gap:6px; flex-wrap:wrap; }
+.citation { display:inline-flex; gap:6px; align-items:center; background:#ecfeff; color:#155e75; padding:4px 8px; border-radius:999px; border:1px solid #a5f3fc; text-decoration:none; font-size:12px; }
+
+.chat-panel-input {
+  display: grid;
+  grid-template-columns: 4fr 1fr;   /* 4/5 và 1/5 */
+  align-items: end;
+  gap: 10px;
+  padding: 10px 12px;
+  border-top: 1px solid #eef2f7;
+}
+
+.chat-panel-input textarea {
+  width: 100%;
+  min-height: 36px;
+  max-height: 120px;
+  resize: vertical;
+  padding: 9px 12px;
+  border: 1px solid #e5e7eb;
+  border-radius: 10px;
+  font-size: 13.5px;
+}
+
+.chat-panel-input .btn-primary {
+  width: 100%;          /* chiếm 1/5 còn lại */
+  min-width: 0;         /* cho phép co giãn theo cột grid */
+  height: 36px;
+  padding: 6px 12px;
+  border-radius: 10px;
+  font-size: 13px;
+  line-height: 1;
+}
+
+/* Giới hạn tối thiểu nút ở màn rất hẹp */
+@media (max-width: 380px) {
+  .chat-panel-input {
+    grid-template-columns: 1fr 84px; /* giữ nút tối thiểu 84px */
+  }
+}
+
+.chat-panel-footer { font-size:12px; color:#6b7280; display:flex; justify-content:flex-end; padding: 6px 10px 8px; }
+
+.empty{
+  display:flex;
+  flex-direction:column;
+  align-items:flex-start;        /* canh trên-trái */
+  justify-content:flex-start;
+  gap:8px;
+  color:#6b7280;
+  padding: 14px 2px;             /* thêm khoảng cách với khung */
+  text-align:left;
+}
+.empty h4{ font-size:14px; font-weight:600; margin:0; }
+.empty p{ font-size:13px; margin:0; }

@@ -47,6 +47,8 @@ import Profile from "./pages/traveler/components/Hotel/Profile/Profile";
 import BookTourPage from "./pages/traveler/BookTourPage";
 import HotelDetailPage from "./pages/traveler/HotelDetailPage";
 import BookTourDetailPage from "./pages/traveler/BookTourDetailPage";
+import ChatPage from "./pages/traveler/ChatPage";
+import ChatWidget from "./pages/traveler/ChatWidget";
 
 // Admin Pages
 import PendingProvidersList from "./pages/admin/PendingProvidersList";
@@ -56,6 +58,10 @@ import UserListPage from "./pages/admin/UserListPage";
 import AIItineraryGenerator from "./components/ai/AIItineraryGenerator";
 import MyItineraries from "./components/ai/MyItineraries";
 import ItineraryDetail from "./components/ai/ItineraryDetail";
+
+// Auth Pages
+import ForgotPasswordPage from "./pages/auth/ForgotPasswordPage";
+import ResetPasswordPage from "./pages/auth/ResetPasswordPage";
 
 function App() {
   return (
@@ -116,6 +122,7 @@ function App() {
             {/* Trang List Tour cho Traveler*/}
             <Route path="/tour" element={<BookTourPage />} />
             <Route path="/tour/:id" element={<BookTourDetailPage />} />
+            <Route path="/chat" element={<ChatPage />} />
 
             {/* Provider Registration - Must be accessible without full authentication */}
             <Route
@@ -235,12 +242,18 @@ function App() {
                   <Route index element={<PromotionListPage />} />
                   <Route path="create" element={<PromotionCreatePage />} />
                 </Route>
+                
               </Route>
             </Route>
+
+            {/* Auth flows */}
+            <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+            <Route path="/reset-password" element={<ResetPasswordPage />} />
 
             {/* 404 - Must be last */}
             <Route path="*" element={<NotFoundPage />} />
           </Routes>
+          <ChatWidget />
         </AuthProvider>
       </Router>
     </ErrorBoundary>

@@ -1,6 +1,7 @@
 import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import { useAuth } from "../../contexts/AuthContext";
+import apiClient from "../../config/apiClient";
 import "./AuthPage.css";
 
 const AuthPage = () => {
@@ -27,86 +28,57 @@ const AuthPage = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    const url = isRegister
-      ? "http://localhost:3000/api/auth/register"
-      : "http://localhost:3000/api/auth/login";
+    const endpoint = isRegister ? "/auth/register" : "/auth/login";
 
     const body = isRegister
       ? {
-        name: formData.name,
-        email: formData.email,
-        password: formData.password,
-        role_name: formData.role,
-      }
+          name: formData.name,
+          email: formData.email,
+          password: formData.password,
+          role_name: formData.role,
+        }
       : {
-        email: formData.email,
-        password: formData.password,
-      };
+          email: formData.email,
+          password: formData.password,
+        };
 
     if (isRegister && formData.password !== formData.confirmPassword) {
       return alert("Mật khẩu xác nhận không khớp!");
     }
 
     try {
-      const response = await fetch(url, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(body),
-      });
+      const { data } = await apiClient.post(endpoint, body);
 
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.message || "Có lỗi xảy ra, vui lòng thử lại.");
+      if (!data?.success && !data?.data) {
+        throw new Error(data?.message || "Có lỗi xảy ra, vui lòng thử lại.");
       }
 
-      // Lưu provider_id và provider object vào localStorage nếu user có role_id = 2
+      // Lưu provider info nếu có
       if (data.data.role_id === 2) {
-        // ✅ FIX: Lưu provider._id thay vì user.id
         if (data.data.provider && data.data.provider._id) {
-          localStorage.setItem('providerId', data.data.provider._id);
-          console.log('✅ Saved providerId from provider object:', data.data.provider._id);
+          localStorage.setItem("providerId", data.data.provider._id);
         } else {
-          // Fallback: nếu chưa có provider object, lưu user.id tạm
-          localStorage.setItem('providerId', data.data.id);
-          console.warn('⚠️ Provider object not found, using user.id as fallback');
+          localStorage.setItem("providerId", data.data.id);
         }
-
-        // Lưu toàn bộ provider object
         if (data.data.provider) {
-          localStorage.setItem('provider', JSON.stringify(data.data.provider));
+          localStorage.setItem("provider", JSON.stringify(data.data.provider));
         }
       }
 
-      // Login và lấy role_id được trả về
       const roleId = login(data.data);
 
-      // Điều hướng người dùng dựa vào role
       if (roleId === 2) {
-        // Check nếu có provider object và đã đăng ký đầy đủ
         const provider = data.data.provider;
-
-        // Check if provider has valid data (_id and licenses)
         const hasProvider = !!provider && !!provider._id;
-        const hasLicenses = provider &&
-          Array.isArray(provider.licenses) &&
-          provider.licenses.length > 0;
+        const hasLicenses =
+          provider && Array.isArray(provider.licenses) && provider.licenses.length > 0;
 
-        // Nếu provider chưa có _id hoặc licenses -> chưa đăng ký
         if (!hasProvider || !hasLicenses) {
-          // Chưa đăng ký provider với hệ thống -> redirect đến trang đăng ký
-          console.log("Provider chưa đăng ký đầy đủ, redirect to registration");
           navigate("/register/service-provider");
         } else if (!provider.admin_verified) {
-          // Đã đăng ký nhưng chưa được admin verify
-          alert("⏳ Tài khoản của bạn đang chờ xác minh từ Admin. Vui lòng đợi email thông báo từ hệ thống.");
-          console.log("Provider chưa được admin verify");
+          alert("⏳ Tài khoản của bạn đang chờ xác minh từ Admin.");
           navigate("/");
         } else {
-          // Đã đăng ký đầy đủ và đã verify -> vào provider route (sẽ auto-redirect theo type)
-          console.log("Provider đã được verify, redirect to provider route");
           navigate("/provider");
         }
       } else {
@@ -114,7 +86,7 @@ const AuthPage = () => {
       }
     } catch (error) {
       console.error("Lỗi xác thực:", error);
-      alert(error.message);
+      alert(error?.response?.data?.message || error.message || "Đăng nhập thất bại");
     }
   };
 
@@ -199,6 +171,11 @@ const AuthPage = () => {
               onChange={handleInputChange}
               required
             />
+            {!isRegister && (
+              <div className="auth-inline-actions">
+                <Link to="/forgot-password" className="auth-link">Quên mật khẩu?</Link>
+              </div>
+            )}
           </div>
 
           {isRegister && (

@@ -112,3 +112,12 @@
 .submit-btn:hover {
   background-color: #1b5e20;
 }
+
+.auth-inline-actions {
+  margin-top: 6px;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.auth-link { color:#4f46e5; font-size: 12.5px; text-decoration: none; }
+.auth-link:hover { text-decoration: underline; }

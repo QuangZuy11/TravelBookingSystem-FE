@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useAuth } from "../../contexts/AuthContext";
 import Header from "../../components/layout/Header/Header";
 import "./Profile.css";
+import RequestPasswordResetButton from "../../components/common/RequestPasswordResetButton";
 
 const initialFormState = {
   name: "",
@@ -368,6 +369,12 @@ const Profile = () => {
                   {profileMessage}
                 </div>
               )}
+
+              {/* Gửi email đặt lại mật khẩu (quên/đổi mật khẩu) */}
+              <div style={{ marginTop: 16, paddingTop: 12, borderTop: "1px solid #eee" }}>
+                <h3 style={{ margin: 0, marginBottom: 8 }}>Đổi mật khẩu qua email</h3>
+                <RequestPasswordResetButton email={formData.email || profile?.email} />
+              </div>
 
               <h2 style={{ marginTop: "30px" }}>Đổi mật khẩu</h2>
               <form onSubmit={handleChangePassword}>
