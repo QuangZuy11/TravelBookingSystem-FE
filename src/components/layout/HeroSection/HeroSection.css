@@ -50,7 +50,21 @@
   gap: 16px;
   margin-bottom: 40px;
 }
-
+.btn-primary-HeroSection {
+  display: inline-block;
+  padding: 10px 22px;
+  font-weight: 600;
+  color: white;
+  background-color: #003c3c;
+  border-radius: 6px;
+  text-decoration: none;
+  transition: all 0.3s ease;
+}
+.btn-primary-HeroSection:hover {
+  background-color: #0f766e;
+  color: #fff;
+  transform: translateY(-2px);
+}
 .btn {
   padding: 12px 24px;
   font-size: 16px;

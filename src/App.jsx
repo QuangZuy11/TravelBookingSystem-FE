@@ -18,6 +18,7 @@ import TourDashboardPage from "./pages/provider/tour/TourDashboard";
 import TourListPage from "./pages/provider/tour/TourList";
 import CreateTourWizard from "./pages/provider/tour/CreateTourWizard";
 import TourDetailsPage from "./pages/provider/tour/TourDetailsPage";
+import TermsAndConditions from "./pages/TermsOfService";
 
 // Hotel Management
 import HotelDashboard from "./pages/provider/hotel/HotelDashboard";
@@ -31,7 +32,6 @@ import RoomListPage from "./pages/provider/hotel/RoomListPage";
 import PromotionListPage from "./pages/provider/promotions/PromotionListPage";
 import PromotionCreatePage from "./pages/provider/promotions/PromotionCreatePage";
 import PromotionEditPage from "./pages/provider/promotions/PromotionEditPage";
-
 
 // Provider Layout
 import ProviderLayout from "./pages/provider/ProviderLayout";
@@ -48,7 +48,6 @@ import Profile from "./pages/traveler/components/Hotel/Profile/Profile";
 import BookTourPage from "./pages/traveler/BookTourPage";
 import HotelDetailPage from "./pages/traveler/HotelDetailPage";
 import BookTourDetailPage from "./pages/traveler/BookTourDetailPage";
-
 
 // Admin Pages
 import PendingProvidersList from "./pages/admin/PendingProvidersList";
@@ -114,9 +113,11 @@ function App() {
             <Route path="/hotel-list" element={<HotelListPage />} />
             <Route path="/hotel-detail/:id" element={<HotelDetailPage />} />
             <Route path="/auth" element={<AuthPage />} />
+            <Route path="/terms-of-service" element={<TermsAndConditions />} />
             {/* Trang List Tour cho Traveler*/}
             <Route path="/tour" element={<BookTourPage />} />
             <Route path="/tour/:id" element={<BookTourDetailPage />} />
+
             {/* Provider Registration - Must be accessible without full authentication */}
             <Route
               path="/register/service-provider"
@@ -144,7 +145,10 @@ function App() {
 
             <Route path="/ai-itinerary" element={<AIItineraryGenerator />} />
             <Route path="/my-itineraries" element={<MyItineraries />} />
-            <Route path="/ai-itinerary/:itineraryId" element={<ItineraryDetail />} />
+            <Route
+              path="/ai-itinerary/:itineraryId"
+              element={<ItineraryDetail />}
+            />
 
             {/* Protected Routes - Admin */}
             <Route
