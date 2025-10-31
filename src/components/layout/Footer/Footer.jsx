@@ -44,16 +44,16 @@ export default function Footer() {
             <h3 className="footer-title">Liên Kết Nhanh</h3>
             <ul className="footer-links">
               <li>
-                <p href="/tours">Tour Du Lịch</p>
+                <a href="/tour">Tour Du Lịch</a>
               </li>
               <li>
-                <p href="/search">Tìm Kiếm</p>
+                <a href="/search">Tìm Kiếm</a>
               </li>
               <li>
-                <p href="#">Khuyến Mãi</p>
+                <a href="#">Khuyến Mãi</a>
               </li>
               <li>
-                <p href="#">Về Chúng Tôi</p>
+                <a href="#">Về Chúng Tôi</a>
               </li>
             </ul>
           </div>
@@ -63,16 +63,16 @@ export default function Footer() {
             <h3 className="footer-title">Hỗ Trợ</h3>
             <ul className="footer-links">
               <li>
-                <p href="#">Trung Tâm Trợ Giúp</p>
+                <a href="#">Trung Tâm Trợ Giúp</a>
               </li>
               <li>
-                <p href="#">Chính Sách</p>
+                <a href="#">Chính Sách</a>
               </li>
               <li>
-                <p href="#">Điều Khoản</p>
+                <a href="#">Điều Khoản</a>
               </li>
               <li>
-                <p href="#">Liên Hệ</p>
+                <a href="#">Liên Hệ</a>
               </li>
             </ul>
           </div>

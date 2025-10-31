@@ -50,12 +50,12 @@
   gap: 1rem;
 }
 
-.filter-item {
+.filter-item-ToursPage {
   display: flex;
   flex-direction: column;
 }
 
-.filter-item label {
+.filter-item-ToursPage label {
   display: block;
   font-size: 0.875rem;
   font-weight: 500;
@@ -63,8 +63,8 @@
   color: #374151;
 }
 
-.filter-item input,
-.filter-item select {
+.filter-item-ToursPage input,
+.filter-item-ToursPage select {
   width: 100%;
   padding: 0.5rem 0.75rem;
   border: 1px solid #d1d5db;
@@ -76,13 +76,13 @@
   background-color: white;
 }
 
-.filter-item input:focus,
-.filter-item select:focus {
+.filter-item-ToursPage input:focus,
+.filter-item-ToursPage select:focus {
   border-color: #06b6d4;
 }
 
-.btn-primary {
-  background-color: #2a4655 !important;
+.btn-primary-ToursPage {
+  background-color: #003c3c !important;
   color: white !important;
   border: none;
   width: 100%;
@@ -96,7 +96,7 @@
   transition: background-color 0.2s;
 }
 
-.btn-primary:hover {
+.btn-primary-ToursPage:hover {
   background-color: #0f766e !important;
 }
 

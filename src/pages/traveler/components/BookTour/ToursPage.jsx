@@ -110,7 +110,7 @@ export default function ToursPage() {
           </div>
 
           <div className="filter-grid">
-            <div className="filter-item">
+            <div className="filter-item-ToursPage">
               <label>Tìm kiếm</label>
               <input
                 type="text"
@@ -120,7 +120,7 @@ export default function ToursPage() {
               />
             </div>
 
-            <div className="filter-item">
+            <div className="filter-item-ToursPage">
               <label>Điểm đến</label>
               <select
                 value={filterDestination}
@@ -136,7 +136,7 @@ export default function ToursPage() {
               </select>
             </div>
 
-            <div className="filter-item">
+            <div className="filter-item-ToursPage">
               <label>Mức giá</label>
               <select
                 value={filterPrice}
@@ -150,7 +150,7 @@ export default function ToursPage() {
               </select>
             </div>
 
-            <div className="filter-item">
+            <div className="filter-item-ToursPage">
               <label>Sắp xếp</label>
               <select
                 value={sortBy}
@@ -163,9 +163,12 @@ export default function ToursPage() {
               </select>
             </div>
 
-            <div className="filter-item">
+            <div className="filter-item-ToursPage">
               <label>&nbsp;</label>
-              <button onClick={handleSearch} className="btn-primary">
+              <button
+                onClick={handleSearch}
+                className="btn-primary-ToursPage"
+              >
                 <Search size={16} style={{ marginRight: 6 }} />
                 Tìm kiếm
               </button>

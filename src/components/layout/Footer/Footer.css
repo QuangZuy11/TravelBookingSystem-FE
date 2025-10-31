@@ -69,6 +69,7 @@
 .footer-desc {
   font-size: 0.9rem;
   color: #000000; /* gray-300 */
+  margin-top: 1px;
 }
 
 .footer-social button {
@@ -110,10 +111,11 @@
 .footer-links li a {
   font-size: 0.9rem;
   color: #000000;
+  text-decoration: none;
 }
 
 .footer-links li a:hover {
-  color: rgb(90, 72, 72);
+  color: #003c3c;
 }
 
 .footer-contact {
