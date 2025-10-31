@@ -18,7 +18,8 @@ import TourDashboardPage from "./pages/provider/tour/TourDashboard";
 import TourListPage from "./pages/provider/tour/TourList";
 import CreateTourWizard from "./pages/provider/tour/CreateTourWizard";
 import TourDetailsPage from "./pages/provider/tour/TourDetailsPage";
-import TermsAndConditions from "./pages/TermsOfService";
+import TermsAndConditions from "./pages/terms/TermsOfService";
+
 // Hotel Management
 import HotelDashboard from "./pages/provider/hotel/HotelDashboard";
 import HotelDetailsPage from "./pages/provider/hotel/HotelDetailsPage";
@@ -30,6 +31,7 @@ import BookingManagementPage from "./pages/provider/hotel/BookingManagementPage"
 import RoomListPage from "./pages/provider/hotel/RoomListPage";
 import PromotionListPage from "./pages/provider/promotions/PromotionListPage";
 import PromotionCreatePage from "./pages/provider/promotions/PromotionCreatePage";
+import PromotionEditPage from "./pages/provider/promotions/PromotionEditPage";
 
 // Provider Layout
 import ProviderLayout from "./pages/provider/ProviderLayout";
@@ -240,8 +242,9 @@ function App() {
                 <Route path="promotions">
                   <Route index element={<PromotionListPage />} />
                   <Route path="create" element={<PromotionCreatePage />} />
+                  <Route path=":promotionId/edit" element={<PromotionEditPage />} />
                 </Route>
-                
+
               </Route>
             </Route>
 

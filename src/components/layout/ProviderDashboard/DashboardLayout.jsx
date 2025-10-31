@@ -14,7 +14,7 @@ const DashboardLayout = () => {
     try {
       const provider = JSON.parse(providerStr);
       if (provider?.licenses && Array.isArray(provider.licenses)) {
-        const types = [...new Set(provider.licenses.map((l) => l.service_type))];
+        const types = [...new Set(provider.licenses.map((item) => item.service_type))];
         setProviderTypes(types);
       } else if (Array.isArray(provider?.type)) {
         setProviderTypes(provider.type);
@@ -30,20 +30,51 @@ const DashboardLayout = () => {
     }
   }, [location.pathname]);
 
-  const menuItems = [{ path: '/provider/dashboard', label: 'Dashboard', icon: '📊' }];
+  const menuItems = [
+    {
+      path: '/provider/dashboard',
+      label: 'Dashboard',
+      icon: '📊',
+    },
+  ];
 
   if (providerTypes.includes('hotel')) {
-    menuItems.push(
-      { path: '/provider/hotels', label: 'Hotels', icon: '🏨' },
-      { path: '/provider/promotions', label: 'Promotions', icon: '🎟️' },
-    );
+    menuItems.push({
+      path: '/provider/hotels',
+      label: 'Hotels',
+      icon: '🏨',
+    });
+  }
+
+  if (providerTypes.includes('hotel') || providerTypes.includes('tour')) {
+    menuItems.push({
+      path: '/provider/promotions',
+      label: 'Promotions',
+      icon: '🏷️',
+    });
   }
 
   const tourSubmenu = [
-    { path: '/provider/tours', label: 'Dashboard', icon: '🧭' },
-    { path: '/provider/tours/create', label: 'Create Tour', icon: '🛫' },
-    { path: '/provider/tours/bookings', label: 'Tour Bookings', icon: '📘' },
-    { path: '/provider/tours/statistics', label: 'Statistics', icon: '📈' },
+    {
+      path: '/provider/tours',
+      label: 'Dashboard',
+      icon: '🗂️',
+    },
+    {
+      path: '/provider/tours/create',
+      label: 'Create Tour',
+      icon: '➕',
+    },
+    {
+      path: '/provider/tours/bookings',
+      label: 'Tour Bookings',
+      icon: '🗓️',
+    },
+    {
+      path: '/provider/tours/statistics',
+      label: 'Statistics',
+      icon: '📈',
+    },
   ];
 
   return (
@@ -59,7 +90,9 @@ const DashboardLayout = () => {
               to={item.path}
               className={({ isActive }) => `nav-item ${isActive ? 'active' : ''}`}
             >
-              <span className="nav-icon">{item.icon}</span>
+              <span className="nav-icon" aria-hidden="true">
+                {item.icon}
+              </span>
               <span className="nav-label">{item.label}</span>
             </NavLink>
           ))}
@@ -72,10 +105,14 @@ const DashboardLayout = () => {
                 onClick={() => setIsTourMenuOpen((prev) => !prev)}
               >
                 <div className="nav-item-label">
-                  <span className="nav-icon">🧭</span>
+                  <span className="nav-icon" aria-hidden="true">
+                    🧭
+                  </span>
                   <span className="nav-label">Tour Management</span>
                 </div>
-                <span className={`dropdown-arrow ${isTourMenuOpen ? 'open' : ''}`}>⌄</span>
+                <span className={`dropdown-arrow ${isTourMenuOpen ? 'open' : ''}`} aria-hidden="true">
+                  ▾
+                </span>
               </button>
 
               <div className={`submenu ${isTourMenuOpen ? 'open' : ''}`}>
@@ -85,7 +122,9 @@ const DashboardLayout = () => {
                     to={item.path}
                     className={({ isActive }) => `submenu-item ${isActive ? 'active' : ''}`}
                   >
-                    <span className="nav-icon">{item.icon}</span>
+                    <span className="nav-icon" aria-hidden="true">
+                      {item.icon}
+                    </span>
                     <span className="nav-label">{item.label}</span>
                   </NavLink>
                 ))}
@@ -109,3 +148,4 @@ const DashboardLayout = () => {
 };
 
 export default DashboardLayout;
+
