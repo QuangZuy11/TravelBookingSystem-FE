@@ -2,7 +2,8 @@ import React, { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import { useAuth } from "../../../../contexts/AuthContext";
 import "./BookTourDetail.css";
-
+import { AiTwotoneEdit } from "react-icons/ai";
+import { MdOutlineDeleteOutline } from "react-icons/md";
 const BookTourDetail = () => {
   const { id } = useParams();
   const { user } = useAuth();
@@ -240,13 +241,15 @@ const BookTourDetail = () => {
 
   const isMyFeedback = (feedback) => {
     if (!user) return false;
-    // Lấy user_id từ token bằng cách decode JWT
+
     try {
       const token = localStorage.getItem("token");
       if (!token) return false;
 
-      // Decode JWT token (không verify, chỉ để lấy payload)
+      // Decode JWT token để lấy user_id
       const base64Url = token.split(".")[1];
+      if (!base64Url) return false;
+
       const base64 = base64Url.replace(/-/g, "+").replace(/_/g, "/");
       const jsonPayload = decodeURIComponent(
         atob(base64)
@@ -255,21 +258,34 @@ const BookTourDetail = () => {
           .join("")
       );
       const decoded = JSON.parse(jsonPayload);
-      const userId =
+
+      // Lấy user_id từ token (hỗ trợ nhiều format)
+      const currentUserId =
         decoded.user?._id || decoded.user?.id || decoded._id || decoded.id;
 
-      // So sánh với user_id trong feedback
-      // Feedback có thể có user_id là ObjectId hoặc string
+      // Lấy user_id từ feedback (hỗ trợ nhiều format)
       const feedbackUserId =
         feedback.user_id?._id ||
         feedback.user_id ||
-        feedback.user_id_populated?._id;
+        feedback.user_id_populated?._id ||
+        null;
 
-      return (
-        userId &&
-        feedbackUserId &&
-        userId.toString() === feedbackUserId.toString()
-      );
+      // Debug log
+      console.log("🔍 Checking feedback ownership:", {
+        currentUserId,
+        feedbackUserId,
+        feedback,
+      });
+
+      if (!currentUserId || !feedbackUserId) {
+        return false;
+      }
+
+      // So sánh (cả hai đều convert sang string để đảm bảo)
+      const isMine = currentUserId.toString() === feedbackUserId.toString();
+
+      console.log("🔍 Is my feedback?", isMine);
+      return isMine;
     } catch (err) {
       console.error("Error decoding token:", err);
       return false;
@@ -701,7 +717,7 @@ const BookTourDetail = () => {
                               onClick={() => handleEditFeedback(feedback)}
                               title="Sửa"
                             >
-                              ✏️
+                              <AiTwotoneEdit />
                             </button>
                             <button
                               className="delete-feedback-btn"
@@ -712,7 +728,7 @@ const BookTourDetail = () => {
                               }
                               title="Xóa"
                             >
-                              🗑️
+                              <MdOutlineDeleteOutline />
                             </button>
                           </div>
                         )}
