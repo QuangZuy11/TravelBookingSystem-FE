@@ -18,7 +18,7 @@ import TourDashboardPage from "./pages/provider/tour/TourDashboard";
 import TourListPage from "./pages/provider/tour/TourList";
 import CreateTourWizard from "./pages/provider/tour/CreateTourWizard";
 import TourDetailsPage from "./pages/provider/tour/TourDetailsPage";
-import TermsAndConditions from "./pages/TermsOfService";
+import TermsAndConditions from "./pages/terms/TermsOfService";
 
 // Hotel Management
 import HotelDashboard from "./pages/provider/hotel/HotelDashboard";
