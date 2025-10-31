@@ -151,7 +151,7 @@ const TourSearchForm = () => {
 
           <button
             onClick={handleSearch}
-            className="tour-search-button"
+            className="tour-search-buttonhome"
             disabled={loading}
           >
             {loading ? (
