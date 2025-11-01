@@ -9,7 +9,7 @@ const BasicInfoForm = ({ providerId, initialData, isEditMode, onNext, onCancel }
     const [formData, setFormData] = useState({
         title: '',
         description: '',
-        destination_id: [], // Array of destination IDs
+        destination: '', // Single destination as string
         meeting_point: {
             address: '',
             instructions: '' // Optional instructions
@@ -32,16 +32,14 @@ const BasicInfoForm = ({ providerId, initialData, isEditMode, onNext, onCancel }
     const [newHighlight, setNewHighlight] = useState('');
     const [newDate, setNewDate] = useState('');
 
-    // Destination states
-    const [destinations, setDestinations] = useState([]);
-    const [loadingDestinations, setLoadingDestinations] = useState(true);
+    // Destination is now a simple text input, no need for API loading
 
     // Helper to check if form has basic required data
     const hasMinimumRequiredData = () => {
         return (
             formData.title.trim().length > 0 &&
             // Description is optional - removed from required checks
-            Array.isArray(formData.destination_id) && formData.destination_id.length > 0 &&
+            formData.destination && formData.destination.trim().length > 0 &&
             formData.meeting_point.address.trim().length >= 10 &&
             /^\d+\s*ngày\s*\d+\s*đêm$/i.test(formData.duration) &&
             formData.price >= 100000 &&
@@ -65,57 +63,23 @@ const BasicInfoForm = ({ providerId, initialData, isEditMode, onNext, onCancel }
         providerIdUsing: currentProviderId
     });
 
-    // Fetch destinations
-    useEffect(() => {
-        const fetchDestinations = async () => {
-            try {
-                setLoadingDestinations(true);
-                const response = await axios.get('http://localhost:3000/api/destinations');
-                if (response.data && response.data.success) {
-                    setDestinations(response.data.data || []);
-                }
-            } catch (err) {
-                console.error('Error fetching destinations:', err);
-                toast.error('Không thể tải danh sách điểm đến');
-            } finally {
-                setLoadingDestinations(false);
-            }
-        };
-        fetchDestinations();
-    }, []);
+    // No longer need to fetch destinations from API since it's now a text input
 
     // Load initial data in edit mode OR when coming back from next step
     useEffect(() => {
         if (initialData) {
             console.log('📥 Loading initial data into form:', initialData);
-            // Handle destination_id - can be array of IDs or array of objects
-            let destinationIds = [];
-            if (Array.isArray(initialData.destination_id)) {
-                // Array of IDs or objects
-                destinationIds = initialData.destination_id.map(item => {
-                    // If it's an object, extract the ID
-                    if (typeof item === 'object' && item !== null) {
-                        return item._id || item.id;
-                    }
-                    // If it's already a string ID
-                    return item;
-                }).filter(Boolean); // Remove any null/undefined
-            } else if (Array.isArray(initialData.destinations)) {
-                // Array of destination objects with id field
-                destinationIds = initialData.destinations.map(dest => dest.id || dest._id).filter(Boolean);
-            } else if (initialData.destination_id) {
-                // Legacy: single destination ID (could be object or string)
-                if (typeof initialData.destination_id === 'object') {
-                    destinationIds = [initialData.destination_id._id || initialData.destination_id.id];
-                } else {
-                    destinationIds = [initialData.destination_id];
-                }
+            // Handle destination - simplified since it's now always a string
+            let destination = '';
+            if (typeof initialData.destination === 'string') {
+                destination = initialData.destination;
             }
+            // Remove legacy destination_id support since we've fully migrated to destination
 
             setFormData({
                 title: initialData.title || '',
                 description: initialData.description || '',
-                destination_id: destinationIds,
+                destination: destination,
                 meeting_point: {
                     address: initialData.meeting_point?.address || '',
                     instructions: initialData.meeting_point?.instructions || ''
@@ -155,6 +119,11 @@ const BasicInfoForm = ({ providerId, initialData, isEditMode, onNext, onCancel }
                 ...prev,
                 [name]: name === 'price' ? Number(value) || 0 : value
             }));
+
+            // Log destination changes for debugging
+            if (name === 'destination') {
+                console.log('🎯 Destination updated:', value);
+            }
         }
 
         // Clear error when user types
@@ -166,26 +135,7 @@ const BasicInfoForm = ({ providerId, initialData, isEditMode, onNext, onCancel }
         }
     };
 
-    // Destination handlers
-    const handleAddDestination = (destinationId) => {
-        if (destinationId && !formData.destination_id.includes(destinationId)) {
-            setFormData(prev => ({
-                ...prev,
-                destination_id: [...prev.destination_id, destinationId]
-            }));
-            // Clear error
-            if (errors.destination_id) {
-                setErrors(prev => ({ ...prev, destination_id: null }));
-            }
-        }
-    };
-
-    const handleRemoveDestination = (destinationId) => {
-        setFormData(prev => ({
-            ...prev,
-            destination_id: prev.destination_id.filter(id => id !== destinationId)
-        }));
-    };
+    // Destination is now handled by the standard handleChange function
 
     const addHighlight = () => {
         if (newHighlight.trim()) {
@@ -238,9 +188,20 @@ const BasicInfoForm = ({ providerId, initialData, isEditMode, onNext, onCancel }
         // 2. Description validation (OPTIONAL - no validation)
         // Description is completely optional, no length checks
 
-        // 3. Destination validation (array)
-        if (!Array.isArray(formData.destination_id) || formData.destination_id.length === 0) {
-            newErrors.destination_id = 'Vui lòng chọn ít nhất 1 địa điểm';
+        // 3. Destination validation (text string)
+        const destination = String(formData.destination || '').trim();
+        if (!destination) {
+            newErrors.destination = 'Vui lòng nhập địa điểm';
+        } else if (destination.length < 2) {
+            newErrors.destination = 'Tên địa điểm phải có ít nhất 2 ký tự';
+        } else if (destination.length > 200) {
+            newErrors.destination = 'Tên địa điểm quá dài (tối đa 200 ký tự)';
+        } else {
+            // Check for valid destination format (basic Vietnamese text validation)
+            const validDestinationPattern = /^[a-zA-ZÀ-ỹ0-9\s\-,\.]+$/;
+            if (!validDestinationPattern.test(destination)) {
+                newErrors.destination = 'Địa điểm chỉ được chứa chữ cái, số và các ký tự "-", ",", "."';
+            }
         }
 
         // 4. Meeting point validation
@@ -428,7 +389,7 @@ const BasicInfoForm = ({ providerId, initialData, isEditMode, onNext, onCancel }
                             Cần hoàn thiện thông tin
                         </h4>
                         <ul style={{ margin: 0, paddingLeft: '1.25rem', color: '#78350f', fontSize: '0.875rem', lineHeight: '1.6' }}>
-                            {!formData.destination_id && <li>Chọn địa điểm</li>}
+                            {!formData.destination && <li>Nhập địa điểm</li>}
                             {formData.meeting_point.address.trim().length < 10 && <li>Địa chỉ điểm tập trung</li>}
                             {!/^\d+\s*ngày\s*\d+\s*đêm$/i.test(formData.duration) && <li>Thời gian tour (format: X ngày Y đêm)</li>}
                             {formData.price < 100000 && <li>Giá tour (tối thiểu 100,000 VNĐ)</li>}
@@ -493,70 +454,28 @@ const BasicInfoForm = ({ providerId, initialData, isEditMode, onNext, onCancel }
                 {errors.description && <span className="error-message">❌ {errors.description}</span>}
             </div>
 
-            {/* Destination Multi-Selector */}
+            {/* Destination Input */}
             <div className="form-group">
                 <label className="form-label">
                     Địa điểm <span className="required">*</span>
-                    <span style={{
-                        marginLeft: '8px',
-                        fontSize: '0.85rem',
-                        color: formData.destination_id.length === 0 ? '#ef4444' : '#10b981',
-                        fontWeight: 'normal'
-                    }}>
-                        ({formData.destination_id.length} địa điểm)
-                    </span>
                 </label>
-
-                {loadingDestinations ? (
-                    <div style={{ padding: '12px', color: '#6b7280', fontSize: '14px' }}>
-                        Đang tải danh sách địa điểm...
-                    </div>
-                ) : (
-                    <>
-                        <select
-                            onChange={(e) => handleAddDestination(e.target.value)}
-                            value=""
-                            className="form-select"
-                            style={{ marginBottom: '10px' }}
-                        >
-                            <option value="">-- Chọn địa điểm để thêm --</option>
-                            {destinations
-                                .filter(dest => !formData.destination_id.includes(dest._id))
-                                .map(dest => (
-                                    <option key={dest._id} value={dest._id}>
-                                        {dest.name}
-                                    </option>
-                                ))
-                            }
-                        </select>
-
-                        {/* Selected destinations */}
-                        {formData.destination_id.length > 0 && (
-                            <div className="items-list" style={{ marginTop: '10px' }}>
-                                {formData.destination_id.map(destId => {
-                                    const dest = destinations.find(d => d._id === destId);
-                                    return (
-                                        <div key={destId} className="item-tag">
-                                            <span>📍 {dest?.name || destId}</span>
-                                            <button
-                                                type="button"
-                                                onClick={() => handleRemoveDestination(destId)}
-                                                className="btn-remove"
-                                            >
-                                                ×
-                                            </button>
-                                        </div>
-                                    );
-                                })}
-                            </div>
-                        )}
-                    </>
+                <input
+                    type="text"
+                    name="destination"
+                    value={formData.destination}
+                    onChange={handleChange}
+                    className={`form-input ${errors.destination ? 'error' : ''}`}
+                    placeholder="VD: Hà Nội, Hồ Chí Minh, Đà Nẵng, Nha Trang..."
+                    maxLength={200}
+                />
+                {errors.destination && <span className="error-message">❌ {errors.destination}</span>}
+                {!errors.destination && formData.destination && formData.destination.trim().length > 0 && (
+                    <span className="success-message">✓ Địa điểm hợp lệ</span>
                 )}
-
-                {errors.destination_id && <span className="error-message">❌ {errors.destination_id}</span>}
-                {!errors.destination_id && formData.destination_id.length > 0 && (
-                    <span className="success-message">✓ {formData.destination_id.length} địa điểm đã chọn</span>
-                )}
+                <small className="form-hint">
+                    💡 Nhập tên thành phố hoặc khu vực du lịch chính.
+                    Có thể nhập nhiều địa điểm cách nhau bằng dấu "-" (VD: Hà Nội - Hạ Long - Sapa)
+                </small>
             </div>
 
             {/* Meeting Point */}

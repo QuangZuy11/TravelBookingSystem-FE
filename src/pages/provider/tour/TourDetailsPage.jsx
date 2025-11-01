@@ -175,9 +175,12 @@ const TourDetailsPage = () => {
                     <div className="info-item">
                         <span className="info-label">Địa điểm:</span>
                         <span className="info-value">
+                            {/* Handle multiple destinations */}
                             {tour.destinations && tour.destinations.length > 0
-                                ? tour.destinations.map(dest => dest.name).join(', ')
-                                : (tour.destination_id?.name || tour.location || 'Chưa có thông tin')
+                                ? tour.destinations.map(dest => dest.name || dest).join(', ')
+                                : Array.isArray(tour.destination_id) && tour.destination_id.length > 0
+                                    ? tour.destination_id.map(dest => typeof dest === 'object' ? dest.name : dest).join(', ')
+                                    : (tour.destination_id?.name || tour.location || 'Chưa có thông tin')
                             }
                         </span>
                     </div>
@@ -310,20 +313,6 @@ const TourDetailsPage = () => {
                                     <p className="itinerary-description">{itinerary.description}</p>
                                 )}
 
-                                {/* Meals */}
-                                {itinerary.meals && itinerary.meals.length > 0 && (
-                                    <div className="meals-info">
-                                        <strong>Bữa ăn:</strong>
-                                        {itinerary.meals.map((meal, idx) => (
-                                            <span key={idx} className="meal-tag">
-                                                {meal === 'breakfast' ? '🍳 Sáng' :
-                                                    meal === 'lunch' ? '🍱 Trưa' :
-                                                        meal === 'dinner' ? '🍽️ Tối' : meal}
-                                            </span>
-                                        ))}
-                                    </div>
-                                )}
-
                                 {/* Activities */}
                                 {itinerary.activities && itinerary.activities.length > 0 && (
                                     <div className="activities-list">
@@ -331,28 +320,8 @@ const TourDetailsPage = () => {
                                         {itinerary.activities.map((activity, actIdx) => (
                                             <div key={actIdx} className="activity-item">
                                                 <div className="activity-header">
-                                                    <span className="activity-name">📍 {activity.activity_name}</span>
-                                                    {activity.start_time && activity.end_time && (
-                                                        <span className="activity-time">
-                                                            ⏰ {activity.start_time} - {activity.end_time}
-                                                        </span>
-                                                    )}
-                                                </div>
-                                                {activity.description && (
-                                                    <p className="activity-description">{activity.description}</p>
-                                                )}
-                                                <div className="activity-meta">
-                                                    {activity.cost > 0 && (
-                                                        <span className="activity-cost">
-                                                            💵 {activity.cost.toLocaleString('vi-VN')} VNĐ
-                                                        </span>
-                                                    )}
-                                                    {activity.included_in_tour && (
-                                                        <span className="badge-included">Bao gồm</span>
-                                                    )}
-                                                    {activity.optional && (
-                                                        <span className="badge-optional">Tùy chọn</span>
-                                                    )}
+                                                    <span className="activity-time">⏰ {activity.time || `${activity.start_time} - ${activity.end_time}`}</span>
+                                                    <span className="activity-name">📍 {activity.action || activity.activity_name}</span>
                                                 </div>
                                             </div>
                                         ))}

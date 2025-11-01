@@ -13,12 +13,9 @@ const ItineraryForm = ({ tourId, basicInfo, existingItineraries = [], isEditMode
         day_number: 1,
         title: '',
         description: '',
-        meals: [],
         activities: []
     });
     const [loading, setLoading] = useState(false);
-    // Lưu danh sách activities sẽ bị xóa khi save (soft delete)
-    const [activitiesToDelete, setActivitiesToDelete] = useState([]);
     // Prevent double-click on delete button
     const [deletingActivityIndex, setDeletingActivityIndex] = useState(null);
 
@@ -26,8 +23,6 @@ const ItineraryForm = ({ tourId, basicInfo, existingItineraries = [], isEditMode
     useEffect(() => {
         if (existingItineraries.length > 0) {
             setItineraries(existingItineraries);
-            // Clear danh sách activities chờ xóa khi reload data
-            setActivitiesToDelete([]);
             // Load data của ngày đầu tiên nếu có
             const firstItinerary = existingItineraries[0];
             if (firstItinerary) {
@@ -37,7 +32,6 @@ const ItineraryForm = ({ tourId, basicInfo, existingItineraries = [], isEditMode
                     day_number: 1,
                     title: firstItinerary.title || '',
                     description: firstItinerary.description || '',
-                    meals: Array.isArray(firstItinerary.meals) ? firstItinerary.meals : [],
                     activities: Array.isArray(firstItinerary.activities) ? firstItinerary.activities : []
                 });
             }
@@ -75,32 +69,13 @@ const ItineraryForm = ({ tourId, basicInfo, existingItineraries = [], isEditMode
         setFormData(prev => ({
             ...prev,
             activities: [...prev.activities, {
-                activity_name: '',
-                start_time: '',
-                end_time: '',
-                description: '',
-                cost: 0,
-                included_in_tour: true,
-                optional: false
+                time: '',
+                action: ''
             }]
         }));
     };
 
     const handleActivityChange = (index, field, value) => {
-        // Kiểm tra nếu đang ở ngày cuối và đang thay đổi end_time
-        if (field === 'end_time' && currentDay === maxDays) {
-            const endTimeValue = value;
-            // Parse giờ từ string "HH:MM"
-            if (endTimeValue) {
-                const [hours] = endTimeValue.split(':').map(Number);
-                // Không cho nhập giờ kết thúc sau 18:00 (6PM) ở ngày cuối
-                if (hours >= 18) {
-                    toast.error('⚠️ Ngày cuối cùng không thể có hoạt động buổi tối (sau 18:00)');
-                    return; // Không update value
-                }
-            }
-        }
-
         setFormData(prev => ({
             ...prev,
             activities: prev.activities.map((activity, i) =>
@@ -118,35 +93,7 @@ const ItineraryForm = ({ tourId, basicInfo, existingItineraries = [], isEditMode
 
         setDeletingActivityIndex(index);
 
-        const activity = formData.activities[index];
-
-        console.log('🗑️ REMOVING ACTIVITY:', {
-            index,
-            activity,
-            hasActivityId: !!activity._id,
-            formDataId: formData._id,
-            hasFormDataId: !!formData._id
-        });
-
-        // Nếu activity đã có _id (đã lưu vào database), thêm vào danh sách "chờ xóa"
-        if (activity._id && formData._id) {
-            const deleteItem = {
-                itineraryId: formData._id,
-                activityId: activity._id
-            };
-            console.log('✅ Adding to delete queue:', deleteItem);
-            setActivitiesToDelete(prev => {
-                const newList = [...prev, deleteItem];
-                console.log('📋 Updated activitiesToDelete:', newList);
-                return newList;
-            });
-            // Thay toast.info bằng toast (generic) hoặc toast.success
-            toast('Đã đánh dấu xóa hoạt động (sẽ xóa khi bạn nhấn Lưu)', { icon: '🗑️' });
-        } else {
-            console.log('⚠️ NOT adding to delete queue - activity is new (not saved yet)');
-        }
-
-        // Xóa khỏi state (xóa khỏi UI ngay lập tức)
+        // Xóa activity đơn giản khỏi state
         setFormData(prev => ({
             ...prev,
             activities: prev.activities.filter((_, i) => i !== index)
@@ -156,63 +103,17 @@ const ItineraryForm = ({ tourId, basicInfo, existingItineraries = [], isEditMode
         setTimeout(() => setDeletingActivityIndex(null), 300);
     };
 
-    const handleMealChange = (meal) => {
-        setFormData(prev => ({
-            ...prev,
-            meals: prev.meals.includes(meal)
-                ? prev.meals.filter(m => m !== meal)
-                : [...prev.meals, meal]
-        }));
-    };
 
-    // Kiểm tra giờ hoạt động có conflict không
-    const validateActivityTimes = (activities) => {
-        // Lọc ra các activities có đầy đủ thời gian
-        const activitiesWithTime = activities.filter(
-            act => act.start_time && act.end_time && act.activity_name.trim()
-        );
 
-        // So sánh từng cặp activities
-        for (let i = 0; i < activitiesWithTime.length; i++) {
-            for (let j = i + 1; j < activitiesWithTime.length; j++) {
-                const act1 = activitiesWithTime[i];
-                const act2 = activitiesWithTime[j];
-
-                // Chuyển thời gian sang phút để so sánh dễ hơn
-                const start1 = timeToMinutes(act1.start_time);
-                const end1 = timeToMinutes(act1.end_time);
-                const start2 = timeToMinutes(act2.start_time);
-                const end2 = timeToMinutes(act2.end_time);
-
-                // Kiểm tra end_time phải sau start_time
-                if (end1 <= start1) {
-                    toast.error(`Hoạt động "${act1.activity_name}": Giờ kết thúc phải sau giờ bắt đầu`);
-                    return false;
-                }
-                if (end2 <= start2) {
-                    toast.error(`Hoạt động "${act2.activity_name}": Giờ kết thúc phải sau giờ bắt đầu`);
-                    return false;
-                }
-
-                // Kiểm tra conflict: act1 và act2 có chồng chéo thời gian không?
-                // Chồng chéo nếu: start1 < end2 && start2 < end1
-                if (start1 < end2 && start2 < end1) {
-                    toast.error(
-                        `Xung đột thời gian: "${act1.activity_name}" (${act1.start_time}-${act1.end_time}) ` +
-                        `và "${act2.activity_name}" (${act2.start_time}-${act2.end_time})`
-                    );
-                    return false;
-                }
-            }
+    // Validate activities đơn giản
+    const validateActivities = (activities) => {
+        // Kiểm tra có ít nhất 1 activity có cả time và action
+        const validActivities = activities.filter(act => act.time.trim() && act.action.trim());
+        if (validActivities.length === 0) {
+            toast.error('Phải có ít nhất 1 hoạt động với thời gian và hành động');
+            return false;
         }
-
         return true;
-    };
-
-    // Helper: Chuyển HH:mm sang số phút
-    const timeToMinutes = (timeString) => {
-        const [hours, minutes] = timeString.split(':').map(Number);
-        return hours * 60 + minutes;
     };
 
     const saveCurrentItinerary = async () => {
@@ -226,17 +127,12 @@ const ItineraryForm = ({ tourId, basicInfo, existingItineraries = [], isEditMode
             return false;
         }
 
-        // Kiểm tra xem có hoạt động nào có tên không (Bug 2 fix)
-        const validActivities = formData.activities.filter(act => act.activity_name.trim());
-        if (validActivities.length === 0) {
-            toast.error('Phải có ít nhất 1 hoạt động có tên hợp lệ');
+        // Validate activities đơn giản
+        if (!validateActivities(formData.activities)) {
             return false;
         }
 
-        // Kiểm tra conflict giờ hoạt động (Bug mới)
-        if (!validateActivityTimes(formData.activities)) {
-            return false;
-        }
+        const validActivities = formData.activities.filter(act => act.time.trim() && act.action.trim());
 
         setLoading(true);
 
@@ -252,8 +148,7 @@ const ItineraryForm = ({ tourId, basicInfo, existingItineraries = [], isEditMode
                     `http://localhost:3000/api/itineraries/${existingItinerary._id}`,
                     {
                         title: formData.title,
-                        description: formData.description,
-                        meals: formData.meals
+                        description: formData.description
                     }, {
                     headers: { Authorization: `Bearer ${token}` }
                 }
@@ -269,8 +164,7 @@ const ItineraryForm = ({ tourId, basicInfo, existingItineraries = [], isEditMode
                         tour_id: tourId,
                         day_number: formData.day_number,
                         title: formData.title,
-                        description: formData.description,
-                        meals: formData.meals
+                        description: formData.description
                     }, {
                     headers: { Authorization: `Bearer ${token}` }
                 }
@@ -278,59 +172,17 @@ const ItineraryForm = ({ tourId, basicInfo, existingItineraries = [], isEditMode
                 itineraryId = itineraryResponse.data.data._id;
             }
 
-            // XÓA các activities đã đánh dấu xóa (thực hiện DELETE thực sự)
-            console.log('🔍 CHECKING DELETE QUEUE:', {
-                activitiesToDeleteLength: activitiesToDelete.length,
-                activitiesToDelete: activitiesToDelete
-            });
-
-            if (activitiesToDelete.length > 0) {
-                console.log('🗑️ STARTING DELETE OPERATIONS...');
-                for (const item of activitiesToDelete) {
-                    try {
-                        const deleteUrl = `http://localhost:3000/api/itineraries/${item.itineraryId}/activities/${item.activityId}`;
-                        console.log('🔥 Deleting activity:', deleteUrl);
-                        await axios.delete(deleteUrl, {
-                            headers: { Authorization: `Bearer ${token}` }
-                        });
-                        console.log('✅ Successfully deleted activity:', item.activityId);
-                    } catch (error) {
-                        console.error('❌ Error deleting activity:', error);
-                        // Tiếp tục xóa các activities khác dù có lỗi
-                    }
-                }
-                // Clear danh sách chờ xóa sau khi đã xóa xong
-                setActivitiesToDelete([]);
-                toast.success('Đã xóa các hoạt động đã đánh dấu');
-            } else {
-                console.log('ℹ️ No activities to delete');
+            // Lưu activities đơn giản - chỉ update itinerary với activities array
+            await axios.put(
+                `http://localhost:3000/api/itineraries/${itineraryId}`,
+                {
+                    title: formData.title,
+                    description: formData.description,
+                    activities: validActivities // Lưu trực tiếp array activities
+                }, {
+                headers: { Authorization: `Bearer ${token}` }
             }
-
-            // Add/Update activities (chỉ xử lý activities có tên)
-            for (const activity of validActivities) {
-                if (activity._id) {
-                    // UPDATE existing activity
-                    await axios.put(
-                        `http://localhost:3000/api/itineraries/${itineraryId}/activities/${activity._id}`,
-                        {
-                            activity_name: activity.activity_name,
-                            start_time: activity.start_time,
-                            end_time: activity.end_time,
-                            description: activity.description,
-                            location: activity.location
-                        },
-                        { headers: { Authorization: `Bearer ${token}` } }
-                    );
-                } else {
-                    // CREATE new activity
-                    const response = await axios.post(
-                        `http://localhost:3000/api/itineraries/${itineraryId}/activities`,
-                        activity
-                    );
-                    // Cập nhật _id cho activity mới tạo
-                    activity._id = response.data.data._id;
-                }
-            }
+            );
 
             // Update state
             if (existingItinerary) {
@@ -362,7 +214,7 @@ const ItineraryForm = ({ tourId, basicInfo, existingItineraries = [], isEditMode
 
     const handleAddDay = async () => {
         // Lưu ngày hiện tại trước
-        const hasCurrentDayData = formData.title.trim() && formData.activities.some(act => act.activity_name.trim());
+        const hasCurrentDayData = formData.title.trim() && formData.activities.some(act => act.time.trim() && act.action.trim());
         if (hasCurrentDayData) {
             const success = await saveCurrentItinerary();
             if (!success) return;
@@ -386,15 +238,14 @@ const ItineraryForm = ({ tourId, basicInfo, existingItineraries = [], isEditMode
             day_number: nextDay,
             title: '',
             description: '',
-            meals: [],
             activities: []
         });
         toast.info(`Đang tạo ngày ${nextDay}`);
     };
 
     const handleFinish = async () => {
-        // Bug 2 Fix: Kiểm tra ngày hiện tại có dữ liệu hợp lệ không
-        const hasCurrentDayData = formData.title.trim() && formData.activities.some(act => act.activity_name.trim());
+        // Kiểm tra ngày hiện tại có dữ liệu hợp lệ không
+        const hasCurrentDayData = formData.title.trim() && formData.activities.some(act => act.time.trim() && act.action.trim());
 
         if (itineraries.length === 0 && !hasCurrentDayData) {
             toast.error('Phải có ít nhất 1 ngày lịch trình với hoạt động hợp lệ!');
@@ -420,7 +271,6 @@ const ItineraryForm = ({ tourId, basicInfo, existingItineraries = [], isEditMode
                 day_number: dayNumber,
                 title: itinerary.title || '',
                 description: itinerary.description || '',
-                meals: Array.isArray(itinerary.meals) ? itinerary.meals : [],
                 activities: Array.isArray(itinerary.activities) ? itinerary.activities : []
             });
         } else {
@@ -430,7 +280,6 @@ const ItineraryForm = ({ tourId, basicInfo, existingItineraries = [], isEditMode
                 day_number: dayNumber,
                 title: '',
                 description: '',
-                meals: [],
                 activities: []
             });
         }
@@ -463,7 +312,6 @@ const ItineraryForm = ({ tourId, basicInfo, existingItineraries = [], isEditMode
                     day_number: 1,
                     title: '',
                     description: '',
-                    meals: [],
                     activities: []
                 });
             }
@@ -571,21 +419,7 @@ const ItineraryForm = ({ tourId, basicInfo, existingItineraries = [], isEditMode
                 </div>
             )}
 
-            {/* Pending Deletions Warning */}
-            {activitiesToDelete.length > 0 && (
-                <div style={{
-                    padding: '12px 16px',
-                    backgroundColor: '#fee2e2',
-                    border: '2px solid #f87171',
-                    borderRadius: '8px',
-                    marginBottom: '20px',
-                    color: '#991b1b',
-                    fontSize: '14px',
-                    fontWeight: '600'
-                }}>
-                    🗑️ Có {activitiesToDelete.length} hoạt động đang chờ xóa. Nhấn "Lưu và tiếp tục" để xóa vĩnh viễn.
-                </div>
-            )}
+
 
             {/* Day Title */}
             <div className="form-group">
@@ -611,28 +445,6 @@ const ItineraryForm = ({ tourId, basicInfo, existingItineraries = [], isEditMode
                     className="form-textarea"
                     placeholder="Mô tả chi tiết về lịch trình trong ngày..."
                 />
-            </div>
-
-            {/* Meals */}
-            <div className="meals-section">
-                <label className="form-label">Bữa ăn</label>
-                <div className="meals-grid">
-                    {[
-                        { value: 'breakfast', label: '🍳 Sáng', icon: '☀️' },
-                        { value: 'lunch', label: '🍱 Trưa', icon: '🌤️' },
-                        { value: 'dinner', label: '🍽️ Tối', icon: '🌙' }
-                    ].map(meal => (
-                        <label key={meal.value} className={`meal-checkbox ${formData.meals.includes(meal.value) ? 'checked' : ''}`}>
-                            <input
-                                type="checkbox"
-                                checked={formData.meals.includes(meal.value)}
-                                onChange={() => handleMealChange(meal.value)}
-                            />
-                            <span className="meal-icon">{meal.icon}</span>
-                            <span className="meal-label">{meal.label}</span>
-                        </label>
-                    ))}
-                </div>
             </div>
 
             {/* Activities */}
@@ -661,24 +473,7 @@ const ItineraryForm = ({ tourId, basicInfo, existingItineraries = [], isEditMode
                     </button>
                 </div>
 
-                {/* Warning cho ngày cuối */}
-                {currentDay === maxDays && (
-                    <div style={{
-                        backgroundColor: '#fef3c7',
-                        border: '1px solid #fbbf24',
-                        borderRadius: '8px',
-                        padding: '12px 16px',
-                        marginBottom: '16px',
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: '8px'
-                    }}>
-                        <span style={{ fontSize: '20px' }}>⚠️</span>
-                        <span style={{ color: '#92400e', fontSize: '14px', fontWeight: '500' }}>
-                            Đây là ngày cuối - Hoạt động không được kết thúc sau 18:00 (không có buổi tối)
-                        </span>
-                    </div>
-                )}
+
 
                 {formData.activities.length === 0 ? (
                     <div className="empty-state">
@@ -702,49 +497,27 @@ const ItineraryForm = ({ tourId, basicInfo, existingItineraries = [], isEditMode
                                 </div>
 
                                 <div className="activity-form">
-                                    {/* Activity Name */}
+                                    {/* Time */}
                                     <div className="form-group">
-                                        <label className="form-label">Tên hoạt động *</label>
+                                        <label className="form-label">Thời gian *</label>
                                         <input
                                             type="text"
-                                            value={activity.activity_name}
-                                            onChange={(e) => handleActivityChange(index, 'activity_name', e.target.value)}
+                                            value={activity.time}
+                                            onChange={(e) => handleActivityChange(index, 'time', e.target.value)}
                                             className="form-input"
-                                            placeholder="VD: Tham quan Bà Nà Hills"
+                                            placeholder="VD: 08:00 - 12:00"
                                         />
                                     </div>
 
-                                    {/* Time */}
-                                    <div className="form-row">
-                                        <div className="form-group">
-                                            <label className="form-label">Giờ bắt đầu</label>
-                                            <input
-                                                type="time"
-                                                value={activity.start_time}
-                                                onChange={(e) => handleActivityChange(index, 'start_time', e.target.value)}
-                                                className="form-input"
-                                            />
-                                        </div>
-                                        <div className="form-group">
-                                            <label className="form-label">Giờ kết thúc</label>
-                                            <input
-                                                type="time"
-                                                value={activity.end_time}
-                                                onChange={(e) => handleActivityChange(index, 'end_time', e.target.value)}
-                                                className="form-input"
-                                            />
-                                        </div>
-                                    </div>
-
-                                    {/* Description */}
+                                    {/* Action */}
                                     <div className="form-group">
-                                        <label className="form-label">Mô tả</label>
-                                        <textarea
-                                            value={activity.description}
-                                            onChange={(e) => handleActivityChange(index, 'description', e.target.value)}
-                                            rows={2}
-                                            className="form-textarea"
-                                            placeholder="Mô tả chi tiết về hoạt động..."
+                                        <label className="form-label">Hoạt động *</label>
+                                        <input
+                                            type="text"
+                                            value={activity.action}
+                                            onChange={(e) => handleActivityChange(index, 'action', e.target.value)}
+                                            className="form-input"
+                                            placeholder="VD: Tham quan Bà Nà Hills, cáp treo"
                                         />
                                     </div>
                                 </div>

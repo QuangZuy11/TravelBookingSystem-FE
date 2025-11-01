@@ -531,7 +531,20 @@ const TourDashboard = () => {
                                         onMouseLeave={() => setHoveredRow(null)}
                                     >
                                         <td style={tdFirstStyle} title={tour.title}>{tour.title}</td>
-                                        <td style={tdStyle} title={tour.location}>{tour.location}</td>
+                                        <td style={tdStyle} title={
+                                            tour.destinations && tour.destinations.length > 0
+                                                ? tour.destinations.map(dest => dest.name || dest).join(', ')
+                                                : Array.isArray(tour.destination_id) && tour.destination_id.length > 0
+                                                    ? tour.destination_id.map(dest => typeof dest === 'object' ? dest.name : dest).join(', ')
+                                                    : tour.location || 'Chưa có địa điểm'
+                                        }>
+                                            {tour.destinations && tour.destinations.length > 0
+                                                ? tour.destinations.map(dest => dest.name || dest).join(', ')
+                                                : Array.isArray(tour.destination_id) && tour.destination_id.length > 0
+                                                    ? tour.destination_id.map(dest => typeof dest === 'object' ? dest.name : dest).join(', ')
+                                                    : tour.location || 'Chưa có địa điểm'
+                                            }
+                                        </td>
                                         <td style={tdStyle}>{tour.duration_hours} giờ</td>
                                         <td style={tdStyle}>
                                             <span style={{ fontWeight: '600', color: '#10b981' }}>

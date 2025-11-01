@@ -8,8 +8,8 @@ export function TourCard({ tour }) {
   const highlights = Array.isArray(tour.highlights)
     ? tour.highlights
     : typeof tour.highlights === "string"
-    ? [tour.highlights]
-    : [];
+      ? [tour.highlights]
+      : [];
 
   return (
     <div className="tour-card">
@@ -18,12 +18,19 @@ export function TourCard({ tour }) {
       </div>
 
       <div className="tour-info">
-        <h3 className="tour-name">{tour.name}</h3>
+        <h3 className="tour-name">{tour.title}</h3>
 
         <div className="tour-meta">
           <div className="tour-destination">
             <MapPin size={16} />
-            <span>{tour.location}</span>
+            <span>
+              {tour.destinations && tour.destinations.length > 0
+                ? tour.destinations.map(dest => dest.name || dest).join(', ')
+                : Array.isArray(tour.destination_id) && tour.destination_id.length > 0
+                  ? tour.destination_id.map(dest => typeof dest === 'object' ? dest.name : dest).join(', ')
+                  : tour.location || 'Chưa có địa điểm'
+              }
+            </span>
           </div>
           <div className="tour-duration">
             <Clock size={16} />

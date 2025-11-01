@@ -50,7 +50,14 @@ export default function DetailTour() {
               <Star size={18} fill="#FFD700" stroke="#FFD700" />
               {tour.rating} ({tour.total_rating})
             </span>
-            <span className="location">{tour.location}</span>
+            <span className="location">
+              {tour.destinations && tour.destinations.length > 0
+                ? tour.destinations.map(dest => dest.name || dest).join(', ')
+                : Array.isArray(tour.destination_id) && tour.destination_id.length > 0
+                  ? tour.destination_id.map(dest => typeof dest === 'object' ? dest.name : dest).join(', ')
+                  : tour.location || 'Chưa có địa điểm'
+              }
+            </span>
           </div>
           <div className="hero-price">
             <span>{tour.price.toLocaleString()}₫</span> / {tour.duration_hours}
@@ -99,7 +106,9 @@ export default function DetailTour() {
               <p className="itinerary-desc">{day.description}</p>
               <ul>
                 {day.activities?.map((act, i) => (
-                  <li key={i}>{act}</li>
+                  <li key={i}>
+                    <strong>{act.time || `${act.start_time} - ${act.end_time}`}:</strong> {act.action || act.activity_name || act}
+                  </li>
                 ))}
               </ul>
             </div>

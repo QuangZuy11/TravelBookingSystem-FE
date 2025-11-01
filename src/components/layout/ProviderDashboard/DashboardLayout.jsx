@@ -30,13 +30,7 @@ const DashboardLayout = () => {
     }
   }, [location.pathname]);
 
-  const menuItems = [
-    {
-      path: '/provider/dashboard',
-      label: 'Dashboard',
-      icon: '📊',
-    },
-  ];
+  const menuItems = [];
 
   if (providerTypes.includes('hotel')) {
     menuItems.push({
@@ -69,11 +63,6 @@ const DashboardLayout = () => {
       path: '/provider/tours/bookings',
       label: 'Tour Bookings',
       icon: '🗓️',
-    },
-    {
-      path: '/provider/tours/statistics',
-      label: 'Statistics',
-      icon: '📈',
     },
   ];
 

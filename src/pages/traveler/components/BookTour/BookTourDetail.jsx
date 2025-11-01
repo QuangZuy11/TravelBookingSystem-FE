@@ -147,10 +147,10 @@ const BookTourDetail = () => {
       const body = editingFeedback
         ? { comment: feedbackForm.comment, rating: feedbackForm.rating }
         : {
-            tour_id: id,
-            comment: feedbackForm.comment,
-            rating: feedbackForm.rating,
-          };
+          tour_id: id,
+          comment: feedbackForm.comment,
+          rating: feedbackForm.rating,
+        };
 
       const response = await fetch(url, {
         method,
@@ -453,7 +453,14 @@ const BookTourDetail = () => {
                         d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
                       />
                     </svg>
-                    <span>{tour.location}</span>
+                    <span>
+                      {tour.destinations && tour.destinations.length > 0
+                        ? tour.destinations.map(dest => dest.name || dest).join(', ')
+                        : Array.isArray(tour.destination_id) && tour.destination_id.length > 0
+                          ? tour.destination_id.map(dest => typeof dest === 'object' ? dest.name : dest).join(', ')
+                          : tour.location || 'Chưa có địa điểm'
+                      }
+                    </span>
                   </div>
                   <div className="meta-item">
                     <svg
@@ -534,7 +541,14 @@ const BookTourDetail = () => {
                           {day.activities.map((activity, activityIndex) => (
                             <div key={activityIndex} className="activity-item">
                               <span className="activity-bullet"></span>
-                              <span className="activity-text">{activity}</span>
+                              <span className="activity-text">
+                                {activity.time && activity.action
+                                  ? `${activity.time}: ${activity.action}`
+                                  : activity.activity_name
+                                    ? `${activity.start_time || ''} - ${activity.end_time || ''}: ${activity.activity_name}`
+                                    : activity
+                                }
+                              </span>
                             </div>
                           ))}
                         </div>
@@ -636,9 +650,8 @@ const BookTourDetail = () => {
                           <button
                             key={star}
                             type="button"
-                            className={`star-btn ${
-                              feedbackForm.rating >= star ? "active" : ""
-                            }`}
+                            className={`star-btn ${feedbackForm.rating >= star ? "active" : ""
+                              }`}
                             onClick={() =>
                               setFeedbackForm({ ...feedbackForm, rating: star })
                             }
@@ -1076,7 +1089,7 @@ const BookTourDetail = () => {
                         -
                         {formatPrice(
                           (tour.price * bookingData.guests * tour.discount) /
-                            100
+                          100
                         )}
                       </span>
                     </div>
@@ -1088,9 +1101,9 @@ const BookTourDetail = () => {
                       {formatPrice(
                         tour.discount
                           ? (tour.price *
-                              bookingData.guests *
-                              (100 - tour.discount)) /
-                              100
+                            bookingData.guests *
+                            (100 - tour.discount)) /
+                          100
                           : totalPrice
                       )}
                     </span>

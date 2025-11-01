@@ -60,10 +60,22 @@ const TourList = () => {
         }
     };
 
-    const filteredTours = tours.filter(tour =>
-        tour.title?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        tour.location?.toLowerCase().includes(searchTerm.toLowerCase())
-    );
+    const filteredTours = tours.filter(tour => {
+        const searchLower = searchTerm.toLowerCase();
+        const tourTitle = tour.title?.toLowerCase() || '';
+        const tourLocation = tour.location?.toLowerCase() || '';
+
+        // Search in destinations array
+        const destinationNames = tour.destinations && tour.destinations.length > 0
+            ? tour.destinations.map(dest => (dest.name || dest).toLowerCase()).join(' ')
+            : Array.isArray(tour.destination_id) && tour.destination_id.length > 0
+                ? tour.destination_id.map(dest => (typeof dest === 'object' ? dest.name : dest).toLowerCase()).join(' ')
+                : '';
+
+        return tourTitle.includes(searchLower) ||
+            tourLocation.includes(searchLower) ||
+            destinationNames.includes(searchLower);
+    });
 
     if (loading) return <LoadingSpinner />;
 
@@ -110,7 +122,12 @@ const TourList = () => {
                                         {tour.title}
                                     </td>
                                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                                        {tour.location}
+                                        {tour.destinations && tour.destinations.length > 0
+                                            ? tour.destinations.map(dest => dest.name || dest).join(', ')
+                                            : Array.isArray(tour.destination_id) && tour.destination_id.length > 0
+                                                ? tour.destination_id.map(dest => typeof dest === 'object' ? dest.name : dest).join(', ')
+                                                : tour.location || 'Chưa có địa điểm'
+                                        }
                                     </td>
                                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                                         {tour.duration_hours} giờ

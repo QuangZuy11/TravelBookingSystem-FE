@@ -11,8 +11,6 @@ import ProtectedRoute from "./components/common/ProtectedRoute";
 import NotFoundPage from "./pages/NotFoundPage";
 import UnauthorizedPage from "./pages/UnauthorizedPage";
 import DashboardLayout from "./components/layout/ProviderDashboard/DashboardLayout";
-import TourDashboard from "./pages/provider/dashboard/TourDashboard";
-
 // Tour Management
 import TourDashboardPage from "./pages/provider/tour/TourDashboard";
 import TourListPage from "./pages/provider/tour/TourList";
@@ -35,7 +33,6 @@ import PromotionEditPage from "./pages/provider/promotions/PromotionEditPage";
 
 // Provider Layout
 import ProviderLayout from "./pages/provider/ProviderLayout";
-import ProviderGeneralDashboard from "./pages/provider/ProviderGeneralDashboard";
 
 // Provider Routes
 import ProviderTypeRouter from "./components/routes/ProviderTypeRouter";
@@ -204,12 +201,6 @@ function App() {
                 {/* Provider Type Router - Auto-redirect based on provider type */}
                 <Route index element={<ProviderTypeRouter />} />
 
-                {/* General Dashboard for multi-service providers */}
-                <Route
-                  path="dashboard"
-                  element={<ProviderGeneralDashboard />}
-                />
-
                 <Route path="bookings" element={<BookingManagementPage />} />
 
                 {/* Tour Management - NEW MODULE */}
@@ -219,7 +210,6 @@ function App() {
                   <Route path=":tourId" element={<TourDetailsPage />} />
                   <Route path=":tourId/edit" element={<CreateTourWizard />} />
                   <Route path="bookings" element={<BookingManagementPage />} />
-                  <Route path="statistics" element={<TourDashboard />} />
                 </Route>
                 {/* Hotel Management */}
                 <Route path="hotels">
