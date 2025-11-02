@@ -41,24 +41,33 @@ const TourItineraryManager = () => {
         }
     }, [tourId, user]);
 
-    const loadTourItineraries = async () => {
+    const loadTourItineraries = async (skipLoading = false) => {
         try {
-            setLoading(true);
+            if (!skipLoading) {
+                setLoading(true);
+            }
             setError(null);
 
             const response = await getTourItineraries(tourId);
 
             if (response.success) {
-                setTourItineraries(response.data || []);
+                const sortedItineraries = (response.data || []).sort((a, b) => a.day_number - b.day_number);
+                setTourItineraries(sortedItineraries);
+                return sortedItineraries;
             } else {
                 throw new Error(response.message || 'Failed to load tour itineraries');
             }
         } catch (err) {
             console.error('❌ Load Tour Itineraries Error:', err);
             setError(err.message || 'Failed to load tour itineraries');
-            toast.error(err.message || 'Failed to load tour itineraries');
+            if (!skipLoading) {
+                toast.error(err.message || 'Failed to load tour itineraries');
+            }
+            return [];
         } finally {
-            setLoading(false);
+            if (!skipLoading) {
+                setLoading(false);
+            }
         }
     };
 
@@ -116,8 +125,26 @@ const TourItineraryManager = () => {
 
             if (response.success) {
                 toast.success(editingId ? 'Itinerary updated successfully!' : 'Itinerary created successfully!');
-                resetForm();
-                loadTourItineraries();
+
+                // Reload data first (skip loading state to avoid UI flicker)
+                const updatedItineraries = await loadTourItineraries(true);
+
+                // Clear form but keep it open for adding next day
+                if (editingId) {
+                    // If editing, close form after update
+                    resetForm();
+                } else {
+                    // If creating new, prepare form for next day based on updated data
+                    const nextDayNumber = Math.max(1, ...updatedItineraries.map(it => it.day_number), 0) + 1;
+                    setFormData({
+                        day_number: nextDayNumber,
+                        title: '',
+                        description: '',
+                        activities: [{ time: '08:00', action: '' }]
+                    });
+                    setEditingId(null);
+                    // Keep form open for next day
+                }
             } else {
                 throw new Error(response.message || 'Failed to save itinerary');
             }
@@ -161,8 +188,12 @@ const TourItineraryManager = () => {
     };
 
     const resetForm = () => {
+        const nextDayNumber = tourItineraries.length > 0
+            ? Math.max(...tourItineraries.map(it => it.day_number)) + 1
+            : 1;
+
         setFormData({
-            day_number: Math.max(1, ...tourItineraries.map(it => it.day_number), 0) + 1,
+            day_number: nextDayNumber,
             title: '',
             description: '',
             activities: [{ time: '08:00', action: '' }]

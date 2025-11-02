@@ -23,6 +23,7 @@ const BasicInfoForm = ({ providerId, initialData, isEditMode, onNext, onCancel }
         price: 0, // Single price field
         image: '',
         highlights: [], // Điểm nổi bật của tour
+        included_services: [], // Dịch vụ bao gồm
         available_dates: [],
         status: 'draft'
     });
@@ -30,6 +31,7 @@ const BasicInfoForm = ({ providerId, initialData, isEditMode, onNext, onCancel }
     const [errors, setErrors] = useState({});
     const [loading, setLoading] = useState(false);
     const [newHighlight, setNewHighlight] = useState('');
+    const [newService, setNewService] = useState('');
     const [newDate, setNewDate] = useState('');
 
     // Destination is now a simple text input, no need for API loading
@@ -93,6 +95,7 @@ const BasicInfoForm = ({ providerId, initialData, isEditMode, onNext, onCancel }
                 price: initialData.price || 0,
                 image: initialData.image || '',
                 highlights: Array.isArray(initialData.highlights) ? initialData.highlights : [],
+                included_services: Array.isArray(initialData.included_services) ? initialData.included_services : [],
                 available_dates: Array.isArray(initialData.available_dates) ? initialData.available_dates : [],
                 status: initialData.status || 'draft'
             });
@@ -151,6 +154,23 @@ const BasicInfoForm = ({ providerId, initialData, isEditMode, onNext, onCancel }
         setFormData(prev => ({
             ...prev,
             highlights: (Array.isArray(prev.highlights) ? prev.highlights : []).filter((_, i) => i !== index)
+        }));
+    };
+
+    const addService = () => {
+        if (newService.trim()) {
+            setFormData(prev => ({
+                ...prev,
+                included_services: [...(Array.isArray(prev.included_services) ? prev.included_services : []), newService.trim()]
+            }));
+            setNewService('');
+        }
+    };
+
+    const removeService = (index) => {
+        setFormData(prev => ({
+            ...prev,
+            included_services: (Array.isArray(prev.included_services) ? prev.included_services : []).filter((_, i) => i !== index)
         }));
     };
 
@@ -566,9 +586,6 @@ const BasicInfoForm = ({ providerId, initialData, isEditMode, onNext, onCancel }
                 >
                     <option value="draft">📝 Nháp - Chưa công khai</option>
                     <option value="published">✅ Hoạt động - Đang mở đặt chỗ</option>
-                    <option value="inactive">⏸️ Tạm dừng - Không nhận đặt chỗ</option>
-                    <option value="completed">✔️ Hoàn thành - Tour đã kết thúc</option>
-                    <option value="cancelled">❌ Đã hủy</option>
                 </select>
                 <small className="form-hint">
                     💡 Chọn "Nháp" nếu chưa muốn công khai tour. Chọn "Hoạt động" khi sẵn sàng nhận booking.
@@ -711,6 +728,49 @@ const BasicInfoForm = ({ providerId, initialData, isEditMode, onNext, onCancel }
                         <div key={index} className="item-tag">
                             <span>⭐ {highlight}</span>
                             <button type="button" onClick={() => removeHighlight(index)} className="btn-remove">
+                                ×
+                            </button>
+                        </div>
+                    ))}
+                </div>
+            </div>
+
+            {/* Included Services */}
+            <div className="services-section">
+                <h3 className="subsection-title">
+                    Dịch vụ bao gồm
+                    <span style={{
+                        marginLeft: '8px',
+                        fontSize: '0.85rem',
+                        color: formData.included_services.length === 0 ? '#64748b' : '#10b981',
+                        fontWeight: 'normal'
+                    }}>
+                        ({formData.included_services.length} dịch vụ)
+                    </span>
+                </h3>
+                <div className="add-item-group">
+                    <input
+                        type="text"
+                        value={newService}
+                        onChange={(e) => setNewService(e.target.value)}
+                        onKeyPress={(e) => e.key === 'Enter' && (e.preventDefault(), addService())}
+                        className="form-input"
+                        placeholder="VD: Xe đưa đón, Khách sạn 4 sao, Bữa sáng..."
+                        maxLength={150}
+                    />
+                    <button
+                        type="button"
+                        onClick={addService}
+                        className="btn-add"
+                    >
+                        + Thêm
+                    </button>
+                </div>
+                <div className="items-list">
+                    {(Array.isArray(formData.included_services) ? formData.included_services : []).map((service, index) => (
+                        <div key={index} className="item-tag">
+                            <span>✓ {service}</span>
+                            <button type="button" onClick={() => removeService(index)} className="btn-remove">
                                 ×
                             </button>
                         </div>

@@ -20,6 +20,20 @@ import './ItineraryForm.css'; const ItineraryForm = ({ tourId, basicInfo, existi
         description: '',
         activities: [{ time: '08:00', action: '' }]
     });
+
+    // Local state để track changes without losing data
+    const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
+
+    // Debug: Log formData changes
+    useEffect(() => {
+        console.log('📋 FormData changed:', {
+            day: formData.day_number,
+            title: formData.title,
+            activitiesCount: formData.activities?.length || 0,
+            activities: formData.activities,
+            hasUnsavedChanges
+        });
+    }, [formData, hasUnsavedChanges]);
     const [loading, setLoading] = useState(false);
     const [saving, setSaving] = useState(false);
     const [deletingActivityIndex, setDeletingActivityIndex] = useState(null);
@@ -33,6 +47,17 @@ import './ItineraryForm.css'; const ItineraryForm = ({ tourId, basicInfo, existi
             loadDay(1);
         }
     }, [tourId, existingItineraries, isEditMode]);
+
+    // Ensure there's always at least one activity
+    useEffect(() => {
+        if (!formData.activities || formData.activities.length === 0) {
+            console.log('🔧 Auto-adding default activity - activities were empty');
+            setFormData(prev => ({
+                ...prev,
+                activities: [{ time: '08:00', action: '' }]
+            }));
+        }
+    }, [formData.activities]);
 
     // Load existing itineraries from API
     const loadExistingItineraries = async () => {
@@ -98,9 +123,25 @@ import './ItineraryForm.css'; const ItineraryForm = ({ tourId, basicInfo, existi
                 i === index ? { ...activity, [field]: value } : activity
             )
         }));
+        setHasUnsavedChanges(true);
+    };
+
+    // Track title và description changes
+    const handleFormFieldChange = (field, value) => {
+        setFormData(prev => ({
+            ...prev,
+            [field]: value
+        }));
+        setHasUnsavedChanges(true);
     };
 
     const handleRemoveActivity = (index) => {
+        // Prevent removing the last activity
+        if (formData.activities.length <= 1) {
+            toast.error('Phải có ít nhất 1 hoạt động trong ngày!');
+            return;
+        }
+
         // Prevent rapid multiple clicks
         if (deletingActivityIndex === index) {
             console.log('⚠️ Already deleting this activity, ignoring...');
@@ -131,13 +172,15 @@ import './ItineraryForm.css'; const ItineraryForm = ({ tourId, basicInfo, existi
         return true;
     };
 
-    const saveCurrentItinerary = async () => {
+    const saveCurrentItinerary = async (preventFormReset = false) => {
+        console.log('💾 saveCurrentItinerary called with formData:', formData);
+
         if (!formData.title.trim()) {
             toast.error('Vui lòng nhập tiêu đề cho ngày này');
             return false;
         }
 
-        if (formData.activities.length === 0) {
+        if (!formData.activities || formData.activities.length === 0) {
             toast.error('Phải có ít nhất 1 hoạt động');
             return false;
         }
@@ -149,6 +192,11 @@ import './ItineraryForm.css'; const ItineraryForm = ({ tourId, basicInfo, existi
 
         const validActivities = formData.activities.filter(act => act.time?.trim() && act.action?.trim());
 
+        if (validActivities.length === 0) {
+            toast.error('Phải có ít nhất 1 hoạt động hợp lệ (có thời gian và nội dung)');
+            return false;
+        }
+
         setSaving(true);
 
         try {
@@ -157,35 +205,57 @@ import './ItineraryForm.css'; const ItineraryForm = ({ tourId, basicInfo, existi
 
             const itineraryData = {
                 day_number: formData.day_number,
-                title: formData.title,
-                description: formData.description,
+                title: formData.title.trim(),
+                description: formData.description?.trim() || '',
                 activities: validActivities
             };
+
+            console.log('📤 Sending itinerary data:', itineraryData);
 
             let response;
 
             if (existingItinerary && existingItinerary._id) {
                 // UPDATE existing itinerary using new service
+                console.log('🔄 Updating existing itinerary:', existingItinerary._id);
                 response = await updateTourItinerary(existingItinerary._id, itineraryData);
             } else {
                 // CREATE new itinerary using new service
+                console.log('✨ Creating new itinerary for tour:', tourId);
                 response = await createTourItinerary(tourId, itineraryData);
             }
 
             if (response.success) {
                 const savedItinerary = response.data;
+                console.log('✅ Saved itinerary:', savedItinerary);
 
-                // Update state
+                // Update itineraries state immediately
+                let updatedItineraries;
                 if (existingItinerary) {
                     // Update existing
-                    setItineraries(prev => prev.map(it =>
+                    updatedItineraries = itineraries.map(it =>
                         it.day_number === formData.day_number ? savedItinerary : it
-                    ));
+                    );
                 } else {
                     // Add new
-                    setItineraries(prev => [...prev, savedItinerary]);
+                    updatedItineraries = [...itineraries, savedItinerary];
                 }
 
+                setItineraries(updatedItineraries);
+
+                // Update form data với saved data (không reset)
+                if (!preventFormReset) {
+                    setFormData({
+                        _id: savedItinerary._id,
+                        day_number: savedItinerary.day_number,
+                        title: savedItinerary.title,
+                        description: savedItinerary.description,
+                        activities: savedItinerary.activities.length > 0
+                            ? savedItinerary.activities
+                            : [{ time: '08:00', action: '' }]
+                    });
+                }
+
+                setHasUnsavedChanges(false);
                 toast.success(`Đã ${existingItinerary ? 'cập nhật' : 'lưu'} ngày ${formData.day_number}`);
                 return true;
             } else {
@@ -200,12 +270,22 @@ import './ItineraryForm.css'; const ItineraryForm = ({ tourId, basicInfo, existi
         }
     };
 
+    // Thêm button "Lưu ngày hiện tại"
+    const handleSaveCurrentDay = async () => {
+        const success = await saveCurrentItinerary();
+        if (success) {
+            // Không reset form, chỉ update với saved data
+            console.log('✅ Current day saved successfully');
+        }
+    };
+
     const handleAddDay = async () => {
-        // Lưu ngày hiện tại trước
-        const hasCurrentDayData = formData.title.trim() && formData.activities.some(act => act.time.trim() && act.action.trim());
-        if (hasCurrentDayData) {
-            const success = await saveCurrentItinerary();
-            if (!success) return;
+        console.log('🔄 handleAddDay - Current formData:', formData);
+
+        // Kiểm tra có unsaved changes không
+        if (hasUnsavedChanges) {
+            toast.error('Vui lòng lưu ngày hiện tại trước khi thêm ngày mới!');
+            return;
         }
 
         // Tìm số ngày tiếp theo chưa được tạo
@@ -220,18 +300,25 @@ import './ItineraryForm.css'; const ItineraryForm = ({ tourId, basicInfo, existi
             return;
         }
 
-        // Load ngày mới
+        console.log(`🆕 Creating new day ${nextDay}`);
+
+        // Load ngày mới với activities mặc định
         setCurrentDay(nextDay);
-        setFormData({
+
+        // Set form data cho ngày mới
+        const newFormData = {
             day_number: nextDay,
             title: '',
             description: '',
-            activities: []
-        });
-        toast.info(`Đang tạo ngày ${nextDay}`);
-    };
+            activities: [{ time: '08:00', action: '' }]
+        };
 
-    const handleFinish = async () => {
+        setFormData(newFormData);
+        setHasUnsavedChanges(false);
+
+        console.log('📋 New day form data set:', newFormData);
+        toast.success(`Đã tạo ngày ${nextDay}! Hãy điền thông tin lịch trình.`);
+    }; const handleFinish = async () => {
         // Kiểm tra ngày hiện tại có dữ liệu hợp lệ không
         const hasCurrentDayData = formData.title.trim() && formData.activities.some(act => act.time.trim() && act.action.trim());
 
@@ -250,11 +337,32 @@ import './ItineraryForm.css'; const ItineraryForm = ({ tourId, basicInfo, existi
     };
 
     // Load itinerary data for selected day
-    const loadDay = (dayNumber) => {
+    const loadDay = async (dayNumber) => {
+        // Kiểm tra có unsaved changes không
+        if (hasUnsavedChanges) {
+            const confirmed = window.confirm(
+                `Bạn có thay đổi chưa được lưu cho ngày ${currentDay}. Bạn có muốn lưu trước khi chuyển sang ngày ${dayNumber} không?\n\n` +
+                `• Chọn "OK" để lưu và chuyển\n` +
+                `• Chọn "Hủy" để bỏ thay đổi và chuyển`
+            );
+
+            if (confirmed) {
+                const success = await saveCurrentItinerary();
+                if (!success) {
+                    toast.error('Không thể lưu ngày hiện tại. Vui lòng thử lại!');
+                    return;
+                }
+            } else {
+                // User chose to discard changes
+                setHasUnsavedChanges(false);
+            }
+        }
+
         const itinerary = itineraries.find(it => it.day_number === dayNumber);
+
+        let newFormData;
         if (itinerary) {
-            setCurrentDay(dayNumber);
-            setFormData({
+            newFormData = {
                 _id: itinerary._id,
                 day_number: dayNumber,
                 title: itinerary.title || '',
@@ -262,20 +370,24 @@ import './ItineraryForm.css'; const ItineraryForm = ({ tourId, basicInfo, existi
                 activities: Array.isArray(itinerary.activities) && itinerary.activities.length > 0
                     ? itinerary.activities
                     : [{ time: '08:00', action: '' }]
-            });
+            };
         } else {
             // New day - initialize with default activity
-            setCurrentDay(dayNumber);
-            setFormData({
+            newFormData = {
                 day_number: dayNumber,
                 title: '',
                 description: '',
                 activities: [{ time: '08:00', action: '' }]
-            });
+            };
         }
-    };
 
-    // Delete a saved day using new service
+        setCurrentDay(dayNumber);
+        setFormData(newFormData);
+        setHasUnsavedChanges(false);
+
+        console.log('� Loaded day', dayNumber, 'with data:', newFormData);
+        toast.info(`Đã chuyển sang ngày ${dayNumber}`);
+    };    // Delete a saved day using new service
     const handleDeleteDay = async (dayNumber) => {
         const itinerary = itineraries.find(it => it.day_number === dayNumber);
         if (!itinerary || !itinerary._id) return;
@@ -338,9 +450,25 @@ import './ItineraryForm.css'; const ItineraryForm = ({ tourId, basicInfo, existi
     };
 
     // Handler khi nhấn "Quay lại"
-    const handleBackClick = () => {
+    const handleBackClick = async () => {
+        if (hasUnsavedChanges) {
+            const confirmed = window.confirm(
+                `Bạn có thay đổi chưa được lưu cho ngày ${currentDay}. Bạn có muốn lưu trước khi quay lại không?\n\n` +
+                `• Chọn "OK" để lưu và quay lại\n` +
+                `• Chọn "Hủy" để bỏ thay đổi và quay lại`
+            );
+
+            if (confirmed) {
+                const success = await saveCurrentItinerary();
+                if (!success) {
+                    toast.error('Không thể lưu. Vui lòng thử lại!');
+                    return;
+                }
+            }
+        }
+
         const updatedItineraries = saveDraftItinerary();
-        console.log('⬅️ Saving draft before going back:', updatedItineraries);
+        console.log('⬅️ Going back with itineraries:', updatedItineraries);
         onBack(updatedItineraries);
     };
 
@@ -412,6 +540,25 @@ import './ItineraryForm.css'; const ItineraryForm = ({ tourId, basicInfo, existi
                 </div>
             )}
 
+            {/* Save reminder */}
+            {hasUnsavedChanges && (
+                <div style={{
+                    padding: '12px 16px',
+                    backgroundColor: '#fef3c7',
+                    border: '2px solid #fbbf24',
+                    borderRadius: '8px',
+                    marginBottom: '20px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '12px',
+                    color: '#92400e',
+                    fontSize: '14px',
+                    fontWeight: '600'
+                }}>
+                    💾 <span>Bạn có thay đổi chưa lưu! Nhấn <strong>"💾 Lưu ngày"</strong> để lưu hoặc <strong>"➕ Thêm ngày mới"</strong> sẽ bị vô hiệu hóa.</span>
+                </div>
+            )}
+
 
 
             {/* Day Title */}
@@ -422,7 +569,7 @@ import './ItineraryForm.css'; const ItineraryForm = ({ tourId, basicInfo, existi
                 <input
                     type="text"
                     value={formData.title}
-                    onChange={(e) => setFormData(prev => ({ ...prev, title: e.target.value }))}
+                    onChange={(e) => handleFormFieldChange('title', e.target.value)}
                     className="form-input"
                     placeholder={`VD: Ngày ${currentDay}: Khởi hành - Đà Nẵng`}
                 />
@@ -433,7 +580,7 @@ import './ItineraryForm.css'; const ItineraryForm = ({ tourId, basicInfo, existi
                 <label className="form-label">Mô tả</label>
                 <textarea
                     value={formData.description}
-                    onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value }))}
+                    onChange={(e) => handleFormFieldChange('description', e.target.value)}
                     rows={3}
                     className="form-textarea"
                     placeholder="Mô tả chi tiết về lịch trình trong ngày..."
@@ -456,14 +603,47 @@ import './ItineraryForm.css'; const ItineraryForm = ({ tourId, basicInfo, existi
                         }}>
                             {formData.activities.length} hoạt động
                         </span>
+                        {hasUnsavedChanges && (
+                            <span style={{
+                                marginLeft: '8px',
+                                fontSize: '12px',
+                                fontWeight: '600',
+                                color: '#f59e0b',
+                                backgroundColor: '#fef3c7',
+                                padding: '4px 8px',
+                                borderRadius: '8px'
+                            }}>
+                                Chưa lưu
+                            </span>
+                        )}
                     </h3>
-                    <button
-                        type="button"
-                        onClick={handleAddActivity}
-                        className="btn-add-activity"
-                    >
-                        + Thêm hoạt động
-                    </button>
+                    <div style={{ display: 'flex', gap: '8px' }}>
+                        <button
+                            type="button"
+                            onClick={handleSaveCurrentDay}
+                            disabled={saving}
+                            className="btn-save-day"
+                            style={{
+                                padding: '6px 12px',
+                                backgroundColor: hasUnsavedChanges ? '#10b981' : '#6b7280',
+                                color: 'white',
+                                border: 'none',
+                                borderRadius: '6px',
+                                fontSize: '14px',
+                                fontWeight: '600',
+                                cursor: saving ? 'not-allowed' : 'pointer'
+                            }}
+                        >
+                            {saving ? '💾 Đang lưu...' : '💾 Lưu ngày'}
+                        </button>
+                        <button
+                            type="button"
+                            onClick={handleAddActivity}
+                            className="btn-add-activity"
+                        >
+                            + Thêm hoạt động
+                        </button>
+                    </div>
                 </div>
 
 
@@ -472,6 +652,14 @@ import './ItineraryForm.css'; const ItineraryForm = ({ tourId, basicInfo, existi
                     <div className="empty-state">
                         <span className="empty-icon">📋</span>
                         <p>Chưa có hoạt động nào. Nhấn "Thêm hoạt động" để bắt đầu.</p>
+                        <button
+                            type="button"
+                            onClick={handleAddActivity}
+                            className="btn-add-activity"
+                            style={{ marginTop: '1rem' }}
+                        >
+                            + Thêm hoạt động đầu tiên
+                        </button>
                     </div>
                 ) : (
                     <div className="activities-list">
@@ -546,14 +734,41 @@ import './ItineraryForm.css'; const ItineraryForm = ({ tourId, basicInfo, existi
                 </button>
 
                 <div className="right-actions">
+                    {hasUnsavedChanges && (
+                        <div style={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '8px',
+                            padding: '8px 12px',
+                            backgroundColor: '#fef3c7',
+                            border: '2px solid #fbbf24',
+                            borderRadius: '8px',
+                            fontSize: '14px',
+                            fontWeight: '600',
+                            color: '#92400e'
+                        }}>
+                            ⚠️ Bạn cần lưu ngày hiện tại trước!
+                        </div>
+                    )}
+
                     <button
                         type="button"
                         onClick={handleAddDay}
-                        disabled={loading || saving || currentDay >= maxDays}
+                        disabled={loading || saving || currentDay >= maxDays || hasUnsavedChanges}
                         className="btn-add-day"
-                        title={currentDay >= maxDays ? `Đã đạt số ngày tối đa (${maxDays} ngày)` : 'Lưu ngày này và thêm ngày mới'}
+                        style={{
+                            opacity: hasUnsavedChanges ? 0.5 : 1,
+                            cursor: hasUnsavedChanges ? 'not-allowed' : 'pointer'
+                        }}
+                        title={
+                            hasUnsavedChanges
+                                ? 'Vui lòng lưu ngày hiện tại trước khi thêm ngày mới'
+                                : currentDay >= maxDays
+                                    ? `Đã đạt số ngày tối đa (${maxDays} ngày)`
+                                    : 'Thêm ngày mới'
+                        }
                     >
-                        💾 {saving ? 'Đang lưu...' : `Lưu và thêm ngày mới ${currentDay >= maxDays ? '(Đã max)' : ''}`}
+                        {saving ? '💾 Đang lưu...' : hasUnsavedChanges ? '🔒 Cần lưu trước' : `➕ Thêm ngày ${currentDay + 1} ${currentDay >= maxDays ? '(Đã max)' : ''}`}
                     </button>
 
                     <button

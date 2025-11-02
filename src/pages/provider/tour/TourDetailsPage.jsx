@@ -37,11 +37,15 @@ const TourDetailsPage = () => {
             setLoading(true);
 
             // 1. Fetch tour basic info
+            console.log('🚀 Fetching tour with endpoint:', `http://localhost:3000/api/tour/provider/${providerId}/tours/${tourId}`);
+
             const tourResponse = await axios.get(
                 `http://localhost:3000/api/tour/provider/${providerId}/tours/${tourId}`, {
                 headers: { Authorization: `Bearer ${token}` }
             }
             );
+
+            console.log('📦 Tour Response:', tourResponse.data);
             setTour(tourResponse.data.data);
 
             // 2. Fetch itineraries using new service
@@ -127,7 +131,7 @@ const TourDetailsPage = () => {
                     <button onClick={() => navigate('/provider/tours')} className="btn-back">
                         ← Quay lại
                     </button>
-                    <h1 className="page-title">{tour.title}</h1>
+                    <h1 className="page-title">{tour.name || tour.title}</h1>
                     <span className={`status-badge status-${tour.status}`}>
                         {tour.status === 'published' ? 'Đang hoạt động' :
                             tour.status === 'draft' ? 'Bản nháp' :
@@ -161,13 +165,7 @@ const TourDetailsPage = () => {
                     <div className="info-item">
                         <span className="info-label">Địa điểm:</span>
                         <span className="info-value">
-                            {/* Handle multiple destinations */}
-                            {tour.destinations && tour.destinations.length > 0
-                                ? tour.destinations.map(dest => dest.name || dest).join(', ')
-                                : Array.isArray(tour.destination_id) && tour.destination_id.length > 0
-                                    ? tour.destination_id.map(dest => typeof dest === 'object' ? dest.name : dest).join(', ')
-                                    : (tour.destination_id?.name || tour.location || 'Chưa có thông tin')
-                            }
+                            {tour.destination || tour.location || 'Chưa có thông tin địa điểm'}
                         </span>
                     </div>
                     <div className="info-item">
@@ -198,7 +196,7 @@ const TourDetailsPage = () => {
 
                 {tour.image && (
                     <div className="tour-image">
-                        <img src={getProxiedGoogleDriveUrl(tour.image)} alt={tour.title} />
+                        <img src={getProxiedGoogleDriveUrl(tour.image)} alt={tour.name || tour.title} />
                     </div>
                 )}
             </div>
