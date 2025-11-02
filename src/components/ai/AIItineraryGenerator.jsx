@@ -5,8 +5,8 @@ import { useAuth } from '../../contexts/AuthContext';
 import TopBar from '../layout/Topbar/Topbar';
 import Header from '../layout/Header/Header';
 import Footer from '../layout/Footer/Footer';
-import { generateAIItinerary, getDestinations } from '../../services/aiItineraryService';
-import ItineraryView from './ItineraryView';
+import { generateAIItinerary, PREFERENCE_OPTIONS, BUDGET_OPTIONS } from '../../services/aiItineraryService';
+import NewItineraryView from './NewItineraryView';
 import './AIItinerary.css';
 
 const AIItineraryGenerator = () => {
@@ -15,7 +15,6 @@ const AIItineraryGenerator = () => {
 
     const [formData, setFormData] = useState({
         destination: '',
-        destination_id: '', // Add destination_id
         participants: 1,
         ageRange: '',
         duration_days: 3,
@@ -23,7 +22,6 @@ const AIItineraryGenerator = () => {
         preferences: []
     });
 
-    const [destinations, setDestinations] = useState([]);
     const [loading, setLoading] = useState(false);
     const [loadingMessage, setLoadingMessage] = useState('');
     const [result, setResult] = useState(null);
@@ -37,27 +35,7 @@ const AIItineraryGenerator = () => {
             setTimeout(() => navigate('/auth'), 2000);
             return;
         }
-
-        const loadDestinations = async () => {
-            try {
-                const data = await getDestinations();
-                console.log('✅ Loaded destinations:', data.length);
-                setDestinations(data);
-                if (data.length > 0 && !formData.destination) {
-                    setFormData(prev => ({
-                        ...prev,
-                        destination: data[0].name,
-                        destination_id: data[0]._id
-                    }));
-                }
-            } catch (err) {
-                console.error('Failed to load destinations:', err);
-                toast.error('Failed to load destinations');
-            }
-        };
-
-        loadDestinations();
-    }, [user, authLoading, navigate, formData.destination]);
+    }, [user, authLoading, navigate]);
 
     const handlePreferenceToggle = (prefId) => {
         setFormData(prev => ({
@@ -73,22 +51,32 @@ const AIItineraryGenerator = () => {
         setError(null);
         setResult(null);
 
-        if (!formData.destination) {
-            toast.error('Please select a destination.');
+        // Enhanced validation based on new API spec
+        if (!formData.destination.trim()) {
+            toast.error('Please enter a destination.');
+            return;
+        }
+        if (formData.destination.trim().length < 2) {
+            toast.error('Please enter a valid destination (at least 2 characters).');
             return;
         }
         if (formData.preferences.length < 2) {
-            toast.error('Please select at least 2 preferences.');
+            toast.error('Please select at least 2 preferences for better personalization.');
+            return;
+        }
+        if (formData.participants < 1) {
+            toast.error('Number of travelers must be at least 1.');
             return;
         }
 
         setLoading(true);
 
         const messages = [
-            'Finding best attractions...',
-            'Optimizing your schedule...',
-            'Adding personal touches...',
-            'Almost done...'
+            '🤖 AI analyzing your preferences...',
+            '🗺️ Finding perfect destinations...',
+            '⏰ Optimizing your schedule...',
+            '💡 Adding personalized touches...',
+            '✨ Almost ready...'
         ];
 
         let messageIndex = 0;
@@ -97,47 +85,43 @@ const AIItineraryGenerator = () => {
         const messageInterval = setInterval(() => {
             messageIndex = (messageIndex + 1) % messages.length;
             setLoadingMessage(messages[messageIndex]);
-        }, 1000);
+        }, 1500);
 
         try {
-            let userId = user?.providerId || user?.id || user?._id;
-            if (!userId) {
-                const userStr = localStorage.getItem('user');
-                if (userStr) {
-                    try {
-                        const userData = JSON.parse(userStr);
-                        userId = userData.providerId || userData.id || userData._id;
-                    } catch (parseErr) {
-                        console.error('Failed to parse user data:', parseErr);
-                    }
-                }
-            }
-
-            if (!userId) {
-                throw new Error('User ID not found. Please login again.');
-            }
-
+            // Build request data according to new API spec
             const requestData = {
-                user_id: userId,
-                destination: formData.destination,
-                destination_id: formData.destination_id, // Include destination_id
+                destination: formData.destination.trim(),
                 duration_days: formData.duration_days,
                 participant_number: formData.participants,
-                age_range: formData.ageRange,
                 budget_level: formData.budget_level,
                 preferences: formData.preferences
             };
 
-            console.log('📤 Sending AI Itinerary Request:', {
-                ...requestData,
-                user_id: '***' // Hide user_id in log
-            });
+            // Add optional fields if provided
+            if (formData.ageRange && formData.ageRange.trim()) {
+                requestData.age_range = formData.ageRange.trim();
+            }
+
+            console.log('📤 Sending AI Itinerary Request:', requestData);
 
             const response = await generateAIItinerary(requestData);
-            setResult(response.data);
-            toast.success(response.message || 'Itinerary generated successfully!');
+
+            if (response.success && response.data) {
+                setResult(response.data);
+                toast.success(response.message || 'Perfect itinerary generated! 🎉');
+
+                // Navigate to detail view after successful generation
+                if (response.data.aiGeneratedId) {
+                    setTimeout(() => {
+                        navigate(`/ai-itinerary/${response.data.aiGeneratedId}`);
+                    }, 2000);
+                }
+            } else {
+                throw new Error(response.message || 'Failed to generate itinerary');
+            }
         } catch (err) {
-            const errorMessage = err.response?.data?.message || err.message || 'Failed to generate itinerary';
+            console.error('❌ Generation Error:', err);
+            const errorMessage = err.message || 'Failed to generate itinerary. Please try again.';
             setError(errorMessage);
             toast.error(errorMessage);
         } finally {
@@ -196,16 +180,8 @@ const AIItineraryGenerator = () => {
         );
     }
 
-    const preferenceTags = [
-        { id: 'culture', label: 'Culture', icon: '🎭', gradient: 'linear-gradient(135deg, #fb923c 0%, #ea580c 100%)' },
-        { id: 'history', label: 'History', icon: '🏛️', gradient: 'linear-gradient(135deg, #fbbf24 0%, #d97706 100%)' },
-        { id: 'food', label: 'Food', icon: '🍜', gradient: 'linear-gradient(135deg, #f87171 0%, #dc2626 100%)' },
-        { id: 'nature', label: 'Nature', icon: '🌿', gradient: 'linear-gradient(135deg, #4ade80 0%, #16a34a 100%)' },
-        { id: 'adventure', label: 'Adventure', icon: '🏔️', gradient: 'linear-gradient(135deg, #60a5fa 0%, #2563eb 100%)' },
-        { id: 'entertainment', label: 'Entertainment', icon: '🎪', gradient: 'linear-gradient(135deg, #a78bfa 0%, #7c3aed 100%)' },
-        { id: 'shopping', label: 'Shopping', icon: '🛍️', gradient: 'linear-gradient(135deg, #f472b6 0%, #ec4899 100%)' },
-        { id: 'relaxation', label: 'Relaxation', icon: '🧘', gradient: 'linear-gradient(135deg, #2dd4bf 0%, #14b8a6 100%)' }
-    ];
+    // Use preference options from service
+    const preferenceTags = PREFERENCE_OPTIONS;
 
     const styles = {
         heroSection: {
@@ -499,24 +475,21 @@ const AIItineraryGenerator = () => {
                                         <label style={styles.label}>
                                             ✈️ Destination
                                         </label>
-                                        <select
+                                        <input
+                                            type="text"
+                                            placeholder="Enter destination (e.g., Hanoi, Da Nang, Ho Chi Minh City...)"
                                             value={formData.destination}
-                                            onChange={(e) => {
-                                                const selectedDest = destinations.find(d => d.name === e.target.value);
-                                                setFormData(prev => ({
-                                                    ...prev,
-                                                    destination: e.target.value,
-                                                    destination_id: selectedDest?._id || ''
-                                                }));
+                                            onChange={(e) => setFormData(prev => ({
+                                                ...prev,
+                                                destination: e.target.value
+                                            }))}
+                                            style={{
+                                                ...styles.input,
+                                                fontSize: '1rem',
+                                                fontWeight: '500'
                                             }}
-                                            style={styles.select}
                                             required
-                                        >
-                                            <option value="">Select destination...</option>
-                                            {destinations.map(dest => (
-                                                <option key={dest._id} value={dest.name}>{dest.name}</option>
-                                            ))}
-                                        </select>
+                                        />
                                     </div>
 
                                     {/* Participants */}
@@ -600,11 +573,7 @@ const AIItineraryGenerator = () => {
                                 </div>
 
                                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '1.25rem' }}>
-                                    {[
-                                        { value: 'low', emoji: '💰', title: 'Budget', desc: 'Affordable adventures', gradient: 'linear-gradient(135deg, #6b7280 0%, #4b5563 100%)' },
-                                        { value: 'medium', emoji: '⚖️', title: 'Moderate', desc: 'Balanced comfort', gradient: 'linear-gradient(135deg, #10b981 0%, #14b8a6 100%)' },
-                                        { value: 'high', emoji: '💎', title: 'Luxury', desc: 'Premium experiences', gradient: 'linear-gradient(135deg, #3b82f6 0%, #6366f1 100%)' }
-                                    ].map(budget => (
+                                    {BUDGET_OPTIONS.map(budget => (
                                         <label key={budget.value} style={{ cursor: 'pointer' }}>
                                             <input
                                                 type="radio"
@@ -636,7 +605,7 @@ const AIItineraryGenerator = () => {
                                                     {budget.title}
                                                 </div>
                                                 <div style={{ fontSize: '0.875rem', opacity: formData.budget_level === budget.value ? 0.9 : 0.6 }}>
-                                                    {budget.desc}
+                                                    {budget.description}
                                                 </div>
                                                 {formData.budget_level === budget.value && (
                                                     <div style={{
@@ -804,13 +773,32 @@ const AIItineraryGenerator = () => {
                     {result && (
                         <div style={{
                             marginTop: '3rem',
-                            backgroundColor: 'white',
+                            backgroundColor: 'transparent',
                             borderRadius: '1.5rem',
                             boxShadow: '0 20px 60px rgba(0,0,0,0.15)',
-                            padding: '2rem',
-                            border: '2px solid #86efac'
+                            overflow: 'hidden',
+                            border: '3px solid #10b981',
+                            position: 'relative'
                         }}>
-                            <ItineraryView data={result} destination={formData.destination} />
+                            {/* Success Banner */}
+                            <div style={{
+                                background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
+                                color: 'white',
+                                padding: '1rem',
+                                textAlign: 'center',
+                                fontSize: '1rem',
+                                fontWeight: '600',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                gap: '0.5rem'
+                            }}>
+                                <span style={{ fontSize: '1.5rem' }}>🎉</span>
+                                <span>Your Perfect Itinerary is Ready!</span>
+                                <span style={{ fontSize: '1.5rem' }}>✨</span>
+                            </div>
+
+                            <NewItineraryView data={result} showActions={true} />
                         </div>
                     )}
                 </div>

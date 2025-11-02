@@ -55,11 +55,14 @@ import AdminDashboardPage from "./pages/admin/AdminDashboardPage";
 import UserListPage from "./pages/admin/UserListPage";
 import AIItineraryGenerator from "./components/ai/AIItineraryGenerator";
 import MyItineraries from "./components/ai/MyItineraries";
-import ItineraryDetail from "./components/ai/ItineraryDetail";
+import AIItineraryErrorBoundary from "./components/ai/AIItineraryErrorBoundary";
+import TourItineraryManager from "./components/tour/TourItineraryManager";
 
 // Auth Pages
 import ForgotPasswordPage from "./pages/auth/ForgotPasswordPage";
 import ResetPasswordPage from "./pages/auth/ResetPasswordPage";
+import ItineraryDetailNew from "./components/ai/ItineraryDetailNew";
+import ItineraryCustomize from "./components/ai/ItineraryCustomize";
 
 function App() {
   return (
@@ -147,11 +150,31 @@ function App() {
               }
             />
 
-            <Route path="/ai-itinerary" element={<AIItineraryGenerator />} />
-            <Route path="/my-itineraries" element={<MyItineraries />} />
+            <Route path="/ai-itinerary" element={
+              <AIItineraryErrorBoundary>
+                <AIItineraryGenerator />
+              </AIItineraryErrorBoundary>
+            } />
+            <Route path="/my-itineraries" element={
+              <AIItineraryErrorBoundary>
+                <MyItineraries />
+              </AIItineraryErrorBoundary>
+            } />
             <Route
               path="/ai-itinerary/:itineraryId"
-              element={<ItineraryDetail />}
+              element={
+                <AIItineraryErrorBoundary>
+                  <ItineraryDetailNew />
+                </AIItineraryErrorBoundary>
+              }
+            />
+            <Route
+              path="/ai-itinerary/:itineraryId/customize"
+              element={
+                <AIItineraryErrorBoundary>
+                  <ItineraryCustomize />
+                </AIItineraryErrorBoundary>
+              }
             />
 
             {/* Protected Routes - Admin */}
@@ -209,6 +232,7 @@ function App() {
                   <Route path="create" element={<CreateTourWizard />} />
                   <Route path=":tourId" element={<TourDetailsPage />} />
                   <Route path=":tourId/edit" element={<CreateTourWizard />} />
+                  <Route path=":tourId/itinerary-manager" element={<TourItineraryManager />} />
                   <Route path="bookings" element={<BookingManagementPage />} />
                 </Route>
                 {/* Hotel Management */}

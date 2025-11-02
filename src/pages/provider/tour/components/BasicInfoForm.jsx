@@ -565,7 +565,7 @@ const BasicInfoForm = ({ providerId, initialData, isEditMode, onNext, onCancel }
                     className="form-select"
                 >
                     <option value="draft">📝 Nháp - Chưa công khai</option>
-                    <option value="active">✅ Hoạt động - Đang mở đặt chỗ</option>
+                    <option value="published">✅ Hoạt động - Đang mở đặt chỗ</option>
                     <option value="inactive">⏸️ Tạm dừng - Không nhận đặt chỗ</option>
                     <option value="completed">✔️ Hoàn thành - Tour đã kết thúc</option>
                     <option value="cancelled">❌ Đã hủy</option>

@@ -148,11 +148,11 @@ const TourList = () => {
                                         </span>
                                     </td>
                                     <td className="px-6 py-4 whitespace-nowrap text-sm">
-                                        <span className={`px-2 py-1 text-xs font-semibold rounded-full ${tour.status === 'active' ? 'bg-green-100 text-green-800' :
+                                        <span className={`px-2 py-1 text-xs font-semibold rounded-full ${tour.status === 'published' ? 'bg-green-100 text-green-800' :
                                             tour.status === 'draft' ? 'bg-gray-100 text-gray-800' :
                                                 'bg-red-100 text-red-800'
                                             }`}>
-                                            {tour.status === 'active' ? 'Hoạt động' :
+                                            {tour.status === 'published' ? 'Hoạt động' :
                                                 tour.status === 'draft' ? 'Bản nháp' :
                                                     tour.status === 'inactive' ? 'Tạm dừng' : tour.status}
                                         </span>

@@ -1,42 +1,58 @@
+/**
+ * Updated ItineraryForm Component
+ * Now uses new aiItineraryService.js with Tour API endpoints
+ * Simplified time+action format matching API structure
+ */
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
 import toast from 'react-hot-toast';
-import './ItineraryForm.css';
-
-const ItineraryForm = ({ tourId, basicInfo, existingItineraries = [], isEditMode, onNext, onBack }) => {
+import {
+    createTourItinerary,
+    getTourItineraries,
+    updateTourItinerary,
+    deleteTourItinerary
+} from '../../../../services/aiItineraryService';
+import './ItineraryForm.css'; const ItineraryForm = ({ tourId, basicInfo, existingItineraries = [], isEditMode, onNext, onBack }) => {
     const [itineraries, setItineraries] = useState(existingItineraries);
-    // Nếu edit mode và có itineraries, bắt đầu từ ngày 1 để có thể edit
-    // Nếu create mode hoặc chưa có itineraries, bắt đầu từ ngày 1
     const [currentDay, setCurrentDay] = useState(1);
-    const token = localStorage.getItem('token');
     const [formData, setFormData] = useState({
         day_number: 1,
         title: '',
         description: '',
-        activities: []
+        activities: [{ time: '08:00', action: '' }]
     });
     const [loading, setLoading] = useState(false);
-    // Prevent double-click on delete button
+    const [saving, setSaving] = useState(false);
     const [deletingActivityIndex, setDeletingActivityIndex] = useState(null);
 
-    // Cập nhật khi existingItineraries thay đổi (khi quay lại từ step 3)
+    // Load existing itineraries when component mounts
     useEffect(() => {
-        if (existingItineraries.length > 0) {
+        if (tourId && isEditMode) {
+            loadExistingItineraries();
+        } else if (existingItineraries.length > 0) {
             setItineraries(existingItineraries);
-            // Load data của ngày đầu tiên nếu có
-            const firstItinerary = existingItineraries[0];
-            if (firstItinerary) {
-                setCurrentDay(1);
-                setFormData({
-                    _id: firstItinerary._id, // ⚠️ QUAN TRỌNG: Phải set _id
-                    day_number: 1,
-                    title: firstItinerary.title || '',
-                    description: firstItinerary.description || '',
-                    activities: Array.isArray(firstItinerary.activities) ? firstItinerary.activities : []
-                });
-            }
+            loadDay(1);
         }
-    }, [existingItineraries]);
+    }, [tourId, existingItineraries, isEditMode]);
+
+    // Load existing itineraries from API
+    const loadExistingItineraries = async () => {
+        try {
+            setLoading(true);
+            const response = await getTourItineraries(tourId);
+
+            if (response.success && response.data) {
+                setItineraries(response.data);
+                if (response.data.length > 0) {
+                    loadDay(1);
+                }
+            }
+        } catch (error) {
+            console.error('❌ Load Existing Itineraries Error:', error);
+            toast.error('Failed to load existing itineraries');
+        } finally {
+            setLoading(false);
+        }
+    };
 
     // Parse số ngày từ duration string "X ngày Y đêm"
     const parseDaysFromDuration = (durationString) => {
@@ -69,7 +85,7 @@ const ItineraryForm = ({ tourId, basicInfo, existingItineraries = [], isEditMode
         setFormData(prev => ({
             ...prev,
             activities: [...prev.activities, {
-                time: '',
+                time: '10:00',
                 action: ''
             }]
         }));
@@ -105,10 +121,9 @@ const ItineraryForm = ({ tourId, basicInfo, existingItineraries = [], isEditMode
 
 
 
-    // Validate activities đơn giản
+    // Validate activities - simplified format (time + action)
     const validateActivities = (activities) => {
-        // Kiểm tra có ít nhất 1 activity có cả time và action
-        const validActivities = activities.filter(act => act.time.trim() && act.action.trim());
+        const validActivities = activities.filter(act => act.time?.trim() && act.action?.trim());
         if (validActivities.length === 0) {
             toast.error('Phải có ít nhất 1 hoạt động với thời gian và hành động');
             return false;
@@ -127,88 +142,61 @@ const ItineraryForm = ({ tourId, basicInfo, existingItineraries = [], isEditMode
             return false;
         }
 
-        // Validate activities đơn giản
+        // Validate activities - simplified format
         if (!validateActivities(formData.activities)) {
             return false;
         }
 
-        const validActivities = formData.activities.filter(act => act.time.trim() && act.action.trim());
+        const validActivities = formData.activities.filter(act => act.time?.trim() && act.action?.trim());
 
-        setLoading(true);
+        setSaving(true);
 
         try {
             // Check if this day already exists
             const existingItinerary = itineraries.find(it => it.day_number === formData.day_number);
 
-            let itineraryId;
+            const itineraryData = {
+                day_number: formData.day_number,
+                title: formData.title,
+                description: formData.description,
+                activities: validActivities
+            };
+
+            let response;
 
             if (existingItinerary && existingItinerary._id) {
-                // UPDATE existing itinerary
-                await axios.put(
-                    `http://localhost:3000/api/itineraries/${existingItinerary._id}`,
-                    {
-                        title: formData.title,
-                        description: formData.description
-                    }, {
-                    headers: { Authorization: `Bearer ${token}` }
-                }
-                );
-                itineraryId = existingItinerary._id;
-
-                // Không cần xóa tất cả activities nữa vì đã xóa từng cái riêng lẻ
+                // UPDATE existing itinerary using new service
+                response = await updateTourItinerary(existingItinerary._id, itineraryData);
             } else {
-                // CREATE new itinerary
-                const itineraryResponse = await axios.post(
-                    'http://localhost:3000/api/itineraries',
-                    {
-                        tour_id: tourId,
-                        day_number: formData.day_number,
-                        title: formData.title,
-                        description: formData.description
-                    }, {
-                    headers: { Authorization: `Bearer ${token}` }
+                // CREATE new itinerary using new service
+                response = await createTourItinerary(tourId, itineraryData);
+            }
+
+            if (response.success) {
+                const savedItinerary = response.data;
+
+                // Update state
+                if (existingItinerary) {
+                    // Update existing
+                    setItineraries(prev => prev.map(it =>
+                        it.day_number === formData.day_number ? savedItinerary : it
+                    ));
+                } else {
+                    // Add new
+                    setItineraries(prev => [...prev, savedItinerary]);
                 }
-                );
-                itineraryId = itineraryResponse.data.data._id;
-            }
 
-            // Lưu activities đơn giản - chỉ update itinerary với activities array
-            await axios.put(
-                `http://localhost:3000/api/itineraries/${itineraryId}`,
-                {
-                    title: formData.title,
-                    description: formData.description,
-                    activities: validActivities // Lưu trực tiếp array activities
-                }, {
-                headers: { Authorization: `Bearer ${token}` }
-            }
-            );
-
-            // Update state
-            if (existingItinerary) {
-                // Update existing
-                setItineraries(prev => prev.map(it =>
-                    it.day_number === formData.day_number
-                        ? { ...formData, _id: itineraryId, activities: validActivities }
-                        : it
-                ));
+                toast.success(`Đã ${existingItinerary ? 'cập nhật' : 'lưu'} ngày ${formData.day_number}`);
+                return true;
             } else {
-                // Add new
-                setItineraries(prev => [...prev, {
-                    ...formData,
-                    _id: itineraryId,
-                    activities: validActivities
-                }]);
+                throw new Error(response.message || 'Failed to save itinerary');
             }
-
-            toast.success(`Đã ${existingItinerary ? 'cập nhật' : 'lưu'} ngày ${formData.day_number}`);
-            return true;
         } catch (error) {
-            console.error('Error saving itinerary:', error);
-            toast.error('Không thể lưu lịch trình. Vui lòng thử lại!');
+            console.error('❌ Save Itinerary Error:', error);
+            toast.error(error.message || 'Không thể lưu lịch trình. Vui lòng thử lại!');
             return false;
         } finally {
-            setLoading(false);
+            setSaving(false);
         }
     };
 
@@ -261,31 +249,33 @@ const ItineraryForm = ({ tourId, basicInfo, existingItineraries = [], isEditMode
         onNext({ itineraries: hasCurrentDayData ? [...itineraries] : itineraries });
     };
 
-    // Load itinerary của ngày được chọn
+    // Load itinerary data for selected day
     const loadDay = (dayNumber) => {
         const itinerary = itineraries.find(it => it.day_number === dayNumber);
         if (itinerary) {
             setCurrentDay(dayNumber);
             setFormData({
-                _id: itinerary._id, // ⚠️ QUAN TRỌNG: Phải set _id để handleRemoveActivity biết activity đã lưu
+                _id: itinerary._id,
                 day_number: dayNumber,
                 title: itinerary.title || '',
                 description: itinerary.description || '',
-                activities: Array.isArray(itinerary.activities) ? itinerary.activities : []
+                activities: Array.isArray(itinerary.activities) && itinerary.activities.length > 0
+                    ? itinerary.activities
+                    : [{ time: '08:00', action: '' }]
             });
         } else {
-            // Ngày mới
+            // New day - initialize with default activity
             setCurrentDay(dayNumber);
             setFormData({
                 day_number: dayNumber,
                 title: '',
                 description: '',
-                activities: []
+                activities: [{ time: '08:00', action: '' }]
             });
         }
     };
 
-    // Delete một ngày đã lưu
+    // Delete a saved day using new service
     const handleDeleteDay = async (dayNumber) => {
         const itinerary = itineraries.find(it => it.day_number === dayNumber);
         if (!itinerary || !itinerary._id) return;
@@ -294,30 +284,33 @@ const ItineraryForm = ({ tourId, basicInfo, existingItineraries = [], isEditMode
 
         try {
             setLoading(true);
-            // Delete itinerary from backend
-            await axios.delete(`http://localhost:3000/api/itineraries/${itinerary._id}`, {
-                headers: { Authorization: `Bearer ${token}` }
-            });
 
-            // Remove from state
-            setItineraries(prev => prev.filter(it => it.day_number !== dayNumber));
-            toast.success(`Đã xóa ngày ${dayNumber}`);
+            // Delete itinerary using new service
+            const response = await deleteTourItinerary(itinerary._id);
 
-            // Load ngày 1 hoặc ngày mới
-            if (itineraries.length > 1) {
-                loadDay(1);
+            if (response.success) {
+                // Remove from state
+                setItineraries(prev => prev.filter(it => it.day_number !== dayNumber));
+                toast.success(`Đã xóa ngày ${dayNumber}`);
+
+                // Load day 1 or create new day
+                if (itineraries.length > 1) {
+                    loadDay(1);
+                } else {
+                    setCurrentDay(1);
+                    setFormData({
+                        day_number: 1,
+                        title: '',
+                        description: '',
+                        activities: [{ time: '08:00', action: '' }]
+                    });
+                }
             } else {
-                setCurrentDay(1);
-                setFormData({
-                    day_number: 1,
-                    title: '',
-                    description: '',
-                    activities: []
-                });
+                throw new Error(response.message || 'Failed to delete itinerary');
             }
         } catch (error) {
-            console.error('Error deleting itinerary:', error);
-            toast.error('Không thể xóa ngày. Vui lòng thử lại!');
+            console.error('❌ Delete Itinerary Error:', error);
+            toast.error(error.message || 'Không thể xóa ngày. Vui lòng thử lại!');
         } finally {
             setLoading(false);
         }
@@ -497,19 +490,18 @@ const ItineraryForm = ({ tourId, basicInfo, existingItineraries = [], isEditMode
                                 </div>
 
                                 <div className="activity-form">
-                                    {/* Time */}
+                                    {/* Time - Simplified format */}
                                     <div className="form-group">
                                         <label className="form-label">Thời gian *</label>
                                         <input
-                                            type="text"
+                                            type="time"
                                             value={activity.time}
                                             onChange={(e) => handleActivityChange(index, 'time', e.target.value)}
                                             className="form-input"
-                                            placeholder="VD: 08:00 - 12:00"
                                         />
                                     </div>
 
-                                    {/* Action */}
+                                    {/* Action - Single field */}
                                     <div className="form-group">
                                         <label className="form-label">Hoạt động *</label>
                                         <input
@@ -557,20 +549,20 @@ const ItineraryForm = ({ tourId, basicInfo, existingItineraries = [], isEditMode
                     <button
                         type="button"
                         onClick={handleAddDay}
-                        disabled={loading || currentDay >= maxDays}
+                        disabled={loading || saving || currentDay >= maxDays}
                         className="btn-add-day"
                         title={currentDay >= maxDays ? `Đã đạt số ngày tối đa (${maxDays} ngày)` : 'Lưu ngày này và thêm ngày mới'}
                     >
-                        💾 Lưu và thêm ngày mới {currentDay >= maxDays && '(Đã max)'}
+                        💾 {saving ? 'Đang lưu...' : `Lưu và thêm ngày mới ${currentDay >= maxDays ? '(Đã max)' : ''}`}
                     </button>
 
                     <button
                         type="button"
                         onClick={handleFinish}
-                        disabled={loading}
+                        disabled={loading || saving}
                         className="btn-submit"
                     >
-                        {loading ? 'Đang xử lý...' : 'Tiếp theo: Ngân sách →'}
+                        {(loading || saving) ? 'Đang xử lý...' : 'Tiếp theo: Ngân sách →'}
                     </button>
                 </div>
             </div>

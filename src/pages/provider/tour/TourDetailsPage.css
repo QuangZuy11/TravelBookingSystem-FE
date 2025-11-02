@@ -382,8 +382,47 @@
     border: 1px solid #d1d5db;
     border-radius: 8px;
     margin-bottom: 12px;
+    transition: all 0.2s ease;
 }
 
+.activity-item:hover {
+    border-color: #10b981;
+    box-shadow: 0 2px 4px rgba(16, 185, 129, 0.1);
+}
+
+.activity-content {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.activity-time {
+    font-size: 14px;
+    font-weight: 700;
+    color: #10b981;
+    background-color: #f0fdf4;
+    padding: 4px 8px;
+    border-radius: 6px;
+    width: fit-content;
+}
+
+.activity-action {
+    font-size: 15px;
+    font-weight: 500;
+    color: #1f2937;
+    line-height: 1.4;
+}
+
+.no-activities {
+    padding: 20px;
+    text-align: center;
+    background-color: #f9fafb;
+    border: 2px dashed #d1d5db;
+    border-radius: 8px;
+    margin: 12px 0;
+}
+
+/* Legacy support */
 .activity-header {
     display: flex;
     justify-content: space-between;
@@ -395,11 +434,6 @@
     font-size: 15px;
     font-weight: 600;
     color: #1f2937;
-}
-
-.activity-time {
-    font-size: 13px;
-    color: #6b7280;
 }
 
 .activity-description {
