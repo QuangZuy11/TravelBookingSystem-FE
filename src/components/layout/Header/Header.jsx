@@ -99,8 +99,19 @@ const Header = () => {
         service_types: provider.licenses.map((l) => l.service_type),
       });
 
-      // Tất cả providers đều vào /provider/dashboard
-      navigate("/provider/dashboard");
+      // Route directly to specific service dashboard based on provider type
+      const serviceTypes = provider.licenses.map(l => l.service_type);
+
+      if (serviceTypes.includes('tour')) {
+        // Tour provider
+        navigate('/provider/tours');
+      } else if (serviceTypes.includes('hotel')) {
+        // Hotel provider  
+        navigate('/provider/hotels');
+      } else {
+        // Fallback
+        navigate('/provider/tours');
+      }
     }
   };
 
@@ -148,6 +159,10 @@ const Header = () => {
                 <a href="/my-tours" className="dropdown-item">
                   <FaSuitcase className="dropdown-icon" />
                   <span>Tour Đã Đặt</span>
+                </a>
+                <a href="/my-itineraries" className="dropdown-item">
+                  <FaSuitcase className="dropdown-icon" />
+                  <span>My Itineraries</span>
                 </a>
                 {user.role === "ServiceProvider" && (
                   <a

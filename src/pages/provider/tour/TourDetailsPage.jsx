@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import toast from 'react-hot-toast';
+import { getTourItineraries } from '../../../services/aiItineraryService';
 import './TourDetailsPage.css';
 import { getProxiedGoogleDriveUrl } from '../../../utils/googleDriveImageHelper';
 
@@ -36,56 +37,38 @@ const TourDetailsPage = () => {
             setLoading(true);
 
             // 1. Fetch tour basic info
+            console.log('🚀 Fetching tour with endpoint:', `http://localhost:3000/api/tour/provider/${providerId}/tours/${tourId}`);
+
             const tourResponse = await axios.get(
                 `http://localhost:3000/api/tour/provider/${providerId}/tours/${tourId}`, {
                 headers: { Authorization: `Bearer ${token}` }
             }
             );
+
+            console.log('📦 Tour Response:', tourResponse.data);
             setTour(tourResponse.data.data);
 
-            // 2. Fetch itineraries
-            const itinerariesResponse = await axios.get(
-                `http://localhost:3000/api/itineraries/tour/${tourId}`, {
-                headers: { Authorization: `Bearer ${token}` }
-            }
-            );
+            // 2. Fetch itineraries using new service
+            try {
+                const itinerariesResponse = await getTourItineraries(tourId);
 
-            if (itinerariesResponse.data.data) {
-                const itinerariesData = itinerariesResponse.data.data;
+                if (itinerariesResponse.success && itinerariesResponse.data) {
+                    const itinerariesData = itinerariesResponse.data;
 
-                // 3. Fetch activities for each itinerary
-                const itinerariesWithActivities = await Promise.all(
-                    itinerariesData.map(async (itinerary) => {
-                        try {
-                            const activitiesResponse = await axios.get(
-                                `http://localhost:3000/api/itineraries/${itinerary._id}/activities`, {
-                                headers: { Authorization: `Bearer ${token}` }
-                            }
-                            );
-                            return {
-                                ...itinerary,
-                                activities: activitiesResponse.data.data || []
-                            };
-                        } catch (error) {
-                            console.error(`Error fetching activities for itinerary ${itinerary._id}:`, error);
-                            return { ...itinerary, activities: [] };
-                        }
-                    })
-                );
+                    // Itineraries already include activities in new format
+                    setItineraries(itinerariesData);
 
-                setItineraries(itinerariesWithActivities);
-
-                // 4. Extract budget items from itineraries
-                const allBudgetItems = itinerariesWithActivities.flatMap(itinerary =>
-                    itinerary.budget_breakdowns || []
-                );
-                console.log('🔍 Budget items extracted:', allBudgetItems);
-                console.log('📊 Itineraries with budgets:', itinerariesWithActivities.map(i => ({
-                    id: i._id,
-                    day: i.day_number,
-                    budgets: i.budget_breakdowns
-                })));
-                setBudgetItems(allBudgetItems);
+                    // 3. Extract budget items from itineraries
+                    const allBudgetItems = itinerariesData.flatMap(itinerary =>
+                        itinerary.budget_breakdowns || []
+                    );
+                    console.log('🔍 Budget items extracted:', allBudgetItems);
+                    setBudgetItems(allBudgetItems);
+                }
+            } catch (itineraryError) {
+                console.error('Error fetching itineraries:', itineraryError);
+                // Don't show error toast for itineraries, just log it
+                setItineraries([]);
             }
 
         } catch (error) {
@@ -148,14 +131,21 @@ const TourDetailsPage = () => {
                     <button onClick={() => navigate('/provider/tours')} className="btn-back">
                         ← Quay lại
                     </button>
-                    <h1 className="page-title">{tour.title}</h1>
+                    <h1 className="page-title">{tour.name || tour.title}</h1>
                     <span className={`status-badge status-${tour.status}`}>
-                        {tour.status === 'active' ? 'Đang hoạt động' :
+                        {tour.status === 'published' ? 'Đang hoạt động' :
                             tour.status === 'draft' ? 'Bản nháp' :
                                 tour.status === 'inactive' ? 'Tạm ngừng' : tour.status}
                     </span>
                 </div>
                 <div className="header-actions">
+                    <button
+                        onClick={() => navigate(`/provider/tours/${tourId}/itinerary-manager`)}
+                        className="btn-edit"
+                        style={{ backgroundColor: '#10b981', marginRight: '0.5rem' }}
+                    >
+                        📅 Quản lý lịch trình
+                    </button>
                     <button
                         onClick={() => navigate(`/provider/tours/${tourId}/edit`)}
                         className="btn-edit"
@@ -175,10 +165,7 @@ const TourDetailsPage = () => {
                     <div className="info-item">
                         <span className="info-label">Địa điểm:</span>
                         <span className="info-value">
-                            {tour.destinations && tour.destinations.length > 0
-                                ? tour.destinations.map(dest => dest.name).join(', ')
-                                : (tour.destination_id?.name || tour.location || 'Chưa có thông tin')
-                            }
+                            {tour.destination || tour.location || 'Chưa có thông tin địa điểm'}
                         </span>
                     </div>
                     <div className="info-item">
@@ -209,7 +196,7 @@ const TourDetailsPage = () => {
 
                 {tour.image && (
                     <div className="tour-image">
-                        <img src={getProxiedGoogleDriveUrl(tour.image)} alt={tour.title} />
+                        <img src={getProxiedGoogleDriveUrl(tour.image)} alt={tour.name || tour.title} />
                     </div>
                 )}
             </div>
@@ -310,52 +297,31 @@ const TourDetailsPage = () => {
                                     <p className="itinerary-description">{itinerary.description}</p>
                                 )}
 
-                                {/* Meals */}
-                                {itinerary.meals && itinerary.meals.length > 0 && (
-                                    <div className="meals-info">
-                                        <strong>Bữa ăn:</strong>
-                                        {itinerary.meals.map((meal, idx) => (
-                                            <span key={idx} className="meal-tag">
-                                                {meal === 'breakfast' ? '🍳 Sáng' :
-                                                    meal === 'lunch' ? '🍱 Trưa' :
-                                                        meal === 'dinner' ? '🍽️ Tối' : meal}
-                                            </span>
-                                        ))}
-                                    </div>
-                                )}
-
-                                {/* Activities */}
+                                {/* Activities - Updated for new format */}
                                 {itinerary.activities && itinerary.activities.length > 0 && (
                                     <div className="activities-list">
                                         <h4 className="activities-title">Hoạt động ({itinerary.activities.length}):</h4>
                                         {itinerary.activities.map((activity, actIdx) => (
                                             <div key={actIdx} className="activity-item">
-                                                <div className="activity-header">
-                                                    <span className="activity-name">📍 {activity.activity_name}</span>
-                                                    {activity.start_time && activity.end_time && (
-                                                        <span className="activity-time">
-                                                            ⏰ {activity.start_time} - {activity.end_time}
-                                                        </span>
-                                                    )}
-                                                </div>
-                                                {activity.description && (
-                                                    <p className="activity-description">{activity.description}</p>
-                                                )}
-                                                <div className="activity-meta">
-                                                    {activity.cost > 0 && (
-                                                        <span className="activity-cost">
-                                                            💵 {activity.cost.toLocaleString('vi-VN')} VNĐ
-                                                        </span>
-                                                    )}
-                                                    {activity.included_in_tour && (
-                                                        <span className="badge-included">Bao gồm</span>
-                                                    )}
-                                                    {activity.optional && (
-                                                        <span className="badge-optional">Tùy chọn</span>
-                                                    )}
+                                                <div className="activity-content">
+                                                    <span className="activity-time">⏰ {activity.time}</span>
+                                                    <span className="activity-action">📝 {activity.action}</span>
                                                 </div>
                                             </div>
                                         ))}
+                                    </div>
+                                )}
+
+                                {/* Empty state for no activities */}
+                                {(!itinerary.activities || itinerary.activities.length === 0) && (
+                                    <div className="no-activities">
+                                        <span style={{
+                                            color: '#6b7280',
+                                            fontStyle: 'italic',
+                                            fontSize: '0.875rem'
+                                        }}>
+                                            Chưa có hoạt động nào được thêm
+                                        </span>
                                     </div>
                                 )}
                             </div>

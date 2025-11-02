@@ -173,6 +173,55 @@
   margin: 0;
 }
 
+/* ========== TIMELINE ACTIVITIES (NEW FORMAT) ========== */
+.activities-timeline {
+  margin-top: 15px;
+}
+
+.timeline-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 15px;
+  margin-bottom: 15px;
+  padding-bottom: 15px;
+  border-bottom: 1px solid #eee;
+}
+
+.timeline-item:last-child {
+  border-bottom: none;
+  margin-bottom: 0;
+  padding-bottom: 0;
+}
+
+.timeline-time {
+  font-size: 14px;
+  font-weight: 700;
+  color: #17a2b8;
+  background-color: #e8f4f8;
+  padding: 6px 12px;
+  border-radius: 6px;
+  min-width: 80px;
+  text-align: center;
+  flex-shrink: 0;
+}
+
+.timeline-content {
+  font-size: 15px;
+  color: #333;
+  line-height: 1.5;
+  flex: 1;
+}
+
+.no-activities {
+  color: #999;
+  font-style: italic;
+  text-align: center;
+  padding: 20px;
+  background-color: #f8f9fa;
+  border-radius: 8px;
+  border: 2px dashed #dee2e6;
+}
+
 .activities-list li {
   padding: 10px 0 10px 25px;
   position: relative;

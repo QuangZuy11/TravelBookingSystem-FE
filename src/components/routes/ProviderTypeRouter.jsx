@@ -6,9 +6,9 @@ import { useAuth } from '../../contexts/AuthContext';
  * ProviderTypeRouter - Routes provider to appropriate dashboard based on their service type
  * 
  * Logic:
- * - All providers go to /provider/dashboard
- * - Dashboard will automatically show only sections for registered service types
- * - ServiceProviderDashboard uses provider.type.includes('hotel'|'tour') to conditionally render sections
+ * - Tour providers go to /provider/tours
+ * - Hotel providers go to /provider/hotels
+ * - Each provider only has one service type
  */
 const ProviderTypeRouter = () => {
     const { user } = useAuth();
@@ -51,8 +51,19 @@ const ProviderTypeRouter = () => {
             service_types: provider.licenses.map(l => l.service_type)
         });
 
-        // All providers with valid data go to dashboard
-        setTargetRoute('/provider/dashboard');
+        // Route directly to specific service dashboard based on provider type
+        const serviceTypes = provider.licenses.map(l => l.service_type);
+
+        if (serviceTypes.includes('tour')) {
+            // Tour provider
+            setTargetRoute('/provider/tours');
+        } else if (serviceTypes.includes('hotel')) {
+            // Hotel provider  
+            setTargetRoute('/provider/hotels');
+        } else {
+            // Fallback (shouldn't happen with valid data)
+            setTargetRoute('/provider/tours');
+        }
     };
 
     // Loading state

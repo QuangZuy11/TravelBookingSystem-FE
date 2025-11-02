@@ -81,8 +81,12 @@ const styles = {
     },
     grid: {
         display: 'grid',
-        gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))',
-        gap: '1.5rem'
+        gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))',
+        gap: '1.5rem',
+        '@media (max-width: 768px)': {
+            gridTemplateColumns: '1fr',
+            gap: '1rem'
+        }
     },
     card: {
         backgroundColor: 'white',
@@ -248,8 +252,21 @@ const MyItineraries = () => {
             }
 
             const response = await getUserItineraries(userId);
-            setRequests(response.data.requests || []);
-            setItineraries(response.data.itineraries || []);
+
+            if (response.success) {
+                const requests = response.data.requests || [];
+                const itineraries = response.data.itineraries || [];
+
+                // Log for monitoring (can be removed in production)
+                if (process.env.NODE_ENV === 'development') {
+                    console.log(`📋 Loaded ${itineraries.length} itineraries and ${requests.length} requests`);
+                }
+
+                setRequests(requests);
+                setItineraries(itineraries);
+            } else {
+                throw new Error(response.message || 'Failed to load itineraries');
+            }
         } catch (err) {
             console.error('Failed to load itineraries:', err);
             setError(err.message || 'Failed to load itineraries');
@@ -380,10 +397,10 @@ const MyItineraries = () => {
                                             {/* Card Header */}
                                             <div style={styles.cardHeader}>
                                                 <h3 style={styles.cardTitle}>
-                                                    {request?.destination || 'Unknown Destination'}
+                                                    📍 {itinerary.destination || 'Unknown Destination'}
                                                 </h3>
                                                 <p style={styles.cardSubtitle}>
-                                                    {request?.duration_days || 0} days • {request?.budget_level || 'medium'} budget
+                                                    {itinerary.duration_days || 0} days • {itinerary.budget_level || 'medium'} budget
                                                 </p>
                                             </div>
 
@@ -398,28 +415,50 @@ const MyItineraries = () => {
                                                             day: 'numeric'
                                                         })}
                                                     </p>
+
                                                     <p style={styles.infoText}>
                                                         <span style={{ fontWeight: '600' }}>Status:</span>{' '}
                                                         <span style={{
                                                             ...styles.statusBadge,
                                                             ...(itinerary.status === 'done' ? styles.statusDone : styles.statusPending)
                                                         }}>
-                                                            {itinerary.status}
+                                                            {itinerary.status === 'done' ? '✅ Original' : '⏳ Processing'}
                                                         </span>
                                                     </p>
-                                                    {request?.preferences && request.preferences.length > 0 && (
+
+                                                    {/* New: Customization Status */}
+                                                    {itinerary.hasCustomized && (
                                                         <p style={styles.infoText}>
-                                                            <span style={{ fontWeight: '600' }}>Preferences:</span>{' '}
-                                                            {request.preferences.join(', ')}
+                                                            <span style={{ fontWeight: '600' }}>Customization:</span>{' '}
+                                                            <span style={{
+                                                                ...styles.statusBadge,
+                                                                backgroundColor: '#8b5cf6',
+                                                                color: 'white'
+                                                            }}>
+                                                                ✨ Available
+                                                            </span>
                                                         </p>
                                                     )}
+
+                                                    {itinerary.preferences && itinerary.preferences.length > 0 && (
+                                                        <p style={styles.infoText}>
+                                                            <span style={{ fontWeight: '600' }}>Preferences:</span>{' '}
+                                                            {itinerary.preferences.join(', ')}
+                                                        </p>
+                                                    )}
+
+                                                    {/* Participants and Duration */}
+                                                    <p style={styles.infoText}>
+                                                        <span style={{ fontWeight: '600' }}>Trip Details:</span>{' '}
+                                                        {itinerary.participant_number || 1} travelers • {itinerary.duration_days} days
+                                                    </p>
                                                 </div>
 
                                                 <div style={styles.summary}>
-                                                    {itinerary.summary || 'No summary available'}
+                                                    {itinerary.summary || `${itinerary.duration_days}-day adventure in ${itinerary.destination}`}
                                                 </div>
 
-                                                {/* Actions */}
+                                                {/* Enhanced Actions */}
                                                 <div style={styles.buttonGroup}>
                                                     <button
                                                         onClick={() => handleView(itinerary._id)}
@@ -427,15 +466,31 @@ const MyItineraries = () => {
                                                         onMouseOver={(e) => e.target.style.backgroundColor = '#0d9488'}
                                                         onMouseOut={(e) => e.target.style.backgroundColor = '#14b8a6'}
                                                     >
-                                                        View Details
+                                                        👁️ View
                                                     </button>
+
+                                                    {/* Customize Button */}
+                                                    {itinerary.status === 'done' && (
+                                                        <button
+                                                            onClick={() => navigate(`/ai-itinerary/${itinerary.hasCustomized ? itinerary.customizedId : itinerary._id}/customize`)}
+                                                            style={{
+                                                                ...styles.viewButton,
+                                                                backgroundColor: itinerary.hasCustomized ? '#8b5cf6' : '#f59e0b'
+                                                            }}
+                                                            onMouseOver={(e) => e.target.style.backgroundColor = itinerary.hasCustomized ? '#7c3aed' : '#d97706'}
+                                                            onMouseOut={(e) => e.target.style.backgroundColor = itinerary.hasCustomized ? '#8b5cf6' : '#f59e0b'}
+                                                        >
+                                                            {itinerary.hasCustomized ? '🎨 View Custom' : '✏️ Customize'}
+                                                        </button>
+                                                    )}
+
                                                     <button
                                                         onClick={() => handleDelete(itinerary._id)}
                                                         style={styles.deleteButton}
                                                         onMouseOver={(e) => e.target.style.backgroundColor = '#dc2626'}
                                                         onMouseOut={(e) => e.target.style.backgroundColor = '#ef4444'}
                                                     >
-                                                        Delete
+                                                        🗑️
                                                     </button>
                                                 </div>
                                             </div>

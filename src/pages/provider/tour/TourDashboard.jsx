@@ -38,7 +38,7 @@ const TourDashboard = () => {
             setTours(toursArray);
 
             if (toursArray.length > 0) {
-                const activeTours = toursArray.filter(t => t.status === 'active').length;
+                const activeTours = toursArray.filter(t => t.status === 'published').length;
                 const totalBookings = toursArray.reduce((sum, tour) =>
                     sum + (tour.capacity?.current_participants || 0), 0);
                 const totalRatings = toursArray.reduce((sum, tour) => sum + (tour.rating || 0), 0);
@@ -531,7 +531,20 @@ const TourDashboard = () => {
                                         onMouseLeave={() => setHoveredRow(null)}
                                     >
                                         <td style={tdFirstStyle} title={tour.title}>{tour.title}</td>
-                                        <td style={tdStyle} title={tour.location}>{tour.location}</td>
+                                        <td style={tdStyle} title={
+                                            tour.destinations && tour.destinations.length > 0
+                                                ? tour.destinations.map(dest => dest.name || dest).join(', ')
+                                                : Array.isArray(tour.destination_id) && tour.destination_id.length > 0
+                                                    ? tour.destination_id.map(dest => typeof dest === 'object' ? dest.name : dest).join(', ')
+                                                    : tour.location || 'Chưa có địa điểm'
+                                        }>
+                                            {tour.destinations && tour.destinations.length > 0
+                                                ? tour.destinations.map(dest => dest.name || dest).join(', ')
+                                                : Array.isArray(tour.destination_id) && tour.destination_id.length > 0
+                                                    ? tour.destination_id.map(dest => typeof dest === 'object' ? dest.name : dest).join(', ')
+                                                    : tour.location || 'Chưa có địa điểm'
+                                            }
+                                        </td>
                                         <td style={tdStyle}>{tour.duration_hours} giờ</td>
                                         <td style={tdStyle}>
                                             <span style={{ fontWeight: '600', color: '#10b981' }}>
@@ -562,12 +575,12 @@ const TourDashboard = () => {
                                                 borderRadius: '9999px',
                                                 fontSize: '0.75rem',
                                                 fontWeight: '600',
-                                                background: tour.status === 'active' ? '#d1fae5' :
+                                                background: tour.status === 'published' ? '#d1fae5' :
                                                     tour.status === 'draft' ? '#f3f4f6' : '#fecaca',
-                                                color: tour.status === 'active' ? '#065f46' :
+                                                color: tour.status === 'published' ? '#065f46' :
                                                     tour.status === 'draft' ? '#374151' : '#991b1b'
                                             }}>
-                                                {tour.status === 'active' ? 'Hoạt động' :
+                                                {tour.status === 'published' ? 'Hoạt động' :
                                                     tour.status === 'draft' ? 'Nháp' : 'Dừng'}
                                             </span>
                                         </td>
