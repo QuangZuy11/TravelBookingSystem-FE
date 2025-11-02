@@ -216,25 +216,19 @@
   background: rgba(255, 255, 255, 0.12);
   backdrop-filter: blur(10px);
   border-radius: 16px;
-  padding: 24px;
+  padding: 16px;
   border: 1px solid rgba(255, 255, 255, 0.2);
   position: relative;
   z-index: 1;
 }
 
 .room-summary-card h4 {
-  font-size: 18px;
+  font-size: 17px;
   font-weight: 600;
-  margin: 0 0 20px 0;
+  margin: 0 0 12px 0;
   color: white;
   display: flex;
   align-items: center;
-  gap: 8px;
-}
-
-.room-summary-card h4::before {
-  content: '🏨';
-  font-size: 20px;
 }
 
 .room-details-grid {
@@ -271,7 +265,7 @@
 
 /* Booking Sections */
 .booking-section {
-  padding: 30px;
+  padding: 20px 30px;
   border-bottom: 1px solid #f1f5f9;
   position: relative;
 }
@@ -284,19 +278,19 @@
   display: flex;
   align-items: center;
   gap: 12px;
-  font-size: 20px;
+  font-size: 18px;
   font-weight: 600;
   color: #1e293b;
-  margin: 0 0 24px 0;
-  padding-bottom: 16px;
-  border-bottom: 3px solid #f1f5f9;
+  margin: 0 0 16px 0;
+  padding-bottom: 12px;
+  border-bottom: 2px solid #f1f5f9;
   position: relative;
 }
 
 .booking-section h4::before {
   content: '';
   position: absolute;
-  bottom: -3px;
+  bottom: -2px;
   left: 0;
   width: 60px;
   height: 3px;
@@ -313,14 +307,14 @@
 .form-row {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 24px;
-  margin-bottom: 24px;
+  gap: 16px;
+  margin-bottom: 16px;
 }
 
 .form-group {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 6px;
 }
 
 .form-group label {
@@ -373,9 +367,9 @@
 /* Date Selection Card */
 .date-selection-card {
   background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
-  border-radius: 16px;
-  padding: 24px;
-  margin-bottom: 24px;
+  border-radius: 12px;
+  padding: 16px;
+  margin-bottom: 16px;
   border: 1px solid #e2e8f0;
   position: relative;
   overflow: hidden;
@@ -387,22 +381,22 @@
   top: 0;
   left: 0;
   right: 0;
-  height: 4px;
+  height: 3px;
   background: linear-gradient(90deg, #0a5757, #0f766e);
 }
 
 .date-inputs {
   display: grid;
   grid-template-columns: 1fr auto 1fr;
-  gap: 24px;
+  gap: 16px;
   align-items: end;
-  margin-bottom: 16px;
+  margin-bottom: 12px;
 }
 
 .date-input-group {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 6px;
 }
 
 .date-input-group label {
@@ -496,8 +490,8 @@
 /* Payment Breakdown */
 .payment-breakdown {
   background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
-  border-radius: 16px;
-  padding: 24px;
+  border-radius: 12px;
+  padding: 16px;
   border: 1px solid #e2e8f0;
   position: relative;
   overflow: hidden;
@@ -509,7 +503,7 @@
   top: 0;
   left: 0;
   right: 0;
-  height: 4px;
+  height: 3px;
   background: linear-gradient(90deg, #059669, #10b981);
 }
 
@@ -517,7 +511,7 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 12px 0;
+  padding: 10px 0;
   border-bottom: 1px solid #e2e8f0;
 }
 
@@ -614,18 +608,187 @@
 /* QR Code Section */
 .qr-code-section {
   text-align: center;
-  padding: 24px;
+  padding: 20px;
   background: linear-gradient(135deg, #fafafa 0%, #f5f5f5 100%);
-  border-radius: 16px;
+  border-radius: 12px;
   border: 2px solid #e5e7eb;
-  margin-top: 24px;
 }
 
-.qr-code-section h5 {
-  margin: 0 0 20px 0;
-  font-size: 18px;
+.qr-loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  padding: 40px 20px;
+  text-align: center;
+}
+
+.qr-loading p {
+  color: #666;
+  font-size: 14px;
+  margin: 0;
+}
+
+.qr-error {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  padding: 40px 20px;
+  text-align: center;
+}
+
+.qr-error p {
+  color: #dc3545;
+  font-size: 14px;
+  margin: 0;
+}
+
+/* PayOS QR Container */
+.qr-code-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+}
+
+.payos-qr-image {
+  animation: fadeIn 0.4s ease-in;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.qr-instructions {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  width: 100%;
+  max-width: 350px;
+}
+
+.instruction-badge {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: linear-gradient(135deg, #e0f2fe 0%, #bae6fd 100%);
+  border: 1px solid #38bdf8;
+  border-radius: 8px;
+  padding: 12px 16px;
+  font-size: 13px;
+  color: #0c4a6e;
+  font-weight: 500;
+}
+
+.amount-display {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%);
+  border: 1px solid #22c55e;
+  border-radius: 8px;
+  padding: 12px 16px;
+}
+
+.amount-text {
+  font-size: 15px;
+  color: #14532d;
+}
+
+.amount-text strong {
+  font-size: 17px;
+  color: #0a5757;
+}
+
+/* Payment Info Card */
+.payment-info-card {
+  background: white;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  padding: 16px;
+  margin-top: 16px;
+  text-align: left;
+}
+
+.payment-info-card h5 {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0 0 12px 0;
+  font-size: 15px;
   font-weight: 600;
   color: #374151;
+  padding-bottom: 8px;
+  border-bottom: 2px solid #f3f4f6;
+}
+
+.payment-details {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+
+.detail-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 0;
+  border-bottom: 1px solid #f3f4f6;
+}
+
+.detail-row:last-child {
+  border-bottom: none;
+}
+
+.detail-row .label {
+  font-size: 13px;
+  color: #6b7280;
+  font-weight: 500;
+}
+
+.detail-row .value {
+  font-size: 14px;
+  color: #1f2937;
+  font-weight: 600;
+}
+
+.badge-payos {
+  background: linear-gradient(135deg, #0a5757 0%, #0f766e 100%);
+  color: white;
+  padding: 4px 12px;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.payment-notice {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: #f0fdf4;
+  border-left: 3px solid #22c55e;
+  border-radius: 6px;
+  padding: 10px 12px;
+  margin-top: 12px;
+}
+
+.payment-notice p {
+  margin: 0;
+  font-size: 12px;
+  color: #14532d;
+  font-weight: 500;
 }
 
 .qr-code-placeholder {
@@ -644,20 +807,20 @@
 /* Modal Footer */
 .booking-modal-footer {
   display: flex;
-  gap: 16px;
+  gap: 12px;
   justify-content: flex-end;
-  padding: 24px 30px;
+  padding: 16px 24px;
   background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
   border-top: 1px solid #e5e7eb;
 }
 
 .btn-cancel {
-  padding: 14px 28px;
+  padding: 12px 24px;
   border: 2px solid #d1d5db;
   background: white;
   color: #374151;
   font-weight: 600;
-  border-radius: 12px;
+  border-radius: 10px;
   cursor: pointer;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   font-size: 14px;
@@ -673,12 +836,12 @@
 }
 
 .btn-confirm {
-  padding: 14px 28px;
+  padding: 12px 24px;
   background: linear-gradient(135deg, #0a5757, #0f766e);
   color: white;
   border: none;
   font-weight: 700;
-  border-radius: 12px;
+  border-radius: 10px;
   cursor: pointer;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   font-size: 14px;
@@ -838,6 +1001,90 @@
   justify-content: center;
   padding: 40px 20px;
   text-align: center;
+}
+
+/* Error Banner for inline errors */
+.booking-error-banner {
+  background: linear-gradient(135deg, #fee2e2 0%, #fecaca 100%);
+  border: 2px solid #f87171;
+  border-radius: 12px;
+  padding: 16px 20px;
+  margin: 0 30px 20px 30px;
+  animation: slideDown 0.3s ease-out;
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.error-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  color: #991b1b;
+  font-weight: 600;
+  font-size: 15px;
+  margin-bottom: 12px;
+}
+
+.conflict-dates {
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px solid #fca5a5;
+}
+
+.conflict-dates p {
+  margin: 0 0 8px 0;
+  font-size: 14px;
+  color: #7f1d1d;
+  font-weight: 600;
+}
+
+.conflict-dates ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.conflict-dates li {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  background: white;
+  border-radius: 8px;
+  font-size: 13px;
+  color: #7f1d1d;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.status-badge {
+  margin-left: auto;
+  padding: 3px 8px;
+  border-radius: 6px;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.status-badge.confirmed {
+  background: #dbeafe;
+  color: #1e40af;
+}
+
+.status-badge.reserved {
+  background: #fef3c7;
+  color: #92400e;
 }
 
 .btn-retry {
