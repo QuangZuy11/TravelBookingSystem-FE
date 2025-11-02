@@ -245,9 +245,16 @@
 
 .detail-item {
   display: flex;
-  justify-content: space-between;
   align-items: center;
+  gap: 12px;
   padding: 8px 0;
+}
+
+.detail-item > div {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  flex: 1;
 }
 
 .detail-label {
@@ -804,6 +811,16 @@
   margin-bottom: 16px;
 }
 
+/* Lucide icon spinner */
+.loading-spinner-icon {
+  animation: spin 1s linear infinite;
+}
+
+/* Spinner for button */
+.spinner-rotate {
+  animation: spin 1s linear infinite;
+}
+
 @keyframes spin {
   0% {
     transform: rotate(0deg);
@@ -938,6 +955,13 @@
   font-size: 15px;
 }
 
+.summary-item > span:first-child {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #64748b;
+}
+
 .summary-item:last-child {
   border-bottom: none;
 }
@@ -948,6 +972,10 @@
   margin-top: 10px;
   font-size: 18px;
   font-weight: 600;
+}
+
+.summary-item.total > span:first-child {
+  color: #0a5757;
 }
 
 .booking-id {

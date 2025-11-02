@@ -1,6 +1,10 @@
 import React, { useContext, useState, useEffect, useCallback } from 'react';
 import { AuthContext } from '../../../../../contexts/AuthContext';
-import { FaHotel, FaUser, FaPhone, FaEnvelope, FaBed, FaCalendarAlt, FaCreditCard, FaQrcode, FaMapMarkerAlt, FaArrowLeft, FaClock } from 'react-icons/fa';
+import {
+    Hotel, User, Phone, Mail, Bed, Calendar, CreditCard,
+    QrCode, MapPin, ArrowLeft, Clock, X, AlertCircle,
+    CheckCircle, Loader, DollarSign, Users, Building
+} from 'lucide-react';
 import './BookingModal.css';
 
 const BookingModal = ({
@@ -92,8 +96,9 @@ const BookingModal = ({
 
         setIsReserving(true);
 
-        // Debug: Log the data being sent
-        const roomId = selectedRoomNumber?.id || selectedRoomNumber?._id;
+        // Get room ID - prioritize selectedRoomNumber (actual room instance)
+        const roomId = selectedRoomNumber?._id || selectedRoomNumber?.id;
+
         console.log('🔍 Booking Data Debug:', {
             selectedRoom,
             selectedRoomNumber,
@@ -118,7 +123,8 @@ const BookingModal = ({
 
             console.log('📤 Request Data:', requestData);
 
-            // Call API to create reservation
+            // Call API to create reservation with NEW LOGIC
+            // Backend will check date conflicts instead of room status
             const response = await fetch('/api/traveler/bookings/reserve', {
                 method: 'POST',
                 headers: {
@@ -134,6 +140,7 @@ const BookingModal = ({
             console.log('📥 Response Data:', result);
 
             if (response.ok && result.success) {
+                // Success - move to step 2
                 setReservationData(result.data);
                 setCurrentStep(2);
 
@@ -143,21 +150,31 @@ const BookingModal = ({
                 const remainingSeconds = Math.floor((expireTime - now) / 1000);
                 setCountdown(Math.max(0, remainingSeconds));
             } else {
-                // Handle errors with more detail
+                // Handle errors with detailed messages
                 console.error('❌ API Error:', result);
+
                 if (response.status === 401) {
-                    alert('Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại.');
+                    alert('⚠️ Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại.');
                 } else if (response.status === 400) {
-                    alert(`Dữ liệu không hợp lệ: ${result.message || 'Vui lòng kiểm tra thông tin đặt phòng'}`);
+                    // Show conflict dates if available
+                    if (result.conflictDates && result.conflictDates.length > 0) {
+                        const conflictInfo = result.conflictDates.map(c =>
+                            `• ${new Date(c.checkIn).toLocaleDateString('vi-VN')} - ${new Date(c.checkOut).toLocaleDateString('vi-VN')} (${c.status})`
+                        ).join('\n');
+
+                        alert(`❌ ${result.message}\n\nPhòng đã được đặt trong các ngày:\n${conflictInfo}`);
+                    } else {
+                        alert(`❌ ${result.message || 'Dữ liệu không hợp lệ. Vui lòng kiểm tra thông tin đặt phòng.'}`);
+                    }
                 } else if (response.status === 500) {
-                    alert(`Lỗi server: ${result.message || 'Có lỗi xảy ra trên server'}`);
+                    alert(`⚠️ Lỗi server: ${result.message || 'Có lỗi xảy ra trên server. Vui lòng thử lại sau.'}`);
                 } else {
                     alert(result.message || 'Không thể tạo đặt phòng. Vui lòng thử lại.');
                 }
             }
         } catch (error) {
             console.error('❌ Network Error:', error);
-            alert('Lỗi kết nối. Vui lòng kiểm tra mạng và thử lại.');
+            alert('🔌 Lỗi kết nối. Vui lòng kiểm tra mạng và thử lại.');
         } finally {
             setIsReserving(false);
         }
@@ -226,28 +243,26 @@ const BookingModal = ({
                         {currentStep === 1 ? 'Thông tin đặt phòng' : 'Thanh toán'}
                         {currentStep === 2 && (
                             <span className="countdown-timer">
-                                <FaClock size={16} />
+                                <Clock size={16} />
                                 {formatCountdown(countdown)}
                             </span>
                         )}
                     </h3>
                     <button className="modal-close-btn" onClick={currentStep === 2 ? handleCancelReservation : onClose}>
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                            <line x1="18" y1="6" x2="6" y2="18"></line>
-                            <line x1="6" y1="6" x2="18" y2="18"></line>
-                        </svg>
+                        <X size={20} />
                     </button>
                 </div>
 
                 <div className="booking-modal-content">
                     {previewLoading ? (
                         <div className="booking-loading">
-                            <div className="loading-spinner"></div>
+                            <Loader className="loading-spinner-icon" size={40} />
                             <p>Đang tải thông tin đặt phòng...</p>
                         </div>
                     ) : previewError ? (
                         <div className="booking-error">
-                            <p style={{ color: 'red' }}>{previewError}</p>
+                            <AlertCircle size={40} color="#dc3545" />
+                            <p style={{ color: '#dc3545', marginTop: '12px' }}>{previewError}</p>
                             <button onClick={onRetryPreview} className="btn-retry">
                                 Thử lại
                             </button>
@@ -264,12 +279,12 @@ const BookingModal = ({
                                     <div className="booking-header-card">
                                         <div className="booking-hotel-info">
                                             <div className="hotel-logo">
-                                                <FaHotel size={32} />
+                                                <Hotel size={32} color="#2d6a4f" />
                                             </div>
                                             <div className="hotel-details">
                                                 <h3>{previewData?.hotel?.name || hotelData?.name || 'Tên khách sạn'}</h3>
                                                 <div className="hotel-address">
-                                                    <FaMapMarkerAlt size={14} />
+                                                    <MapPin size={14} />
                                                     <span>
                                                         {formatAddress(previewData?.hotel?.address || hotelData?.address)}
                                                     </span>
@@ -279,23 +294,38 @@ const BookingModal = ({
 
                                         <div className="booking-room-summary">
                                             <div className="room-summary-card">
-                                                <h4>{selectedRoom?.name}</h4>
+                                                <h4>
+                                                    <Bed size={20} style={{ marginRight: '8px' }} />
+                                                    {selectedRoom?.name}
+                                                </h4>
                                                 <div className="room-details-grid">
                                                     <div className="detail-item">
-                                                        <span className="detail-label">Phòng số</span>
-                                                        <span className="detail-value">#{selectedRoomNumber?.roomNumber || 'TBA'}</span>
+                                                        <Building size={16} color="#666" />
+                                                        <div>
+                                                            <span className="detail-label">Phòng số</span>
+                                                            <span className="detail-value">#{selectedRoomNumber?.roomNumber || 'TBA'}</span>
+                                                        </div>
                                                     </div>
                                                     <div className="detail-item">
-                                                        <span className="detail-label">Tầng</span>
-                                                        <span className="detail-value">{selectedRoomNumber?.floor || 1}</span>
+                                                        <Building size={16} color="#666" />
+                                                        <div>
+                                                            <span className="detail-label">Tầng</span>
+                                                            <span className="detail-value">{selectedRoomNumber?.floor || 1}</span>
+                                                        </div>
                                                     </div>
                                                     <div className="detail-item">
-                                                        <span className="detail-label">Diện tích</span>
-                                                        <span className="detail-value">{selectedRoomNumber?.area || 25}m²</span>
+                                                        <Building size={16} color="#666" />
+                                                        <div>
+                                                            <span className="detail-label">Diện tích</span>
+                                                            <span className="detail-value">{selectedRoomNumber?.area || 25}m²</span>
+                                                        </div>
                                                     </div>
                                                     <div className="detail-item">
-                                                        <span className="detail-label">Sức chứa</span>
-                                                        <span className="detail-value">{selectedRoomNumber?.capacity || 2} người</span>
+                                                        <Users size={16} color="#666" />
+                                                        <div>
+                                                            <span className="detail-label">Sức chứa</span>
+                                                            <span className="detail-value">{selectedRoomNumber?.capacity || 2} người</span>
+                                                        </div>
                                                     </div>
                                                 </div>
                                             </div>
@@ -305,7 +335,7 @@ const BookingModal = ({
                                     {/* Guest Information */}
                                     <div className="booking-section">
                                         <h4>
-                                            <FaUser size={20} />
+                                            <User size={20} />
                                             Thông tin người đặt
                                         </h4>
                                         <div className="guest-info-notice" style={{
@@ -326,7 +356,7 @@ const BookingModal = ({
                                         <div className="form-row">
                                             <div className="form-group">
                                                 <label>
-                                                    <FaUser size={16} />
+                                                    <User size={16} />
                                                     Họ và tên *
                                                 </label>
                                                 <input
@@ -340,7 +370,7 @@ const BookingModal = ({
                                             </div>
                                             <div className="form-group">
                                                 <label>
-                                                    <FaPhone size={16} />
+                                                    <Phone size={16} />
                                                     Số điện thoại *
                                                 </label>
                                                 <input
@@ -355,7 +385,7 @@ const BookingModal = ({
                                         </div>
                                         <div className="form-group">
                                             <label>
-                                                <FaEnvelope size={16} />
+                                                <Mail size={16} />
                                                 Email *
                                             </label>
                                             <input
@@ -372,7 +402,7 @@ const BookingModal = ({
                                     {/* Stay Information */}
                                     <div className="booking-section">
                                         <h4>
-                                            <FaBed size={20} />
+                                            <Calendar size={20} />
                                             Thông tin lưu trú
                                         </h4>
 
@@ -380,7 +410,7 @@ const BookingModal = ({
                                             <div className="date-inputs">
                                                 <div className="date-input-group">
                                                     <label>
-                                                        <FaCalendarAlt size={16} />
+                                                        <Calendar size={16} />
                                                         Nhận phòng
                                                     </label>
                                                     <input
@@ -394,14 +424,12 @@ const BookingModal = ({
                                                 </div>
 
                                                 <div className="date-separator">
-                                                    <svg viewBox="0 0 24 24" fill="currentColor" width="20" height="20">
-                                                        <path d="M16.01 11H4v2h12.01v3L20 12l-3.99-4z" />
-                                                    </svg>
+                                                    <ArrowLeft size={20} style={{ transform: 'rotate(180deg)' }} />
                                                 </div>
 
                                                 <div className="date-input-group">
                                                     <label>
-                                                        <FaCalendarAlt size={16} />
+                                                        <Calendar size={16} />
                                                         Trả phòng
                                                     </label>
                                                     <input
@@ -417,9 +445,7 @@ const BookingModal = ({
 
                                             {calculateNights() > 0 && (
                                                 <div className="stay-duration">
-                                                    <svg viewBox="0 0 24 24" fill="currentColor" width="16" height="16">
-                                                        <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z" />
-                                                    </svg>
+                                                    <CheckCircle size={16} color="#2d6a4f" />
                                                     <span>{calculateNights()} đêm lưu trú</span>
                                                 </div>
                                             )}
@@ -427,9 +453,7 @@ const BookingModal = ({
 
                                         <div className="form-group">
                                             <label>
-                                                <svg viewBox="0 0 24 24" fill="currentColor" width="16" height="16">
-                                                    <path d="M20 2H4c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm-1 16H5V8h14v10zm-7-9h5v5h-5z" />
-                                                </svg>
+                                                <AlertCircle size={16} />
                                                 Yêu cầu đặc biệt
                                             </label>
                                             <textarea
@@ -444,13 +468,13 @@ const BookingModal = ({
                                     {/* Payment Summary */}
                                     <div className="booking-section">
                                         <h4>
-                                            <FaCreditCard size={20} />
+                                            <CreditCard size={20} />
                                             Tóm tắt thanh toán
                                         </h4>
                                         <div className="payment-breakdown">
                                             <div className="payment-item">
                                                 <span>
-                                                    <FaBed size={16} />
+                                                    <Bed size={16} />
                                                     {formatPrice(previewData?.room?.pricePerNight || selectedRoom?.rawPrice || 0)} VNĐ × {calculateNights()} đêm
                                                 </span>
                                                 <span>{formatPrice(calculateSubtotal())} VNĐ</span>
@@ -460,7 +484,7 @@ const BookingModal = ({
                                                 <>
                                                     <div className="payment-item discount">
                                                         <span>
-                                                            <FaQrcode size={16} />
+                                                            <DollarSign size={16} />
                                                             Giảm giá ({discountPercent}%)
                                                         </span>
                                                         <span className="discount-amount">-{formatPrice(calculateDiscount())} VNĐ</span>
@@ -470,8 +494,8 @@ const BookingModal = ({
                                             )}
 
                                             <div className="payment-item total">
-                                                <span>Tổng thanh toán</span>
-                                                <span>{formatPrice(calculateTotalPrice())} VNĐ</span>
+                                                <span><strong>Tổng thanh toán</strong></span>
+                                                <span><strong>{formatPrice(calculateTotalPrice())} VNĐ</strong></span>
                                             </div>
                                         </div>
                                     </div>
@@ -479,6 +503,7 @@ const BookingModal = ({
                                     {/* Step 1 Footer */}
                                     <div className="booking-modal-footer">
                                         <button type="button" className="btn-cancel" onClick={onClose}>
+                                            <X size={18} style={{ marginRight: '6px' }} />
                                             Hủy
                                         </button>
                                         <button
@@ -487,10 +512,24 @@ const BookingModal = ({
                                             disabled={isReserving || calculateNights() <= 0}
                                             style={{
                                                 opacity: (isReserving || calculateNights() <= 0) ? 0.7 : 1,
-                                                cursor: (isReserving || calculateNights() <= 0) ? 'not-allowed' : 'pointer'
+                                                cursor: (isReserving || calculateNights() <= 0) ? 'not-allowed' : 'pointer',
+                                                display: 'flex',
+                                                alignItems: 'center',
+                                                justifyContent: 'center',
+                                                gap: '8px'
                                             }}
                                         >
-                                            {isReserving ? 'Đang xử lý...' : 'Tiếp tục thanh toán'}
+                                            {isReserving ? (
+                                                <>
+                                                    <Loader size={18} className="spinner-rotate" />
+                                                    Đang xử lý...
+                                                </>
+                                            ) : (
+                                                <>
+                                                    <CreditCard size={18} />
+                                                    Tiếp tục thanh toán
+                                                </>
+                                            )}
                                         </button>
                                     </div>
                                 </form>
@@ -502,7 +541,7 @@ const BookingModal = ({
                                     {/* Reservation Summary */}
                                     <div className="booking-header-card">
                                         <div className="countdown-warning">
-                                            <FaClock size={20} />
+                                            <Clock size={20} color="#d32f2f" />
                                             <div>
                                                 <h4>Thời gian giữ phòng: {formatCountdown(countdown)}</h4>
                                                 <p>Vui lòng hoàn tất thanh toán trước khi hết thời gian</p>
@@ -513,24 +552,36 @@ const BookingModal = ({
                                     {/* Reservation Details */}
                                     <div className="booking-section">
                                         <h4>
-                                            <FaHotel size={20} />
+                                            <CheckCircle size={20} color="#2d6a4f" />
                                             Thông tin đặt phòng
                                         </h4>
                                         <div className="reservation-summary">
                                             <div className="summary-item">
-                                                <span>Mã đặt phòng:</span>
+                                                <span>
+                                                    <Building size={16} color="#666" />
+                                                    Mã đặt phòng:
+                                                </span>
                                                 <span className="booking-id">{reservationData.bookingId}</span>
                                             </div>
                                             <div className="summary-item">
-                                                <span>Khách sạn:</span>
+                                                <span>
+                                                    <Hotel size={16} color="#666" />
+                                                    Khách sạn:
+                                                </span>
                                                 <span>{reservationData.hotel.name}</span>
                                             </div>
                                             <div className="summary-item">
-                                                <span>Phòng:</span>
+                                                <span>
+                                                    <Bed size={16} color="#666" />
+                                                    Phòng:
+                                                </span>
                                                 <span>#{reservationData.room.roomNumber} - {reservationData.room.type}</span>
                                             </div>
                                             <div className="summary-item">
-                                                <span>Thời gian:</span>
+                                                <span>
+                                                    <Calendar size={16} color="#666" />
+                                                    Thời gian:
+                                                </span>
                                                 <span>
                                                     {new Date(reservationData.booking.checkInDate).toLocaleDateString('vi-VN')} - {' '}
                                                     {new Date(reservationData.booking.checkOutDate).toLocaleDateString('vi-VN')}
@@ -538,8 +589,11 @@ const BookingModal = ({
                                                 </span>
                                             </div>
                                             <div className="summary-item total">
-                                                <span>Tổng tiền:</span>
-                                                <span className="total-amount">{formatPrice(reservationData.booking.totalAmount)} VNĐ</span>
+                                                <span>
+                                                    <DollarSign size={16} color="#2d6a4f" />
+                                                    <strong>Tổng tiền:</strong>
+                                                </span>
+                                                <span className="total-amount"><strong>{formatPrice(reservationData.booking.totalAmount)} VNĐ</strong></span>
                                             </div>
                                         </div>
                                     </div>
@@ -547,7 +601,7 @@ const BookingModal = ({
                                     {/* QR Code Payment */}
                                     <div className="booking-section">
                                         <h4>
-                                            <FaQrcode size={20} />
+                                            <QrCode size={20} />
                                             Thanh toán QR Code
                                         </h4>
                                         <div className="qr-code-section">
@@ -604,7 +658,7 @@ const BookingModal = ({
                                     {/* Step 2 Footer */}
                                     <div className="booking-modal-footer">
                                         <button type="button" className="btn-cancel" onClick={handleBackToStep1}>
-                                            <FaArrowLeft size={14} />
+                                            <ArrowLeft size={18} style={{ marginRight: '6px' }} />
                                             Quay lại
                                         </button>
                                         <button
@@ -614,7 +668,14 @@ const BookingModal = ({
                                                 alert('Thanh toán thành công! (Demo)');
                                                 onClose();
                                             }}
+                                            style={{
+                                                display: 'flex',
+                                                alignItems: 'center',
+                                                justifyContent: 'center',
+                                                gap: '8px'
+                                            }}
                                         >
+                                            <CheckCircle size={18} />
                                             Đã thanh toán
                                         </button>
                                     </div>
