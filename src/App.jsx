@@ -48,6 +48,8 @@ import Profile from "./pages/traveler/components/Hotel/Profile/Profile";
 import BookTourPage from "./pages/traveler/BookTourPage";
 import HotelDetailPage from "./pages/traveler/HotelDetailPage";
 import BookTourDetailPage from "./pages/traveler/BookTourDetailPage";
+import MyToursPage from "./pages/traveler/MyToursPage";
+import MyTourDetailPage from "./pages/traveler/MyTourDetailPage";
 import ChatPage from "./pages/traveler/ChatPage";
 import ChatWidget from "./pages/traveler/ChatWidget";
 
@@ -157,16 +159,39 @@ function App() {
               }
             />
 
-            <Route path="/ai-itinerary" element={
-              <AIItineraryErrorBoundary>
-                <AIItineraryGenerator />
-              </AIItineraryErrorBoundary>
-            } />
-            <Route path="/my-itineraries" element={
-              <AIItineraryErrorBoundary>
-                <MyItineraries />
-              </AIItineraryErrorBoundary>
-            } />
+            <Route
+              path="/my-tours"
+              element={
+                <ProtectedRoute>
+                  <MyToursPage />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/my-tours/:bookingId"
+              element={
+                <ProtectedRoute>
+                  <MyTourDetailPage />
+                </ProtectedRoute>
+              }
+            />
+
+            <Route
+              path="/ai-itinerary"
+              element={
+                <AIItineraryErrorBoundary>
+                  <AIItineraryGenerator />
+                </AIItineraryErrorBoundary>
+              }
+            />
+            <Route
+              path="/my-itineraries"
+              element={
+                <AIItineraryErrorBoundary>
+                  <MyItineraries />
+                </AIItineraryErrorBoundary>
+              }
+            />
             <Route
               path="/ai-itinerary/:itineraryId"
               element={
@@ -220,27 +245,27 @@ function App() {
             <Route
               path="/admin/terms-policies"
               element={
-              <ProtectedRoute requiredRole="Admin">
-                <AdminPolicyTermsPage />
-              </ProtectedRoute>
+                <ProtectedRoute requiredRole="Admin">
+                  <AdminPolicyTermsPage />
+                </ProtectedRoute>
               }
             />
             <Route
               path="/admin/terms-policies/create"
               element={
-              <ProtectedRoute requiredRole="Admin">
-                <AdminPolicyTermCreatePage />
-              </ProtectedRoute>
+                <ProtectedRoute requiredRole="Admin">
+                  <AdminPolicyTermCreatePage />
+                </ProtectedRoute>
               }
             />
             <Route
               path="/admin/terms-policies/:id"
               element={
-              <ProtectedRoute requiredRole="Admin">
-                <AdminPolicyTermDetailPage />
-              </ProtectedRoute>
-            }
-          />
+                <ProtectedRoute requiredRole="Admin">
+                  <AdminPolicyTermDetailPage />
+                </ProtectedRoute>
+              }
+            />
             <Route
               path="/admin/terms-policies/:id/edit"
               element={
@@ -271,7 +296,10 @@ function App() {
                   <Route path="create" element={<CreateTourWizard />} />
                   <Route path=":tourId" element={<TourDetailsPage />} />
                   <Route path=":tourId/edit" element={<CreateTourWizard />} />
-                  <Route path=":tourId/itinerary-manager" element={<TourItineraryManager />} />
+                  <Route
+                    path=":tourId/itinerary-manager"
+                    element={<TourItineraryManager />}
+                  />
                   <Route path="bookings" element={<BookingManagementPage />} />
                 </Route>
                 {/* Hotel Management */}
@@ -298,9 +326,11 @@ function App() {
                 <Route path="promotions">
                   <Route index element={<PromotionListPage />} />
                   <Route path="create" element={<PromotionCreatePage />} />
-                  <Route path=":promotionId/edit" element={<PromotionEditPage />} />
+                  <Route
+                    path=":promotionId/edit"
+                    element={<PromotionEditPage />}
+                  />
                 </Route>
-
               </Route>
             </Route>
 

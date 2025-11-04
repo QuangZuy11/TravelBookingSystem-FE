@@ -33,7 +33,7 @@ export function TourCard({ tour }) {
                       typeof dest === "object" ? dest.name : dest
                     )
                     .join(", ")
-                : tour.location || "Chưa có địa điểm"}
+                : tour.destination || "Chưa có địa điểm"}
             </span>
           </div>
           <div className="tour-duration">

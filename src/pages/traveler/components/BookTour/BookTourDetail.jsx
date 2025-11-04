@@ -2,8 +2,6 @@ import React, { useState, useEffect, useCallback } from "react";
 import { useParams } from "react-router-dom";
 import { useAuth } from "../../../../contexts/AuthContext";
 import "./BookTourDetail.css";
-import { AiTwotoneEdit } from "react-icons/ai";
-import { MdOutlineDeleteOutline } from "react-icons/md";
 const BookTourDetail = () => {
   const { id } = useParams();
   const { user } = useAuth();
@@ -13,14 +11,8 @@ const BookTourDetail = () => {
   const [acceptedTerms, setAcceptedTerms] = useState(false);
   const [errors, setErrors] = useState({});
 
-  // Feedback states
+  // Feedback states (read-only)
   const [feedbacks, setFeedbacks] = useState([]);
-  const [showFeedbackForm, setShowFeedbackForm] = useState(false);
-  const [editingFeedback, setEditingFeedback] = useState(null);
-  const [feedbackForm, setFeedbackForm] = useState({
-    comment: "",
-    rating: 5,
-  });
 
   // Payment states
   const [showPaymentModal, setShowPaymentModal] = useState(false);
@@ -369,170 +361,6 @@ const BookTourDetail = () => {
     return new Intl.NumberFormat("vi-VN").format(price) + " ₫";
   };
 
-  // Feedback handlers
-  const handleFeedbackSubmit = async (e) => {
-    e.preventDefault();
-
-    if (!user) {
-      alert("Vui lòng đăng nhập để đánh giá tour");
-      return;
-    }
-
-    try {
-      const token = localStorage.getItem("token");
-      const url = editingFeedback
-        ? `http://localhost:3000/api/traveler/feedbacks/${editingFeedback.id}`
-        : "http://localhost:3000/api/traveler/feedbacks";
-
-      const method = editingFeedback ? "PUT" : "POST";
-      const body = editingFeedback
-        ? { comment: feedbackForm.comment, rating: feedbackForm.rating }
-        : {
-            tour_id: id,
-            comment: feedbackForm.comment,
-            rating: feedbackForm.rating,
-          };
-
-      const response = await fetch(url, {
-        method,
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify(body),
-      });
-
-      const result = await response.json();
-
-      if (result.success) {
-        // Reload tour data để lấy feedbacks mới
-        const tourResponse = await fetch(
-          `http://localhost:3000/api/traveler/tours/${id}`
-        );
-        const tourResult = await tourResponse.json();
-        if (tourResult.success && tourResult.data) {
-          setTour(tourResult.data);
-          setFeedbacks(tourResult.data.feedbacks || []);
-        }
-
-        setFeedbackForm({ comment: "", rating: 5 });
-        setShowFeedbackForm(false);
-        setEditingFeedback(null);
-        alert(
-          editingFeedback
-            ? "Cập nhật đánh giá thành công!"
-            : "Đánh giá đã được gửi!"
-        );
-      } else {
-        alert(result.message || "Có lỗi xảy ra");
-      }
-    } catch (err) {
-      console.error("Error submitting feedback:", err);
-      alert("Có lỗi xảy ra khi gửi đánh giá");
-    }
-  };
-
-  const handleDeleteFeedback = async (feedbackId) => {
-    if (!window.confirm("Bạn có chắc chắn muốn xóa đánh giá này?")) {
-      return;
-    }
-
-    try {
-      const token = localStorage.getItem("token");
-      const response = await fetch(
-        `http://localhost:3000/api/traveler/feedbacks/${feedbackId}`,
-        {
-          method: "DELETE",
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
-
-      const result = await response.json();
-
-      if (result.success) {
-        // Reload tour data
-        const tourResponse = await fetch(
-          `http://localhost:3000/api/traveler/tours/${id}`
-        );
-        const tourResult = await tourResponse.json();
-        if (tourResult.success && tourResult.data) {
-          setTour(tourResult.data);
-          setFeedbacks(tourResult.data.feedbacks || []);
-        }
-        alert("Đã xóa đánh giá thành công!");
-      } else {
-        alert(result.message || "Có lỗi xảy ra");
-      }
-    } catch (err) {
-      console.error("Error deleting feedback:", err);
-      alert("Có lỗi xảy ra khi xóa đánh giá");
-    }
-  };
-
-  const handleEditFeedback = (feedback) => {
-    setEditingFeedback(feedback);
-    setFeedbackForm({
-      comment: feedback.comment,
-      rating: feedback.rating,
-    });
-    setShowFeedbackForm(true);
-  };
-
-  const isMyFeedback = (feedback) => {
-    if (!user) return false;
-
-    try {
-      const token = localStorage.getItem("token");
-      if (!token) return false;
-
-      // Decode JWT token để lấy user_id
-      const base64Url = token.split(".")[1];
-      if (!base64Url) return false;
-
-      const base64 = base64Url.replace(/-/g, "+").replace(/_/g, "/");
-      const jsonPayload = decodeURIComponent(
-        atob(base64)
-          .split("")
-          .map((c) => "%" + ("00" + c.charCodeAt(0).toString(16)).slice(-2))
-          .join("")
-      );
-      const decoded = JSON.parse(jsonPayload);
-
-      // Lấy user_id từ token (hỗ trợ nhiều format)
-      const currentUserId =
-        decoded.user?._id || decoded.user?.id || decoded._id || decoded.id;
-
-      // Lấy user_id từ feedback (hỗ trợ nhiều format)
-      const feedbackUserId =
-        feedback.user_id?._id ||
-        feedback.user_id ||
-        feedback.user_id_populated?._id ||
-        null;
-
-      // Debug log
-      console.log("🔍 Checking feedback ownership:", {
-        currentUserId,
-        feedbackUserId,
-        feedback,
-      });
-
-      if (!currentUserId || !feedbackUserId) {
-        return false;
-      }
-
-      // So sánh (cả hai đều convert sang string để đảm bảo)
-      const isMine = currentUserId.toString() === feedbackUserId.toString();
-
-      console.log("🔍 Is my feedback?", isMine);
-      return isMine;
-    } catch (err) {
-      console.error("Error decoding token:", err);
-      return false;
-    }
-  };
-
   const formatDate = (dateString) => {
     if (!dateString) return "";
     const date = new Date(dateString);
@@ -706,7 +534,7 @@ const BookTourDetail = () => {
                               typeof dest === "object" ? dest.name : dest
                             )
                             .join(", ")
-                        : tour.location || "Chưa có địa điểm"}
+                        : tour.description || "Chưa có địa điểm"}
                     </span>
                   </div>
                   <div className="meta-item">
@@ -868,87 +696,7 @@ const BookTourDetail = () => {
 
             {/* Feedbacks Card */}
             <div className="tour-card">
-              <div className="card-title-wrapper">
-                <h2 className="card-title">Đánh giá từ khách hàng</h2>
-                {user && (
-                  <button
-                    className="add-feedback-btn"
-                    onClick={() => {
-                      setShowFeedbackForm(!showFeedbackForm);
-                      setEditingFeedback(null);
-                      setFeedbackForm({ comment: "", rating: 5 });
-                    }}
-                  >
-                    {showFeedbackForm ? "Hủy" : "+ Thêm đánh giá"}
-                  </button>
-                )}
-              </div>
-
-              {/* Feedback Form */}
-              {showFeedbackForm && user && (
-                <div className="feedback-form-wrapper">
-                  <form
-                    onSubmit={handleFeedbackSubmit}
-                    className="feedback-form"
-                  >
-                    <div className="feedback-form-group">
-                      <label className="feedback-label">Đánh giá của bạn</label>
-                      <div className="rating-input">
-                        {[1, 2, 3, 4, 5].map((star) => (
-                          <button
-                            key={star}
-                            type="button"
-                            className={`star-btn ${
-                              feedbackForm.rating >= star ? "active" : ""
-                            }`}
-                            onClick={() =>
-                              setFeedbackForm({ ...feedbackForm, rating: star })
-                            }
-                          >
-                            ★
-                          </button>
-                        ))}
-                      </div>
-                    </div>
-                    <div className="feedback-form-group">
-                      <label className="feedback-label">Bình luận</label>
-                      <textarea
-                        className="feedback-textarea"
-                        value={feedbackForm.comment}
-                        onChange={(e) =>
-                          setFeedbackForm({
-                            ...feedbackForm,
-                            comment: e.target.value,
-                          })
-                        }
-                        placeholder="Chia sẻ trải nghiệm của bạn..."
-                        rows={4}
-                        required
-                      />
-                    </div>
-                    <div className="feedback-form-actions">
-                      <button type="submit" className="submit-feedback-btn">
-                        {editingFeedback ? "Cập nhật" : "Gửi đánh giá"}
-                      </button>
-                      {editingFeedback && (
-                        <button
-                          type="button"
-                          className="cancel-feedback-btn"
-                          onClick={() => {
-                            setShowFeedbackForm(false);
-                            setEditingFeedback(null);
-                            setFeedbackForm({ comment: "", rating: 5 });
-                          }}
-                        >
-                          Hủy
-                        </button>
-                      )}
-                    </div>
-                  </form>
-                </div>
-              )}
-
-              {/* Feedbacks List */}
+              <h2 className="card-title">Đánh giá từ khách hàng</h2>
               {feedbacks && feedbacks.length > 0 ? (
                 <div className="feedbacks-list">
                   {feedbacks.map((feedback) => (
@@ -972,28 +720,6 @@ const BookTourDetail = () => {
                             </div>
                           </div>
                         </div>
-                        {isMyFeedback(feedback) && (
-                          <div className="feedback-actions">
-                            <button
-                              className="edit-feedback-btn"
-                              onClick={() => handleEditFeedback(feedback)}
-                              title="Sửa"
-                            >
-                              <AiTwotoneEdit />
-                            </button>
-                            <button
-                              className="delete-feedback-btn"
-                              onClick={() =>
-                                handleDeleteFeedback(
-                                  feedback.id || feedback._id
-                                )
-                              }
-                              title="Xóa"
-                            >
-                              <MdOutlineDeleteOutline />
-                            </button>
-                          </div>
-                        )}
                       </div>
                       <div className="feedback-rating">
                         {renderStars(feedback.rating)}
@@ -1005,22 +731,8 @@ const BookTourDetail = () => {
               ) : (
                 <div className="no-feedbacks">
                   <p>
-                    Chưa có đánh giá nào. Hãy là người đầu tiên đánh giá tour
-                    này!
-                  </p>
-                </div>
-              )}
-
-              {!user && (
-                <div className="feedback-login-prompt">
-                  <p>
-                    <a
-                      href="/auth"
-                      style={{ color: "#06b6d4", textDecoration: "underline" }}
-                    >
-                      Đăng nhập
-                    </a>{" "}
-                    để thêm đánh giá của bạn
+                    Chưa có đánh giá nào. Hãy đặt tour và trải nghiệm để đánh
+                    giá!
                   </p>
                 </div>
               )}
