@@ -31,6 +31,8 @@ import RoomListPage from "./pages/provider/hotel/RoomListPage";
 import PromotionListPage from "./pages/provider/promotions/PromotionListPage";
 import PromotionCreatePage from "./pages/provider/promotions/PromotionCreatePage";
 import PromotionEditPage from "./pages/provider/promotions/PromotionEditPage";
+import HotelAdsPage from "./pages/provider/promotions/HotelAdsPage";
+import TourAdsPage from "./pages/provider/promotions/TourAdsPage";
 
 // Provider Layout
 import ProviderLayout from "./pages/provider/ProviderLayout";
@@ -54,6 +56,10 @@ import PendingProvidersList from "./pages/admin/PendingProvidersList";
 import ProviderDetailPage from "./pages/admin/ProviderDetailPage";
 import AdminDashboardPage from "./pages/admin/AdminDashboardPage";
 import UserListPage from "./pages/admin/UserListPage";
+import AdminPolicyTermsPage from "./pages/admin/AdminPolicyTermsPage";
+import AdminPolicyTermCreatePage from "./pages/admin/AdminPolicyTermCreatePage";
+import AdminPolicyTermDetailPage from "./pages/admin/AdminPolicyTermDetailPage";
+import AdminPolicyTermEditPage from "./pages/admin/AdminPolicyTermEditPage";
 import AIItineraryGenerator from "./components/ai/AIItineraryGenerator";
 import MyItineraries from "./components/ai/MyItineraries";
 import AIItineraryErrorBoundary from "./components/ai/AIItineraryErrorBoundary";
@@ -211,6 +217,38 @@ function App() {
                 // </ProtectedRoute>
               }
             />
+            <Route
+              path="/admin/terms-policies"
+              element={
+              <ProtectedRoute requiredRole="Admin">
+                <AdminPolicyTermsPage />
+              </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/admin/terms-policies/create"
+              element={
+              <ProtectedRoute requiredRole="Admin">
+                <AdminPolicyTermCreatePage />
+              </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/admin/terms-policies/:id"
+              element={
+              <ProtectedRoute requiredRole="Admin">
+                <AdminPolicyTermDetailPage />
+              </ProtectedRoute>
+            }
+          />
+            <Route
+              path="/admin/terms-policies/:id/edit"
+              element={
+                <ProtectedRoute requiredRole="Admin">
+                  <AdminPolicyTermEditPage />
+                </ProtectedRoute>
+              }
+            />
 
             {/* Protected Routes - Provider */}
             <Route
@@ -254,6 +292,8 @@ function App() {
                     element={<RoomFormPage />}
                   />
                 </Route>
+                <Route path="hotel-ads" element={<HotelAdsPage />} />
+                <Route path="tour-ads" element={<TourAdsPage />} />
 
                 <Route path="promotions">
                   <Route index element={<PromotionListPage />} />

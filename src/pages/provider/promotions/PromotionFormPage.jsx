@@ -41,9 +41,16 @@ const PromotionFormPage = ({ mode }) => {
     return null;
   }, [location.state, mode]);
 
+  const preselectedTargetIdFromState = useMemo(() => {
+    if (mode !== 'create') return '';
+    const raw = location.state?.targetId;
+    return typeof raw === 'string' ? raw : '';
+  }, [location.state, mode]);
+
   const [formData, setFormData] = useState({
     ...initialFormState,
     targetType: forcedTargetTypeFromState || '',
+    targetId: preselectedTargetIdFromState || '',
   });
   const [providerId, setProviderId] = useState('');
   const [hotels, setHotels] = useState([]);
@@ -182,17 +189,26 @@ const PromotionFormPage = ({ mode }) => {
           next.targetType = hasHotels ? 'hotel' : hasTours ? 'tour' : '';
         }
 
+        const preferredTargetId =
+          forcedTargetTypeFromState && forcedTargetTypeFromState === next.targetType
+            ? preselectedTargetIdFromState
+            : preselectedTargetIdFromState && !forcedTargetTypeFromState
+            ? preselectedTargetIdFromState
+            : '';
+
         if (next.targetType === 'hotel') {
-          const exists = hotels.some((hotel) => hotel._id === next.targetId);
-          next.targetId = exists ? next.targetId : hotels[0]?._id || '';
+          const candidate = preferredTargetId || next.targetId;
+          const exists = hotels.some((hotel) => hotel._id === candidate);
+          next.targetId = exists ? candidate : hotels[0]?._id || '';
         } else if (next.targetType === 'tour') {
-          const exists = tours.some((tour) => tour._id === next.targetId);
-          next.targetId = exists ? next.targetId : tours[0]?._id || '';
+          const candidate = preferredTargetId || next.targetId;
+          const exists = tours.some((tour) => tour._id === candidate);
+          next.targetId = exists ? candidate : tours[0]?._id || '';
         }
         return next;
       });
     }
-  }, [forcedTargetTypeFromState, hotels, mode, promotionData, tours]);
+  }, [forcedTargetTypeFromState, hotels, mode, preselectedTargetIdFromState, promotionData, tours]);
 
   const handleChange = (event) => {
     const { name, value } = event.target;

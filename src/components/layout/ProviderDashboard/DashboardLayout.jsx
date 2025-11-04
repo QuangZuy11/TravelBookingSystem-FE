@@ -21,7 +21,7 @@ const DashboardLayout = () => {
   const [providerTypes, setProviderTypes] = useState([]);
 
   useEffect(() => {
-    const providerStr = localStorage.getItem('provider');
+    const providerStr = localStorage.getItem("provider");
     if (!providerStr) return;
 
     try {
@@ -33,12 +33,12 @@ const DashboardLayout = () => {
         setProviderTypes(provider.type);
       }
     } catch (error) {
-      console.error('Error parsing provider types from localStorage:', error);
+      console.error("Error parsing provider types from localStorage:", error);
     }
   }, []);
 
   useEffect(() => {
-    if (location.pathname.includes('/tour')) {
+    if (location.pathname.includes("/tour")) {
       setIsTourMenuOpen(true);
     }
   }, [location.pathname]);
@@ -156,18 +156,18 @@ const DashboardLayout = () => {
             );
           })}
 
-          {providerTypes.includes('tour') && (
+          {providerTypes.includes("tour") && (
             <div className="nav-item-wrapper">
               <button
                 type="button"
-                className={`nav-item-dropdown ${location.pathname.includes('/tour') ? 'active' : ''}`}
+                className={`nav-item-dropdown ${location.pathname.includes("/tour") ? "active" : ""}`}
                 onClick={() => setIsTourMenuOpen((prev) => !prev)}
               >
                 <div className="nav-item-label">
                   <Compass className="nav-icon" size={20} strokeWidth={2} />
                   <span className="nav-label">Tour Management</span>
                 </div>
-                <span className={`dropdown-arrow ${isTourMenuOpen ? 'open' : ''}`} aria-hidden="true">
+                <span className={`dropdown-arrow ${isTourMenuOpen ? "open" : ""}`} aria-hidden="true">
                   ▾
                 </span>
               </button>
@@ -201,4 +201,3 @@ const DashboardLayout = () => {
 };
 
 export default DashboardLayout;
-
