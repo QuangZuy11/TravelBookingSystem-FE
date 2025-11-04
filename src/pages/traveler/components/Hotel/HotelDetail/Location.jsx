@@ -134,7 +134,7 @@ export default function Location({ hotelData, nearbyPOIs, destination }) {
         <section id="location" className="hotel-detail-content-section location-section">
             <div className="hotel-detail-section-header">
                 <h2 className="hotel-detail-section-title">
-                    🗺️ Vị Trí & Địa Điểm Gần Khách Sạn
+                    Địa Điểm Gần Khách Sạn
                 </h2>
                 {destination ? (
                     <p className="hotel-detail-section-description">

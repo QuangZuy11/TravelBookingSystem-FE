@@ -1,4 +1,5 @@
 import { useState, useContext, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { FaHotel, FaMapMarkerAlt, FaUser, FaPhone, FaEnvelope, FaCalendarAlt, FaBed, FaCreditCard, FaQrcode } from 'react-icons/fa';
 import { AuthContext } from '../../../../../contexts/AuthContext';
 import { getProxiedGoogleDriveUrl } from '../../../../../utils/googleDriveImageHelper';
@@ -8,6 +9,11 @@ import './HotelDetail.css';
 
 export default function Rooms({ roomsData, loading, error, hotelData }) {
     const { user, updateUserInfo } = useContext(AuthContext);
+    const navigate = useNavigate();
+
+    // Determine if logged-in user is a traveler (case-insensitive)
+    const userRole = user && user.role ? String(user.role).trim().toLowerCase() : '';
+    const isTraveler = Boolean(user && (userRole === 'traveler' || userRole === 'user' || userRole === 'customer'));
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [selectedRoom, setSelectedRoom] = useState(null);
     const [bookingForm, setBookingForm] = useState({
@@ -489,14 +495,35 @@ export default function Rooms({ roomsData, loading, error, hotelData }) {
                                 </div>
                                 <button
                                     className="room-book-btn"
-                                    disabled={room.availableCount === 0}
-                                    onClick={() => handleBookRoom(room)}
+                                    disabled={room.availableCount === 0 || !isTraveler}
+                                    onClick={() => {
+                                        if (room.availableCount === 0) return;
+                                        if (!user) {
+                                            // Not logged in -> redirect to auth
+                                            navigate('/auth', { state: { from: window.location.pathname } });
+                                            return;
+                                        }
+                                        if (!isTraveler) {
+                                            alert('Chỉ tài khoản traveler mới được đặt phòng. Vui lòng đăng ký/đăng nhập bằng tài khoản traveler.');
+                                            return;
+                                        }
+                                        handleBookRoom(room);
+                                    }}
+                                    title={
+                                        room.availableCount === 0
+                                            ? 'Hết phòng'
+                                            : !user
+                                                ? 'Đăng nhập để đặt phòng'
+                                                : !isTraveler
+                                                    ? 'Chỉ tài khoản traveler mới được đặt phòng'
+                                                    : 'Đặt ngay'
+                                    }
                                     style={{
-                                        opacity: room.availableCount === 0 ? 0.5 : 1,
-                                        cursor: room.availableCount === 0 ? 'not-allowed' : 'pointer'
+                                        opacity: room.availableCount === 0 || !isTraveler ? 0.5 : 1,
+                                        cursor: room.availableCount === 0 || !isTraveler ? 'not-allowed' : 'pointer'
                                     }}
                                 >
-                                    {room.availableCount > 0 ? 'Đặt ngay' : 'Hết phòng'}
+                                    {room.availableCount === 0 ? 'Hết phòng' : !user ? 'Đăng nhập để đặt' : !isTraveler ? 'Không được phép' : 'Đặt ngay'}
                                 </button>
                             </div>
                         </div>

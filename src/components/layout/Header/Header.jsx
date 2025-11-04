@@ -125,7 +125,7 @@ const Header = () => {
       <nav className="header-nav">
         <a href="/">Trang Chủ</a>
         <a href="/tour">Tour Du Lịch</a>
-        <a href="/hotel-page">Khách Sạn</a>
+        <a href="/hotel-list">Khách Sạn</a>
         <a href="/terms-of-service">Điều khoản</a>
         <a href="/contact">Liên Hệ</a>
       </nav>

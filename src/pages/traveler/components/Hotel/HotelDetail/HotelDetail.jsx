@@ -184,7 +184,7 @@ const HotelDetail = () => {
                     Phòng
                 </button>
                 <button className={activeSection === "location" ? "active" : ""} onClick={() => scrollToSection("location")}>
-                    Vị trí & Địa điểm gần
+                    Vị trí
                 </button>
                 <button className={activeSection === "amenities" ? "active" : ""} onClick={() => scrollToSection("amenities")}>
                     Tiện ích
