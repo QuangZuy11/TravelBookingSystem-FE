@@ -19,7 +19,8 @@ import TourDetailsPage from "./pages/provider/tour/TourDetailsPage";
 import TermsAndConditions from "./pages/terms/TermsOfService";
 
 // Hotel Management
-import HotelDashboard from "./pages/provider/hotel/HotelDashboard";
+import OverviewPage from "./pages/provider/hotel/OverviewPage";
+import HotelManagePage from "./pages/provider/hotel/HotelManagePage";
 import HotelDetailsPage from "./pages/provider/hotel/HotelDetailsPage";
 import RoomTypeDetailsPage from "./pages/provider/hotel/RoomTypeDetailsPage";
 import CreateHotelPage from "./pages/provider/hotel/CreateHotelPage";
@@ -237,7 +238,8 @@ function App() {
                 </Route>
                 {/* Hotel Management */}
                 <Route path="hotels">
-                  <Route index element={<HotelDashboard />} />
+                  <Route index element={<OverviewPage />} />
+                  <Route path="manage" element={<HotelManagePage />} />
                   <Route path="new" element={<CreateHotelPage />} />
                   <Route path=":hotelId/edit" element={<EditHotelPage />} />
                   <Route path=":hotelId" element={<HotelDetailsPage />} />

@@ -86,11 +86,6 @@ const DashboardLayout = () => {
         icon: Sparkles,
       },
       {
-        path: '/provider/promotions',
-        label: 'Giảm giá',
-        icon: Tag,
-      },
-      {
         path: '/provider/gallery',
         label: 'Hình ảnh',
         icon: Image,
@@ -99,6 +94,11 @@ const DashboardLayout = () => {
         path: '/provider/bookings',
         label: 'Booking',
         icon: Calendar,
+      },
+      {
+        path: '/provider/promotions',
+        label: 'Giảm giá',
+        icon: Tag,
       }
     );
   } else {
