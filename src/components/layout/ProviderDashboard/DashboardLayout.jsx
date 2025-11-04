@@ -99,6 +99,11 @@ const DashboardLayout = () => {
         path: '/provider/promotions',
         label: 'Giảm giá',
         icon: Tag,
+      },
+      {
+        path: "/provider/hotel-ads",
+        label: "Hotel Ads",
+        icon: Tag,
       }
     );
   } else {
@@ -111,12 +116,19 @@ const DashboardLayout = () => {
     });
   }
 
+
   if (providerTypes.includes('tour') && !providerTypes.includes('hotel')) {
     menuItems.push({
       path: '/provider/promotions',
       label: 'Promotions',
       icon: Tag,
     });
+    menuItems.push({
+      path: "/provider/tour-ads",
+      label: "Tour Ads",
+      icon: Tag,
+    });
+
   }
 
   const tourSubmenu = [
