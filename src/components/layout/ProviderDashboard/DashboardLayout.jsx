@@ -1,6 +1,6 @@
-import React, { useEffect, useState } from 'react';
-import { NavLink, Outlet, useLocation } from 'react-router-dom';
-import './DashboardLayout.css';
+import React, { useEffect, useState } from "react";
+import { NavLink, Outlet, useLocation } from "react-router-dom";
+import "./DashboardLayout.css";
 
 const DashboardLayout = () => {
   const location = useLocation();
@@ -8,7 +8,7 @@ const DashboardLayout = () => {
   const [providerTypes, setProviderTypes] = useState([]);
 
   useEffect(() => {
-    const providerStr = localStorage.getItem('provider');
+    const providerStr = localStorage.getItem("provider");
     if (!providerStr) return;
 
     try {
@@ -20,49 +20,64 @@ const DashboardLayout = () => {
         setProviderTypes(provider.type);
       }
     } catch (error) {
-      console.error('Error parsing provider types from localStorage:', error);
+      console.error("Error parsing provider types from localStorage:", error);
     }
   }, []);
 
   useEffect(() => {
-    if (location.pathname.includes('/tour')) {
+    if (location.pathname.includes("/tour")) {
       setIsTourMenuOpen(true);
     }
   }, [location.pathname]);
 
   const menuItems = [];
 
-  if (providerTypes.includes('hotel')) {
+  if (providerTypes.includes("hotel")) {
+    menuItems.push(
+      {
+        path: "/provider/hotels",
+        label: "Hotels",
+        icon: "🏨",
+      },
+      {
+        path: "/provider/hotel-ads",
+        label: "Hotel Ads",
+        icon: "📣",
+      }
+    );
+  }
+
+  if (providerTypes.includes("tour")) {
     menuItems.push({
-      path: '/provider/hotels',
-      label: 'Hotels',
-      icon: '🏨',
+      path: "/provider/tour-ads",
+      label: "Tour Ads",
+      icon: "🪧",
     });
   }
 
-  if (providerTypes.includes('hotel') || providerTypes.includes('tour')) {
+  if (providerTypes.includes("hotel") || providerTypes.includes("tour")) {
     menuItems.push({
-      path: '/provider/promotions',
-      label: 'Promotions',
-      icon: '🏷️',
+      path: "/provider/promotions",
+      label: "Promotions",
+      icon: "🏷️",
     });
   }
 
   const tourSubmenu = [
     {
-      path: '/provider/tours',
-      label: 'Dashboard',
-      icon: '🗂️',
+      path: "/provider/tours",
+      label: "Dashboard",
+      icon: "📊",
     },
     {
-      path: '/provider/tours/create',
-      label: 'Create Tour',
-      icon: '➕',
+      path: "/provider/tours/create",
+      label: "Create Tour",
+      icon: "➕",
     },
     {
-      path: '/provider/tours/bookings',
-      label: 'Tour Bookings',
-      icon: '🗓️',
+      path: "/provider/tours/bookings",
+      label: "Tour Bookings",
+      icon: "🧾",
     },
   ];
 
@@ -77,7 +92,7 @@ const DashboardLayout = () => {
             <NavLink
               key={item.path}
               to={item.path}
-              className={({ isActive }) => `nav-item ${isActive ? 'active' : ''}`}
+              className={({ isActive }) => `nav-item ${isActive ? "active" : ""}`}
             >
               <span className="nav-icon" aria-hidden="true">
                 {item.icon}
@@ -86,11 +101,11 @@ const DashboardLayout = () => {
             </NavLink>
           ))}
 
-          {providerTypes.includes('tour') && (
+          {providerTypes.includes("tour") && (
             <div className="nav-item-wrapper">
               <button
                 type="button"
-                className={`nav-item-dropdown ${location.pathname.includes('/tour') ? 'active' : ''}`}
+                className={`nav-item-dropdown ${location.pathname.includes("/tour") ? "active" : ""}`}
                 onClick={() => setIsTourMenuOpen((prev) => !prev)}
               >
                 <div className="nav-item-label">
@@ -99,17 +114,17 @@ const DashboardLayout = () => {
                   </span>
                   <span className="nav-label">Tour Management</span>
                 </div>
-                <span className={`dropdown-arrow ${isTourMenuOpen ? 'open' : ''}`} aria-hidden="true">
+                <span className={`dropdown-arrow ${isTourMenuOpen ? "open" : ""}`} aria-hidden="true">
                   ▾
                 </span>
               </button>
 
-              <div className={`submenu ${isTourMenuOpen ? 'open' : ''}`}>
+              <div className={`submenu ${isTourMenuOpen ? "open" : ""}`}>
                 {tourSubmenu.map((item) => (
                   <NavLink
                     key={item.path}
                     to={item.path}
-                    className={({ isActive }) => `submenu-item ${isActive ? 'active' : ''}`}
+                    className={({ isActive }) => `submenu-item ${isActive ? "active" : ""}`}
                   >
                     <span className="nav-icon" aria-hidden="true">
                       {item.icon}
@@ -137,4 +152,3 @@ const DashboardLayout = () => {
 };
 
 export default DashboardLayout;
-
