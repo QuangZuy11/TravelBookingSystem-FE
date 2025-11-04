@@ -188,7 +188,7 @@ const ServiceProviderDashboard = () => {
 // ==================== LICENSE CARD COMPONENT ====================
 
 const LicenseCard = ({ license, onManage, onContact, isSingle = false }) => {
-    const statusConfig = getLicenseStatusConfig(license.verification_status);
+    // const statusConfig = getLicenseStatusConfig(license.verification_status);
 
     return (
         <div className={`license-card ${license.verification_status} ${isSingle ? 'single' : ''}`}>
