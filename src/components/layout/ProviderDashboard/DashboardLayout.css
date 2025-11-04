@@ -4,50 +4,64 @@
 }
 
 .dashboard-sidebar {
-    width: 250px;
-    background-color: #0c1e35;
-    color: white;
-    padding: 1rem;
+    width: 280px;
+    background-color: #e8e8e8;
+    color: #1a1a1a;
+    padding: 0;
     flex-shrink: 0;
+    box-shadow: 2px 0 8px rgba(0, 0, 0, 0.05);
 }
 
 .sidebar-header {
-    padding: 1rem 0;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    padding: 1.5rem 1rem;
+    border-bottom: 2px solid rgba(0, 0, 0, 0.08);
+    margin: 0;
 }
 
 .sidebar-header h2 {
     margin: 0;
-    font-size: 1.25rem;
+    font-size: 1.4rem;
+    font-weight: 700;
     text-align: center;
+    color: #1a1a1a;
 }
 
 .sidebar-nav {
-    margin-top: 2rem;
+    margin: 0;
+    padding: 1rem;
 }
 
 .nav-item {
     display: flex;
     align-items: center;
-    padding: 0.75rem 1rem;
-    color: #fff;
+    padding: 1rem 1.25rem;
+    color: #1a1a1a;
     text-decoration: none;
-    border-radius: 6px;
+    border-radius: 12px;
     margin-bottom: 0.5rem;
-    transition: background-color 0.2s;
+    transition: all 0.3s ease;
+    font-weight: 500;
+    font-size: 1rem;
+    background-color: transparent;
 }
 
 .nav-item:hover {
-    background-color: rgba(255, 255, 255, 0.1);
+    background-color: rgba(10, 87, 87, 0.08);
+    transform: translateX(4px);
 }
 
 .nav-item.active {
-    background-color: #1a73e8;
+    background: linear-gradient(135deg, #0a5757 0%, #2d6a4f 100%);
+    color: white;
+    box-shadow: 0 4px 12px rgba(10, 87, 87, 0.25);
 }
 
 .nav-icon {
-    margin-right: 0.75rem;
-    font-size: 1.25rem;
+    margin-right: 1rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
 }
 
 /* Tour Management Dropdown Menu */
@@ -60,22 +74,27 @@
     align-items: center;
     justify-content: space-between;
     width: 100%;
-    padding: 0.75rem 1rem;
-    color: #fff;
+    padding: 1rem 1.25rem;
+    color: #1a1a1a;
     background-color: transparent;
     border: none;
-    border-radius: 6px;
+    border-radius: 12px;
     cursor: pointer;
-    transition: background-color 0.2s;
+    transition: all 0.3s ease;
     text-align: left;
+    font-weight: 500;
+    font-size: 1rem;
 }
 
 .nav-item-dropdown:hover {
-    background-color: rgba(255, 255, 255, 0.1);
+    background-color: rgba(10, 87, 87, 0.08);
+    transform: translateX(4px);
 }
 
 .nav-item-dropdown.active {
-    background-color: #1a73e8;
+    background: linear-gradient(135deg, #0a5757 0%, #2d6a4f 100%);
+    color: white;
+    box-shadow: 0 4px 12px rgba(10, 87, 87, 0.25);
 }
 
 .nav-item-label {
@@ -84,8 +103,9 @@
 }
 
 .dropdown-arrow {
-    font-size: 0.75rem;
-    transition: transform 0.2s;
+    font-size: 0.875rem;
+    transition: transform 0.3s ease;
+    font-weight: bold;
 }
 
 .dropdown-arrow.open {
@@ -96,6 +116,7 @@
     max-height: 0;
     overflow: hidden;
     transition: max-height 0.3s ease-out;
+    margin-top: 0.5rem;
 }
 
 .submenu.open {
@@ -105,43 +126,49 @@
 .submenu-item {
     display: flex;
     align-items: center;
-    padding: 0.75rem 1rem 0.75rem 2.5rem;
-    color: rgba(255, 255, 255, 0.8);
+    padding: 0.875rem 1.25rem 0.875rem 3rem;
+    color: #4a4a4a;
     text-decoration: none;
-    border-radius: 6px;
+    border-radius: 10px;
     margin-bottom: 0.25rem;
-    transition: all 0.2s;
-    font-size: 0.9rem;
+    transition: all 0.3s ease;
+    font-size: 0.95rem;
+    font-weight: 500;
 }
 
 .submenu-item:hover {
-    background-color: rgba(255, 255, 255, 0.1);
-    color: #fff;
-    padding-left: 2.75rem;
+    background-color: rgba(10, 87, 87, 0.08);
+    color: #1a1a1a;
+    transform: translateX(4px);
 }
 
 .submenu-item.active {
-    background-color: rgba(26, 115, 232, 0.5);
-    color: #fff;
+    background-color: rgba(10, 87, 87, 0.15);
+    color: #0a5757;
+    font-weight: 600;
 }
 
 .dashboard-main {
     flex-grow: 1;
-    background-color: #f5f6fa;
+    background-color: #f8f9fa;
 }
 
 .dashboard-header {
     background-color: white;
-    padding: 1rem 2rem;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    padding: 1.5rem 2.5rem;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    border-bottom: 1px solid #e0e0e0;
+    margin: 0;
 }
 
 .header-content h1 {
     margin: 0;
-    font-size: 1.5rem;
-    color: #333;
+    font-size: 1.75rem;
+    font-weight: 700;
+    color: #1a1a1a;
 }
 
 .dashboard-content {
-    padding: 2rem;
+    padding: 0;
+    margin: 0;
 }
