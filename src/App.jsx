@@ -27,6 +27,7 @@ import CreateHotelPage from "./pages/provider/hotel/CreateHotelPage";
 import EditHotelPage from "./pages/provider/hotel/EditHotelPage";
 import RoomFormPage from "./pages/provider/hotel/RoomFormPage";
 import BookingManagementPage from "./pages/provider/hotel/BookingManagementPage";
+import RevenueStatisticsPage from "./pages/provider/hotel/RevenueStatisticsPage";
 import RoomListPage from "./pages/provider/hotel/RoomListPage";
 import PromotionListPage from "./pages/provider/promotions/PromotionListPage";
 import PromotionCreatePage from "./pages/provider/promotions/PromotionCreatePage";
@@ -289,6 +290,7 @@ function App() {
                 <Route index element={<ProviderTypeRouter />} />
 
                 <Route path="bookings" element={<BookingManagementPage />} />
+                <Route path="revenue-statistics" element={<RevenueStatisticsPage />} />
 
                 {/* Tour Management - NEW MODULE */}
                 <Route path="tours">

@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
+import { useNavigate } from 'react-router-dom';
 import {
     Search,
     Calendar,
@@ -22,6 +23,8 @@ import {
 } from '../../../services/bookingService';
 
 const BookingManagementPage = () => {
+    const navigate = useNavigate();
+
     // State management
     const [searchTerm, setSearchTerm] = useState('');
     const [selectedDate, setSelectedDate] = useState('');
@@ -190,15 +193,31 @@ const BookingManagementPage = () => {
                 gap: '1.5rem',
                 marginBottom: '1.5rem'
             }}>
-                <div style={{
-                    background: 'white',
-                    borderRadius: '16px',
-                    padding: '1.5rem',
-                    boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)',
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '1rem'
-                }}>
+                <div
+                    onClick={() => navigate('/provider/revenue-statistics')}
+                    style={{
+                        background: 'white',
+                        borderRadius: '16px',
+                        padding: '1.5rem',
+                        boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '1rem',
+                        cursor: 'pointer',
+                        transition: 'all 0.3s ease',
+                        border: '2px solid transparent'
+                    }}
+                    onMouseEnter={(e) => {
+                        e.currentTarget.style.transform = 'translateY(-4px)';
+                        e.currentTarget.style.boxShadow = '0 8px 16px rgba(10, 87, 87, 0.2)';
+                        e.currentTarget.style.borderColor = '#0a5757';
+                    }}
+                    onMouseLeave={(e) => {
+                        e.currentTarget.style.transform = 'translateY(0)';
+                        e.currentTarget.style.boxShadow = '0 2px 8px rgba(0, 0, 0, 0.1)';
+                        e.currentTarget.style.borderColor = 'transparent';
+                    }}
+                >
                     <div style={{
                         background: 'linear-gradient(135deg, #0a5757 0%, #2d6a4f 100%)',
                         borderRadius: '12px',

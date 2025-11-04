@@ -38,6 +38,78 @@ export const getBookingStatistics = async (params = {}) => {
 };
 
 /**
+ * Lấy thống kê doanh thu theo ngày (Daily Revenue Chart)
+ * @param {Object} params - { year, month, start_date, end_date }
+ * @returns {Promise} Daily statistics array
+ */
+export const getDailyStatistics = async (params = {}) => {
+    try {
+        const queryParams = new URLSearchParams();
+
+        if (params.year) queryParams.append('year', params.year);
+        if (params.month) queryParams.append('month', params.month);
+        if (params.start_date) queryParams.append('start_date', params.start_date);
+        if (params.end_date) queryParams.append('end_date', params.end_date);
+
+        const queryString = queryParams.toString();
+        const url = `${API_URL}/provider/hotel-bookings/statistics/daily${queryString ? `?${queryString}` : ''}`;
+
+        const response = await axios.get(url, getAuthHeaders());
+        return response.data;
+    } catch (error) {
+        console.error('Error fetching daily statistics:', error);
+        throw error.response?.data || error;
+    }
+};
+
+/**
+ * Lấy thống kê doanh thu theo tháng (Monthly Revenue Chart)
+ * @param {Object} params - { year, start_date, end_date }
+ * @returns {Promise} Monthly statistics array
+ */
+export const getMonthlyStatistics = async (params = {}) => {
+    try {
+        const queryParams = new URLSearchParams();
+
+        if (params.year) queryParams.append('year', params.year);
+        if (params.start_date) queryParams.append('start_date', params.start_date);
+        if (params.end_date) queryParams.append('end_date', params.end_date);
+
+        const queryString = queryParams.toString();
+        const url = `${API_URL}/provider/hotel-bookings/statistics/monthly${queryString ? `?${queryString}` : ''}`;
+
+        const response = await axios.get(url, getAuthHeaders());
+        return response.data;
+    } catch (error) {
+        console.error('Error fetching monthly statistics:', error);
+        throw error.response?.data || error;
+    }
+};
+
+/**
+ * Lấy thống kê doanh thu theo năm (Yearly Revenue Chart)
+ * @param {Object} params - { start_year, end_year }
+ * @returns {Promise} Yearly statistics array
+ */
+export const getYearlyStatistics = async (params = {}) => {
+    try {
+        const queryParams = new URLSearchParams();
+
+        if (params.start_year) queryParams.append('start_year', params.start_year);
+        if (params.end_year) queryParams.append('end_year', params.end_year);
+
+        const queryString = queryParams.toString();
+        const url = `${API_URL}/provider/hotel-bookings/statistics/yearly${queryString ? `?${queryString}` : ''}`;
+
+        const response = await axios.get(url, getAuthHeaders());
+        return response.data;
+    } catch (error) {
+        console.error('Error fetching yearly statistics:', error);
+        throw error.response?.data || error;
+    }
+};
+
+/**
  * Lấy danh sách bookings (Table with pagination)
  * @param {Object} params - Query parameters
  * @returns {Promise} Bookings list with pagination
