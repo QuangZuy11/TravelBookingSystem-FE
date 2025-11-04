@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { useParams } from "react-router-dom";
 import { useAuth } from "../../../../contexts/AuthContext";
 import "./BookTourDetail.css";
@@ -21,6 +21,14 @@ const BookTourDetail = () => {
     comment: "",
     rating: 5,
   });
+
+  // Payment states
+  const [showPaymentModal, setShowPaymentModal] = useState(false);
+  const [paymentData, setPaymentData] = useState(null);
+  const [isCreatingPayment, setIsCreatingPayment] = useState(false);
+  const [isCreatingBooking, setIsCreatingBooking] = useState(false);
+  const [bookingCreated, setBookingCreated] = useState(null);
+  const [countdown, setCountdown] = useState(120);
 
   const [bookingData, setBookingData] = useState({
     guests: 1,
@@ -102,26 +110,259 @@ const BookTourDetail = () => {
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleBooking = (e) => {
+  const handleBooking = async (e) => {
     e.preventDefault();
 
     if (!validateForm()) {
       return;
     }
 
-    const booking = {
-      tourId: tour.id,
-      tourName: tour.title,
-      ...bookingData,
-      totalPrice: tour.discount
-        ? (tour.price * bookingData.guests * (100 - tour.discount)) / 100
-        : tour.price * bookingData.guests,
-      bookingDate: new Date().toISOString(),
-      status: "pending",
-    };
-    console.log("Booking:", booking);
+    if (!user) {
+      alert("Vui lòng đăng nhập để đặt tour");
+      return;
+    }
+
+    setIsCreatingBooking(true);
     setErrors({});
-    alert("Đặt tour thành công! Chúng tôi sẽ liên hệ với bạn sớm nhất.");
+
+    try {
+      const token = localStorage.getItem("token");
+
+      // Step 1: Tạo tour booking
+      const bookingResponse = await fetch(
+        "http://localhost:3000/api/traveler/tour-bookings/reserve",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({
+            tour_id: id,
+            tour_date: bookingData.startDate,
+            guests: bookingData.guests,
+            contactName: bookingData.contactName,
+            contactEmail: bookingData.contactEmail,
+            contactPhone: bookingData.contactPhone,
+            emergencyContact: bookingData.emergencyContact,
+            emergencyPhone: bookingData.emergencyPhone,
+            specialRequests: bookingData.specialRequests,
+          }),
+        }
+      );
+
+      // Kiểm tra content-type trước khi parse JSON
+      const contentType = bookingResponse.headers.get("content-type");
+      if (!contentType || !contentType.includes("application/json")) {
+        throw new Error(
+          `Server trả về lỗi (${bookingResponse.status}). Vui lòng kiểm tra backend server có đang chạy không.`
+        );
+      }
+
+      const bookingResult = await bookingResponse.json();
+
+      if (!bookingResponse.ok || !bookingResult.success) {
+        throw new Error(
+          bookingResult.message ||
+            `Lỗi ${bookingResponse.status}: Không thể tạo booking`
+        );
+      }
+
+      setBookingCreated(bookingResult.data);
+
+      // Step 2: Tạo payment link ngay sau khi booking thành công
+      await handleCreatePayment(bookingResult.data.bookingId);
+    } catch (error) {
+      console.error("Error creating booking:", error);
+      alert(error.message || "Có lỗi xảy ra khi đặt tour");
+      setIsCreatingBooking(false);
+    }
+  };
+
+  // Handle create PayOS payment
+  const handleCreatePayment = async (bookingId) => {
+    setIsCreatingPayment(true);
+
+    try {
+      const token = localStorage.getItem("token");
+      const response = await fetch(
+        "http://localhost:3000/api/traveler/tour-payments/create",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({
+            booking_id: bookingId,
+          }),
+        }
+      );
+
+      // Kiểm tra content-type trước khi parse JSON
+      const contentType = response.headers.get("content-type");
+      if (!contentType || !contentType.includes("application/json")) {
+        throw new Error(
+          `Server trả về lỗi (${response.status}). Vui lòng kiểm tra backend server.`
+        );
+      }
+
+      const result = await response.json();
+
+      if (response.ok && result.success) {
+        setPaymentData({
+          paymentId: result.data.payment_id,
+          qrCode: result.data.qr_code_base64 || result.data.qr_code,
+          qrCodeString: result.data.qr_code,
+          checkoutUrl: result.data.checkout_url,
+          amount: result.data.amount,
+          expiredAt: result.data.expired_at,
+          orderCode: result.data.order_code,
+        });
+
+        // Tính countdown từ expired_at
+        const expiredAt = new Date(result.data.expired_at);
+        const now = new Date();
+        const remainingSeconds = Math.floor((expiredAt - now) / 1000);
+        setCountdown(Math.max(0, remainingSeconds));
+
+        // Hiển thị modal payment
+        setShowPaymentModal(true);
+
+        // Start polling payment status
+        startPaymentStatusPolling(result.data.payment_id);
+      } else {
+        throw new Error(result.message || "Không thể tạo thanh toán");
+      }
+    } catch (error) {
+      console.error("Payment creation error:", error);
+      alert(
+        "Đặt tour thành công nhưng không thể tạo thanh toán. Vui lòng thử lại sau."
+      );
+    } finally {
+      setIsCreatingPayment(false);
+      setIsCreatingBooking(false);
+    }
+  };
+
+  // Poll payment status every 3 seconds
+  const startPaymentStatusPolling = (paymentId) => {
+    const pollInterval = setInterval(async () => {
+      try {
+        const token = localStorage.getItem("token");
+        const response = await fetch(
+          `http://localhost:3000/api/traveler/tour-payments/${paymentId}/status`,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+
+        // Kiểm tra content-type
+        const contentType = response.headers.get("content-type");
+        if (!contentType || !contentType.includes("application/json")) {
+          console.error("Non-JSON response from payment status endpoint");
+          return;
+        }
+
+        const result = await response.json();
+
+        if (result.success) {
+          const status = result.data.status;
+
+          if (status === "completed") {
+            clearInterval(pollInterval);
+            alert("✅ Thanh toán thành công! Booking đã được xác nhận.");
+            setShowPaymentModal(false);
+            // Reload page or navigate
+            window.location.reload();
+          } else if (["failed", "cancelled", "expired"].includes(status)) {
+            clearInterval(pollInterval);
+          }
+        }
+      } catch (error) {
+        console.error("Poll error:", error);
+      }
+    }, 3000);
+
+    // Stop polling after 2 minutes
+    setTimeout(() => {
+      clearInterval(pollInterval);
+    }, 120000);
+  };
+
+  // Handle cancel payment
+  const handleCancelPayment = useCallback(async () => {
+    if (!paymentData?.paymentId) return;
+
+    try {
+      const token = localStorage.getItem("token");
+      const response = await fetch(
+        `http://localhost:3000/api/traveler/tour-payments/${paymentData.paymentId}/cancel`,
+        {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      // Không cần parse response nếu chỉ cancel
+      if (!response.ok) {
+        console.warn("Failed to cancel payment:", response.status);
+      }
+    } catch (error) {
+      console.error("Error cancelling payment:", error);
+    }
+
+    // Cancel booking if exists
+    if (bookingCreated?.bookingId) {
+      try {
+        const token = localStorage.getItem("token");
+        const response = await fetch(
+          `http://localhost:3000/api/traveler/tour-bookings/${bookingCreated.bookingId}/cancel`,
+          {
+            method: "POST",
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+        if (!response.ok) {
+          console.warn("Failed to cancel booking:", response.status);
+        }
+      } catch (error) {
+        console.error("Error cancelling booking:", error);
+      }
+    }
+
+    setShowPaymentModal(false);
+    setPaymentData(null);
+    setBookingCreated(null);
+  }, [paymentData, bookingCreated]);
+
+  // Countdown timer effect
+  useEffect(() => {
+    if (showPaymentModal && countdown > 0) {
+      const timer = setInterval(() => {
+        setCountdown((prev) => {
+          if (prev <= 1) {
+            handleCancelPayment();
+            return 0;
+          }
+          return prev - 1;
+        });
+      }, 1000);
+
+      return () => clearInterval(timer);
+    }
+  }, [showPaymentModal, countdown, handleCancelPayment]);
+
+  // Format countdown time
+  const formatCountdown = (seconds) => {
+    const minutes = Math.floor(seconds / 60);
+    const remainingSeconds = seconds % 60;
+    return `${minutes}:${remainingSeconds.toString().padStart(2, "0")}`;
   };
 
   const formatPrice = (price) => {
@@ -147,10 +388,10 @@ const BookTourDetail = () => {
       const body = editingFeedback
         ? { comment: feedbackForm.comment, rating: feedbackForm.rating }
         : {
-          tour_id: id,
-          comment: feedbackForm.comment,
-          rating: feedbackForm.rating,
-        };
+            tour_id: id,
+            comment: feedbackForm.comment,
+            rating: feedbackForm.rating,
+          };
 
       const response = await fetch(url, {
         method,
@@ -455,11 +696,17 @@ const BookTourDetail = () => {
                     </svg>
                     <span>
                       {tour.destinations && tour.destinations.length > 0
-                        ? tour.destinations.map(dest => dest.name || dest).join(', ')
-                        : Array.isArray(tour.destination_id) && tour.destination_id.length > 0
-                          ? tour.destination_id.map(dest => typeof dest === 'object' ? dest.name : dest).join(', ')
-                          : tour.location || 'Chưa có địa điểm'
-                      }
+                        ? tour.destinations
+                            .map((dest) => dest.name || dest)
+                            .join(", ")
+                        : Array.isArray(tour.destination_id) &&
+                          tour.destination_id.length > 0
+                        ? tour.destination_id
+                            .map((dest) =>
+                              typeof dest === "object" ? dest.name : dest
+                            )
+                            .join(", ")
+                        : tour.location || "Chưa có địa điểm"}
                     </span>
                   </div>
                   <div className="meta-item">
@@ -545,9 +792,10 @@ const BookTourDetail = () => {
                                 {activity.time && activity.action
                                   ? `${activity.time}: ${activity.action}`
                                   : activity.activity_name
-                                    ? `${activity.start_time || ''} - ${activity.end_time || ''}: ${activity.activity_name}`
-                                    : activity
-                                }
+                                  ? `${activity.start_time || ""} - ${
+                                      activity.end_time || ""
+                                    }: ${activity.activity_name}`
+                                  : activity}
                               </span>
                             </div>
                           ))}
@@ -650,8 +898,9 @@ const BookTourDetail = () => {
                           <button
                             key={star}
                             type="button"
-                            className={`star-btn ${feedbackForm.rating >= star ? "active" : ""
-                              }`}
+                            className={`star-btn ${
+                              feedbackForm.rating >= star ? "active" : ""
+                            }`}
                             onClick={() =>
                               setFeedbackForm({ ...feedbackForm, rating: star })
                             }
@@ -1089,7 +1338,7 @@ const BookTourDetail = () => {
                         -
                         {formatPrice(
                           (tour.price * bookingData.guests * tour.discount) /
-                          100
+                            100
                         )}
                       </span>
                     </div>
@@ -1101,30 +1350,56 @@ const BookTourDetail = () => {
                       {formatPrice(
                         tour.discount
                           ? (tour.price *
-                            bookingData.guests *
-                            (100 - tour.discount)) /
-                          100
+                              bookingData.guests *
+                              (100 - tour.discount)) /
+                              100
                           : totalPrice
                       )}
                     </span>
                   </div>
                 </div>
 
-                <button type="submit" className="submit-button">
-                  <svg
-                    className="button-icon"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"
-                    />
-                  </svg>
-                  Đặt tour ngay
+                <button
+                  type="submit"
+                  className="submit-button"
+                  disabled={isCreatingBooking || isCreatingPayment}
+                >
+                  {isCreatingBooking || isCreatingPayment ? (
+                    <>
+                      <svg
+                        className="button-icon spinner"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                        style={{ animation: "spin 1s linear infinite" }}
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
+                        />
+                      </svg>
+                      Đang xử lý...
+                    </>
+                  ) : (
+                    <>
+                      <svg
+                        className="button-icon"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"
+                        />
+                      </svg>
+                      Đặt tour ngay
+                    </>
+                  )}
                 </button>
 
                 <div className="secure-payment">
@@ -1190,9 +1465,140 @@ const BookTourDetail = () => {
         </div>
       </div>
 
+      {/* Payment Modal */}
+      {showPaymentModal && (
+        <div className="payment-modal-overlay" onClick={handleCancelPayment}>
+          <div className="payment-modal" onClick={(e) => e.stopPropagation()}>
+            <div className="payment-modal-header">
+              <h3>
+                Thanh toán tour
+                <span className="countdown-timer">
+                  ⏱️ {formatCountdown(countdown)}
+                </span>
+              </h3>
+              <button className="modal-close-btn" onClick={handleCancelPayment}>
+                ×
+              </button>
+            </div>
+
+            <div className="payment-modal-content">
+              {isCreatingPayment ? (
+                <div className="payment-loading">
+                  <div className="spinner"></div>
+                  <p>Đang tạo mã thanh toán...</p>
+                </div>
+              ) : paymentData ? (
+                <>
+                  {/* Booking Summary */}
+                  {bookingCreated && (
+                    <div className="booking-summary-card">
+                      <h4>Thông tin đặt tour</h4>
+                      <div className="summary-row">
+                        <span>Mã đặt tour:</span>
+                        <strong>
+                          {bookingCreated.bookingNumber ||
+                            bookingCreated.bookingId}
+                        </strong>
+                      </div>
+                      <div className="summary-row">
+                        <span>Tour:</span>
+                        <span>{tour?.name || tour?.title}</span>
+                      </div>
+                      <div className="summary-row">
+                        <span>Số khách:</span>
+                        <span>{bookingData.guests} người</span>
+                      </div>
+                      <div className="summary-row">
+                        <span>Ngày khởi hành:</span>
+                        <span>
+                          {new Date(bookingData.startDate).toLocaleDateString(
+                            "vi-VN"
+                          )}
+                        </span>
+                      </div>
+                      <div className="summary-row total">
+                        <span>Tổng tiền:</span>
+                        <strong>{formatPrice(paymentData.amount)}</strong>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* QR Code Section */}
+                  <div className="qr-code-section">
+                    <h4>Quét mã QR để thanh toán</h4>
+                    {paymentData.qrCode &&
+                    paymentData.qrCode.startsWith("data:image") ? (
+                      <div className="qr-code-container">
+                        <img
+                          src={paymentData.qrCode}
+                          alt="PayOS QR Code"
+                          className="qr-code-image"
+                        />
+                        <div className="qr-instructions">
+                          <p>📱 Quét mã QR bằng ứng dụng ngân hàng</p>
+                          <p className="amount-text">
+                            Số tiền:{" "}
+                            <strong>{formatPrice(paymentData.amount)}</strong>
+                          </p>
+                        </div>
+                      </div>
+                    ) : (
+                      <div className="qr-fallback">
+                        <p>Không thể hiển thị QR code</p>
+                        <a
+                          href={paymentData.checkoutUrl}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="checkout-link-btn"
+                        >
+                          Mở trang thanh toán PayOS
+                        </a>
+                      </div>
+                    )}
+
+                    {/* Payment Info */}
+                    <div className="payment-info-card">
+                      <div className="info-row">
+                        <span>Mã giao dịch:</span>
+                        <span>#{paymentData.orderCode}</span>
+                      </div>
+                      <div className="info-row">
+                        <span>Hết hạn lúc:</span>
+                        <span>
+                          {new Date(paymentData.expiredAt).toLocaleTimeString(
+                            "vi-VN",
+                            {
+                              hour: "2-digit",
+                              minute: "2-digit",
+                            }
+                          )}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                </>
+              ) : (
+                <div className="payment-error">
+                  <p>Không thể tạo mã thanh toán</p>
+                </div>
+              )}
+            </div>
+
+            <div className="payment-modal-footer">
+              <button className="btn-cancel" onClick={handleCancelPayment}>
+                Hủy thanh toán
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       <style>{`
         @keyframes spin {
           to { transform: rotate(360deg); }
+        }
+        .spinner {
+          animation: spin 1s linear infinite;
         }
       `}</style>
     </div>
