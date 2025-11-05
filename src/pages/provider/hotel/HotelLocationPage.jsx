@@ -81,7 +81,6 @@ const HotelLocationPage = () => {
     return (
         <div style={{
             minHeight: '100vh',
-            background: '#10b981',
             padding: '2rem'
         }}>
             <div style={{
@@ -119,7 +118,6 @@ const HotelLocationPage = () => {
                         <h1 style={{
                             fontSize: '2.5rem',
                             fontWeight: '700',
-                            background: '#10b981',
                             WebkitBackgroundClip: 'text',
                             WebkitTextFillColor: 'transparent',
                             marginBottom: '0.5rem'

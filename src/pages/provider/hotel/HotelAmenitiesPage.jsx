@@ -16,77 +16,23 @@ const HotelAmenitiesPage = () => {
     const [hotel, setHotel] = useState(null);
     const [isEditing, setIsEditing] = useState(false);
 
-    const [amenities, setAmenities] = useState({
-        general: [],
-        room: [],
-        bathroom: [],
-        entertainment: [],
-        foodAndDrink: [],
-        services: [],
-        business: [],
-        outdoor: [],
-        safety: [],
-        accessibility: []
-    });
+    const [amenities, setAmenities] = useState([]);
 
-    const amenitiesOptions = {
-        general: [
-            'Free Wi-Fi', 'Parking', 'Air Conditioning', 'Heating', 'Elevator',
-            'Non-smoking rooms', 'Soundproof rooms', 'Family rooms', 'Pet-friendly',
-            '24-hour front desk', 'Express check-in/out', 'Luggage storage',
-            'Concierge service', 'ATM', 'Currency exchange'
-        ],
-        room: [
-            'TV', 'Cable channels', 'Satellite channels', 'Telephone', 'Safe',
-            'Mini bar', 'Coffee/Tea maker', 'Electric kettle', 'Refrigerator',
-            'Desk', 'Seating area', 'Sofa', 'Wardrobe', 'Iron', 'Ironing facilities',
-            'Alarm clock', 'Mosquito net', 'Fan', 'Heating', 'Carpeted floor'
-        ],
-        bathroom: [
-            'Private bathroom', 'Shower', 'Bathtub', 'Hot water', 'Bidet',
-            'Hairdryer', 'Toiletries', 'Slippers', 'Bathrobe', 'Towels',
-            'Toilet paper', 'Shampoo', 'Conditioner', 'Body soap', 'Toothbrush kit'
-        ],
-        entertainment: [
-            'Swimming pool', 'Outdoor pool', 'Indoor pool', 'Spa', 'Sauna',
-            'Hot tub', 'Fitness center', 'Massage', 'Kids club', 'Playground',
-            'Game room', 'Library', 'Karaoke', 'BBQ facilities', 'Garden',
-            'Terrace', 'Sunbathing area', 'Beach access', 'Water sports'
-        ],
-        foodAndDrink: [
-            'Restaurant', 'Bar', 'Coffee shop', 'Breakfast included', 'Room service',
-            'Buffet', 'Continental breakfast', 'Asian breakfast', 'Vegetarian options',
-            'Halal food', 'Kids meals', 'Special diet menus', 'Packed lunches',
-            'Snack bar', 'Wine/Champagne'
-        ],
-        services: [
-            'Laundry', 'Dry cleaning', 'Ironing service', 'Daily housekeeping',
-            'Babysitting', 'Airport shuttle', 'Car rental', 'Tour desk',
-            'Ticket service', 'Taxi service', 'Valet parking', 'Shoeshine',
-            'Wake-up service', 'Newspaper delivery', 'Gift shop'
-        ],
-        business: [
-            'Business center', 'Meeting rooms', 'Conference facilities',
-            'Fax/Photocopying', 'Printer', 'Scanner', 'Projector',
-            'Video conferencing', 'Whiteboard', 'Flipchart'
-        ],
-        outdoor: [
-            'Garden', 'Terrace', 'Balcony', 'Patio', 'Outdoor furniture',
-            'BBQ area', 'Picnic area', 'Outdoor dining', 'Sun loungers',
-            'Beach umbrellas', 'Fishing', 'Hiking', 'Cycling', 'Horse riding'
-        ],
-        safety: [
-            'CCTV', 'Security 24-hour', 'Fire extinguisher', 'Smoke detector',
-            'First aid kit', 'Emergency exit', 'Safety deposit box',
-            'Key card access', 'Security alarm', 'Fire alarm'
-        ],
-        accessibility: [
-            'Wheelchair accessible', 'Elevator access', 'Accessible parking',
-            'Accessible bathroom', 'Grab rails', 'Lowered sink',
-            'Emergency cord', 'Visual aids', 'Braille signage',
-            'Auditory guidance', 'Service animals allowed'
-        ]
-    };
+    const amenitiesOptions = [
+        'Wi-Fi',
+        'Parking',
+        'Air Conditioning',
+        'Restaurant',
+        'Bar',
+        'Pool',
+        'Spa',
+        'Gym',
+        'Room Service',
+        'Business Center',
+        'Airport Shuttle',
+        'Conference Room',
+        'Laundry Service'
+    ];
 
     useEffect(() => {
         fetchHotelAmenities();
@@ -101,13 +47,10 @@ const HotelAmenitiesPage = () => {
             );
 
             if (response.data.success) {
-                setHotel(response.data.hotel);
-                if (response.data.hotel.amenities) {
-                    setAmenities({
-                        ...amenities,
-                        ...response.data.hotel.amenities
-                    });
-                }
+                const hotelData = response.data.data; // Thay đổi từ response.data.hotel sang response.data.data
+                setHotel(hotelData);
+                setAmenities(hotelData.amenities || []);
+                console.log("Loaded amenities:", hotelData.amenities); // Debug log
             }
         } catch (error) {
             console.error('Error fetching hotel amenities:', error);
@@ -117,18 +60,18 @@ const HotelAmenitiesPage = () => {
         }
     };
 
-    const toggleAmenity = (category, amenity) => {
-        setAmenities(prev => ({
-            ...prev,
-            [category]: prev[category].includes(amenity)
-                ? prev[category].filter(item => item !== amenity)
-                : [...prev[category], amenity]
-        }));
+    const toggleAmenity = (amenity) => {
+        setAmenities(prev =>
+            prev.includes(amenity)
+                ? prev.filter(item => item !== amenity)
+                : [...prev, amenity]
+        );
     };
 
     const handleSave = async () => {
         try {
             setSaving(true);
+            console.log("Saving amenities:", amenities); // Debug log
             const response = await axios.put(
                 `/api/hotel/provider/${providerId}/hotels/${hotelId}`,
                 { amenities },
@@ -150,7 +93,6 @@ const HotelAmenitiesPage = () => {
 
     const containerStyle = {
         minHeight: '100vh',
-        background: '#10b981',
         padding: '2rem',
         fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif'
     };
@@ -243,31 +185,7 @@ const HotelAmenitiesPage = () => {
         );
     }
 
-    const categoryIcons = {
-        general: '🏨',
-        room: '🛏️',
-        bathroom: '🚿',
-        entertainment: '🎉',
-        foodAndDrink: '🍽️',
-        services: '🛎️',
-        business: '💼',
-        outdoor: '🌳',
-        safety: '🔒',
-        accessibility: '♿'
-    };
-
-    const categoryLabels = {
-        general: 'Tiện nghi chung',
-        room: 'Tiện nghi phòng',
-        bathroom: 'Phòng tắm',
-        entertainment: 'Giải trí',
-        foodAndDrink: 'Ẩm thực & Đồ uống',
-        services: 'Dịch vụ',
-        business: 'Doanh nghiệp',
-        outdoor: 'Ngoài trời',
-        safety: 'An toàn',
-        accessibility: 'Tiếp cận'
-    };
+    // Delete unused constants
 
     return (
         <div style={containerStyle}>
@@ -332,97 +250,71 @@ const HotelAmenitiesPage = () => {
                 {/* Statistics */}
                 {!isEditing && (
                     <div style={{
-                        display: 'grid',
-                        gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
-                        gap: '1rem',
+                        padding: '1.5rem',
+                        background: '#10b981',
+                        borderRadius: '16px',
+                        color: 'white',
+                        textAlign: 'center',
                         marginBottom: '2rem'
                     }}>
-                        {Object.keys(amenities).map(category => {
-                            const count = amenities[category].length;
+                        <div style={{ fontSize: '2rem', marginBottom: '0.5rem' }}>
+                            ✨
+                        </div>
+                        <div style={{ fontSize: '1.5rem', fontWeight: '700' }}>
+                            {amenities.length}
+                        </div>
+                        <div style={{ fontSize: '0.875rem', opacity: 0.9 }}>
+                            Tiện nghi đang được cung cấp
+                        </div>
+                    </div>
+                )}
+
+                {/* Available Amenities */}
+                <div style={sectionStyle}>
+                    <h2 style={sectionTitleStyle}>
+                        <span style={{ fontSize: '1.75rem' }}>✨</span>
+                        Danh sách tiện nghi
+                    </h2>
+                    <div style={{
+                        display: 'grid',
+                        gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))',
+                        gap: '1rem'
+                    }}>
+                        {amenitiesOptions.map(amenity => {
+                            const isSelected = amenities.includes(amenity);
                             return (
-                                <div key={category} style={{
-                                    padding: '1.5rem',
-                                    background: '#10b981',
-                                    borderRadius: '16px',
-                                    color: 'white',
-                                    textAlign: 'center'
-                                }}>
-                                    <div style={{ fontSize: '2rem', marginBottom: '0.5rem' }}>
-                                        {categoryIcons[category]}
-                                    </div>
-                                    <div style={{ fontSize: '1.5rem', fontWeight: '700' }}>
-                                        {count}
-                                    </div>
-                                    <div style={{ fontSize: '0.875rem', opacity: 0.9 }}>
-                                        {categoryLabels[category]}
-                                    </div>
+                                <div
+                                    key={amenity}
+                                    onClick={() => isEditing && toggleAmenity(amenity)}
+                                    style={amenityItemStyle(isSelected, isEditing)}
+                                >
+                                    {isEditing && (
+                                        <input
+                                            type="checkbox"
+                                            checked={isSelected}
+                                            onChange={() => { }}
+                                            style={{ cursor: 'pointer' }}
+                                        />
+                                    )}
+                                    {!isEditing && isSelected && (
+                                        <span style={{ color: '#10b981', fontSize: '1.2rem' }}>✓</span>
+                                    )}
+                                    <span>{amenity}</span>
                                 </div>
                             );
                         })}
                     </div>
-                )}
-
-                {/* Amenities Categories */}
-                {Object.keys(amenitiesOptions).map(category => (
-                    <div key={category} style={sectionStyle}>
-                        <h2 style={sectionTitleStyle}>
-                            <span style={{ fontSize: '1.75rem' }}>{categoryIcons[category]}</span>
-                            {categoryLabels[category]}
-                            {!isEditing && (
-                                <span style={{
-                                    marginLeft: 'auto',
-                                    fontSize: '1rem',
-                                    fontWeight: '600',
-                                    color: '#10b981',
-                                    background: '#e0e7ff',
-                                    padding: '0.25rem 0.75rem',
-                                    borderRadius: '8px'
-                                }}>
-                                    {amenities[category].length} tiện nghi
-                                </span>
-                            )}
-                        </h2>
+                    {!isEditing && amenities.length === 0 && (
                         <div style={{
-                            display: 'grid',
-                            gridTemplateColumns: 'repeat(auto-fill, minmax(250px, 1fr))',
-                            gap: '1rem'
+                            textAlign: 'center',
+                            color: '#9ca3af',
+                            padding: '2rem',
+                            fontSize: '1rem'
                         }}>
-                            {amenitiesOptions[category].map(amenity => {
-                                const isSelected = amenities[category].includes(amenity);
-                                return (
-                                    <div
-                                        key={amenity}
-                                        onClick={() => isEditing && toggleAmenity(category, amenity)}
-                                        style={amenityItemStyle(isSelected, isEditing)}
-                                    >
-                                        {isEditing && (
-                                            <input
-                                                type="checkbox"
-                                                checked={isSelected}
-                                                onChange={() => { }}
-                                                style={{ cursor: 'pointer' }}
-                                            />
-                                        )}
-                                        {!isEditing && isSelected && (
-                                            <span style={{ color: '#10b981', fontSize: '1.2rem' }}>✓</span>
-                                        )}
-                                        <span>{amenity}</span>
-                                    </div>
-                                );
-                            })}
+                            Chưa có tiện nghi nào được thêm
                         </div>
-                        {!isEditing && amenities[category].length === 0 && (
-                            <div style={{
-                                textAlign: 'center',
-                                color: '#9ca3af',
-                                padding: '2rem',
-                                fontSize: '1rem'
-                            }}>
-                                Chưa có tiện nghi nào trong danh mục này
-                            </div>
-                        )}
-                    </div>
-                ))}
+                    )}
+                </div>
 
                 {/* Back Button */}
                 <div style={{ textAlign: 'center', marginTop: '2rem' }}>

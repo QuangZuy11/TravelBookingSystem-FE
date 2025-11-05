@@ -264,7 +264,7 @@ const HotelInfoPage = () => {
                                                 border: '2px solid #e5e7eb',
                                                 borderRadius: '8px'
                                             }}>
-                                                {hotel.phoneNumber || 'Chưa cập nhật'}
+                                                {hotel.contactInfo.phone || 'Chưa cập nhật'}
                                             </div>
                                         </div>
                                         <div style={{ marginBottom: '1rem' }}>
@@ -282,7 +282,7 @@ const HotelInfoPage = () => {
                                                 border: '2px solid #e5e7eb',
                                                 borderRadius: '8px'
                                             }}>
-                                                {hotel.email || 'Chưa cập nhật'}
+                                                {hotel.contactInfo.email || 'Chưa cập nhật'}
                                             </div>
                                         </div>
                                     </div>

@@ -168,7 +168,6 @@ const HotelGalleryPage = () => {
 
     const containerStyle = {
         minHeight: '100vh',
-        background: '#10b981',
         padding: '2rem',
         fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif'
     };

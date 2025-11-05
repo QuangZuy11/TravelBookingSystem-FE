@@ -135,12 +135,12 @@ const DashboardLayout = () => {
           icon: Image,
         },
         {
-          path: `/provider/hotels/${hotelId}/bookings`,
+          path: `/provider/bookings`,
           label: 'Booking',
           icon: Calendar,
         },
         {
-          path: `/provider/hotels/${hotelId}/discounts`,
+          path: `/provider/promotions`,
           label: 'Giảm giá',
           icon: Tag,
         }
