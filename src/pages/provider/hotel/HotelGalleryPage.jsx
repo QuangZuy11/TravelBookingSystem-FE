@@ -16,23 +16,10 @@ const HotelGalleryPage = () => {
     const [uploading, setUploading] = useState(false);
     const [hotel, setHotel] = useState(null);
     const [gallery, setGallery] = useState([]);
-    const [selectedCategory, setSelectedCategory] = useState('all');
     const [selectedImage, setSelectedImage] = useState(null);
     const [newImages, setNewImages] = useState([]);
 
-    const categories = [
-        { value: 'all', label: '🎨 Tất cả', color: '#10b981' },
-        { value: 'exterior', label: '🏢 Bên ngoài', color: '#10b981' },
-        { value: 'lobby', label: '🚪 Sảnh', color: '#f59e0b' },
-        { value: 'rooms', label: '🛏️ Phòng', color: '#3b82f6' },
-        { value: 'restaurant', label: '🍽️ Nhà hàng', color: '#ef4444' },
-        { value: 'pool', label: '🏊 Hồ bơi', color: '#06b6d4' },
-        { value: 'gym', label: '💪 Phòng gym', color: '#8b5cf6' },
-        { value: 'spa', label: '🧖 Spa', color: '#ec4899' },
-        { value: 'facilities', label: '🏛️ Cơ sở vật chất', color: '#14b8a6' },
-        { value: 'events', label: '🎉 Sự kiện', color: '#f97316' },
-        { value: 'other', label: '📷 Khác', color: '#6b7280' }
-    ];
+    // No longer need categories
 
     useEffect(() => {
         fetchHotelGallery();
@@ -76,21 +63,23 @@ const HotelGalleryPage = () => {
 
     const handleFileSelect = (e) => {
         const files = Array.from(e.target.files);
+        const remainingSlots = 7 - gallery.length;
+
+        if (files.length + gallery.length > 7) {
+            toast.error(`Chỉ có thể tải lên tối đa ${remainingSlots} ảnh nữa!`);
+            return;
+        }
+
         const imageFiles = files.map(file => ({
             file,
             preview: URL.createObjectURL(file),
-            category: 'other',
             caption: '',
             isNew: true
         }));
         setNewImages([...newImages, ...imageFiles]);
     };
 
-    const updateNewImageCategory = (index, category) => {
-        setNewImages(prev => prev.map((img, i) =>
-            i === index ? { ...img, category } : img
-        ));
-    };
+    // No longer need category updates
 
     const updateNewImageCaption = (index, caption) => {
         setNewImages(prev => prev.map((img, i) =>
@@ -114,8 +103,7 @@ const HotelGalleryPage = () => {
 
             newImages.forEach((img, index) => {
                 formData.append('images', img.file);
-                formData.append(`categories`, img.category);
-                formData.append(`captions`, img.caption);
+                formData.append(`captions`, img.caption || '');
             });
 
             const response = await axios.post(
@@ -162,9 +150,7 @@ const HotelGalleryPage = () => {
         }
     };
 
-    const filteredGallery = selectedCategory === 'all'
-        ? gallery
-        : gallery.filter(img => img.category === selectedCategory);
+    // No longer need category filtering
 
     const containerStyle = {
         minHeight: '100vh',
@@ -206,19 +192,7 @@ const HotelGalleryPage = () => {
         transition: 'all 0.3s ease'
     };
 
-    const categoryButtonStyle = (isActive, color) => ({
-        padding: '0.75rem 1.5rem',
-        fontSize: '0.95rem',
-        fontWeight: '600',
-        borderRadius: '12px',
-        border: '2px solid',
-        borderColor: isActive ? color : '#e5e7eb',
-        background: isActive ? color : 'white',
-        color: isActive ? 'white' : '#6b7280',
-        cursor: 'pointer',
-        transition: 'all 0.3s ease',
-        whiteSpace: 'nowrap'
-    });
+    // Removed category button style
 
     const breadcrumbItems = [
         { label: 'Dashboard', path: '/provider' },
@@ -229,7 +203,7 @@ const HotelGalleryPage = () => {
     if (loading) {
         return (
             <div style={containerStyle}>
-                <div style={{ textAlign: 'center', padding: '4rem', color: 'white' }}>
+                <div style={{ textAlign: 'center', padding: '4rem', color: '#6b7280', background: 'white', borderRadius: '12px' }}>
                     <div style={{ fontSize: '3rem', marginBottom: '1rem' }}>⏳</div>
                     <div style={{ fontSize: '1.5rem' }}>Đang tải thư viện ảnh...</div>
                 </div>
@@ -250,175 +224,132 @@ const HotelGalleryPage = () => {
                     </p>
                 </div>
 
-                {/* Upload Section */}
-                <div style={{
-                    marginBottom: '2rem',
-                    padding: '2rem',
-                    background: '#f9fafb',
-                    borderRadius: '16px',
-                    border: '2px dashed #10b981'
-                }}>
-                    <h2 style={{
-                        fontSize: '1.5rem',
-                        fontWeight: '700',
-                        color: '#1f2937',
-                        marginBottom: '1.5rem'
+                {/* Upload Section - Only show when gallery has less than 7 images */}
+                {gallery.length < 7 && (
+                    <div style={{
+                        marginBottom: '2rem',
+                        padding: '2rem',
+                        background: '#f9fafb',
+                        borderRadius: '16px',
+                        border: '2px dashed #10b981'
                     }}>
-                        📤 Tải ảnh mới
-                    </h2>
+                        <h2 style={{
+                            fontSize: '1.5rem',
+                            fontWeight: '700',
+                            color: '#1f2937',
+                            marginBottom: '1.5rem'
+                        }}>
+                            📤 Tải ảnh mới ({7 - gallery.length} ảnh còn lại)
+                        </h2>
 
-                    <input
-                        type="file"
-                        multiple
-                        accept="image/*"
-                        onChange={handleFileSelect}
-                        style={{ display: 'none' }}
-                        id="gallery-upload"
-                    />
-                    <label
-                        htmlFor="gallery-upload"
-                        style={{
-                            ...buttonStyle,
-                            background: '#10b981',
-                            color: 'white',
-                            boxShadow: '0 4px 15px rgba(102, 126, 234, 0.4)',
-                            display: 'inline-block'
-                        }}
-                    >
-                        📁 Chọn ảnh
-                    </label>
-
-                    {/* New Images Preview */}
-                    {newImages.length > 0 && (
-                        <div style={{ marginTop: '2rem' }}>
-                            <div style={{
-                                display: 'grid',
-                                gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))',
-                                gap: '1.5rem'
-                            }}>
-                                {newImages.map((img, index) => (
-                                    <div key={index} style={{
-                                        background: 'white',
-                                        borderRadius: '12px',
-                                        overflow: 'hidden',
-                                        border: '2px solid #e5e7eb'
-                                    }}>
-                                        <div style={{
-                                            width: '100%',
-                                            height: '200px',
-                                            overflow: 'hidden'
-                                        }}>
-                                            <img
-                                                src={img.preview}
-                                                alt="Preview"
-                                                style={{
-                                                    width: '100%',
-                                                    height: '100%',
-                                                    objectFit: 'cover'
-                                                }}
-                                            />
-                                        </div>
-                                        <div style={{ padding: '1rem' }}>
-                                            <select
-                                                value={img.category}
-                                                onChange={(e) => updateNewImageCategory(index, e.target.value)}
-                                                style={{
-                                                    width: '100%',
-                                                    padding: '0.5rem',
-                                                    marginBottom: '0.5rem',
-                                                    borderRadius: '8px',
-                                                    border: '2px solid #e5e7eb'
-                                                }}
-                                            >
-                                                {categories.filter(c => c.value !== 'all').map(cat => (
-                                                    <option key={cat.value} value={cat.value}>
-                                                        {cat.label}
-                                                    </option>
-                                                ))}
-                                            </select>
-                                            <input
-                                                type="text"
-                                                value={img.caption}
-                                                onChange={(e) => updateNewImageCaption(index, e.target.value)}
-                                                placeholder="Mô tả ảnh (tùy chọn)"
-                                                style={{
-                                                    width: '100%',
-                                                    padding: '0.5rem',
-                                                    marginBottom: '0.5rem',
-                                                    borderRadius: '8px',
-                                                    border: '2px solid #e5e7eb'
-                                                }}
-                                            />
-                                            <button
-                                                onClick={() => removeNewImage(index)}
-                                                style={{
-                                                    ...buttonStyle,
-                                                    background: '#ef4444',
-                                                    color: 'white',
-                                                    width: '100%',
-                                                    padding: '0.5rem'
-                                                }}
-                                            >
-                                                🗑️ Xóa
-                                            </button>
-                                        </div>
-                                    </div>
-                                ))}
-                            </div>
-                            <button
-                                onClick={handleUpload}
-                                disabled={uploading}
-                                style={{
-                                    ...buttonStyle,
-                                    background: '#10b981',
-                                    color: 'white',
-                                    marginTop: '1.5rem',
-                                    opacity: uploading ? 0.6 : 1
-                                }}
-                            >
-                                {uploading ? '⏳ Đang tải lên...' : `⬆️ Tải lên ${newImages.length} ảnh`}
-                            </button>
-                        </div>
-                    )}
-                </div>
-
-                {/* Category Filter */}
-                <div style={{
-                    marginBottom: '2rem',
-                    display: 'flex',
-                    gap: '1rem',
-                    overflowX: 'auto',
-                    padding: '0.5rem 0'
-                }}>
-                    {categories.map(cat => (
-                        <button
-                            key={cat.value}
-                            onClick={() => setSelectedCategory(cat.value)}
-                            style={categoryButtonStyle(selectedCategory === cat.value, cat.color)}
+                        <input
+                            type="file"
+                            multiple
+                            accept="image/*"
+                            onChange={handleFileSelect}
+                            style={{ display: 'none' }}
+                            id="gallery-upload"
+                            max={7 - gallery.length}
+                        />
+                        <label
+                            htmlFor="gallery-upload"
+                            style={{
+                                ...buttonStyle,
+                                background: '#10b981',
+                                color: 'white',
+                                boxShadow: '0 4px 15px rgba(102, 126, 234, 0.4)',
+                                display: 'inline-block'
+                            }}
                         >
-                            {cat.label}
-                            {cat.value !== 'all' && (
-                                <span style={{ marginLeft: '0.5rem' }}>
-                                    ({gallery.filter(img => img.category === cat.value).length})
-                                </span>
-                            )}
-                            {cat.value === 'all' && (
-                                <span style={{ marginLeft: '0.5rem' }}>
-                                    ({gallery.length})
-                                </span>
-                            )}
-                        </button>
-                    ))}
-                </div>
+                            📁 Chọn ảnh
+                        </label>
 
+                        {/* New Images Preview */}
+                        {newImages.length > 0 && (
+                            <div style={{ marginTop: '2rem' }}>
+                                <div style={{
+                                    display: 'grid',
+                                    gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))',
+                                    gap: '1.5rem'
+                                }}>
+                                    {newImages.map((img, index) => (
+                                        <div key={index} style={{
+                                            background: 'white',
+                                            borderRadius: '12px',
+                                            overflow: 'hidden',
+                                            border: '2px solid #e5e7eb'
+                                        }}>
+                                            <div style={{
+                                                width: '100%',
+                                                height: '200px',
+                                                overflow: 'hidden'
+                                            }}>
+                                                <img
+                                                    src={img.preview}
+                                                    alt="Preview"
+                                                    style={{
+                                                        width: '100%',
+                                                        height: '100%',
+                                                        objectFit: 'cover'
+                                                    }}
+                                                />
+                                            </div>
+                                            <div style={{ padding: '1rem' }}>
+                                                {/* Removed category selector */}
+                                                <input
+                                                    type="text"
+                                                    value={img.caption}
+                                                    onChange={(e) => updateNewImageCaption(index, e.target.value)}
+                                                    placeholder="Mô tả ảnh (tùy chọn)"
+                                                    style={{
+                                                        width: '100%',
+                                                        padding: '0.5rem',
+                                                        marginBottom: '0.5rem',
+                                                        borderRadius: '8px',
+                                                        border: '2px solid #e5e7eb'
+                                                    }}
+                                                />
+                                                <button
+                                                    onClick={() => removeNewImage(index)}
+                                                    style={{
+                                                        ...buttonStyle,
+                                                        background: '#ef4444',
+                                                        color: 'white',
+                                                        width: '100%',
+                                                        padding: '0.5rem'
+                                                    }}
+                                                >
+                                                    🗑️ Xóa
+                                                </button>
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+                                <button
+                                    onClick={handleUpload}
+                                    disabled={uploading}
+                                    style={{
+                                        ...buttonStyle,
+                                        background: '#10b981',
+                                        color: 'white',
+                                        marginTop: '1.5rem',
+                                        opacity: uploading ? 0.6 : 1
+                                    }}
+                                >
+                                    {uploading ? '⏳ Đang tải lên...' : `⬆️ Tải lên ${newImages.length} ảnh`}
+                                </button>
+                            </div>
+                        )}
+                    </div>
+                )}
                 {/* Gallery Grid */}
-                {filteredGallery.length > 0 ? (
+                {gallery.length > 0 ? (
                     <div style={{
                         display: 'grid',
                         gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))',
                         gap: '1.5rem'
                     }}>
-                        {filteredGallery.map((image, index) => (
+                        {gallery.map((image, index) => (
                             <div
                                 key={image._id || index}
                                 onClick={() => setSelectedImage(image)}
@@ -459,19 +390,7 @@ const HotelGalleryPage = () => {
                                             e.target.parentElement.innerHTML = '<div style="display:flex;align-items:center;justify-content:center;width:100%;height:100%;background:#f3f4f6;color:#9ca3af;font-size:3rem;">🖼️</div>';
                                         }}
                                     />
-                                    <div style={{
-                                        position: 'absolute',
-                                        top: '0.5rem',
-                                        right: '0.5rem',
-                                        padding: '0.25rem 0.75rem',
-                                        background: categories.find(c => c.value === image.category)?.color || '#6b7280',
-                                        color: 'white',
-                                        borderRadius: '8px',
-                                        fontSize: '0.85rem',
-                                        fontWeight: '600'
-                                    }}>
-                                        {categories.find(c => c.value === image.category)?.label || '📷 Khác'}
-                                    </div>
+                                    {/* Removed category label */}
                                 </div>
                                 {image.caption && (
                                     <div style={{
@@ -496,10 +415,7 @@ const HotelGalleryPage = () => {
                             Chưa có ảnh nào
                         </div>
                         <div style={{ fontSize: '1rem' }}>
-                            {selectedCategory === 'all'
-                                ? 'Bắt đầu tải ảnh lên để tạo thư viện cho khách sạn'
-                                : `Chưa có ảnh trong danh mục ${categories.find(c => c.value === selectedCategory)?.label}`
-                            }
+                            Bắt đầu tải ảnh lên để tạo thư viện cho khách sạn
                         </div>
                     </div>
                 )}
