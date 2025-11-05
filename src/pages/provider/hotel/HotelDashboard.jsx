@@ -344,18 +344,38 @@ const HotelDashboard = () => {
       {/* Actions */}
       <div style={actionsContainerStyle}>
         <button
-          style={buttonPrimaryStyle}
-          onClick={() => navigate('/provider/hotels/new')}
+          style={{
+            ...buttonPrimaryStyle,
+            ...(hotels.length >= 1 ? {
+              background: 'linear-gradient(135deg, #9ca3af 0%, #6b7280 100%)',
+              cursor: 'not-allowed',
+              opacity: 0.6
+            } : {})
+          }}
+          onClick={() => {
+            if (hotels.length >= 1) {
+              alert('❌ Bạn chỉ được phép tạo 1 khách sạn! Nếu muốn thay đổi, vui lòng xóa khách sạn hiện tại trước.');
+              return;
+            }
+            navigate('/provider/hotels/new');
+          }}
+          disabled={hotels.length >= 1}
           onMouseEnter={(e) => {
-            e.currentTarget.style.transform = 'translateY(-2px)';
-            e.currentTarget.style.boxShadow = '0 6px 20px rgba(102, 126, 234, 0.5)';
+            if (hotels.length < 1) {
+              e.currentTarget.style.transform = 'translateY(-2px)';
+              e.currentTarget.style.boxShadow = '0 6px 20px rgba(102, 126, 234, 0.5)';
+            }
           }}
           onMouseLeave={(e) => {
-            e.currentTarget.style.transform = 'translateY(0)';
-            e.currentTarget.style.boxShadow = '0 4px 15px rgba(102, 126, 234, 0.4)';
+            if (hotels.length < 1) {
+              e.currentTarget.style.transform = 'translateY(0)';
+              e.currentTarget.style.boxShadow = '0 4px 15px rgba(102, 126, 234, 0.4)';
+            }
           }}
+          title={hotels.length >= 1 ? 'Bạn chỉ được phép tạo 1 khách sạn' : 'Thêm khách sạn mới'}
         >
-          <span style={{ fontSize: '1.5rem' }}>+</span> Add New Hotel
+          <span style={{ fontSize: '1.5rem' }}>+</span>
+          Add New Hotel {hotels.length >= 1 && '(Đã đạt giới hạn)'}
         </button>
         <button
           style={buttonSecondaryStyle}
@@ -379,12 +399,15 @@ const HotelDashboard = () => {
         {hotels.length === 0 ? (
           <div style={emptyStateStyle}>
             <div style={emptyIconStyle}>🏨</div>
-            <p style={emptyTextStyle}>No hotels found</p>
+            <p style={emptyTextStyle}>Bạn chưa có khách sạn nào</p>
+            <p style={{ ...emptyTextStyle, fontSize: '1rem', marginBottom: '1.5rem' }}>
+              💡 Mỗi nhà cung cấp chỉ được phép tạo 1 khách sạn
+            </p>
             <button
               style={buttonPrimaryStyle}
               onClick={() => navigate('/provider/hotels/new')}
             >
-              Add your first hotel
+              Tạo khách sạn đầu tiên của bạn
             </button>
           </div>
         ) : (

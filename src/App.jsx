@@ -29,6 +29,7 @@ import EditHotelPage from "./pages/provider/hotel/EditHotelPage";
 import RoomFormPage from "./pages/provider/hotel/RoomFormPage";
 import BookingManagementPage from "./pages/provider/hotel/BookingManagementPage";
 import RoomListPage from "./pages/provider/hotel/RoomListPage";
+import BulkRoomCreator from "./pages/provider/hotel/BulkRoomCreator";
 import PromotionListPage from "./pages/provider/promotions/PromotionListPage";
 import PromotionCreatePage from "./pages/provider/promotions/PromotionCreatePage";
 import PromotionEditPage from "./pages/provider/promotions/PromotionEditPage";
@@ -229,6 +230,7 @@ function App() {
                   <Route path=":hotelId" element={<HotelDetailsPage />} />
                   <Route path=":hotelId/rooms" element={<RoomListPage />} />
                   <Route path=":hotelId/rooms/new" element={<RoomFormPage />} />
+                  <Route path=":hotelId/rooms/bulk-create" element={<BulkRoomCreator />} />
                   <Route
                     path=":hotelId/rooms/:roomId"
                     element={<RoomTypeDetailsPage />}

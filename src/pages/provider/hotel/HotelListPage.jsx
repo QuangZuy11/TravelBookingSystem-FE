@@ -36,6 +36,10 @@ const HotelListPage = () => {
     }, [providerId]);
 
     const handleAddHotel = () => {
+        if (hotels.length >= 1) {
+            alert('❌ Bạn chỉ được phép tạo 1 khách sạn! Nếu muốn thay đổi, vui lòng xóa khách sạn hiện tại trước.');
+            return;
+        }
         setEditingHotel(null);
         setIsFormModalOpen(true);
     };
@@ -49,8 +53,8 @@ const HotelListPage = () => {
         if (window.confirm('Are you sure you want to delete this hotel?')) {
             try {
                 await axios.delete(`/api/provider/${providerId}/hotels/${hotelId}`, {
-                headers: { Authorization: `Bearer ${token}` }
-            });
+                    headers: { Authorization: `Bearer ${token}` }
+                });
                 await fetchHotels();
                 alert('Hotel deleted successfully!');
             } catch (err) {
@@ -64,13 +68,13 @@ const HotelListPage = () => {
         try {
             if (editingHotel) {
                 await axios.put(`/api/provider/${providerId}/hotels/${editingHotel._id}`, formData, {
-                headers: { Authorization: `Bearer ${token}` }
-            });
+                    headers: { Authorization: `Bearer ${token}` }
+                });
                 alert('Hotel updated successfully!');
             } else {
                 await axios.post(`/api/provider/${providerId}/hotels`, formData, {
-                headers: { Authorization: `Bearer ${token}` }
-            });
+                    headers: { Authorization: `Bearer ${token}` }
+                });
                 alert('Hotel created successfully!');
             }
             setIsFormModalOpen(false);
@@ -102,9 +106,14 @@ const HotelListPage = () => {
                 />
                 <button
                     onClick={handleAddHotel}
-                    className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
+                    disabled={hotels.length >= 1}
+                    className={`px-4 py-2 rounded-md ${hotels.length >= 1
+                            ? 'bg-gray-400 text-gray-200 cursor-not-allowed'
+                            : 'bg-blue-600 text-white hover:bg-blue-700'
+                        }`}
+                    title={hotels.length >= 1 ? 'Bạn chỉ được phép tạo 1 khách sạn' : 'Thêm khách sạn mới'}
                 >
-                    + Add New Hotel
+                    + Add New Hotel {hotels.length >= 1 && '(Đã đạt giới hạn)'}
                 </button>
             </div>
 
@@ -131,27 +140,26 @@ const HotelListPage = () => {
                                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{hotel.starRating}</td>
                                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{hotel.totalRooms || 'N/A'}</td>
                                     <td className="px-6 py-4 whitespace-nowrap text-sm">
-                                        <span className={`px-2 py-1 text-xs font-semibold rounded-full ${
-                                            hotel.status === 'active' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
-                                        }`}>
+                                        <span className={`px-2 py-1 text-xs font-semibold rounded-full ${hotel.status === 'active' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
+                                            }`}>
                                             {hotel.status}
                                         </span>
                                     </td>
                                     <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                                        <Link 
-                                            to={`/provider/${providerId}/hotels/${hotel._id}`} 
+                                        <Link
+                                            to={`/provider/${providerId}/hotels/${hotel._id}`}
                                             className="text-blue-600 hover:text-blue-900 mr-4"
                                         >
                                             View
                                         </Link>
-                                        <button 
-                                            onClick={() => handleEditHotel(hotel)} 
+                                        <button
+                                            onClick={() => handleEditHotel(hotel)}
                                             className="text-yellow-600 hover:text-yellow-900 mr-4"
                                         >
                                             Edit
                                         </button>
-                                        <button 
-                                            onClick={() => handleDeleteHotel(hotel._id)} 
+                                        <button
+                                            onClick={() => handleDeleteHotel(hotel._id)}
                                             className="text-red-600 hover:text-red-900"
                                         >
                                             Delete
@@ -164,14 +172,14 @@ const HotelListPage = () => {
                 </div>
             )}
 
-            <Modal 
-                isOpen={isFormModalOpen} 
-                onClose={() => setIsFormModalOpen(false)} 
+            <Modal
+                isOpen={isFormModalOpen}
+                onClose={() => setIsFormModalOpen(false)}
                 title={editingHotel ? 'Edit Hotel' : 'Add New Hotel'}
             >
-                <HotelForm 
-                    initialData={editingHotel} 
-                    onSubmit={handleFormSubmit} 
+                <HotelForm
+                    initialData={editingHotel}
+                    onSubmit={handleFormSubmit}
                 />
             </Modal>
         </div>

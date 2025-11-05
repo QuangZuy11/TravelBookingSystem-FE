@@ -10,3 +10,4 @@ export { default as RoomTypeDetailsPage } from './RoomTypeDetailsPage';
 export { default as BookingManagementPage } from './BookingManagementPage';
 export { default as BookingDetailsPage } from './BookingDetailsPage';
 export { default as HotelStatisticsPage } from './HotelStatisticsPage';
+export { default as BulkRoomCreator } from './BulkRoomCreator';

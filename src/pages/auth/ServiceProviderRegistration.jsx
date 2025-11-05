@@ -132,15 +132,12 @@ const ServiceProviderRegistration = () => {
     };
 
     const handleAddLicense = (serviceType) => {
-        // Chỉ hotel mới được thêm nhiều licenses
-        if (serviceType !== 'hotel') {
+        // Tất cả service type chỉ được có 1 license duy nhất
+        const existingLicenses = getLicensesByType(licenses, serviceType);
+        if (existingLicenses.length >= 1) {
             toast.error(`${getServiceTypeDisplay(serviceType)} chỉ có thể có 1 license duy nhất!`);
             return;
         }
-
-        // Check if hotel can still add more licenses
-        const hotelLicenses = getLicensesByType(licenses, 'hotel');
-        // Không giới hạn số lượng license cho hotel
 
         setLicenses([...licenses, {
             service_type: serviceType,
@@ -366,23 +363,14 @@ const ServiceProviderRegistration = () => {
                                 <h3>
                                     {getServiceTypeDisplay(serviceType)}
                                     {serviceType === 'hotel' && (
-                                        <span className="license-badge unlimited">Không giới hạn licenses</span>
+                                        <span className="license-badge limited">Chỉ 1 license duy nhất</span>
                                     )}
                                     {(serviceType === 'tour') && (
                                         <span className="license-badge limited">Chỉ 1 license duy nhất</span>
                                     )}
                                 </h3>
 
-                                {/* Chỉ hotel mới hiển thị nút Add */}
-                                {serviceType === 'hotel' && (
-                                    <button
-                                        type="button"
-                                        onClick={() => handleAddLicense(serviceType)}
-                                        className="btn-add-license"
-                                    >
-                                        ➕ Thêm khách sạn khác
-                                    </button>
-                                )}
+
                             </div>
 
                             {licensesOfType.map((license, idx) => {
@@ -447,8 +435,8 @@ const ServiceProviderRegistration = () => {
                                         <div className="info-content">
                                             <strong>Quy định về license Hotel:</strong>
                                             <ul>
-                                                <li>✅ Được đăng ký <strong>KHÔNG GIỚI HẠN</strong> số lượng licenses</li>
-                                                <li>🏢 Mỗi khách sạn cần 1 giấy phép kinh doanh riêng</li>
+                                                <li>🏢 Mỗi nhà cung cấp chỉ được đăng ký <strong>1 giấy phép duy nhất</strong></li>
+                                                <li>� Sau khi đăng ký thành công, chỉ có thể tạo <strong>1 khách sạn</strong></li>
                                                 <li>📄 Phải có giấy phép hợp lệ từ cơ quan quản lý</li>
                                             </ul>
                                         </div>

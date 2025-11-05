@@ -4,7 +4,6 @@ import axios from 'axios';
 import toast from 'react-hot-toast';
 import BasicInfoForm from './components/BasicInfoForm';
 import ItineraryForm from './components/ItineraryForm';
-import BudgetForm from './components/BudgetForm';
 import './CreateTourWizard.css';
 
 const CreateTourWizard = () => {
@@ -17,8 +16,7 @@ const CreateTourWizard = () => {
     const [tourData, setTourData] = useState({
         tourId: null,
         basicInfo: null,
-        itineraries: [],
-        budgetItems: []
+        itineraries: []
     });
 
     // Get provider _id from localStorage
@@ -87,25 +85,17 @@ const CreateTourWizard = () => {
 
                 console.log('✅ Itineraries with activities:', itinerariesWithActivities);
 
-                // 3. Extract budget items from itineraries (already included in response)
-                const budgetData = itinerariesWithActivities.flatMap(itinerary =>
-                    itinerary.budget_breakdowns || []
-                );
-                console.log('🔍 Budget items from itineraries:', budgetData);
-
                 // Set loaded data
                 setTourData({
                     tourId: editTourId,
                     basicInfo: tourInfo,
-                    itineraries: itinerariesWithActivities,
-                    budgetItems: budgetData
+                    itineraries: itinerariesWithActivities
                 });
 
                 console.log('💾 Final tourData set:', {
                     tourId: editTourId,
                     basicInfo: tourInfo,
-                    itinerariesCount: itinerariesWithActivities.length,
-                    budgetItemsCount: budgetData.length
+                    itinerariesCount: itinerariesWithActivities.length
                 });
 
                 toast.success('Đã tải dữ liệu tour!');
@@ -132,20 +122,11 @@ const CreateTourWizard = () => {
         toast.success('Thông tin cơ bản đã được lưu!');
     };
 
-    const handleItineraryComplete = (data) => {
+    const handleItineraryComplete = async (data) => {
         console.log('💾 Saving itinerary:', data);
         setTourData(prev => ({
             ...prev,
             itineraries: data.itineraries
-        }));
-        setCurrentStep(3);
-        toast.success('Lịch trình đã được lưu!');
-    };
-
-    const handleBudgetComplete = async (data) => {
-        setTourData(prev => ({
-            ...prev,
-            budgetItems: data.budgetItems
         }));
 
         toast.success('Tạo tour thành công!');
@@ -177,24 +158,9 @@ const CreateTourWizard = () => {
         setCurrentStep(1);
     };
 
-    const handleBackFromBudget = (currentBudgetItems) => {
-        // Save current budget items before going back
-        console.log('⬅️ Going back from budget. Current budget items:', currentBudgetItems);
-        setTourData(prev => {
-            const updated = {
-                ...prev,
-                budgetItems: currentBudgetItems
-            };
-            console.log('💾 Updated tourData:', updated);
-            return updated;
-        });
-        setCurrentStep(2);
-    };
-
     const steps = [
         { number: 1, title: 'Thông tin cơ bản', icon: '📝' },
-        { number: 2, title: 'Lịch trình & Hoạt động', icon: '📅' },
-        { number: 3, title: 'Ngân sách', icon: '💰' }
+        { number: 2, title: 'Lịch trình & Hoạt động', icon: '📅' }
     ];
 
     // Show loading state while fetching data in edit mode
@@ -262,17 +228,6 @@ const CreateTourWizard = () => {
                             isEditMode={isEditMode}
                             onNext={handleItineraryComplete}
                             onBack={handleBackFromItinerary}
-                        />
-                    )}
-
-                    {currentStep === 3 && (
-                        <BudgetForm
-                            tourId={tourData.tourId}
-                            itineraries={tourData.itineraries}
-                            existingBudgetItems={tourData.budgetItems}
-                            isEditMode={isEditMode}
-                            onComplete={handleBudgetComplete}
-                            onBack={handleBackFromBudget}
                         />
                     )}
                 </div>

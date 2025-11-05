@@ -154,21 +154,53 @@ const RoomListPage = () => {
                             Manage all rooms in your hotel
                         </p>
                     </div>
-                    <button
-                        style={buttonStyle}
-                        onClick={() => navigate(`/provider/hotels/${hotelId}/rooms/new`)}
-                    >
-                        Add New Room
-                    </button>
+                    <div style={{ display: 'flex', gap: '1rem' }}>
+                        <button
+                            style={{
+                                ...buttonStyle,
+                                background: 'white',
+                                color: '#667eea',
+                                border: '2px solid #667eea'
+                            }}
+                            onClick={() => navigate(`/provider/hotels/${hotelId}/rooms/bulk-create`)}
+                        >
+                            🏗️ Bulk Create Rooms
+                        </button>
+                        <button
+                            style={buttonStyle}
+                            onClick={() => navigate(`/provider/hotels/${hotelId}/rooms/new`)}
+                        >
+                            Add New Room
+                        </button>
+                    </div>
                 </div>
 
                 {rooms.length === 0 ? (
                     <div style={{ textAlign: 'center', padding: '4rem 2rem', color: '#6b7280' }}>
                         <div style={{ fontSize: '4rem', marginBottom: '1rem' }}>🏨</div>
-                        <p style={{ fontSize: '1.25rem' }}>No rooms found</p>
-                        <p style={{ color: '#9CA3AF', marginTop: '0.5rem' }}>
-                            Start by adding a new room to your hotel
+                        <p style={{ fontSize: '1.25rem' }}>Chưa có phòng nào</p>
+                        <p style={{ color: '#9CA3AF', marginTop: '0.5rem', marginBottom: '2rem' }}>
+                            Bắt đầu bằng cách thêm phòng cho khách sạn của bạn
                         </p>
+                        <div style={{ display: 'flex', gap: '1rem', justifyContent: 'center' }}>
+                            <button
+                                onClick={() => navigate(`/provider/hotels/${hotelId}/rooms/bulk-create`)}
+                                style={{
+                                    ...buttonStyle,
+                                    background: 'white',
+                                    color: '#667eea',
+                                    border: '2px solid #667eea'
+                                }}
+                            >
+                                🏗️ Tạo nhiều phòng cùng lúc
+                            </button>
+                            <button
+                                onClick={() => navigate(`/provider/hotels/${hotelId}/rooms/new`)}
+                                style={buttonStyle}
+                            >
+                                ➕ Tạo từng phòng
+                            </button>
+                        </div>
                     </div>
                 ) : (
                     <div style={{ overflowX: 'auto' }}>

@@ -48,8 +48,8 @@ const BasicInfoForm = ({ providerId, initialData, isEditMode, onNext, onCancel }
             formData.capacity.min_participants > 0 &&
             formData.capacity.max_participants > formData.capacity.min_participants &&
             formData.highlights.length > 0 &&
-            formData.image &&
-            formData.available_dates.length > 0
+            formData.image
+            // available_dates is now optional - removed from required checks
         );
     };
 
@@ -310,10 +310,8 @@ const BasicInfoForm = ({ providerId, initialData, isEditMode, onNext, onCancel }
             newErrors.image = 'Vui lòng thêm ảnh đại diện cho tour';
         }
 
-        // 10. Available dates validation
-        if (!Array.isArray(formData.available_dates) || formData.available_dates.length === 0) {
-            newErrors.available_dates = 'Phải có ít nhất 1 ngày khởi hành';
-        } else {
+        // 10. Available dates validation (optional)
+        if (Array.isArray(formData.available_dates) && formData.available_dates.length > 0) {
             // Check if any date is in the past
             const now = new Date();
             const pastDates = formData.available_dates.filter(d => new Date(d.date) < now);
@@ -436,7 +434,7 @@ const BasicInfoForm = ({ providerId, initialData, isEditMode, onNext, onCancel }
                             {formData.capacity.max_participants <= formData.capacity.min_participants && <li>Số người tối đa phải {'>'} tối thiểu</li>}
                             {formData.highlights.length === 0 && <li>Thêm ít nhất 1 điểm nổi bật</li>}
                             {!formData.image && <li>Link hình ảnh đại diện</li>}
-                            {formData.available_dates.length === 0 && <li>Thêm ít nhất 1 ngày khởi hành</li>}
+                            {/* Ngày khởi hành bây giờ là optional */}
                         </ul>
                     </div>
                 </div>

@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import toast from 'react-hot-toast';
 import { addLicense, uploadLicenseDocuments } from '../../services/serviceProviderService';
-import { isValidLicenseFormat } from '../../utils/licenseValidation';
 import './AddHotelLicenseModal.css';
 
 const AddHotelLicenseModal = ({ isOpen, onClose, providerId, onSuccess }) => {
@@ -56,12 +55,6 @@ const AddHotelLicenseModal = ({ isOpen, onClose, providerId, onSuccess }) => {
             return;
         }
 
-        if (!isValidLicenseFormat(licenseNumber)) {
-            setError('License number phải có format: XXX-YYYY-NNN (VD: HTL-2024-001)');
-            setLoading(false);
-            return;
-        }
-
         if (documents.length === 0) {
             setError('Vui lòng upload ít nhất 1 tài liệu giấy phép');
             setLoading(false);
@@ -96,7 +89,10 @@ const AddHotelLicenseModal = ({ isOpen, onClose, providerId, onSuccess }) => {
             <div className="modal-content add-hotel-modal" onClick={(e) => e.stopPropagation()}>
                 {/* Header */}
                 <div className="modal-header">
-                    <h2>➕ Thêm khách sạn mới</h2>
+                    <h2>🏨 Đăng ký giấy phép khách sạn</h2>
+                    <p style={{ fontSize: '0.9rem', color: '#6b7280', marginTop: '0.5rem' }}>
+                        Chỉ được đăng ký 1 giấy phép duy nhất
+                    </p>
                     <button onClick={onClose} className="modal-close" disabled={loading}>
                         ✕
                     </button>
@@ -111,22 +107,15 @@ const AddHotelLicenseModal = ({ isOpen, onClose, providerId, onSuccess }) => {
                         </label>
                         <input
                             type="text"
-                            placeholder="VD: HTL-2024-001"
+                            placeholder="Nhập license number của bạn"
                             value={licenseNumber}
                             onChange={(e) => setLicenseNumber(e.target.value)}
-                            className={licenseNumber && !isValidLicenseFormat(licenseNumber) ? 'input-error' : ''}
                             required
                             disabled={loading}
                         />
                         <small className="hint">
                             ⚠️ License number phải unique trong toàn hệ thống
                         </small>
-                        <small className="hint">
-                            Format: XXX-YYYY-NNN (VD: HTL-2024-001)
-                        </small>
-                        {licenseNumber && !isValidLicenseFormat(licenseNumber) && (
-                            <small className="error-text">❌ Format không hợp lệ</small>
-                        )}
                     </div>
 
                     {/* Documents Upload */}
@@ -196,14 +185,18 @@ const AddHotelLicenseModal = ({ isOpen, onClose, providerId, onSuccess }) => {
                     {/* Info Box */}
                     <div className="info-box">
                         <p>
-                            <strong>📌 Lưu ý:</strong>
+                            <strong>📌 Lưu ý quan trọng:</strong>
                         </p>
                         <ul>
-                            <li>License number phải đúng format và chưa được đăng ký trước đó</li>
-                            <li>Mỗi khách sạn cần 1 license riêng biệt</li>
-                            <li>Giấy phép sẽ được admin xác minh trong 1-3 ngày làm việc</li>
-                            <li>Chỉ sau khi được xác minh mới có thể quản lý khách sạn</li>
+                            <li>🔒 Mỗi nhà cung cấp khách sạn chỉ được đăng ký <strong>1 giấy phép duy nhất</strong></li>
+                            <li>🏨 Sau khi đăng ký thành công, bạn chỉ có thể tạo <strong>1 khách sạn</strong></li>
+                            <li>📋 License number phải chưa được đăng ký trước đó</li>
+                            <li>⏰ Giấy phép sẽ được admin xác minh trong 1-3 ngày làm việc</li>
+                            <li>✅ Chỉ sau khi được xác minh mới có thể quản lý khách sạn</li>
                         </ul>
+                        <p style={{ marginTop: '1rem', padding: '1rem', background: '#fef3cd', borderRadius: '8px', color: '#92400e' }}>
+                            ⚠️ <strong>Thận trọng:</strong> Một khi đã đăng ký, bạn không thể thay đổi giấy phép này. Hãy đảm bảo thông tin chính xác!
+                        </p>
                     </div>
                 </form>
 
@@ -223,7 +216,7 @@ const AddHotelLicenseModal = ({ isOpen, onClose, providerId, onSuccess }) => {
                         disabled={loading || uploading || documents.length === 0 || !licenseNumber.trim()}
                         className="btn-primary"
                     >
-                        {loading ? '⏳ Đang xử lý...' : '✅ Thêm khách sạn'}
+                        {loading ? '⏳ Đang xử lý...' : '🏨 Đăng ký giấy phép'}
                     </button>
                 </div>
             </div>

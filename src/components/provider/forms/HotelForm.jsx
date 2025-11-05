@@ -19,8 +19,7 @@ export const HotelForm = ({ initialData, onSubmit }) => {
         category: '3_star',
         amenities: [],
         images: [],
-        totalRooms: 0,
-        availableRooms: 0,
+
         priceRange: { min: 0, max: 0 },
         policies: {
             checkInTime: '14:00',
@@ -721,47 +720,16 @@ export const HotelForm = ({ initialData, onSubmit }) => {
                     </div>
                 </div>
 
-                {/* Room & Price Information */}
+                {/* Price Information */}
                 <div
-                    style={activeSection === 'rooms' ? sectionActiveStyle : sectionStyle}
-                    onFocus={() => setActiveSection('rooms')}
+                    style={activeSection === 'price' ? sectionActiveStyle : sectionStyle}
+                    onFocus={() => setActiveSection('price')}
                 >
                     <h2 style={sectionTitleStyle}>
-                        <span style={iconStyle}>🛏️</span>
-                        Room & Price Information
+                        <span style={iconStyle}>�</span>
+                        Price Information
                     </h2>
                     <div style={gridStyle}>
-                        <div>
-                            <label style={labelStyle}>Total Rooms</label>
-                            <input
-                                type="number"
-                                name="totalRooms"
-                                value={formData.totalRooms}
-                                onChange={handleChange}
-                                required
-                                min="0"
-                                style={inputStyle}
-                                onFocus={(e) => e.target.style.borderColor = '#667eea'}
-                                onBlur={(e) => e.target.style.borderColor = '#e5e7eb'}
-                                placeholder="50"
-                            />
-                        </div>
-                        <div>
-                            <label style={labelStyle}>Available Rooms</label>
-                            <input
-                                type="number"
-                                name="availableRooms"
-                                value={formData.availableRooms}
-                                onChange={handleChange}
-                                required
-                                min="0"
-                                max={formData.totalRooms}
-                                style={inputStyle}
-                                onFocus={(e) => e.target.style.borderColor = '#667eea'}
-                                onBlur={(e) => e.target.style.borderColor = '#e5e7eb'}
-                                placeholder="30"
-                            />
-                        </div>
                         <div>
                             <label style={labelStyle}>Minimum Price (VND)</label>
                             <input
