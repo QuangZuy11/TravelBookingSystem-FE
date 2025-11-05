@@ -15,11 +15,26 @@ import {
     Star as DefaultIcon
 } from '@mui/icons-material';
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import SmartImage from '../../../../../components/common/SmartImage';
 
 export default function Overview({ hotelData }) {
     // State for image carousel
     const [currentImageIndex, setCurrentImageIndex] = useState(0);
+    // smooth scroll handler must be defined at top-level (hooks rule)
+    const navigate = useNavigate();
+    const handleSelectRooms = (e) => {
+        e?.preventDefault?.();
+        const el = document.getElementById('rooms');
+        if (el) {
+            const headerOffset = 80; // adjust if your header has different height
+            const elementPosition = el.getBoundingClientRect().top + window.pageYOffset;
+            const offsetPosition = elementPosition - headerOffset;
+            window.scrollTo({ top: offsetPosition, behavior: 'smooth' });
+        } else {
+            navigate(window.location.pathname + '#rooms');
+        }
+    };
     // Helper function to get star display based on category
     const getStarDisplay = (category) => {
         const starMap = {
@@ -336,7 +351,7 @@ export default function Overview({ hotelData }) {
                                     {formatPrice(hotelData.priceRange?.min || 0)} <span className="hotel-detail-currency">VNĐ</span>
                                 </div>
                             </div>
-                            <button className="hotel-detail-book-button">Chọn Phòng</button>
+                            <button className="hotel-detail-book-button" onClick={handleSelectRooms}>Chọn Phòng</button>
                         </div>
                     </div>
 

@@ -23,7 +23,18 @@ export function TourCard({ tour }) {
         <div className="tour-meta">
           <div className="tour-destination">
             <MapPin size={16} />
-            <span>{tour.location}</span>
+            <span>
+              {tour.destinations && tour.destinations.length > 0
+                ? tour.destinations.map((dest) => dest.name || dest).join(", ")
+                : Array.isArray(tour.destination_id) &&
+                  tour.destination_id.length > 0
+                ? tour.destination_id
+                    .map((dest) =>
+                      typeof dest === "object" ? dest.name : dest
+                    )
+                    .join(", ")
+                : tour.destination || "Chưa có địa điểm"}
+            </span>
           </div>
           <div className="tour-duration">
             <Clock size={16} />

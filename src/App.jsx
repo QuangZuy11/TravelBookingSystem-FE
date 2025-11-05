@@ -11,8 +11,6 @@ import ProtectedRoute from "./components/common/ProtectedRoute";
 import NotFoundPage from "./pages/NotFoundPage";
 import UnauthorizedPage from "./pages/UnauthorizedPage";
 import DashboardLayout from "./components/layout/ProviderDashboard/DashboardLayout";
-import TourDashboard from "./pages/provider/dashboard/TourDashboard";
-
 // Tour Management
 import TourDashboardPage from "./pages/provider/tour/TourDashboard";
 import TourListPage from "./pages/provider/tour/TourList";
@@ -21,22 +19,25 @@ import TourDetailsPage from "./pages/provider/tour/TourDetailsPage";
 import TermsAndConditions from "./pages/terms/TermsOfService";
 
 // Hotel Management
-import HotelDashboard from "./pages/provider/hotel/HotelDashboard";
+import OverviewPage from "./pages/provider/hotel/OverviewPage";
+import HotelManagePage from "./pages/provider/hotel/HotelManagePage";
 import HotelDetailsPage from "./pages/provider/hotel/HotelDetailsPage";
 import RoomTypeDetailsPage from "./pages/provider/hotel/RoomTypeDetailsPage";
 import CreateHotelPage from "./pages/provider/hotel/CreateHotelPage";
 import EditHotelPage from "./pages/provider/hotel/EditHotelPage";
 import RoomFormPage from "./pages/provider/hotel/RoomFormPage";
 import BookingManagementPage from "./pages/provider/hotel/BookingManagementPage";
+import RevenueStatisticsPage from "./pages/provider/hotel/RevenueStatisticsPage";
 import RoomListPage from "./pages/provider/hotel/RoomListPage";
 import BulkRoomCreator from "./pages/provider/hotel/BulkRoomCreator";
 import PromotionListPage from "./pages/provider/promotions/PromotionListPage";
 import PromotionCreatePage from "./pages/provider/promotions/PromotionCreatePage";
 import PromotionEditPage from "./pages/provider/promotions/PromotionEditPage";
+import HotelAdsPage from "./pages/provider/promotions/HotelAdsPage";
+import TourAdsPage from "./pages/provider/promotions/TourAdsPage";
 
 // Provider Layout
 import ProviderLayout from "./pages/provider/ProviderLayout";
-import ProviderGeneralDashboard from "./pages/provider/ProviderGeneralDashboard";
 
 // Provider Routes
 import ProviderTypeRouter from "./components/routes/ProviderTypeRouter";
@@ -49,6 +50,8 @@ import Profile from "./pages/traveler/components/Hotel/Profile/Profile";
 import BookTourPage from "./pages/traveler/BookTourPage";
 import HotelDetailPage from "./pages/traveler/HotelDetailPage";
 import BookTourDetailPage from "./pages/traveler/BookTourDetailPage";
+import MyToursPage from "./pages/traveler/MyToursPage";
+import MyTourDetailPage from "./pages/traveler/MyTourDetailPage";
 import ChatPage from "./pages/traveler/ChatPage";
 import ChatWidget from "./pages/traveler/ChatWidget";
 
@@ -57,13 +60,20 @@ import PendingProvidersList from "./pages/admin/PendingProvidersList";
 import ProviderDetailPage from "./pages/admin/ProviderDetailPage";
 import AdminDashboardPage from "./pages/admin/AdminDashboardPage";
 import UserListPage from "./pages/admin/UserListPage";
+import AdminPolicyTermsPage from "./pages/admin/AdminPolicyTermsPage";
+import AdminPolicyTermCreatePage from "./pages/admin/AdminPolicyTermCreatePage";
+import AdminPolicyTermDetailPage from "./pages/admin/AdminPolicyTermDetailPage";
+import AdminPolicyTermEditPage from "./pages/admin/AdminPolicyTermEditPage";
 import AIItineraryGenerator from "./components/ai/AIItineraryGenerator";
 import MyItineraries from "./components/ai/MyItineraries";
-import ItineraryDetail from "./components/ai/ItineraryDetail";
+import AIItineraryErrorBoundary from "./components/ai/AIItineraryErrorBoundary";
+import TourItineraryManager from "./components/tour/TourItineraryManager";
 
 // Auth Pages
 import ForgotPasswordPage from "./pages/auth/ForgotPasswordPage";
 import ResetPasswordPage from "./pages/auth/ResetPasswordPage";
+import ItineraryDetailNew from "./components/ai/ItineraryDetailNew";
+import ItineraryCustomize from "./components/ai/ItineraryCustomize";
 
 function App() {
   return (
@@ -151,11 +161,54 @@ function App() {
               }
             />
 
-            <Route path="/ai-itinerary" element={<AIItineraryGenerator />} />
-            <Route path="/my-itineraries" element={<MyItineraries />} />
+            <Route
+              path="/my-tours"
+              element={
+                <ProtectedRoute>
+                  <MyToursPage />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/my-tours/:bookingId"
+              element={
+                <ProtectedRoute>
+                  <MyTourDetailPage />
+                </ProtectedRoute>
+              }
+            />
+
+            <Route
+              path="/ai-itinerary"
+              element={
+                <AIItineraryErrorBoundary>
+                  <AIItineraryGenerator />
+                </AIItineraryErrorBoundary>
+              }
+            />
+            <Route
+              path="/my-itineraries"
+              element={
+                <AIItineraryErrorBoundary>
+                  <MyItineraries />
+                </AIItineraryErrorBoundary>
+              }
+            />
             <Route
               path="/ai-itinerary/:itineraryId"
-              element={<ItineraryDetail />}
+              element={
+                <AIItineraryErrorBoundary>
+                  <ItineraryDetailNew />
+                </AIItineraryErrorBoundary>
+              }
+            />
+            <Route
+              path="/ai-itinerary/:itineraryId/customize"
+              element={
+                <AIItineraryErrorBoundary>
+                  <ItineraryCustomize />
+                </AIItineraryErrorBoundary>
+              }
             />
 
             {/* Protected Routes - Admin */}
@@ -191,6 +244,38 @@ function App() {
                 // </ProtectedRoute>
               }
             />
+            <Route
+              path="/admin/terms-policies"
+              element={
+                <ProtectedRoute requiredRole="Admin">
+                  <AdminPolicyTermsPage />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/admin/terms-policies/create"
+              element={
+                <ProtectedRoute requiredRole="Admin">
+                  <AdminPolicyTermCreatePage />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/admin/terms-policies/:id"
+              element={
+                <ProtectedRoute requiredRole="Admin">
+                  <AdminPolicyTermDetailPage />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/admin/terms-policies/:id/edit"
+              element={
+                <ProtectedRoute requiredRole="Admin">
+                  <AdminPolicyTermEditPage />
+                </ProtectedRoute>
+              }
+            />
 
             {/* Protected Routes - Provider */}
             <Route
@@ -205,13 +290,8 @@ function App() {
                 {/* Provider Type Router - Auto-redirect based on provider type */}
                 <Route index element={<ProviderTypeRouter />} />
 
-                {/* General Dashboard for multi-service providers */}
-                <Route
-                  path="dashboard"
-                  element={<ProviderGeneralDashboard />}
-                />
-
                 <Route path="bookings" element={<BookingManagementPage />} />
+                <Route path="revenue-statistics" element={<RevenueStatisticsPage />} />
 
                 {/* Tour Management - NEW MODULE */}
                 <Route path="tours">
@@ -219,12 +299,16 @@ function App() {
                   <Route path="create" element={<CreateTourWizard />} />
                   <Route path=":tourId" element={<TourDetailsPage />} />
                   <Route path=":tourId/edit" element={<CreateTourWizard />} />
+                  <Route
+                    path=":tourId/itinerary-manager"
+                    element={<TourItineraryManager />}
+                  />
                   <Route path="bookings" element={<BookingManagementPage />} />
-                  <Route path="statistics" element={<TourDashboard />} />
                 </Route>
                 {/* Hotel Management */}
                 <Route path="hotels">
-                  <Route index element={<HotelDashboard />} />
+                  <Route index element={<OverviewPage />} />
+                  <Route path="manage" element={<HotelManagePage />} />
                   <Route path="new" element={<CreateHotelPage />} />
                   <Route path=":hotelId/edit" element={<EditHotelPage />} />
                   <Route path=":hotelId" element={<HotelDetailsPage />} />
@@ -240,13 +324,17 @@ function App() {
                     element={<RoomFormPage />}
                   />
                 </Route>
+                <Route path="hotel-ads" element={<HotelAdsPage />} />
+                <Route path="tour-ads" element={<TourAdsPage />} />
 
                 <Route path="promotions">
                   <Route index element={<PromotionListPage />} />
                   <Route path="create" element={<PromotionCreatePage />} />
-                  <Route path=":promotionId/edit" element={<PromotionEditPage />} />
+                  <Route
+                    path=":promotionId/edit"
+                    element={<PromotionEditPage />}
+                  />
                 </Route>
-
               </Route>
             </Route>
 

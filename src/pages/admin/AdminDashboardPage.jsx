@@ -81,6 +81,13 @@ const AdminDashboardPage = () => {
             Xem chi tiết
           </Link>
         </div>
+        <div className="widget-card">
+          <h2>Điều khoản quảng cáo</h2>
+          <p>Tạo mới và theo dõi điều khoản áp dụng cho chương trình khuyến mãi.</p>
+          <Link to="/admin/terms-policies" className="widget-button">
+            Quản lý điều khoản
+          </Link>
+        </div>
       </div>
     </div>
   );

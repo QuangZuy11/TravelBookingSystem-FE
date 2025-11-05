@@ -8,7 +8,7 @@ const TOUR_BASE_URL = '/tour';
  */
 export const tourApi = {
   // ============ PROVIDER DASHBOARD ============
-  
+
   /**
    * Get provider dashboard data
    * @param {string} providerId - Provider ID
@@ -19,7 +19,7 @@ export const tourApi = {
   },
 
   // ============ TOUR MANAGEMENT ============
-  
+
   /**
    * Get all tours for a provider
    * @param {string} providerId - Provider ID
@@ -85,7 +85,7 @@ export const tourApi = {
   },
 
   // ============ TOUR DATES MANAGEMENT ============
-  
+
   /**
    * Add single tour date
    * @param {string} tourId - Tour ID
@@ -168,7 +168,7 @@ export const tourApi = {
   },
 
   // ============ ITINERARY MANAGEMENT ============
-  
+
   /**
    * Create itinerary
    * @param {string} tourId - Tour ID
@@ -217,40 +217,77 @@ export const tourApi = {
   },
 
   // ============ ACTIVITY MANAGEMENT ============
-  
+
   /**
-   * Add activity to itinerary
+   * UNIFIED ARCHITECTURE: Add activity to itinerary
+   * Get current itinerary, add new activity to activities array, then update
    * @param {string} itineraryId - Itinerary ID
-   * @param {object} activityData - Activity data
-   * @returns {Promise} Created activity
+   * @param {object} activityData - Activity data {time, action}
+   * @returns {Promise} Updated itinerary
    */
   addActivity: async (itineraryId, activityData) => {
-    return await axiosInstance.post(`${TOUR_BASE_URL}/itineraries/${itineraryId}/activities`, activityData);
+    // First get current itinerary
+    const currentItinerary = await axiosInstance.get(`${TOUR_BASE_URL}/itineraries/${itineraryId}`);
+    const activities = currentItinerary.data.data.activities || [];
+
+    // Add new activity
+    activities.push(activityData);
+
+    // Update itinerary with new activities array
+    return await axiosInstance.put(`${TOUR_BASE_URL}/itineraries/${itineraryId}`, {
+      activities: activities
+    });
   },
 
   /**
-   * Update activity
+   * UNIFIED ARCHITECTURE: Update activity in itinerary
+   * Get current itinerary, update specific activity, then update itinerary
    * @param {string} itineraryId - Itinerary ID
-   * @param {string} activityId - Activity ID
-   * @param {object} activityData - Updated activity data
-   * @returns {Promise} Updated activity
+   * @param {number} activityIndex - Activity index in array
+   * @param {object} activityData - Updated activity data {time, action}
+   * @returns {Promise} Updated itinerary
    */
-  updateActivity: async (itineraryId, activityId, activityData) => {
-    return await axiosInstance.put(`${TOUR_BASE_URL}/itineraries/${itineraryId}/activities/${activityId}`, activityData);
+  updateActivity: async (itineraryId, activityIndex, activityData) => {
+    // First get current itinerary
+    const currentItinerary = await axiosInstance.get(`${TOUR_BASE_URL}/itineraries/${itineraryId}`);
+    const activities = currentItinerary.data.data.activities || [];
+
+    // Update specific activity
+    if (activityIndex >= 0 && activityIndex < activities.length) {
+      activities[activityIndex] = { ...activities[activityIndex], ...activityData };
+    }
+
+    // Update itinerary with modified activities array
+    return await axiosInstance.put(`${TOUR_BASE_URL}/itineraries/${itineraryId}`, {
+      activities: activities
+    });
   },
 
   /**
-   * Delete activity
+   * UNIFIED ARCHITECTURE: Delete activity from itinerary
+   * Get current itinerary, remove activity by index, then update itinerary
    * @param {string} itineraryId - Itinerary ID
-   * @param {string} activityId - Activity ID
-   * @returns {Promise} Deletion result
+   * @param {number} activityIndex - Activity index in array
+   * @returns {Promise} Updated itinerary
    */
-  deleteActivity: async (itineraryId, activityId) => {
-    return await axiosInstance.delete(`${TOUR_BASE_URL}/itineraries/${itineraryId}/activities/${activityId}`);
+  deleteActivity: async (itineraryId, activityIndex) => {
+    // First get current itinerary
+    const currentItinerary = await axiosInstance.get(`${TOUR_BASE_URL}/itineraries/${itineraryId}`);
+    const activities = currentItinerary.data.data.activities || [];
+
+    // Remove activity by index
+    if (activityIndex >= 0 && activityIndex < activities.length) {
+      activities.splice(activityIndex, 1);
+    }
+
+    // Update itinerary with modified activities array
+    return await axiosInstance.put(`${TOUR_BASE_URL}/itineraries/${itineraryId}`, {
+      activities: activities
+    });
   },
 
   // ============ BUDGET MANAGEMENT ============
-  
+
   /**
    * Add budget item
    * @param {string} itineraryId - Itinerary ID
@@ -292,7 +329,7 @@ export const tourApi = {
   },
 
   // ============ BOOKING MANAGEMENT ============
-  
+
   /**
    * Create booking
    * @param {object} bookingData - Booking data
@@ -377,7 +414,7 @@ export const tourApi = {
   },
 
   // ============ CUSTOMER TOUR SEARCH ============
-  
+
   /**
    * Search tours
    * @param {object} searchParams - Search parameters

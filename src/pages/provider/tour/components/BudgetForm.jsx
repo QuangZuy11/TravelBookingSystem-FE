@@ -54,14 +54,15 @@ const BudgetForm = ({ tourId, itineraries, existingBudgetItems = [], isEditMode,
                 const itinerariesWithActivities = await Promise.all(
                     itinerariesData.map(async (itinerary) => {
                         try {
+                            // UNIFIED ARCHITECTURE: Get itinerary with activities included
                             const activitiesResponse = await axios.get(
-                                `http://localhost:3000/api/itineraries/${itinerary._id}/activities`, {
+                                `http://localhost:3000/api/tour/itineraries/${itinerary._id}`, {
                                 headers: { Authorization: `Bearer ${token}` }
                             }
                             );
                             return {
                                 ...itinerary,
-                                activities: activitiesResponse.data.data || []
+                                activities: activitiesResponse.data.data?.activities || []
                             };
                         } catch (error) {
                             console.error(`Error loading activities for itinerary ${itinerary._id}:`, error);
