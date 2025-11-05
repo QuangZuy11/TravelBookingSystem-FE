@@ -32,7 +32,7 @@ const AIItineraryCustomize = () => {
     useEffect(() => {
         const initializeCustomization = async () => {
             if (!aiGeneratedId) {
-                setError('Invalid itinerary ID');
+                setError('ID lộ trình không hợp lệ');
                 return;
             }
 
@@ -49,12 +49,12 @@ const AIItineraryCustomize = () => {
                         itinerary_data: response.data.days || []
                     });
                 } else {
-                    throw new Error(response.message || 'Failed to load customizable itinerary');
+                    throw new Error(response.message || 'Không thể tải lộ trình tùy chỉnh');
                 }
             } catch (err) {
                 console.error('❌ Initialization Error:', err);
-                setError(err.message || 'Failed to initialize customization');
-                toast.error(err.message || 'Failed to load itinerary for customization');
+                setError(err.message || 'Không thể khởi tạo tùy chỉnh');
+                toast.error(err.message || 'Không thể tải lộ trình để tùy chỉnh');
             } finally {
                 setLoading(false);
             }
@@ -85,12 +85,12 @@ const AIItineraryCustomize = () => {
                         setItinerary(prev => ({ ...prev, ...response.data }));
                     }
                 } else {
-                    throw new Error(response.message || 'Save failed');
+                    throw new Error(response.message || 'Lưu không thành công');
                 }
             } catch (error) {
                 console.error('❌ Auto-save Error:', error);
                 setSaveStatus('error');
-                toast.error(error.message || 'Failed to auto-save changes');
+                toast.error(error.message || 'Không thể tự động lưu thay đổi');
             } finally {
                 setSaving(false);
                 setTimeout(() => setSaveStatus(''), 2000);
@@ -179,7 +179,7 @@ const AIItineraryCustomize = () => {
 
     // Remove activity
     const handleRemoveActivity = (dayIndex, activityIndex) => {
-        if (!window.confirm('Are you sure you want to remove this activity?')) {
+        if (!window.confirm('Bạn có chắc chắn muốn xóa hoạt động này?')) {
             return;
         }
 
@@ -375,7 +375,7 @@ const AIItineraryCustomize = () => {
                     <div style={styles.container}>
                         <div style={{ textAlign: 'center', padding: '4rem' }}>
                             <div style={{ fontSize: '2rem', marginBottom: '1rem' }}>⚙️</div>
-                            <p style={{ color: '#6b7280' }}>Loading customization interface...</p>
+                            <p style={{ color: '#6b7280' }}>Đang tải giao diện tùy chỉnh...</p>
                         </div>
                     </div>
                 </div>
@@ -393,13 +393,13 @@ const AIItineraryCustomize = () => {
                     <div style={styles.container}>
                         <div style={{ textAlign: 'center', padding: '4rem' }}>
                             <div style={{ fontSize: '2rem', marginBottom: '1rem' }}>❌</div>
-                            <h2 style={{ color: '#1f2937', marginBottom: '1rem' }}>Customization Error</h2>
+                            <h2 style={{ color: '#1f2937', marginBottom: '1rem' }}>Lỗi tùy chỉnh</h2>
                             <p style={{ color: '#6b7280', marginBottom: '1.5rem' }}>{error}</p>
                             <button
                                 onClick={() => navigate('/my-itineraries')}
                                 style={styles.button()}
                             >
-                                Back to My Itineraries
+                                Quay lại lộ trình của tôi
                             </button>
                         </div>
                     </div>
@@ -422,28 +422,28 @@ const AIItineraryCustomize = () => {
                 return (
                     <div style={{ ...styles.saveStatus, color: '#f59e0b' }}>
                         <span>⏳</span>
-                        <span>Saving changes...</span>
+                        <span>Đang lưu thay đổi...</span>
                     </div>
                 );
             case 'saved':
                 return (
                     <div style={{ ...styles.saveStatus, color: '#10b981' }}>
                         <span>✅</span>
-                        <span>Changes saved automatically</span>
+                        <span>Đã tự động lưu thay đổi</span>
                     </div>
                 );
             case 'error':
                 return (
                     <div style={{ ...styles.saveStatus, color: '#ef4444' }}>
                         <span>❌</span>
-                        <span>Failed to save changes</span>
+                        <span>Không thể lưu thay đổi</span>
                     </div>
                 );
             default:
                 return hasChanges ? (
                     <div style={{ ...styles.saveStatus, color: '#6b7280' }}>
                         <span>💾</span>
-                        <span>Changes will be saved automatically</span>
+                        <span>Thay đổi sẽ được tự động lưu</span>
                     </div>
                 ) : null;
         }
@@ -467,14 +467,14 @@ const AIItineraryCustomize = () => {
                             style={styles.backButton}
                         >
                             <span>←</span>
-                            <span>Back to Details</span>
+                            <span>Quay lại chi tiết</span>
                         </a>
 
                         <h1 style={styles.title}>
-                            🎨 Customize Your {itinerary?.destination} Trip
+                            🎨 Tùy chỉnh chuyến đi {itinerary?.destination} của bạn
                         </h1>
                         <p style={styles.subtitle}>
-                            {itinerary?.isOriginal ? 'Creating customized version...' : 'Editing customized version'}
+                            {itinerary?.isOriginal ? 'Đang tạo phiên bản tùy chỉnh...' : 'Đang chỉnh sửa phiên bản tùy chỉnh'}
                         </p>
 
                         {getSaveStatusDisplay()}
@@ -482,11 +482,11 @@ const AIItineraryCustomize = () => {
 
                     {/* Summary Customization */}
                     <div style={styles.summaryCard}>
-                        <h3 style={{ marginBottom: '1rem', color: '#1f2937' }}>📝 Trip Summary</h3>
+                        <h3 style={{ marginBottom: '1rem', color: '#1f2937' }}>📝 Tóm tắt chuyến đi</h3>
                         <textarea
                             value={formData.summary}
                             onChange={(e) => handleSummaryChange(e.target.value)}
-                            placeholder="Describe your perfect trip..."
+                            placeholder="Mô tả chuyến đi hoàn hảo của bạn..."
                             style={styles.summaryInput}
                         />
                     </div>
@@ -516,12 +516,12 @@ const AIItineraryCustomize = () => {
 
                             {/* Activities */}
                             <div>
-                                <h4 style={{ marginBottom: '1rem', color: '#374151' }}>🎯 Activities</h4>
+                                <h4 style={{ marginBottom: '1rem', color: '#374151' }}>🎯 Các hoạt động</h4>
 
                                 {day.activities?.map((activity, activityIndex) => (
                                     <div key={activity.activityId || activityIndex} style={styles.activityCard}>
                                         {activity.userModified && (
-                                            <div style={styles.modifiedBadge}>✏️ Modified</div>
+                                            <div style={styles.modifiedBadge}>✏️ Đã sửa</div>
                                         )}
 
                                         <div style={styles.activityGrid}>
@@ -530,14 +530,14 @@ const AIItineraryCustomize = () => {
                                                     type="text"
                                                     value={activity.activity || ''}
                                                     onChange={(e) => handleActivityUpdate(dayIndex, activityIndex, { activity: e.target.value })}
-                                                    placeholder="Activity name"
+                                                    placeholder="Tên hoạt động"
                                                     style={styles.input}
                                                 />
                                                 <input
                                                     type="text"
                                                     value={activity.location || ''}
                                                     onChange={(e) => handleActivityUpdate(dayIndex, activityIndex, { location: e.target.value })}
-                                                    placeholder="Location"
+                                                    placeholder="Địa điểm"
                                                     style={{ ...styles.input, marginTop: '0.5rem' }}
                                                 />
                                             </div>
@@ -547,10 +547,10 @@ const AIItineraryCustomize = () => {
                                                 onChange={(e) => handleActivityUpdate(dayIndex, activityIndex, { timeSlot: e.target.value })}
                                                 style={styles.select}
                                             >
-                                                <option value="morning">Morning</option>
-                                                <option value="afternoon">Afternoon</option>
-                                                <option value="evening">Evening</option>
-                                                <option value="night">Night</option>
+                                                <option value="morning">Buổi sáng</option>
+                                                <option value="afternoon">Buổi chiều</option>
+                                                <option value="evening">Buổi tối</option>
+                                                <option value="night">Đêm</option>
                                             </select>
 
                                             <input
@@ -576,7 +576,7 @@ const AIItineraryCustomize = () => {
                                                     onClick={() => handleRemoveActivity(dayIndex, activityIndex)}
                                                     style={styles.button('danger')}
                                                 >
-                                                    🗑️ Remove
+                                                    🗑️ Xóa
                                                 </button>
                                             </div>
                                         </div>
@@ -588,7 +588,7 @@ const AIItineraryCustomize = () => {
                                     onClick={() => handleAddActivity(dayIndex)}
                                     style={styles.button('add')}
                                 >
-                                    ➕ Add Activity
+                                    ➕ Thêm hoạt động
                                 </button>
                             </div>
 

@@ -398,7 +398,7 @@ export const ErrorAlert = ({ error, onRetry, onDismiss }) => {
             <div style={styles.header}>
                 <div style={styles.title}>
                     <span>⚠️</span>
-                    <span>Error</span>
+                    <span>Lỗi</span>
                 </div>
             </div>
 
@@ -412,7 +412,7 @@ export const ErrorAlert = ({ error, onRetry, onDismiss }) => {
                         onClick={onRetry}
                         style={{ ...styles.button, ...styles.retryButton }}
                     >
-                        Try Again
+                        Thử Lại
                     </button>
                 )}
                 {onDismiss && (
@@ -420,7 +420,7 @@ export const ErrorAlert = ({ error, onRetry, onDismiss }) => {
                         onClick={onDismiss}
                         style={{ ...styles.button, ...styles.dismissButton }}
                     >
-                        Dismiss
+                        Bỏ Qua
                     </button>
                 )}
             </div>

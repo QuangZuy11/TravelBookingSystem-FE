@@ -1,12 +1,12 @@
 import React, { useState, useEffect } from 'react';
 
-const PassengerForm = ({ 
-    passenger = null, 
-    onSave, 
-    onCancel, 
-    seatNumber = '', 
-    seatClass = '', 
-    passengerIndex = 0 
+const PassengerForm = ({
+    passenger = null,
+    onSave,
+    onCancel,
+    seatNumber = '',
+    seatClass = '',
+    passengerIndex = 0
 }) => {
     const [formData, setFormData] = useState({
         fullName: '',
@@ -42,36 +42,36 @@ const PassengerForm = ({
     ];
 
     const mealOptions = [
-        { value: 'none', label: 'No Preference' },
-        { value: 'vegetarian', label: 'Vegetarian' },
-        { value: 'vegan', label: 'Vegan' },
+        { value: 'none', label: 'Không yêu cầu' },
+        { value: 'vegetarian', label: 'Ăn chay' },
+        { value: 'vegan', label: 'Thuần chay' },
         { value: 'halal', label: 'Halal' },
         { value: 'kosher', label: 'Kosher' },
-        { value: 'gluten-free', label: 'Gluten Free' },
-        { value: 'diabetic', label: 'Diabetic' }
+        { value: 'gluten-free', label: 'Không gluten' },
+        { value: 'diabetic', label: 'Tiểu đường' }
     ];
 
     const validateForm = () => {
         const newErrors = {};
 
         if (!formData.fullName.trim()) {
-            newErrors.fullName = 'Full name is required';
+            newErrors.fullName = 'Vui lòng nhập họ tên';
         }
 
         if (!formData.dateOfBirth) {
-            newErrors.dateOfBirth = 'Date of birth is required';
+            newErrors.dateOfBirth = 'Vui lòng nhập ngày sinh';
         } else {
             const birthDate = new Date(formData.dateOfBirth);
             const today = new Date();
             const age = today.getFullYear() - birthDate.getFullYear();
-            
+
             if (age < 0 || age > 150) {
-                newErrors.dateOfBirth = 'Invalid date of birth';
+                newErrors.dateOfBirth = 'Ngày sinh không hợp lệ';
             }
         }
 
         if (!formData.passportNumber.trim()) {
-            newErrors.passportNumber = 'Passport number is required';
+            newErrors.passportNumber = 'Vui lòng nhập số hộ chiếu';
         }
 
         setErrors(newErrors);
@@ -88,7 +88,7 @@ const PassengerForm = ({
 
     const handleSubmit = (e) => {
         e.preventDefault();
-        
+
         if (validateForm()) {
             onSave(formData);
         }
@@ -223,7 +223,7 @@ const PassengerForm = ({
             <div style={formHeaderStyle}>
                 <h3 style={headerTitleStyle}>
                     <span>👤</span>
-                    Passenger {passengerIndex > 0 ? `#${passengerIndex + 1}` : ''}
+                    Hành khách {passengerIndex > 0 ? `#${passengerIndex + 1}` : ''}
                 </h3>
             </div>
 
@@ -231,7 +231,7 @@ const PassengerForm = ({
             <div style={gridStyle}>
                 <div style={formGroupStyle}>
                     <label style={labelStyle}>
-                        Full Name <span style={requiredStyle}>*</span>
+                        Họ và tên <span style={requiredStyle}>*</span>
                     </label>
                     <input
                         type="text"
@@ -239,14 +239,14 @@ const PassengerForm = ({
                         value={formData.fullName}
                         onChange={handleChange}
                         style={inputStyle}
-                        placeholder="Enter full name"
+                        placeholder="Nhập họ và tên"
                     />
                     {errors.fullName && <p style={errorStyle}>{errors.fullName}</p>}
                 </div>
 
                 <div style={formGroupStyle}>
                     <label style={labelStyle}>
-                        Gender <span style={requiredStyle}>*</span>
+                        Giới tính <span style={requiredStyle}>*</span>
                     </label>
                     <div style={radioContainerStyle}>
                         <label style={radioLabelStyle}>

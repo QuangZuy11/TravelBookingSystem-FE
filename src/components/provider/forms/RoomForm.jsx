@@ -170,26 +170,26 @@ export const RoomForm = ({ initialData, onSubmit, hotelId }) => {
     };
 
     const roomTypes = [
-        { value: 'single', label: '🛏️ Single Room', capacity: 1 },
-        { value: 'double', label: '🛏️🛏️ Double Room', capacity: 2 },
-        { value: 'twin', label: '👥 Twin Room', capacity: 2 },
-        { value: 'suite', label: '👑 Suite', capacity: 3 },
-        { value: 'deluxe', label: '✨ Deluxe', capacity: 4 },
-        { value: 'family', label: '👨‍👩‍👧‍👦 Family Room', capacity: 5 }
+        { value: 'single', label: '🛏️ Phòng Đơn', capacity: 1 },
+        { value: 'double', label: '🛏️🛏️ Phòng Đôi', capacity: 2 },
+        { value: 'twin', label: '👥 Phòng Twin', capacity: 2 },
+        { value: 'suite', label: '👑 Phòng Suite', capacity: 3 },
+        { value: 'deluxe', label: '✨ Phòng Deluxe', capacity: 4 },
+        { value: 'family', label: '👨‍👩‍👧‍👦 Phòng Gia Đình', capacity: 5 }
     ];
 
     const roomAmenities = [
-        'Wi-Fi', 'TV', 'Air Conditioning', 'Mini Bar', 'Safe Box',
-        'Balcony', 'City View', 'Ocean View', 'Mountain View',
-        'Bathtub', 'Shower', 'Hair Dryer', 'Iron', 'Coffee Maker',
-        'Room Service', 'Work Desk', 'Sofa', 'Wardrobe'
+        'Wi-Fi', 'TV', 'Điều Hòa', 'Minibar', 'Két Sắt',
+        'Ban Công', 'View Thành Phố', 'View Biển', 'View Núi',
+        'Bồn Tắm', 'Vòi Sen', 'Máy Sấy Tóc', 'Bàn Ủi', 'Máy Pha Cà Phê',
+        'Dịch Vụ Phòng', 'Bàn Làm Việc', 'Sofa', 'Tủ Quần Áo'
     ];
 
     const statusOptions = [
-        { value: 'available', label: '✅ Available', color: '#10b981' },
-        { value: 'occupied', label: '🔒 Occupied', color: '#ef4444' },
-        { value: 'maintenance', label: '🔧 Maintenance', color: '#f59e0b' },
-        { value: 'reserved', label: '📅 Reserved', color: '#3b82f6' }
+        { value: 'available', label: '✅ Còn Trống', color: '#10b981' },
+        { value: 'occupied', label: '🔒 Đang Sử Dụng', color: '#ef4444' },
+        { value: 'maintenance', label: '🔧 Đang Bảo Trì', color: '#f59e0b' },
+        { value: 'reserved', label: '📅 Đã Đặt Trước', color: '#3b82f6' }
     ];
 
     // Styles
@@ -377,9 +377,9 @@ export const RoomForm = ({ initialData, onSubmit, hotelId }) => {
             <form onSubmit={handleSubmit} style={formContainerStyle}>
                 <div style={headerStyle}>
                     <h1 style={titleStyle}>
-                        {initialData ? '✏️ Edit Room' : '✨ Create New Room'}
+                        {initialData ? '✏️ Chỉnh Sửa Phòng' : '✨ Thêm Phòng Mới'}
                     </h1>
-                    <p style={subtitleStyle}>Add room details and configure availability</p>
+                    <p style={subtitleStyle}>Thêm thông tin chi tiết và cài đặt trạng thái phòng</p>
                 </div>
 
                 {/* Basic Information */}
@@ -389,12 +389,12 @@ export const RoomForm = ({ initialData, onSubmit, hotelId }) => {
                 >
                     <h2 style={sectionTitleStyle}>
                         <span style={{ fontSize: '1.75rem' }}>🏠</span>
-                        Basic Information
+                        Thông Tin Cơ Bản
                     </h2>
 
                     <div style={gridStyle}>
                         <div>
-                            <label style={labelStyle}>Room Number</label>
+                            <label style={labelStyle}>Số Phòng</label>
                             <input
                                 type="text"
                                 name="roomNumber"
@@ -404,11 +404,11 @@ export const RoomForm = ({ initialData, onSubmit, hotelId }) => {
                                 style={inputStyle}
                                 onFocus={(e) => e.target.style.borderColor = '#10b981'}
                                 onBlur={(e) => e.target.style.borderColor = '#e5e7eb'}
-                                placeholder="e.g., 101, A-205"
+                                placeholder="VD: 101, A-205"
                             />
                         </div>
                         <div>
-                            <label style={labelStyle}>Floor</label>
+                            <label style={labelStyle}>Tầng</label>
                             <input
                                 type="number"
                                 name="floor"
@@ -419,13 +419,13 @@ export const RoomForm = ({ initialData, onSubmit, hotelId }) => {
                                 style={inputStyle}
                                 onFocus={(e) => e.target.style.borderColor = '#10b981'}
                                 onBlur={(e) => e.target.style.borderColor = '#e5e7eb'}
-                                placeholder="Floor number"
+                                placeholder="Số tầng"
                             />
                         </div>
                     </div>
 
                     <div style={{ marginBottom: '1.5rem' }}>
-                        <label style={labelStyle}>Description</label>
+                        <label style={labelStyle}>Mô Tả</label>
                         <textarea
                             name="description"
                             value={formData.description}
@@ -434,7 +434,7 @@ export const RoomForm = ({ initialData, onSubmit, hotelId }) => {
                             style={inputStyle}
                             onFocus={(e) => e.target.style.borderColor = '#10b981'}
                             onBlur={(e) => e.target.style.borderColor = '#e5e7eb'}
-                            placeholder="Describe the room features and highlights..."
+                            placeholder="Mô tả các đặc điểm và điểm nổi bật của phòng..."
                         />
                     </div>
                 </div>
@@ -446,7 +446,7 @@ export const RoomForm = ({ initialData, onSubmit, hotelId }) => {
                 >
                     <h2 style={sectionTitleStyle}>
                         <span style={{ fontSize: '1.75rem' }}>🛏️</span>
-                        Room Type & Capacity
+                        Loại Phòng & Sức Chứa
                     </h2>
 
                     <div style={{ ...gridStyle, gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))' }}>
@@ -479,14 +479,14 @@ export const RoomForm = ({ initialData, onSubmit, hotelId }) => {
                                 </div>
                                 <div>{roomType.label.replace(/[^\w\s]/g, '')}</div>
                                 <div style={{ fontSize: '0.875rem', marginTop: '0.5rem', opacity: 0.9 }}>
-                                    Max: {roomType.capacity} guests
+                                    Tối đa: {roomType.capacity} khách
                                 </div>
                             </div>
                         ))}
                     </div>
 
                     <div style={{ marginTop: '1.5rem' }}>
-                        <label style={labelStyle}>Custom Capacity (guests)</label>
+                        <label style={labelStyle}>Sức Chứa Tùy Chỉnh (khách)</label>
                         <input
                             type="number"
                             name="capacity"
@@ -508,12 +508,12 @@ export const RoomForm = ({ initialData, onSubmit, hotelId }) => {
                 >
                     <h2 style={sectionTitleStyle}>
                         <span style={{ fontSize: '1.75rem' }}>💰</span>
-                        Pricing & Status
+                        Giá & Trạng Thái
                     </h2>
 
                     <div style={gridStyle}>
                         <div>
-                            <label style={labelStyle}>Price Per Night (VND)</label>
+                            <label style={labelStyle}>Giá Mỗi Đêm (VNĐ)</label>
                             <input
                                 type="number"
                                 name="pricePerNight"
@@ -524,11 +524,11 @@ export const RoomForm = ({ initialData, onSubmit, hotelId }) => {
                                 style={inputStyle}
                                 onFocus={(e) => e.target.style.borderColor = '#10b981'}
                                 onBlur={(e) => e.target.style.borderColor = '#e5e7eb'}
-                                placeholder="500000"
+                                placeholder="500.000"
                             />
                         </div>
                         <div>
-                            <label style={labelStyle}>Room Status</label>
+                            <label style={labelStyle}>Trạng Thái Phòng</label>
                             <select
                                 name="status"
                                 value={formData.status}
@@ -554,7 +554,7 @@ export const RoomForm = ({ initialData, onSubmit, hotelId }) => {
                 >
                     <h2 style={sectionTitleStyle}>
                         <span style={{ fontSize: '1.75rem' }}>✨</span>
-                        Room Amenities
+                        Tiện Nghi Phòng
                     </h2>
 
                     <div style={checkboxContainerStyle}>
@@ -586,7 +586,7 @@ export const RoomForm = ({ initialData, onSubmit, hotelId }) => {
                 >
                     <h2 style={sectionTitleStyle}>
                         <span style={{ fontSize: '1.75rem' }}>📸</span>
-                        Room Images
+                        Hình Ảnh Phòng
                     </h2>
 
                     <input
@@ -682,7 +682,7 @@ export const RoomForm = ({ initialData, onSubmit, hotelId }) => {
                                                             e.currentTarget.style.background = 'rgba(255, 255, 255, 0.95)';
                                                             e.currentTarget.style.transform = 'scale(1)';
                                                         }}
-                                                        title="Move up"
+                                                        title="Di chuyển lên"
                                                     >
                                                         ⬆️
                                                     </button>
@@ -714,7 +714,7 @@ export const RoomForm = ({ initialData, onSubmit, hotelId }) => {
                                                             e.currentTarget.style.background = 'rgba(255, 255, 255, 0.95)';
                                                             e.currentTarget.style.transform = 'scale(1)';
                                                         }}
-                                                        title="Move down"
+                                                        title="Di chuyển xuống"
                                                     >
                                                         ⬇️
                                                     </button>
@@ -746,7 +746,7 @@ export const RoomForm = ({ initialData, onSubmit, hotelId }) => {
                                                         e.currentTarget.style.background = 'rgba(239, 68, 68, 0.95)';
                                                         e.currentTarget.style.transform = 'scale(1)';
                                                     }}
-                                                    title="Delete image"
+                                                    title="Xóa ảnh"
                                                 >
                                                     🗑️
                                                 </button>
@@ -789,7 +789,7 @@ export const RoomForm = ({ initialData, onSubmit, hotelId }) => {
                             e.currentTarget.style.background = 'white';
                         }}
                     >
-                        Cancel
+                        Hủy Bỏ
                     </button>
                     <button
                         type="submit"
@@ -803,7 +803,7 @@ export const RoomForm = ({ initialData, onSubmit, hotelId }) => {
                             e.currentTarget.style.boxShadow = '0 4px 15px rgba(102, 126, 234, 0.4)';
                         }}
                     >
-                        {initialData ? '✅ Update Room' : '✨ Create Room'}
+                        {initialData ? '✅ Cập Nhật Phòng' : '✨ Tạo Phòng Mới'}
                     </button>
                 </div>
             </form>

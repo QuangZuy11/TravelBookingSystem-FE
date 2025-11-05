@@ -33,7 +33,7 @@ const HotelListPage = () => {
                 return;
             }
         } catch (err) {
-            setError('Failed to fetch hotels.');
+            setError('Không thể tải danh sách khách sạn.');
             console.error(err);
         } finally {
             setLoading(false);
@@ -59,15 +59,15 @@ const HotelListPage = () => {
     };
 
     const handleDeleteHotel = async (hotelId) => {
-        if (window.confirm('Are you sure you want to delete this hotel?')) {
+        if (window.confirm('Bạn có chắc chắn muốn xóa khách sạn này không?')) {
             try {
                 await axios.delete(`/api/provider/${providerId}/hotels/${hotelId}`, {
                     headers: { Authorization: `Bearer ${token}` }
                 });
                 await fetchHotels();
-                alert('Hotel deleted successfully!');
+                alert('Đã xóa khách sạn thành công!');
             } catch (err) {
-                alert('Failed to delete hotel.');
+                alert('Không thể xóa khách sạn.');
                 console.error(err);
             }
         }
@@ -80,12 +80,12 @@ const HotelListPage = () => {
                 hotelResponse = await axios.put(`/api/provider/${providerId}/hotels/${editingHotel._id}`, formData, {
                     headers: { Authorization: `Bearer ${token}` }
                 });
-                alert('Hotel updated successfully!');
+                alert('Đã cập nhật khách sạn thành công!');
             } else {
                 hotelResponse = await axios.post(`/api/provider/${providerId}/hotels`, formData, {
                     headers: { Authorization: `Bearer ${token}` }
                 });
-                alert('Hotel created successfully!');
+                alert('Đã tạo khách sạn thành công!');
             }
 
             setIsFormModalOpen(false);
@@ -94,7 +94,7 @@ const HotelListPage = () => {
             const hotelId = editingHotel ? editingHotel._id : hotelResponse.data.data._id;
             navigate(`/provider/hotels/${hotelId}/overview`);
         } catch (err) {
-            alert('Failed to save hotel.');
+            alert('Không thể lưu thông tin khách sạn.');
             console.error(err);
         }
     };
@@ -128,12 +128,12 @@ const HotelListPage = () => {
     // This code should never be reached due to redirect in fetchHotels
     return (
         <div className="p-6 bg-gray-100 min-h-screen">
-            <h1 className="text-3xl font-bold text-gray-900 mb-6">Manage Hotels</h1>
+            <h1 className="text-3xl font-bold text-gray-900 mb-6">Quản lý khách sạn</h1>
 
             <div className="flex justify-between items-center mb-6">
                 <input
                     type="text"
-                    placeholder="Search by hotel name..."
+                    placeholder="Tìm kiếm theo tên khách sạn..."
                     className="p-2 border border-gray-300 rounded-md w-1/3"
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
@@ -147,23 +147,23 @@ const HotelListPage = () => {
                         }`}
                     title={hotels.length >= 1 ? 'Bạn chỉ được phép tạo 1 khách sạn' : 'Thêm khách sạn mới'}
                 >
-                    + Add New Hotel {hotels.length >= 1 && '(Đã đạt giới hạn)'}
+                    + Thêm khách sạn mới {hotels.length >= 1 && '(Đã đạt giới hạn)'}
                 </button>
             </div>
 
             {filteredHotels.length === 0 ? (
-                <p className="text-center text-gray-500">No hotels found.</p>
+                <p className="text-center text-gray-500">Không tìm thấy khách sạn nào.</p>
             ) : (
                 <div className="bg-white rounded-lg shadow-md overflow-hidden">
                     <table className="min-w-full divide-y divide-gray-200">
                         <thead className="bg-gray-50">
                             <tr>
-                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-900 uppercase">Hotel Name</th>
-                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-900 uppercase">Address</th>
-                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-900 uppercase">Star Rating</th>
-                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-900 uppercase">Total Rooms</th>
-                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-900 uppercase">Status</th>
-                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-900 uppercase">Actions</th>
+                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-900 uppercase">Tên khách sạn</th>
+                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-900 uppercase">Địa chỉ</th>
+                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-900 uppercase">Xếp hạng sao</th>
+                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-900 uppercase">Tổng số phòng</th>
+                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-900 uppercase">Trạng thái</th>
+                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-900 uppercase">Thao tác</th>
                             </tr>
                         </thead>
                         <tbody className="bg-white divide-y divide-gray-200">
@@ -186,19 +186,19 @@ const HotelListPage = () => {
                                             to={`/provider/${providerId}/hotels/${hotel._id}`}
                                             className="text-blue-600 hover:text-blue-900 mr-4"
                                         >
-                                            View
+                                            Xem
                                         </Link>
                                         <button
                                             onClick={() => handleEditHotel(hotel)}
                                             className="text-yellow-600 hover:text-yellow-900 mr-4"
                                         >
-                                            Edit
+                                            Sửa
                                         </button>
                                         <button
                                             onClick={() => handleDeleteHotel(hotel._id)}
                                             className="text-red-600 hover:text-red-900"
                                         >
-                                            Delete
+                                            Xóa
                                         </button>
                                     </td>
                                 </tr>

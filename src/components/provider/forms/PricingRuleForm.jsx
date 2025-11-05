@@ -38,7 +38,7 @@ const PricingRuleForm = ({ initialData, onSubmit }) => {
         <form onSubmit={handleSubmit} className="space-y-4 p-4">
             <div className="grid grid-cols-2 gap-4">
                 <div>
-                    <label className="block text-sm font-medium text-gray-700">Start Date</label>
+                    <label className="block text-sm font-medium text-gray-700">Ngày Bắt Đầu</label>
                     <input
                         type="date"
                         name="startDate"
@@ -49,7 +49,7 @@ const PricingRuleForm = ({ initialData, onSubmit }) => {
                     />
                 </div>
                 <div>
-                    <label className="block text-sm font-medium text-gray-700">End Date</label>
+                    <label className="block text-sm font-medium text-gray-700">Ngày Kết Thúc</label>
                     <input
                         type="date"
                         name="endDate"
@@ -64,10 +64,10 @@ const PricingRuleForm = ({ initialData, onSubmit }) => {
 
             <div className="grid grid-cols-2 gap-4">
                 <div>
-                    <label className="block text-sm font-medium text-gray-700">New Price</label>
+                    <label className="block text-sm font-medium text-gray-700">Giá Mới</label>
                     <div className="mt-1 relative rounded-md shadow-sm">
                         <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                            <span className="text-gray-500 sm:text-sm">$</span>
+                            <span className="text-gray-500 sm:text-sm">₫</span>
                         </div>
                         <input
                             type="number"
@@ -75,14 +75,14 @@ const PricingRuleForm = ({ initialData, onSubmit }) => {
                             value={formData.newPrice}
                             onChange={handleChange}
                             min="0"
-                            step="0.01"
+                            step="1000"
                             required
                             className="block w-full pl-7 rounded-md border border-gray-300 py-2 px-3 shadow-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
                         />
                     </div>
                 </div>
                 <div>
-                    <label className="block text-sm font-medium text-gray-700">Discount Percentage</label>
+                    <label className="block text-sm font-medium text-gray-700">Phần Trăm Giảm Giá</label>
                     <div className="mt-1 relative rounded-md shadow-sm">
                         <input
                             type="number"
@@ -101,13 +101,13 @@ const PricingRuleForm = ({ initialData, onSubmit }) => {
             </div>
 
             <div>
-                <label className="block text-sm font-medium text-gray-700">Reason (Optional)</label>
+                <label className="block text-sm font-medium text-gray-700">Lý Do (Không bắt buộc)</label>
                 <textarea
                     name="reason"
                     value={formData.reason}
                     onChange={handleChange}
                     rows="3"
-                    placeholder="e.g., Holiday season, Off-peak discount, Special event"
+                    placeholder="VD: Mùa du lịch, Giảm giá thấp điểm, Sự kiện đặc biệt"
                     className="mt-1 block w-full rounded-md border border-gray-300 py-2 px-3 shadow-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
                 />
             </div>
@@ -117,7 +117,7 @@ const PricingRuleForm = ({ initialData, onSubmit }) => {
                     type="submit"
                     className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
                 >
-                    {initialData ? 'Update Pricing Rule' : 'Create Pricing Rule'}
+                    {initialData ? 'Cập Nhật Quy Tắc Giá' : 'Tạo Quy Tắc Giá Mới'}
                 </button>
             </div>
         </form>

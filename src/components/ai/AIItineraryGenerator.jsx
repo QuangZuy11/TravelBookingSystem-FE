@@ -35,7 +35,7 @@ const AIItineraryGenerator = () => {
     if (authLoading) return;
 
     if (!user) {
-      toast.error("Please login to use AI Itinerary Generator");
+      toast.error("Vui lòng đăng nhập để sử dụng trình tạo lộ trình AI");
       setTimeout(() => navigate("/auth"), 2000);
       return;
     }
@@ -57,32 +57,32 @@ const AIItineraryGenerator = () => {
 
     // Enhanced validation based on new API spec
     if (!formData.destination.trim()) {
-      toast.error("Please enter a destination.");
+      toast.error("Vui lòng nhập điểm đến.");
       return;
     }
     if (formData.destination.trim().length < 2) {
-      toast.error("Please enter a valid destination (at least 2 characters).");
+      toast.error("Vui lòng nhập điểm đến hợp lệ (ít nhất 2 ký tự).");
       return;
     }
     if (formData.preferences.length < 2) {
       toast.error(
-        "Please select at least 2 preferences for better personalization."
+        "Vui lòng chọn ít nhất 2 sở thích để có lộ trình phù hợp hơn."
       );
       return;
     }
     if (formData.participants < 1) {
-      toast.error("Number of travelers must be at least 1.");
+      toast.error("Số lượng người phải ít nhất là 1.");
       return;
     }
 
     setLoading(true);
 
     const messages = [
-      "🤖 AI analyzing your preferences...",
-      "🗺️ Finding perfect destinations...",
-      "⏰ Optimizing your schedule...",
-      "💡 Adding personalized touches...",
-      "✨ Almost ready...",
+      "🤖 AI đang phân tích sở thích của bạn...",
+      "🗺️ Đang tìm điểm đến phù hợp...",
+      "⏰ Đang tối ưu lịch trình...",
+      "💡 Đang cá nhân hóa...",
+      "✨ Sắp hoàn thành...",
     ];
 
     let messageIndex = 0;
@@ -114,7 +114,7 @@ const AIItineraryGenerator = () => {
 
       if (response.success && response.data) {
         setResult(response.data);
-        toast.success(response.message || "Perfect itinerary generated! 🎉");
+        toast.success(response.message || "Đã tạo lộ trình hoàn hảo! 🎉");
 
         // Navigate to detail view after successful generation
         if (response.data.aiGeneratedId) {
@@ -123,12 +123,12 @@ const AIItineraryGenerator = () => {
           }, 2000);
         }
       } else {
-        throw new Error(response.message || "Failed to generate itinerary");
+        throw new Error(response.message || "Không thể tạo lộ trình");
       }
     } catch (err) {
       console.error("❌ Generation Error:", err);
       const errorMessage =
-        err.message || "Failed to generate itinerary. Please try again.";
+        err.message || "Không thể tạo lộ trình. Vui lòng thử lại.";
       setError(errorMessage);
       toast.error(errorMessage);
     } finally {
@@ -161,11 +161,11 @@ const AIItineraryGenerator = () => {
             }}
           >
             {authLoading ? (
-              <div style={{ color: "#666" }}>Loading authentication...</div>
+              <div style={{ color: "#666" }}>Đang tải xác thực...</div>
             ) : (
               <>
                 <p style={{ color: "#666", marginBottom: "1rem" }}>
-                  Please login to use AI Itinerary Generator
+                  Vui lòng đăng nhập để sử dụng trình tạo lộ trình AI
                 </p>
                 <button
                   onClick={() => navigate("/auth")}
@@ -180,7 +180,7 @@ const AIItineraryGenerator = () => {
                     fontWeight: "600",
                   }}
                 >
-                  Go to Login
+                  Đến trang đăng nhập
                 </button>
               </>
             )}
@@ -421,16 +421,16 @@ const AIItineraryGenerator = () => {
         <div style={styles.heroContent}>
           <div style={styles.badge}>
             <span>✨</span>
-            <span>Powered by AI</span>
+            <span>Được hỗ trợ bởi AI</span>
           </div>
           <h1 style={styles.mainTitle}>
-            Your Perfect Journey,
+            Hành trình hoàn hảo,
             <br />
-            <span style={styles.gradientText}>Crafted by AI</span>
+            <span style={styles.gradientText}>Được tạo bởi AI</span>
           </h1>
           <p style={styles.subtitle}>
-            Answer a few questions and let our AI create a personalized
-            itinerary tailored just for you
+            Trả lời một vài câu hỏi và để AI tạo ra
+            lộ trình được cá nhân hóa dành riêng cho bạn
           </p>
         </div>
       </div>
@@ -457,9 +457,9 @@ const AIItineraryGenerator = () => {
                 }}
               >
                 {[
-                  { label: "Destination", icon: "📍" },
-                  { label: "Budget", icon: "💰" },
-                  { label: "Preferences", icon: "✨" },
+                  { label: "Điểm đến", icon: "📍" },
+                  { label: "Ngân sách", icon: "💰" },
+                  { label: "Sở thích", icon: "✨" },
                 ].map((step, idx) => (
                   <div
                     key={idx}
@@ -532,7 +532,7 @@ const AIItineraryGenerator = () => {
                   >
                     <span style={{ fontSize: "1.5rem" }}>📍</span>
                   </div>
-                  <h2 style={styles.sectionTitle}>Where, When & Who</h2>
+                  <h2 style={styles.sectionTitle}>Ở đâu, Khi nào & Ai</h2>
                 </div>
 
                 <div
@@ -545,10 +545,10 @@ const AIItineraryGenerator = () => {
                 >
                   {/* Destination */}
                   <div style={{ gridColumn: "span 2" }}>
-                    <label style={styles.label}>✈️ Destination</label>
+                    <label style={styles.label}>✈️ Điểm đến</label>
                     <input
                       type="text"
-                      placeholder="Enter destination (e.g., Hanoi, Da Nang, Ho Chi Minh City...)"
+                      placeholder="Nhập điểm đến (VD: Hà Nội, Đà Nẵng, TP. Hồ Chí Minh...)"
                       value={formData.destination}
                       onChange={(e) =>
                         setFormData((prev) => ({
@@ -567,7 +567,7 @@ const AIItineraryGenerator = () => {
 
                   {/* Participants */}
                   <div>
-                    <label style={styles.label}>👥 Travelers</label>
+                    <label style={styles.label}>👥 Số người</label>
                     <div style={styles.counterContainer}>
                       <button
                         type="button"
@@ -619,10 +619,10 @@ const AIItineraryGenerator = () => {
 
                   {/* Age Range */}
                   <div>
-                    <label style={styles.label}>⏰ Age Range</label>
+                    <label style={styles.label}>⏰ Độ tuổi</label>
                     <input
                       type="text"
-                      placeholder="e.g., 25-35"
+                      placeholder="VD: 25-35"
                       value={formData.ageRange}
                       onChange={(e) =>
                         setFormData((prev) => ({
@@ -637,7 +637,7 @@ const AIItineraryGenerator = () => {
 
                 {/* Duration */}
                 <div>
-                  <label style={styles.label}>📅 Trip Duration</label>
+                  <label style={styles.label}>📅 Thời gian</label>
                   <div
                     style={{
                       display: "flex",
@@ -671,7 +671,7 @@ const AIItineraryGenerator = () => {
                           }
                         }}
                       >
-                        {days} {days === 1 ? "day" : "days"}
+                        {days} {days === 1 ? "ngày" : "ngày"}
                       </button>
                     ))}
                   </div>
@@ -690,7 +690,7 @@ const AIItineraryGenerator = () => {
                   >
                     <span style={{ fontSize: "1.5rem" }}>💰</span>
                   </div>
-                  <h2 style={styles.sectionTitle}>Budget Level</h2>
+                  <h2 style={styles.sectionTitle}>Mức chi phí</h2>
                 </div>
 
                 <div
@@ -809,7 +809,7 @@ const AIItineraryGenerator = () => {
                   >
                     <span style={{ fontSize: "1.5rem" }}>✨</span>
                   </div>
-                  <h2 style={styles.sectionTitle}>Your Preferences</h2>
+                  <h2 style={styles.sectionTitle}>Sở thích của bạn</h2>
                 </div>
 
                 <div
@@ -829,7 +829,7 @@ const AIItineraryGenerator = () => {
                 >
                   <span style={{ fontSize: "1.25rem" }}>✨</span>
                   <span style={{ fontWeight: "500" }}>
-                    Select 2-4 preferences for the best personalized results
+                    Chọn 2-4 sở thích để có kết quả phù hợp nhất
                   </span>
                 </div>
 
@@ -969,7 +969,7 @@ const AIItineraryGenerator = () => {
                 ) : (
                   <>
                     <span style={{ fontSize: "1.5rem" }}>✨</span>
-                    <span>Generate My Perfect Itinerary</span>
+                    <span>Tạo lộ trình hoàn hảo cho tôi</span>
                   </>
                 )}
               </button>
@@ -1006,7 +1006,7 @@ const AIItineraryGenerator = () => {
                 }}
               >
                 <span style={{ fontSize: "1.5rem" }}>🎉</span>
-                <span>Your Perfect Itinerary is Ready!</span>
+                <span>                    <span>Lộ trình hoàn hảo của bạn đã sẵn sàng!</span></span>
                 <span style={{ fontSize: "1.5rem" }}>✨</span>
               </div>
 

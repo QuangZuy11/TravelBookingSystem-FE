@@ -295,7 +295,7 @@ export const HotelForm = ({ initialData, onSubmit }) => {
     ];
 
     const paymentOptionsList = [
-        'Credit Card', 'Debit Card', 'Cash', 'Bank Transfer', 'Digital Wallet'
+        'Thẻ Tín Dụng', 'Thẻ Ghi Nợ', 'Tiền Mặt', 'Chuyển Khoản', 'Ví Điện Tử'
     ];
 
     // Styles
@@ -490,9 +490,9 @@ export const HotelForm = ({ initialData, onSubmit }) => {
             <form onSubmit={handleSubmit} style={formContainerStyle}>
                 <div style={headerStyle}>
                     <h1 style={titleStyle}>
-                        {initialData ? 'Update Hotel' : 'Create New Hotel'}
+                        {initialData ? 'Cập Nhật Khách Sạn' : 'Thêm Khách Sạn Mới'}
                     </h1>
-                    <p style={subtitleStyle}>Fill in the details to add your property</p>
+                    <p style={subtitleStyle}>Điền thông tin chi tiết để thêm cơ sở kinh doanh của bạn</p>
                 </div>
 
                 {/* Basic Information */}
@@ -502,10 +502,10 @@ export const HotelForm = ({ initialData, onSubmit }) => {
                 >
                     <h2 style={sectionTitleStyle}>
                         <span style={iconStyle}>🏨</span>
-                        Basic Information
+                        Thông Tin Cơ Bản
                     </h2>
                     <div style={{ ...gridStyle, marginBottom: '1.5rem' }}>
-                        <label style={labelStyle}>Hotel Name</label>
+                        <label style={labelStyle}>Tên Khách Sạn</label>
                         <input
                             type="text"
                             name="name"
@@ -515,11 +515,11 @@ export const HotelForm = ({ initialData, onSubmit }) => {
                             style={inputStyle}
                             onFocus={(e) => e.target.style.borderColor = '#10b981'}
                             onBlur={(e) => e.target.style.borderColor = '#e5e7eb'}
-                            placeholder="Enter hotel name"
+                            placeholder="Nhập tên khách sạn"
                         />
                     </div>
                     <div style={{ ...gridStyle, marginBottom: '1.5rem' }}>
-                        <label style={labelStyle}>Description</label>
+                        <label style={labelStyle}>Mô Tả</label>
                         <textarea
                             name="description"
                             value={formData.description}
@@ -529,7 +529,7 @@ export const HotelForm = ({ initialData, onSubmit }) => {
                             style={inputStyle}
                             onFocus={(e) => e.target.style.borderColor = '#10b981'}
                             onBlur={(e) => e.target.style.borderColor = '#e5e7eb'}
-                            placeholder="Describe your hotel"
+                            placeholder="Mô tả về khách sạn của bạn"
                         />
                     </div>
 
@@ -548,7 +548,7 @@ export const HotelForm = ({ initialData, onSubmit }) => {
 
                     <div style={gridStyle}>
                         <div>
-                            <label style={labelStyle}>Category</label>
+                            <label style={labelStyle}>Hạng Sao</label>
                             <select
                                 name="category"
                                 value={formData.category}
@@ -558,15 +558,15 @@ export const HotelForm = ({ initialData, onSubmit }) => {
                                 onFocus={(e) => e.target.style.borderColor = '#10b981'}
                                 onBlur={(e) => e.target.style.borderColor = '#e5e7eb'}
                             >
-                                <option value="1_star">⭐ 1 Star</option>
-                                <option value="2_star">⭐⭐ 2 Stars</option>
-                                <option value="3_star">⭐⭐⭐ 3 Stars</option>
-                                <option value="4_star">⭐⭐⭐⭐ 4 Stars</option>
-                                <option value="5_star">⭐⭐⭐⭐⭐ 5 Stars</option>
+                                <option value="1_star">⭐ 1 Sao</option>
+                                <option value="2_star">⭐⭐ 2 Sao</option>
+                                <option value="3_star">⭐⭐⭐ 3 Sao</option>
+                                <option value="4_star">⭐⭐⭐⭐ 4 Sao</option>
+                                <option value="5_star">⭐⭐⭐⭐⭐ 5 Sao</option>
                             </select>
                         </div>
                         <div>
-                            <label style={labelStyle}>Status</label>
+                            <label style={labelStyle}>Trạng Thái</label>
                             <select
                                 name="status"
                                 value={formData.status}
@@ -575,9 +575,9 @@ export const HotelForm = ({ initialData, onSubmit }) => {
                                 onFocus={(e) => e.target.style.borderColor = '#10b981'}
                                 onBlur={(e) => e.target.style.borderColor = '#e5e7eb'}
                             >
-                                <option value="active">✅ Active</option>
-                                <option value="inactive">⏸️ Inactive</option>
-                                <option value="maintenance">🔧 Maintenance</option>
+                                <option value="active">✅ Đang Hoạt Động</option>
+                                <option value="inactive">⏸️ Tạm Ngưng</option>
+                                <option value="maintenance">🔧 Đang Bảo Trì</option>
                             </select>
                         </div>
                     </div>
@@ -590,11 +590,11 @@ export const HotelForm = ({ initialData, onSubmit }) => {
                 >
                     <h2 style={sectionTitleStyle}>
                         <span style={iconStyle}>📍</span>
-                        Address Information
+                        Thông Tin Địa Chỉ
                     </h2>
                     <div style={gridStyle}>
                         <div>
-                            <label style={labelStyle}>Street</label>
+                            <label style={labelStyle}>Số Nhà, Đường</label>
                             <input
                                 type="text"
                                 name="address.street"
@@ -604,11 +604,11 @@ export const HotelForm = ({ initialData, onSubmit }) => {
                                 style={inputStyle}
                                 onFocus={(e) => e.target.style.borderColor = '#10b981'}
                                 onBlur={(e) => e.target.style.borderColor = '#e5e7eb'}
-                                placeholder="123 Main Street"
+                                placeholder="123 Đường Nguyễn Huệ"
                             />
                         </div>
                         <div>
-                            <label style={labelStyle}>City</label>
+                            <label style={labelStyle}>Thành Phố</label>
                             <input
                                 type="text"
                                 name="address.city"
@@ -618,11 +618,11 @@ export const HotelForm = ({ initialData, onSubmit }) => {
                                 style={inputStyle}
                                 onFocus={(e) => e.target.style.borderColor = '#10b981'}
                                 onBlur={(e) => e.target.style.borderColor = '#e5e7eb'}
-                                placeholder="Ho Chi Minh City"
+                                placeholder="Thành phố Hồ Chí Minh"
                             />
                         </div>
                         <div>
-                            <label style={labelStyle}>State/Province</label>
+                            <label style={labelStyle}>Quận/Huyện</label>
                             <input
                                 type="text"
                                 name="address.state"
@@ -631,11 +631,11 @@ export const HotelForm = ({ initialData, onSubmit }) => {
                                 style={inputStyle}
                                 onFocus={(e) => e.target.style.borderColor = '#10b981'}
                                 onBlur={(e) => e.target.style.borderColor = '#e5e7eb'}
-                                placeholder="District 1"
+                                placeholder="Quận 1"
                             />
                         </div>
                         <div>
-                            <label style={labelStyle}>Country</label>
+                            <label style={labelStyle}>Quốc Gia</label>
                             <input
                                 type="text"
                                 name="address.country"
@@ -645,7 +645,7 @@ export const HotelForm = ({ initialData, onSubmit }) => {
                                 style={inputStyle}
                                 onFocus={(e) => e.target.style.borderColor = '#10b981'}
                                 onBlur={(e) => e.target.style.borderColor = '#e5e7eb'}
-                                placeholder="Vietnam"
+                                placeholder="Việt Nam"
                             />
                         </div>
                         <div>
@@ -726,12 +726,12 @@ export const HotelForm = ({ initialData, onSubmit }) => {
                     onFocus={() => setActiveSection('price')}
                 >
                     <h2 style={sectionTitleStyle}>
-                        <span style={iconStyle}>�</span>
-                        Price Information
+                        <span style={iconStyle}>💰</span>
+                        Thông Tin Giá
                     </h2>
                     <div style={gridStyle}>
                         <div>
-                            <label style={labelStyle}>Minimum Price (VND)</label>
+                            <label style={labelStyle}>Giá Thấp Nhất (VNĐ)</label>
                             <input
                                 type="number"
                                 name="priceRange.min"
@@ -742,11 +742,11 @@ export const HotelForm = ({ initialData, onSubmit }) => {
                                 style={inputStyle}
                                 onFocus={(e) => e.target.style.borderColor = '#10b981'}
                                 onBlur={(e) => e.target.style.borderColor = '#e5e7eb'}
-                                placeholder="500000"
+                                placeholder="500.000"
                             />
                         </div>
                         <div>
-                            <label style={labelStyle}>Maximum Price (VND)</label>
+                            <label style={labelStyle}>Giá Cao Nhất (VNĐ)</label>
                             <input
                                 type="number"
                                 name="priceRange.max"
@@ -757,7 +757,7 @@ export const HotelForm = ({ initialData, onSubmit }) => {
                                 style={inputStyle}
                                 onFocus={(e) => e.target.style.borderColor = '#10b981'}
                                 onBlur={(e) => e.target.style.borderColor = '#e5e7eb'}
-                                placeholder="2000000"
+                                placeholder="2.000.000"
                             />
                         </div>
                     </div>
@@ -770,11 +770,11 @@ export const HotelForm = ({ initialData, onSubmit }) => {
                 >
                     <h2 style={sectionTitleStyle}>
                         <span style={iconStyle}>📋</span>
-                        Policies
+                        Chính Sách
                     </h2>
                     <div style={gridStyle}>
                         <div>
-                            <label style={labelStyle}>Check-in Time</label>
+                            <label style={labelStyle}>Giờ Nhận Phòng</label>
                             <input
                                 type="time"
                                 name="policies.checkInTime"
@@ -787,7 +787,7 @@ export const HotelForm = ({ initialData, onSubmit }) => {
                             />
                         </div>
                         <div>
-                            <label style={labelStyle}>Check-out Time</label>
+                            <label style={labelStyle}>Giờ Trả Phòng</label>
                             <input
                                 type="time"
                                 name="policies.checkOutTime"
@@ -801,7 +801,7 @@ export const HotelForm = ({ initialData, onSubmit }) => {
                         </div>
                     </div>
                     <div style={{ marginBottom: '1.5rem', marginTop: '1.5rem' }}>
-                        <label style={labelStyle}>Cancellation Policy</label>
+                        <label style={labelStyle}>Chính Sách Hủy Phòng</label>
                         <textarea
                             name="policies.cancellationPolicy"
                             value={formData.policies.cancellationPolicy}
@@ -810,11 +810,11 @@ export const HotelForm = ({ initialData, onSubmit }) => {
                             style={inputStyle}
                             onFocus={(e) => e.target.style.borderColor = '#10b981'}
                             onBlur={(e) => e.target.style.borderColor = '#e5e7eb'}
-                            placeholder="Free cancellation up to 24 hours before check-in..."
+                            placeholder="Miễn phí hủy phòng trước 24 giờ..."
                         />
                     </div>
                     <div style={{ marginBottom: '1.5rem' }}>
-                        <label style={labelStyle}>Payment Options</label>
+                        <label style={labelStyle}>Phương Thức Thanh Toán</label>
                         <div style={checkboxContainerStyle}>
                             {paymentOptionsList.map(option => (
                                 <label
@@ -851,7 +851,7 @@ export const HotelForm = ({ initialData, onSubmit }) => {
                                 onChange={handleChange}
                                 style={checkboxStyle}
                             />
-                            <span>🐾 Pets Allowed</span>
+                            <span>🐾 Cho phép thú cưng</span>
                         </label>
                     </div>
                 </div>
@@ -863,7 +863,7 @@ export const HotelForm = ({ initialData, onSubmit }) => {
                 >
                     <h2 style={sectionTitleStyle}>
                         <span style={iconStyle}>📞</span>
-                        Contact Information
+                        Thông tin liên lạc
                     </h2>
                     <div style={gridStyle}>
                         <div>
@@ -915,7 +915,7 @@ export const HotelForm = ({ initialData, onSubmit }) => {
                 >
                     <h2 style={sectionTitleStyle}>
                         <span style={iconStyle}>✨</span>
-                        Amenities
+                        Tiện nghi
                     </h2>
                     <div style={checkboxContainerStyle}>
                         {amenitiesList.map(amenity => (
@@ -946,7 +946,7 @@ export const HotelForm = ({ initialData, onSubmit }) => {
                 >
                     <h2 style={sectionTitleStyle}>
                         <span style={iconStyle}>📸</span>
-                        Images
+                        Hình Ảnh
                         <span style={{
                             marginLeft: 'auto',
                             fontSize: '1rem',
@@ -1056,7 +1056,7 @@ export const HotelForm = ({ initialData, onSubmit }) => {
                                                             e.currentTarget.style.background = 'rgba(255, 255, 255, 0.95)';
                                                             e.currentTarget.style.transform = 'scale(1)';
                                                         }}
-                                                        title="Move up"
+                                                        title="Tiến lên"
                                                     >
                                                         ⬆️
                                                     </button>
@@ -1088,7 +1088,7 @@ export const HotelForm = ({ initialData, onSubmit }) => {
                                                             e.currentTarget.style.background = 'rgba(255, 255, 255, 0.95)';
                                                             e.currentTarget.style.transform = 'scale(1)';
                                                         }}
-                                                        title="Move down"
+                                                        title="Lùi xuống"
                                                     >
                                                         ⬇️
                                                     </button>
@@ -1120,7 +1120,7 @@ export const HotelForm = ({ initialData, onSubmit }) => {
                                                         e.currentTarget.style.background = 'rgba(239, 68, 68, 0.95)';
                                                         e.currentTarget.style.transform = 'scale(1)';
                                                     }}
-                                                    title="Delete image"
+                                                    title="Xóa ảnh"
                                                 >
                                                     🗑️
                                                 </button>
@@ -1163,7 +1163,7 @@ export const HotelForm = ({ initialData, onSubmit }) => {
                             e.currentTarget.style.background = 'white';
                         }}
                     >
-                        Cancel
+                        Hủy
                     </button>
                     <button
                         type="submit"
@@ -1186,7 +1186,7 @@ export const HotelForm = ({ initialData, onSubmit }) => {
                             }
                         }}
                     >
-                        {initialData ? '✅ Update Hotel' : '✨ Create Hotel'}
+                        {initialData ? '✅ Cập nhật khách sạn' : '✨ Tạo khách sạn'}
                     </button>
                 </div>
             </form>

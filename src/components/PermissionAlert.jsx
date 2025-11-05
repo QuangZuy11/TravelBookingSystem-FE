@@ -17,10 +17,10 @@ const PermissionAlert = ({ itineraryId }) => {
     if (!permissionInfo || permissionInfo.error) {
         return (
             <div style={alertStyles.error}>
-                <div style={alertStyles.title}>⚠️ Authentication Issue</div>
-                <div>Token error: {permissionInfo?.error || 'Unknown error'}</div>
+                <div style={alertStyles.title}>⚠️ Lỗi Xác Thực</div>
+                <div>Lỗi token: {permissionInfo?.error || 'Lỗi không xác định'}</div>
                 <div style={alertStyles.action}>
-                    Please <a href="/auth/login">login again</a> to edit this itinerary.
+                    Vui lòng <a href="/auth/login">đăng nhập lại</a> để chỉnh sửa lịch trình này.
                 </div>
             </div>
         );
@@ -29,10 +29,10 @@ const PermissionAlert = ({ itineraryId }) => {
     if (permissionInfo.isExpired) {
         return (
             <div style={alertStyles.error}>
-                <div style={alertStyles.title}>⏰ Token Expired</div>
-                <div>Your session expired at {permissionInfo.expiresAt?.toLocaleString()}</div>
+                <div style={alertStyles.title}>⏰ Token Hết Hạn</div>
+                <div>Phiên của bạn đã hết hạn lúc {permissionInfo.expiresAt?.toLocaleString()}</div>
                 <div style={alertStyles.action}>
-                    Please <a href="/auth/login">login again</a> to continue.
+                    Vui lòng <a href="/auth/login">đăng nhập lại</a> để tiếp tục.
                 </div>
             </div>
         );
@@ -67,7 +67,7 @@ const PermissionAlert = ({ itineraryId }) => {
                 onClick={() => setShowDetails(!showDetails)}
                 style={alertStyles.toggleButton}
             >
-                {showDetails ? '🔼 Hide Details' : '🔽 Show Details'}
+                {showDetails ? '🔼 Ẩn Chi Tiết' : '🔽 Hiện Chi Tiết'}
             </button>
 
             {showDetails && (
@@ -78,12 +78,12 @@ const PermissionAlert = ({ itineraryId }) => {
                     </pre>
 
                     <div style={alertStyles.troubleshooting}>
-                        <strong>🛠️ Troubleshooting Tips:</strong>
+                        <strong>🛠️ Các Giải Pháp:</strong>
                         <ul>
-                            <li>Make sure you created this itinerary</li>
-                            <li>Check if your account type matches the itinerary type</li>
-                            <li>Try refreshing the page</li>
-                            <li>If issues persist, try logging out and back in</li>
+                            <li>Hãy đảm bảo bạn là người tạo lịch trình này</li>
+                            <li>Kiểm tra loại tài khoản của bạn có phù hợp với loại lịch trình không</li>
+                            <li>Thử tải lại trang</li>
+                            <li>Nếu vẫn gặp lỗi, hãy thử đăng xuất và đăng nhập lại</li>
                         </ul>
                     </div>
                 </div>

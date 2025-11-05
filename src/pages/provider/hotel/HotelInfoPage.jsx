@@ -34,8 +34,8 @@ const HotelInfoPage = () => {
                 setHotel(response.data.data);
             }
         } catch (err) {
-            console.error('Error fetching hotel:', err);
-            setError('Failed to load hotel details');
+            console.error('Lỗi khi tải thông tin khách sạn:', err);
+            setError('Không thể tải thông tin khách sạn');
         } finally {
             setLoading(false);
         }
@@ -48,16 +48,16 @@ const HotelInfoPage = () => {
             });
             setIsEditing(false);
             fetchHotel();
-            alert('Hotel updated successfully!');
+            alert('Đã cập nhật khách sạn thành công!');
         } catch (err) {
-            console.error('Error updating hotel:', err);
-            alert('Failed to update hotel');
+            console.error('Lỗi khi cập nhật khách sạn:', err);
+            alert('Không thể cập nhật khách sạn');
         }
     };
 
     if (loading) return <LoadingSpinner />;
     if (error) return <ErrorAlert message={error} />;
-    if (!hotel) return <ErrorAlert message="Hotel not found" />;
+    if (!hotel) return <ErrorAlert message="Không tìm thấy khách sạn" />;
 
     return (
         <div style={{
