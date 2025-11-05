@@ -17,17 +17,18 @@ const HotelPoliciesPage = () => {
     const [isEditing, setIsEditing] = useState(false);
 
     const [policies, setPolicies] = useState({
-        checkIn: '14:00',
-        checkOut: '12:00',
-        cancellationPolicy: 'free_cancellation',
-        cancellationDays: 3,
-        childPolicy: 'allowed',
-        petPolicy: 'not_allowed',
-        smokingPolicy: 'no_smoking',
-        partyPolicy: 'not_allowed',
-        ageRestriction: 18,
-        additionalPolicies: [],
-        houseRules: []
+        checkInTime: '14:00',
+        checkOutTime: '12:00',
+        cancellationPolicy: '',
+        petsAllowed: false,
+        paymentOptions: [
+            'Credit Card',
+            'Debit Card',
+            'Cash',
+            'Bank Transfer'
+        ],
+        houseRules: [],
+        additionalPolicies: []
     });
 
     useEffect(() => {
@@ -43,13 +44,15 @@ const HotelPoliciesPage = () => {
             );
 
             if (response.data.success) {
-                setHotel(response.data.hotel);
+                const hotelData = response.data.data;
+                setHotel(hotelData);
                 // Load policies from hotel data if exists
-                if (response.data.hotel.policies) {
-                    setPolicies({
-                        ...policies,
-                        ...response.data.hotel.policies
-                    });
+                if (hotelData.policies) {
+                    setPolicies(prev => ({
+                        ...prev,
+                        ...hotelData.policies,
+                        paymentOptions: hotelData.policies.paymentOptions || prev.paymentOptions
+                    }));
                 }
             }
         } catch (error) {
@@ -308,13 +311,13 @@ const HotelPoliciesPage = () => {
                             {isEditing ? (
                                 <input
                                     type="time"
-                                    value={policies.checkIn}
-                                    onChange={(e) => handlePolicyChange('checkIn', e.target.value)}
+                                    value={policies.checkInTime}
+                                    onChange={(e) => handlePolicyChange('checkInTime', e.target.value)}
                                     style={inputStyle}
                                 />
                             ) : (
                                 <div style={{ fontSize: '1.2rem', fontWeight: '600', color: '#1f2937' }}>
-                                    {policies.checkIn}
+                                    {policies.checkInTime}
                                 </div>
                             )}
                         </div>
@@ -323,13 +326,13 @@ const HotelPoliciesPage = () => {
                             {isEditing ? (
                                 <input
                                     type="time"
-                                    value={policies.checkOut}
-                                    onChange={(e) => handlePolicyChange('checkOut', e.target.value)}
+                                    value={policies.checkOutTime}
+                                    onChange={(e) => handlePolicyChange('checkOutTime', e.target.value)}
                                     style={inputStyle}
                                 />
                             ) : (
                                 <div style={{ fontSize: '1.2rem', fontWeight: '600', color: '#1f2937' }}>
-                                    {policies.checkOut}
+                                    {policies.checkOutTime}
                                 </div>
                             )}
                         </div>
@@ -342,153 +345,132 @@ const HotelPoliciesPage = () => {
                         <span style={{ fontSize: '1.75rem' }}>🔄</span>
                         Chính sách hủy phòng
                     </h2>
-                    <div style={gridStyle}>
-                        <div>
-                            <label style={labelStyle}>Loại chính sách</label>
-                            {isEditing ? (
-                                <select
-                                    value={policies.cancellationPolicy}
-                                    onChange={(e) => handlePolicyChange('cancellationPolicy', e.target.value)}
-                                    style={inputStyle}
-                                >
-                                    <option value="free_cancellation">Hủy miễn phí</option>
-                                    <option value="partial_refund">Hoàn tiền một phần</option>
-                                    <option value="no_refund">Không hoàn tiền</option>
-                                    <option value="flexible">Linh hoạt</option>
-                                </select>
-                            ) : (
-                                <div style={{ fontSize: '1.1rem', color: '#1f2937' }}>
-                                    {policies.cancellationPolicy === 'free_cancellation' && '✅ Hủy miễn phí'}
-                                    {policies.cancellationPolicy === 'partial_refund' && '💰 Hoàn tiền một phần'}
-                                    {policies.cancellationPolicy === 'no_refund' && '❌ Không hoàn tiền'}
-                                    {policies.cancellationPolicy === 'flexible' && '🔄 Linh hoạt'}
-                                </div>
-                            )}
-                        </div>
-                        <div>
-                            <label style={labelStyle}>Số ngày trước khi hủy miễn phí</label>
-                            {isEditing ? (
-                                <input
-                                    type="number"
-                                    min="0"
-                                    max="30"
-                                    value={policies.cancellationDays}
-                                    onChange={(e) => handlePolicyChange('cancellationDays', parseInt(e.target.value))}
-                                    style={inputStyle}
-                                />
-                            ) : (
-                                <div style={{ fontSize: '1.2rem', fontWeight: '600', color: '#1f2937' }}>
-                                    {policies.cancellationDays} ngày
-                                </div>
-                            )}
-                        </div>
+                    <div>
+                        <label style={labelStyle}>Chính sách hủy phòng</label>
+                        {isEditing ? (
+                            <textarea
+                                value={policies.cancellationPolicy}
+                                onChange={(e) => handlePolicyChange('cancellationPolicy', e.target.value)}
+                                style={{ ...inputStyle, minHeight: '100px' }}
+                                placeholder="Nhập chính sách hủy phòng..."
+                            />
+                        ) : (
+                            <div style={{ fontSize: '1.1rem', color: '#1f2937' }}>
+                                {policies.cancellationPolicy || 'Chưa có chính sách hủy phòng'}
+                            </div>
+                        )}
                     </div>
                 </div>
 
                 {/* General Policies */}
                 <div style={sectionStyle}>
                     <h2 style={sectionTitleStyle}>
-                        <span style={{ fontSize: '1.75rem' }}>📜</span>
-                        Chính sách chung
+                        <span style={{ fontSize: '1.75rem' }}>🐾</span>
+                        Chính sách thú cưng
                     </h2>
-                    <div style={gridStyle}>
-                        <div>
-                            <label style={labelStyle}>Chính sách trẻ em</label>
-                            {isEditing ? (
-                                <select
-                                    value={policies.childPolicy}
-                                    onChange={(e) => handlePolicyChange('childPolicy', e.target.value)}
-                                    style={inputStyle}
-                                >
-                                    <option value="allowed">Cho phép</option>
-                                    <option value="not_allowed">Không cho phép</option>
-                                    <option value="with_conditions">Có điều kiện</option>
-                                </select>
-                            ) : (
-                                <div style={{ fontSize: '1.1rem', color: '#1f2937' }}>
-                                    {policies.childPolicy === 'allowed' && '✅ Cho phép'}
-                                    {policies.childPolicy === 'not_allowed' && '❌ Không cho phép'}
-                                    {policies.childPolicy === 'with_conditions' && '⚠️ Có điều kiện'}
-                                </div>
-                            )}
-                        </div>
-                        <div>
-                            <label style={labelStyle}>Chính sách thú cưng</label>
-                            {isEditing ? (
-                                <select
-                                    value={policies.petPolicy}
-                                    onChange={(e) => handlePolicyChange('petPolicy', e.target.value)}
-                                    style={inputStyle}
-                                >
-                                    <option value="allowed">Cho phép</option>
-                                    <option value="not_allowed">Không cho phép</option>
-                                    <option value="with_fee">Cho phép (có phí)</option>
-                                </select>
-                            ) : (
-                                <div style={{ fontSize: '1.1rem', color: '#1f2937' }}>
-                                    {policies.petPolicy === 'allowed' && '✅ Cho phép'}
-                                    {policies.petPolicy === 'not_allowed' && '❌ Không cho phép'}
-                                    {policies.petPolicy === 'with_fee' && '💰 Cho phép (có phí)'}
-                                </div>
-                            )}
-                        </div>
-                        <div>
-                            <label style={labelStyle}>Chính sách hút thuốc</label>
-                            {isEditing ? (
-                                <select
-                                    value={policies.smokingPolicy}
-                                    onChange={(e) => handlePolicyChange('smokingPolicy', e.target.value)}
-                                    style={inputStyle}
-                                >
-                                    <option value="no_smoking">Không hút thuốc</option>
-                                    <option value="designated_areas">Khu vực chỉ định</option>
-                                    <option value="allowed">Cho phép</option>
-                                </select>
-                            ) : (
-                                <div style={{ fontSize: '1.1rem', color: '#1f2937' }}>
-                                    {policies.smokingPolicy === 'no_smoking' && '🚭 Không hút thuốc'}
-                                    {policies.smokingPolicy === 'designated_areas' && '📍 Khu vực chỉ định'}
-                                    {policies.smokingPolicy === 'allowed' && '✅ Cho phép'}
-                                </div>
-                            )}
-                        </div>
-                        <div>
-                            <label style={labelStyle}>Chính sách tiệc tùng</label>
-                            {isEditing ? (
-                                <select
-                                    value={policies.partyPolicy}
-                                    onChange={(e) => handlePolicyChange('partyPolicy', e.target.value)}
-                                    style={inputStyle}
-                                >
-                                    <option value="not_allowed">Không cho phép</option>
-                                    <option value="with_permission">Cần xin phép</option>
-                                    <option value="allowed">Cho phép</option>
-                                </select>
-                            ) : (
-                                <div style={{ fontSize: '1.1rem', color: '#1f2937' }}>
-                                    {policies.partyPolicy === 'not_allowed' && '❌ Không cho phép'}
-                                    {policies.partyPolicy === 'with_permission' && '📝 Cần xin phép'}
-                                    {policies.partyPolicy === 'allowed' && '✅ Cho phép'}
-                                </div>
-                            )}
-                        </div>
-                        <div>
-                            <label style={labelStyle}>Giới hạn độ tuổi</label>
-                            {isEditing ? (
-                                <input
-                                    type="number"
-                                    min="0"
-                                    max="100"
-                                    value={policies.ageRestriction}
-                                    onChange={(e) => handlePolicyChange('ageRestriction', parseInt(e.target.value))}
-                                    style={inputStyle}
-                                />
-                            ) : (
-                                <div style={{ fontSize: '1.2rem', fontWeight: '600', color: '#1f2937' }}>
-                                    {policies.ageRestriction}+ tuổi
-                                </div>
-                            )}
-                        </div>
+                    <div>
+                        <label style={labelStyle}>Cho phép thú cưng</label>
+                        {isEditing ? (
+                            <select
+                                value={policies.petsAllowed.toString()}
+                                onChange={(e) => handlePolicyChange('petsAllowed', e.target.value === 'true')}
+                                style={inputStyle}
+                            >
+                                <option value="true">Cho phép</option>
+                                <option value="false">Không cho phép</option>
+                            </select>
+                        ) : (
+                            <div style={{ fontSize: '1.1rem', color: '#1f2937' }}>
+                                {policies.petsAllowed ? '✅ Cho phép' : '❌ Không cho phép'}
+                            </div>
+                        )}
+                    </div>
+                </div>
+
+                {/* Payment Options */}
+                <div style={sectionStyle}>
+                    <h2 style={sectionTitleStyle}>
+                        <span style={{ fontSize: '1.75rem' }}>�</span>
+                        Phương thức thanh toán
+                    </h2>
+                    <div>
+                        <label style={labelStyle}>Các phương thức được chấp nhận</label>
+                        {isEditing ? (
+                            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '1rem' }}>
+                                <label style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                                    <input
+                                        type="checkbox"
+                                        checked={policies.paymentOptions.includes('Credit Card')}
+                                        onChange={(e) => {
+                                            const newPaymentOptions = e.target.checked
+                                                ? [...policies.paymentOptions, 'Credit Card']
+                                                : policies.paymentOptions.filter(option => option !== 'Credit Card');
+                                            handlePolicyChange('paymentOptions', newPaymentOptions);
+                                        }}
+                                    />
+                                    Thẻ tín dụng
+                                </label>
+                                <label style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                                    <input
+                                        type="checkbox"
+                                        checked={policies.paymentOptions.includes('Debit Card')}
+                                        onChange={(e) => {
+                                            const newPaymentOptions = e.target.checked
+                                                ? [...policies.paymentOptions, 'Debit Card']
+                                                : policies.paymentOptions.filter(option => option !== 'Debit Card');
+                                            handlePolicyChange('paymentOptions', newPaymentOptions);
+                                        }}
+                                    />
+                                    Thẻ ghi nợ
+                                </label>
+                                <label style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                                    <input
+                                        type="checkbox"
+                                        checked={policies.paymentOptions.includes('Cash')}
+                                        onChange={(e) => {
+                                            const newPaymentOptions = e.target.checked
+                                                ? [...policies.paymentOptions, 'Cash']
+                                                : policies.paymentOptions.filter(option => option !== 'Cash');
+                                            handlePolicyChange('paymentOptions', newPaymentOptions);
+                                        }}
+                                    />
+                                    Tiền mặt
+                                </label>
+                                <label style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                                    <input
+                                        type="checkbox"
+                                        checked={policies.paymentOptions.includes('Bank Transfer')}
+                                        onChange={(e) => {
+                                            const newPaymentOptions = e.target.checked
+                                                ? [...policies.paymentOptions, 'Bank Transfer']
+                                                : policies.paymentOptions.filter(option => option !== 'Bank Transfer');
+                                            handlePolicyChange('paymentOptions', newPaymentOptions);
+                                        }}
+                                    />
+                                    Chuyển khoản ngân hàng
+                                </label>
+                            </div>
+                        ) : (
+                            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem' }}>
+                                {policies.paymentOptions.map((option, index) => (
+                                    <span
+                                        key={index}
+                                        style={{
+                                            padding: '0.5rem 1rem',
+                                            background: '#f3f4f6',
+                                            borderRadius: '20px',
+                                            fontSize: '0.875rem',
+                                            color: '#1f2937'
+                                        }}
+                                    >
+                                        {option === 'Credit Card' && '💳 Thẻ tín dụng'}
+                                        {option === 'Debit Card' && '💳 Thẻ ghi nợ'}
+                                        {option === 'Cash' && '💵 Tiền mặt'}
+                                        {option === 'Bank Transfer' && '🏦 Chuyển khoản'}
+                                    </span>
+                                ))}
+                            </div>
+                        )}
                     </div>
                 </div>
 

@@ -523,45 +523,48 @@ const ItineraryCustomize = () => {
                 const data = responseData;
                 setItinerary(data);
 
-                // Use new API structure - data.days directly
-                const rawDays = data.days || [];
+                // Handle new API structure with itinerary_data
+                const rawDays = data.itinerary_data || [];
 
                 // Transform API data to match Frontend expectations
-                const transformedDays = rawDays.map((day, dayIndex) => ({
-                    dayNumber: day.dayNumber || dayIndex + 1,
-                    day: day.dayNumber || dayIndex + 1,
-                    theme: day.theme || `Day ${dayIndex + 1}`,
-                    description: day.description || '',
-                    activities: (day.activities || []).map((activity, actIndex) => ({
-                        // Map API fields to Frontend expectations
-                        activity: generateActivityName(activity),
-                        time: generateTimeFromSlot(activity.timeSlot, actIndex),
-                        duration: convertDurationToString(activity.duration),
-                        cost: activity.cost || 0,
-                        type: activity.type || 'sightseeing',
-                        location: activity.location || '',
+                const transformedDays = rawDays.map((dayData, dayIndex) => {
+                    const day = dayData.itinerary || {};
+                    return {
+                        dayNumber: day.day_number || dayIndex + 1,
+                        day: day.day_number || dayIndex + 1,
+                        theme: day.title || `Day ${dayIndex + 1}`,
+                        description: day.description || '',
+                        activities: (dayData.activities || []).map((activity, actIndex) => ({
+                            // Map API fields to Frontend expectations
+                            activity: activity.activity || generateActivityName(activity),
+                            time: generateTimeFromSlot(activity.timeSlot, actIndex),
+                            duration: activity.duration ? convertDurationToString(activity.duration) : '2 hours',
+                            cost: activity.cost || 0,
+                            type: activity.activityType || 'sightseeing',
+                            location: activity.location || '',
 
-                        // Keep original data for reference
-                        activityId: activity.activityId,
-                        _id: activity._id || activity.id,
-                        timeSlot: activity.timeSlot,
-                        userModified: activity.userModified || false
-                    })),
-                    dayTotal: day.dayTotal || 0,
-                    type: day.type || 'customized',
-                    dayId: day.dayId,
-                    originId: day.originId,
-                    userModified: day.userModified || false
-                }));
+                            // Keep original data for reference
+                            activityId: activity.id || activity._id,
+                            _id: activity._id,
+                            timeSlot: activity.timeSlot,
+                            userModified: activity.userModified || false
+                        })),
+                        dayTotal: day.day_total || dayData.activities?.reduce((sum, act) => sum + (act.cost || 0), 0) || 0,
+                        type: day.type || 'customized',
+                        dayId: day._id,
+                        originId: day.origin_id,
+                        userModified: day.user_modified || false
+                    };
+                });
 
                 // Initialize form data with correct data structure
                 setFormData({
                     destination: data.destination || '',
-                    summary: `Customized itinerary for ${data.destination}` || '',
+                    summary: data.summary || '',  // Use summary directly from response
                     itinerary_data: transformedDays,
                     travel_tips: data.travel_tips || [],
                     duration_days: data.duration_days || transformedDays.length,
-                    totalCost: data.totalCost || 0
+                    totalCost: data.budget_total || 0
                 });
 
                 // Store the customized AI ID for future operations
@@ -1008,23 +1011,44 @@ const ItineraryCustomize = () => {
             setSaving(true);
             setSaveStatus('saving');
 
-            // Use customizedAiId if available, otherwise fallback to itineraryId
+            // Use customizedAiId if available, otherwise fallback to itineraryId 
             const saveId = customizedAiId || itineraryId;
 
             if (process.env.NODE_ENV === 'development') {
                 console.log('💾 Saving data:', { saveId, customizedAiId, itineraryId, hasChanges });
             }
 
-            await updateCustomizedItinerary(saveId, formData);
+            const response = await updateCustomizedItinerary(saveId, formData);
 
-            setSaveStatus('saved');
-            setHasChanges(false);
-            toast.success('Itinerary saved successfully!');
+            if (response.success) {
+                setSaveStatus('saved');
+                setHasChanges(false);
+
+                // Update local state with new data
+                setItinerary(response.data);
+
+                // Show success message
+                toast.success('Itinerary saved successfully!');
+
+                // Force reload the data to get latest changes
+                await loadItinerary(true);
+
+                // Get new aiGeneratedId from response and redirect
+                const newAiGeneratedId = response.data?._id;
+                if (newAiGeneratedId) {
+                    setTimeout(() => {
+                        navigate(`/ai-itinerary/${newAiGeneratedId}`);
+                    }, 1500); // Wait 1.5s for toast to be visible
+                }
+            } else {
+                throw new Error(response.message || 'Failed to save itinerary');
+            }
+
             setTimeout(() => setSaveStatus(''), 2000);
         } catch (err) {
             console.error('Save failed:', err);
             setSaveStatus('error');
-            toast.error('Failed to save itinerary');
+            toast.error(err.message || 'Failed to save itinerary');
             setTimeout(() => setSaveStatus(''), 3000);
         } finally {
             setSaving(false);

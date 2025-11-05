@@ -141,11 +141,14 @@ const styles = {
     },
     buttonGroup: {
         display: 'flex',
-        gap: '0.5rem'
+        gap: '0.5rem',
+        alignItems: 'stretch'
     },
     viewButton: {
         flex: 1,
-        padding: '0.5rem 1rem',
+        minWidth: '100px',
+        height: '38px',
+        padding: '0 1rem',
         backgroundColor: '#14b8a6',
         color: 'white',
         border: 'none',
@@ -153,10 +156,15 @@ const styles = {
         fontWeight: '600',
         cursor: 'pointer',
         transition: 'background-color 0.2s ease',
-        fontSize: '0.875rem'
+        fontSize: '0.875rem',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center'
     },
     deleteButton: {
-        padding: '0.5rem 1rem',
+        width: '45px',
+        height: '38px',
+        padding: '0',
         backgroundColor: '#ef4444',
         color: 'white',
         border: 'none',
@@ -164,7 +172,10 @@ const styles = {
         fontWeight: '600',
         cursor: 'pointer',
         transition: 'background-color 0.2s ease',
-        fontSize: '0.875rem'
+        fontSize: '0.875rem',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center'
     },
     createNewSection: {
         marginTop: '2rem',
@@ -236,20 +247,23 @@ const MyItineraries = () => {
             setLoading(true);
             setError(null);
 
-            // Get user_id
-            let userId = null;
-            const userStr = localStorage.getItem('user');
-            if (userStr) {
-                const userData = JSON.parse(userStr);
-                userId = userData.providerId || userData.id || userData._id;
-            }
-            if (!userId) {
-                userId = user?.providerId || localStorage.getItem('providerId');
+            // Get provider from localStorage
+            const providerStr = localStorage.getItem('provider');
+            let provider = null;
+            try {
+                provider = providerStr ? JSON.parse(providerStr) : null;
+            } catch (error) {
+                console.error('Error parsing provider:', error);
             }
 
+            // Use user_id from provider or fallback to user.userId
+            const userId = provider?.user_id || user?.userId;
+
             if (!userId) {
-                throw new Error('User ID not found');
+                throw new Error('User ID not found. Please login again.');
             }
+
+            console.log('Using userId:', userId); // Debug log
 
             const response = await getUserItineraries(userId);
 
@@ -422,7 +436,7 @@ const MyItineraries = () => {
                                                             ...styles.statusBadge,
                                                             ...(itinerary.status === 'done' ? styles.statusDone : styles.statusPending)
                                                         }}>
-                                                            {itinerary.status === 'done' ? '✅ Original' : '⏳ Processing'}
+                                                            {itinerary.status === 'done' ? '✅ Original' : '⏳ Customize'}
                                                         </span>
                                                     </p>
 
@@ -469,18 +483,20 @@ const MyItineraries = () => {
                                                         👁️ View
                                                     </button>
 
-                                                    {/* Customize Button */}
-                                                    {itinerary.status === 'done' && (
+                                                    {/* Customize/Edit Button */}
+                                                    {(itinerary.status === 'done' || itinerary.status === 'custom') && (
                                                         <button
-                                                            onClick={() => navigate(`/ai-itinerary/${itinerary.hasCustomized ? itinerary.customizedId : itinerary._id}/customize`)}
+                                                            onClick={() => navigate(`/ai-itinerary/${itinerary._id}/customize`)}
                                                             style={{
                                                                 ...styles.viewButton,
-                                                                backgroundColor: itinerary.hasCustomized ? '#8b5cf6' : '#f59e0b'
+                                                                backgroundColor: itinerary.status === 'custom' ? '#8b5cf6' : '#f59e0b'
                                                             }}
-                                                            onMouseOver={(e) => e.target.style.backgroundColor = itinerary.hasCustomized ? '#7c3aed' : '#d97706'}
-                                                            onMouseOut={(e) => e.target.style.backgroundColor = itinerary.hasCustomized ? '#8b5cf6' : '#f59e0b'}
+                                                            onMouseOver={(e) => e.target.style.backgroundColor = itinerary.status === 'custom' ? '#7c3aed' : '#d97706'}
+                                                            onMouseOut={(e) => e.target.style.backgroundColor = itinerary.status === 'custom' ? '#8b5cf6' : '#f59e0b'}
                                                         >
-                                                            {itinerary.hasCustomized ? '🎨 View Custom' : '✏️ Customize'}
+                                                            <span style={{ display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
+                                                                {itinerary.status === 'custom' ? '✏️ Edit' : '✏️ Customize'}
+                                                            </span>
                                                         </button>
                                                     )}
 

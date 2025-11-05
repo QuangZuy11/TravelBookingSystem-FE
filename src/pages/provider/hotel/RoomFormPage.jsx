@@ -83,7 +83,6 @@ const RoomFormPage = () => {
   return (
     <div style={{
       minHeight: '100vh',
-      background: '#10b981',
       padding: '2rem'
     }}>
       <div style={{
@@ -100,7 +99,7 @@ const RoomFormPage = () => {
             borderRadius: '12px',
             fontSize: '1rem',
             fontWeight: '600',
-            color: '#10b981',
+            // color: '#10b981',
             cursor: 'pointer',
             display: 'flex',
             alignItems: 'center',

@@ -16,6 +16,7 @@ export const AuthProvider = ({ children }) => {
     const email = localStorage.getItem('email');
     const phone = localStorage.getItem('phone');
     let providerId = localStorage.getItem('providerId');
+    let userId = localStorage.getItem('userId');
     const role = localStorage.getItem('role');
     const providerStr = localStorage.getItem('provider');
 
@@ -52,6 +53,7 @@ export const AuthProvider = ({ children }) => {
         email: email,
         phone: phone,
         providerId: providerId,
+        userId: userId,
         role: role,
         token: token,
         provider: provider
@@ -68,7 +70,8 @@ export const AuthProvider = ({ children }) => {
       fullName: data.fullName,
       email: data.email,
       phone: data.phone,
-      providerId: data.id,
+      providerId: data.provider?._id,
+      userId: data.provider?.user_id || data._id, // Use user_id from provider or _id from user
       role: data.role,
       token: data.token,
       provider: data.provider || null
@@ -79,7 +82,8 @@ export const AuthProvider = ({ children }) => {
     localStorage.setItem('fullName', data.fullName);
     localStorage.setItem('email', data.email || '');
     localStorage.setItem('phone', data.phone || '');
-    localStorage.setItem('providerId', data.id);
+    localStorage.setItem('providerId', data.provider?._id || '');
+    localStorage.setItem('userId', data.provider?.user_id || data._id || '');
     localStorage.setItem('role', data.role);
     localStorage.setItem('user', JSON.stringify(userToSet));
 

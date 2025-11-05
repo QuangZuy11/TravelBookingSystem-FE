@@ -644,7 +644,6 @@ export const RoomForm = ({ initialData, onSubmit, hotelId }) => {
                                         }}>
                                             {/* Image Number */}
                                             <span style={{
-                                                background: 'rgba(102, 126, 234, 0.95)',
                                                 color: 'white',
                                                 padding: '4px 10px',
                                                 borderRadius: '6px',

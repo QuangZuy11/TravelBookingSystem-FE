@@ -103,6 +103,37 @@ const AIItineraryGenerator = () => {
         preferences: formData.preferences,
       };
 
+      // Get provider from localStorage to use its user_id
+      let userId = null;
+      try {
+        // First try to get from provider in localStorage
+        const providerStr = localStorage.getItem('provider');
+        if (providerStr) {
+          const provider = JSON.parse(providerStr);
+          if (provider && provider.user_id) {
+            userId = provider.user_id;
+            console.log('Using user_id from provider:', userId);
+          }
+        }
+
+        // If still no userId, try user object from context
+        if (!userId && user && user.userId) {
+          userId = user.userId;
+          console.log('Using userId from user context:', userId);
+        }
+
+        // Final fallback: localStorage 'user' object
+        if (!userId) {
+          const stored = JSON.parse(localStorage.getItem('user') || '{}');
+          userId = stored.userId;
+          console.log('Using userId from localStorage user:', userId);
+        }
+      } catch (err) {
+        console.warn('Could not derive userId for AI request:', err);
+      }
+
+      if (userId) requestData.user_id = userId;
+
       // Add optional fields if provided
       if (formData.ageRange && formData.ageRange.trim()) {
         requestData.age_range = formData.ageRange.trim();

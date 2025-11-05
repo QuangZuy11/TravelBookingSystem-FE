@@ -110,7 +110,41 @@ export const HotelForm = ({ initialData, onSubmit }) => {
 
     useEffect(() => {
         if (initialData) {
-            setFormData(prevData => ({ ...prevData, ...initialData }));
+            // Map API response data to form data structure
+            setFormData(prevData => ({
+                ...prevData,
+                name: initialData.name || '',
+                description: initialData.description || '',
+                destination_id: initialData.destination_id || '',
+                category: initialData.category || '3_star',
+                status: initialData.status || 'active',
+                address: {
+                    street: initialData.address?.street || '',
+                    city: initialData.address?.city || '',
+                    state: initialData.address?.state || '',
+                    country: initialData.address?.country || '',
+                    zipCode: initialData.address?.zipCode || '',
+                    coordinates: initialData.address?.coordinates || { latitude: 0, longitude: 0 }
+                },
+                priceRange: {
+                    min: initialData.priceRange?.min || 0,
+                    max: initialData.priceRange?.max || 0
+                },
+                policies: {
+                    checkInTime: initialData.policies?.checkInTime || '14:00',
+                    checkOutTime: initialData.policies?.checkOutTime || '12:00',
+                    cancellationPolicy: initialData.policies?.cancellationPolicy || '',
+                    petsAllowed: initialData.policies?.petsAllowed || false,
+                    paymentOptions: initialData.policies?.paymentOptions || []
+                },
+                contactInfo: {
+                    phone: initialData.contactInfo?.phone || '',
+                    email: initialData.contactInfo?.email || '',
+                    website: initialData.contactInfo?.website || ''
+                },
+                amenities: initialData.amenities || [],
+                images: initialData.images || []
+            }));
         }
     }, [initialData]);
 
@@ -301,7 +335,7 @@ export const HotelForm = ({ initialData, onSubmit }) => {
     // Styles
     const containerStyle = {
         minHeight: '100vh',
-        background: '#10b981',
+        // background: '#10b981',
         padding: '2rem',
         fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif'
     };
@@ -324,7 +358,8 @@ export const HotelForm = ({ initialData, onSubmit }) => {
     const titleStyle = {
         fontSize: '2.5rem',
         fontWeight: '700',
-        background: '#10b981',
+        // background: '#10b981',
+        color: '#111827',
         WebkitBackgroundClip: 'text',
         WebkitTextFillColor: 'transparent',
         backgroundClip: 'text',

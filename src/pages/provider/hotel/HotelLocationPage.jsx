@@ -1,9 +1,27 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
+import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
+import 'leaflet/dist/leaflet.css';
 import LoadingSpinner from '../../../components/shared/LoadingSpinner';
 import ErrorAlert from '../../../components/shared/ErrorAlert';
 import { formatAddress } from '../../../utils/addressHelpers';
+import { MAP_CONFIG } from '../../../config/mapConfig';
+import L from 'leaflet';
+import markerIcon from 'leaflet/dist/images/marker-icon.png';
+import markerIconShadow from 'leaflet/dist/images/marker-shadow.png';
+
+// Fix Leaflet marker icon
+delete L.Icon.Default.prototype._getIconUrl;
+L.Icon.Default.mergeOptions({
+    iconUrl: markerIcon,
+    shadowUrl: markerIconShadow,
+    iconSize: [25, 41],
+    iconAnchor: [12, 41],
+    popupAnchor: [1, -34],
+    tooltipAnchor: [16, -28],
+    shadowSize: [41, 41]
+});
 
 const HotelLocationPage = () => {
     const { hotelId } = useParams();
@@ -13,10 +31,17 @@ const HotelLocationPage = () => {
     const [error, setError] = useState(null);
     const [isEditing, setIsEditing] = useState(false);
     const [formData, setFormData] = useState({
-        address: '',
-        latitude: '',
-        longitude: '',
-        nearbyAttractions: []
+        address: {
+            coordinates: {
+                latitude: '',
+                longitude: ''
+            },
+            street: '',
+            city: '',
+            state: '',
+            country: '',
+            zipCode: ''
+        }
     });
     const token = localStorage.getItem('token');
 
@@ -38,10 +63,17 @@ const HotelLocationPage = () => {
                 const hotelData = response.data.data;
                 setHotel(hotelData);
                 setFormData({
-                    address: hotelData.address || '',
-                    latitude: hotelData.latitude || '',
-                    longitude: hotelData.longitude || '',
-                    nearbyAttractions: hotelData.nearbyAttractions || []
+                    address: {
+                        coordinates: {
+                            latitude: hotelData.address?.coordinates?.latitude || '',
+                            longitude: hotelData.address?.coordinates?.longitude || ''
+                        },
+                        street: hotelData.address?.street || '',
+                        city: hotelData.address?.city || '',
+                        state: hotelData.address?.state || '',
+                        country: hotelData.address?.country || '',
+                        zipCode: hotelData.address?.zipCode || ''
+                    }
                 });
             }
         } catch (err) {
@@ -54,10 +86,19 @@ const HotelLocationPage = () => {
 
     const handleInputChange = (e) => {
         const { name, value } = e.target;
-        setFormData(prev => ({
-            ...prev,
-            [name]: value
-        }));
+        setFormData(prev => {
+            // Handle nested object path (e.g., 'address.coordinates.latitude')
+            const path = name.split('.');
+            const newData = { ...prev };
+            let current = newData;
+
+            for (let i = 0; i < path.length - 1; i++) {
+                current = current[path[i]] = { ...current[path[i]] };
+            }
+            current[path[path.length - 1]] = value;
+
+            return newData;
+        });
     };
 
     const handleUpdateLocation = async () => {
@@ -118,6 +159,7 @@ const HotelLocationPage = () => {
                         <h1 style={{
                             fontSize: '2.5rem',
                             fontWeight: '700',
+                            color: 'black',
                             WebkitBackgroundClip: 'text',
                             WebkitTextFillColor: 'transparent',
                             marginBottom: '0.5rem'
@@ -201,29 +243,47 @@ const HotelLocationPage = () => {
                                 display: 'grid',
                                 gap: '2rem'
                             }}>
-                                <div>
-                                    <label style={{
-                                        display: 'block',
-                                        fontWeight: '600',
-                                        color: '#374151',
-                                        marginBottom: '0.5rem'
-                                    }}>
-                                        Địa chỉ đầy đủ:
-                                    </label>
-                                    <textarea
-                                        name="address"
-                                        value={formData.address}
-                                        onChange={handleInputChange}
-                                        rows="3"
-                                        style={{
-                                            width: '100%',
-                                            padding: '0.75rem',
-                                            border: '2px solid #e5e7eb',
-                                            borderRadius: '8px',
-                                            fontSize: '1rem'
-                                        }}
-                                        placeholder="Nhập địa chỉ đầy đủ của khách sạn..."
-                                    />
+                                <div style={{
+                                    display: 'grid',
+                                    gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))',
+                                    gap: '1rem'
+                                }}>
+                                    <div>
+                                        <label style={labelStyle}>
+                                            Đường/Số nhà:
+                                        </label>
+                                        <input
+                                            type="text"
+                                            name="street"
+                                            value={formData.address.street}
+                                            onChange={(e) => handleInputChange({
+                                                target: {
+                                                    name: 'address.street',
+                                                    value: e.target.value
+                                                }
+                                            })}
+                                            style={inputStyle}
+                                            placeholder="VD: 123 Võ Nguyên Giáp"
+                                        />
+                                    </div>
+                                    <div>
+                                        <label style={labelStyle}>
+                                            Thành phố:
+                                        </label>
+                                        <input
+                                            type="text"
+                                            name="city"
+                                            value={formData.address.city}
+                                            onChange={(e) => handleInputChange({
+                                                target: {
+                                                    name: 'address.city',
+                                                    value: e.target.value
+                                                }
+                                            })}
+                                            style={inputStyle}
+                                            placeholder="VD: Hồ Chí Minh"
+                                        />
+                                    </div>
                                 </div>
 
                                 <div style={{
@@ -232,52 +292,109 @@ const HotelLocationPage = () => {
                                     gap: '1rem'
                                 }}>
                                     <div>
-                                        <label style={{
-                                            display: 'block',
-                                            fontWeight: '600',
-                                            color: '#374151',
-                                            marginBottom: '0.5rem'
-                                        }}>
+                                        <label style={labelStyle}>
+                                            Quận/Huyện:
+                                        </label>
+                                        <input
+                                            type="text"
+                                            name="state"
+                                            value={formData.address.state}
+                                            onChange={(e) => handleInputChange({
+                                                target: {
+                                                    name: 'address.state',
+                                                    value: e.target.value
+                                                }
+                                            })}
+                                            style={inputStyle}
+                                            placeholder="VD: Quận 1"
+                                        />
+                                    </div>
+                                    <div>
+                                        <label style={labelStyle}>
+                                            Quốc gia:
+                                        </label>
+                                        <input
+                                            type="text"
+                                            name="country"
+                                            value={formData.address.country}
+                                            onChange={(e) => handleInputChange({
+                                                target: {
+                                                    name: 'address.country',
+                                                    value: e.target.value
+                                                }
+                                            })}
+                                            style={inputStyle}
+                                            placeholder="VD: Vietnam"
+                                        />
+                                    </div>
+                                </div>
+
+                                <div style={{
+                                    display: 'grid',
+                                    gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))',
+                                    gap: '1rem'
+                                }}>
+                                    <div>
+                                        <label style={labelStyle}>
+                                            Mã bưu chính:
+                                        </label>
+                                        <input
+                                            type="text"
+                                            name="zipCode"
+                                            value={formData.address.zipCode}
+                                            onChange={(e) => handleInputChange({
+                                                target: {
+                                                    name: 'address.zipCode',
+                                                    value: e.target.value
+                                                }
+                                            })}
+                                            style={inputStyle}
+                                            placeholder="VD: 70000"
+                                        />
+                                    </div>
+                                </div>
+
+                                <div style={{
+                                    display: 'grid',
+                                    gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))',
+                                    gap: '1rem',
+                                    marginTop: '1rem'
+                                }}>
+                                    <div>
+                                        <label style={labelStyle}>
                                             Vĩ độ (Latitude):
                                         </label>
                                         <input
                                             type="number"
-                                            name="latitude"
-                                            value={formData.latitude}
-                                            onChange={handleInputChange}
                                             step="any"
-                                            style={{
-                                                width: '100%',
-                                                padding: '0.75rem',
-                                                border: '2px solid #e5e7eb',
-                                                borderRadius: '8px',
-                                                fontSize: '1rem'
-                                            }}
+                                            name="latitude"
+                                            value={formData.address.coordinates.latitude}
+                                            onChange={(e) => handleInputChange({
+                                                target: {
+                                                    name: 'address.coordinates.latitude',
+                                                    value: e.target.value
+                                                }
+                                            })}
+                                            style={inputStyle}
                                             placeholder="VD: 21.0285"
                                         />
                                     </div>
                                     <div>
-                                        <label style={{
-                                            display: 'block',
-                                            fontWeight: '600',
-                                            color: '#374151',
-                                            marginBottom: '0.5rem'
-                                        }}>
+                                        <label style={labelStyle}>
                                             Kinh độ (Longitude):
                                         </label>
                                         <input
                                             type="number"
-                                            name="longitude"
-                                            value={formData.longitude}
-                                            onChange={handleInputChange}
                                             step="any"
-                                            style={{
-                                                width: '100%',
-                                                padding: '0.75rem',
-                                                border: '2px solid #e5e7eb',
-                                                borderRadius: '8px',
-                                                fontSize: '1rem'
-                                            }}
+                                            name="longitude"
+                                            value={formData.address.coordinates.longitude}
+                                            onChange={(e) => handleInputChange({
+                                                target: {
+                                                    name: 'address.coordinates.longitude',
+                                                    value: e.target.value
+                                                }
+                                            })}
+                                            style={inputStyle}
                                             placeholder="VD: 105.8048"
                                         />
                                     </div>
@@ -333,15 +450,15 @@ const HotelLocationPage = () => {
                                             borderRadius: '8px'
                                         }}>
                                             <div style={{ marginBottom: '0.5rem' }}>
-                                                <strong>Vĩ độ:</strong> {hotel.latitude || 'Chưa cập nhật'}
+                                                <strong>Vĩ độ:</strong> {hotel.address?.coordinates?.latitude || 'Chưa cập nhật'}
                                             </div>
                                             <div>
-                                                <strong>Kinh độ:</strong> {hotel.longitude || 'Chưa cập nhật'}
+                                                <strong>Kinh độ:</strong> {hotel.address?.coordinates?.longitude || 'Chưa cập nhật'}
                                             </div>
                                         </div>
                                     </div>
 
-                                    <div>
+                                    <div style={{ gridColumn: '1 / -1' }}>
                                         <h4 style={{
                                             fontSize: '1.2rem',
                                             fontWeight: '600',
@@ -351,29 +468,54 @@ const HotelLocationPage = () => {
                                             🗺️ Bản đồ
                                         </h4>
                                         <div style={{
-                                            padding: '1rem',
-                                            background: '#fefce8',
-                                            border: '2px solid #eab308',
-                                            borderRadius: '8px',
-                                            textAlign: 'center'
+                                            height: '400px',
+                                            borderRadius: '12px',
+                                            overflow: 'hidden',
+                                            border: '2px solid #e5e7eb'
                                         }}>
-                                            {hotel.latitude && hotel.longitude ? (
-                                                <a
-                                                    href={`https://www.google.com/maps?q=${hotel.latitude},${hotel.longitude}`}
-                                                    target="_blank"
-                                                    rel="noopener noreferrer"
-                                                    style={{
-                                                        color: '#eab308',
-                                                        textDecoration: 'none',
-                                                        fontWeight: '600'
-                                                    }}
+                                            {hotel.address?.coordinates?.latitude && hotel.address?.coordinates?.longitude ? (
+                                                <MapContainer
+                                                    center={[
+                                                        hotel.address.coordinates.latitude,
+                                                        hotel.address.coordinates.longitude
+                                                    ]}
+                                                    zoom={MAP_CONFIG.DEFAULT_ZOOM}
+                                                    style={{ height: '100%', width: '100%' }}
                                                 >
-                                                    🌍 Xem trên Google Maps
-                                                </a>
+                                                    <TileLayer
+                                                        attribution={MAP_CONFIG.ATTRIBUTION}
+                                                        url={MAP_CONFIG.TILE_LAYER}
+                                                    />
+                                                    <Marker
+                                                        position={[
+                                                            hotel.address.coordinates.latitude,
+                                                            hotel.address.coordinates.longitude
+                                                        ]}
+                                                    >
+                                                        <Popup>
+                                                            <div>
+                                                                <h3 style={{ margin: '0 0 5px 0', fontWeight: 'bold' }}>
+                                                                    {hotel.name}
+                                                                </h3>
+                                                                <p style={{ margin: 0, fontSize: '14px' }}>
+                                                                    {formatAddress(hotel.address)}
+                                                                </p>
+                                                            </div>
+                                                        </Popup>
+                                                    </Marker>
+                                                </MapContainer>
                                             ) : (
-                                                <span style={{ color: '#6b7280' }}>
-                                                    Chưa có tọa độ
-                                                </span>
+                                                <div style={{
+                                                    height: '100%',
+                                                    display: 'flex',
+                                                    alignItems: 'center',
+                                                    justifyContent: 'center',
+                                                    background: '#f9fafb',
+                                                    color: '#6b7280',
+                                                    fontStyle: 'italic'
+                                                }}>
+                                                    Chưa có tọa độ để hiển thị bản đồ
+                                                </div>
                                             )}
                                         </div>
                                     </div>

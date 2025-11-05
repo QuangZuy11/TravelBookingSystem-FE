@@ -92,18 +92,31 @@ export default function Location({ hotelData, nearbyPOIs, destination }) {
     // const mapRef = useRef(null);
 
     // Get hotel coordinates or use default
-    const coordinates = hotelData?.address?.coordinates || MAP_CONFIG.DEFAULT_CENTER;
-    const center = [coordinates.latitude, coordinates.longitude];
+    // Validate coordinates
+    const coordinates = hotelData?.address?.coordinates;
+    const hasValidCoordinates = coordinates &&
+        typeof coordinates.latitude === 'number' &&
+        typeof coordinates.longitude === 'number' &&
+        !isNaN(coordinates.latitude) &&
+        !isNaN(coordinates.longitude);
 
-    // Fallback hardcoded data nếu không có POIs từ backend
-    const defaultPlaces = [
-        { name: "Hồ Hoàn Kiếm", distance: "500m", time: "5 phút đi bộ", type: "Địa danh" },
-        { name: "Phố Cổ Hà Nội", distance: "800m", time: "10 phút đi bộ", type: "Khu phố" },
-        { name: "Nhà Hát Lớn", distance: "1.2km", time: "15 phút đi bộ", type: "Văn hóa" },
-        { name: "Chợ Đồng Xuân", distance: "1.5km", time: "5 phút lái xe", type: "Mua sắm" },
-        { name: "Văn Miếu Quốc Tử Giám", distance: "3km", time: "10 phút lái xe", type: "Di tích" },
-        { name: "Sân bay Nội Bài", distance: "25km", time: "35 phút lái xe", type: "Sân bay" },
-    ];
+    const center = hasValidCoordinates
+        ? [coordinates.latitude, coordinates.longitude]
+        : [MAP_CONFIG.DEFAULT_CENTER.latitude, MAP_CONFIG.DEFAULT_CENTER.longitude];
+
+    // Format complete address
+    const formatAddress = (address) => {
+        if (!address) return '';
+
+        const parts = [];
+        if (address.street) parts.push(address.street);
+        if (address.state) parts.push(address.state);
+        if (address.city) parts.push(address.city);
+        if (address.country) parts.push(address.country);
+        if (address.zipCode) parts.push(address.zipCode);
+
+        return parts.join(', ');
+    };
 
     // Use POIs from backend if available, otherwise use default
     const displayPlaces = nearbyPOIs && nearbyPOIs.length > 0
@@ -123,12 +136,10 @@ export default function Location({ hotelData, nearbyPOIs, destination }) {
                 opening_hours: poi.opening_hours
             };
         })
-        : defaultPlaces.map(place => ({ ...place, icon: '📍' }));
+        : [];
 
     // Get hotel address for display
-    const hotelAddress = hotelData?.address
-        ? `${hotelData.address.street ? hotelData.address.street + ', ' : ''}${hotelData.address.city}, ${hotelData.address.country}`
-        : '123 Đường ABC, Quận XYZ, Thành phố Hà Nội';
+    const hotelAddress = hotelData?.address ? formatAddress(hotelData.address) : 'Chưa có địa chỉ';
 
     return (
         <section id="location" className="hotel-detail-content-section location-section">
@@ -232,15 +243,16 @@ export default function Location({ hotelData, nearbyPOIs, destination }) {
                         <button
                             className="hotel-detail-direction-btn"
                             onClick={() => {
-                                const coords = hotelData?.address?.coordinates;
-                                if (coords) {
+                                if (hasValidCoordinates) {
                                     // Open in OpenStreetMap directions
                                     window.open(
-                                        `https://www.openstreetmap.org/directions?from=&to=${coords.latitude},${coords.longitude}`,
+                                        `https://www.openstreetmap.org/directions?from=&to=${coordinates.latitude},${coordinates.longitude}`,
                                         '_blank'
                                     );
                                 }
                             }}
+                            disabled={!hasValidCoordinates}
+                            title={!hasValidCoordinates ? "Không có thông tin tọa độ" : "Mở chỉ đường"}
                         >
                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                                 <polygon points="3 11 22 2 13 21 11 13 3 11"></polygon>

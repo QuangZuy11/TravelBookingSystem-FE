@@ -366,9 +366,14 @@ const styles = {
 };
 
 const ItineraryDetailNew = () => {
-    const { itineraryId } = useParams();
+    const params = useParams();
     const { user, loading: authLoading } = useAuth();
     const navigate = useNavigate();
+
+    // Log params để debug
+    console.log('URL Params:', params);
+    const aiGeneratedId = params.itineraryId;  // Sửa tên param để khớp với route
+    console.log('aiGeneratedId:', aiGeneratedId);
 
     const [itinerary, setItinerary] = useState(null);
     const [loading, setLoading] = useState(true);
@@ -378,16 +383,33 @@ const ItineraryDetailNew = () => {
     useEffect(() => {
         if (authLoading) return;
 
-        if (!user) {
+        if (!aiGeneratedId) {
+            console.error('No aiGeneratedId provided in URL');
+            setError('Invalid itinerary ID');
+            return;
+        }
+
+        // Get provider from localStorage
+        const providerStr = localStorage.getItem('provider');
+        let provider = null;
+        try {
+            provider = providerStr ? JSON.parse(providerStr) : null;
+        } catch (error) {
+            console.error('Error parsing provider:', error);
+        }
+
+        // Use user_id from provider or fallback to user if not a provider
+        const effectiveUserId = provider?.user_id || user?._id;
+
+        if (!effectiveUserId) {
             toast.error('Please login to view itinerary');
             setTimeout(() => navigate('/auth'), 2000);
             return;
         }
 
+        console.log('Loading itinerary with ID:', aiGeneratedId);
         loadItinerary();
-    }, [itineraryId, user, authLoading, navigate]);
-
-    // Auto-reload on window focus (when user comes back from another tab)
+    }, [aiGeneratedId, user, authLoading, navigate]);    // Auto-reload on window focus (when user comes back from another tab)
     useEffect(() => {
         const handleFocus = () => {
             if (itinerary) {
@@ -406,14 +428,17 @@ const ItineraryDetailNew = () => {
             setError(null);
 
             // Add cache busting for force reload
-            const response = await getItineraryById(itineraryId, {
+            const response = await getItineraryById(aiGeneratedId, {
                 headers: forceReload ? {
                     'Cache-Control': 'no-cache',
                     'Pragma': 'no-cache'
                 } : {}
             });
 
-            setItinerary(response.data);
+            // Normalize response shape: some services return { success, data: {...} }
+            // while others return the payload directly. Support both.
+            const payload = response?.data ?? response;
+            setItinerary(payload);
         } catch (err) {
             console.error('Failed to load itinerary:', err);
             setError(err.message || 'Failed to load itinerary');
@@ -484,7 +509,7 @@ const ItineraryDetailNew = () => {
     // Handle Customize functionality 
     const handleCustomize = () => {
         // Navigate to customize page (will be created)
-        navigate(`/ai-itinerary/${itineraryId}/customize`);
+        navigate(`/ai-itinerary/${aiGeneratedId}/customize`);
     };
 
     if (authLoading || loading) {
@@ -641,7 +666,7 @@ const ItineraryDetailNew = () => {
                                     e.target.style.color = '#475569';
                                 }}
                             >
-                                Customize
+                                {itinerary.status === 'custom' ? 'Edit' : 'Customize'}
                             </button>
                             <button
                                 style={styles.actionButton}

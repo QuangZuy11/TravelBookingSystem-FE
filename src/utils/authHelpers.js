@@ -12,6 +12,7 @@ export const clearAuthData = () => {
   localStorage.removeItem('user');
   localStorage.removeItem('fullName');
   localStorage.removeItem('providerId');
+  localStorage.removeItem('userId');
   localStorage.removeItem('role');
   localStorage.removeItem('provider');
 };
@@ -20,6 +21,26 @@ export const clearAuthData = () => {
  * Get provider ID from localStorage
  * Tries to get from providerId first, then from provider._id
  */
+export const getUserId = () => {
+  // First try to get userId directly
+  let userId = localStorage.getItem('userId');
+
+  // If not found, try to get from provider.user_id
+  if (!userId) {
+    const providerStr = localStorage.getItem('provider');
+    if (providerStr) {
+      try {
+        const provider = JSON.parse(providerStr);
+        userId = provider.user_id;
+      } catch (error) {
+        console.error('Error parsing provider:', error);
+      }
+    }
+  }
+
+  return userId;
+};
+
 export const getProviderId = () => {
   let providerId = localStorage.getItem('providerId');
 
