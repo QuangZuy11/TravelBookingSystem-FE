@@ -3,6 +3,7 @@ import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import { MAP_CONFIG } from '../../../../../config/mapConfig';
+import { formatOpeningHours } from '../../../../../utils/scheduleHelper';
 
 // Helper function for category icons and names
 const getCategoryInfo = (category) => {
@@ -91,8 +92,11 @@ const createPOIIcon = (emoji = '📍') => {
 export default function Location({ hotelData, nearbyPOIs, destination }) {
     // const mapRef = useRef(null);
 
-    // Get hotel coordinates or use default
-    // Validate coordinates
+    // Default coordinates for Ho Chi Minh City center
+    const DEFAULT_LAT = 10.7756587;
+    const DEFAULT_LNG = 106.7004238;
+
+    // Get and validate coordinates
     const coordinates = hotelData?.address?.coordinates;
     const hasValidCoordinates = coordinates &&
         typeof coordinates.latitude === 'number' &&
@@ -100,9 +104,11 @@ export default function Location({ hotelData, nearbyPOIs, destination }) {
         !isNaN(coordinates.latitude) &&
         !isNaN(coordinates.longitude);
 
-    const center = hasValidCoordinates
-        ? [coordinates.latitude, coordinates.longitude]
-        : [MAP_CONFIG.DEFAULT_CENTER.latitude, MAP_CONFIG.DEFAULT_CENTER.longitude];
+    // Set center coordinates for the map
+    const center = [
+        hasValidCoordinates ? coordinates.latitude : DEFAULT_LAT,
+        hasValidCoordinates ? coordinates.longitude : DEFAULT_LNG
+    ];
 
     // Format complete address
     const formatAddress = (address) => {
@@ -118,10 +124,33 @@ export default function Location({ hotelData, nearbyPOIs, destination }) {
         return parts.join(', ');
     };
 
+    // Calculate POI coordinates based on hotel location
+    const getPoiCoordinates = (index, totalPois) => {
+        // Get hotel coordinates or use default HCMC coordinates
+        const baseLatitude = coordinates?.latitude || 10.7756587;
+        const baseLongitude = coordinates?.longitude || 106.7004238;
+
+        // Create a circular pattern around the hotel
+        const radius = 0.01; // Roughly 1km
+        const angle = (360 / totalPois) * index * (Math.PI / 180);
+
+        return {
+            latitude: baseLatitude + radius * Math.cos(angle),
+            longitude: baseLongitude + radius * Math.sin(angle)
+        };
+    };
+
     // Use POIs from backend if available, otherwise use default
     const displayPlaces = nearbyPOIs && nearbyPOIs.length > 0
-        ? nearbyPOIs.map(poi => {
+        ? nearbyPOIs.map((poi, index) => {
             const categoryInfo = getCategoryInfo(poi.category);
+            // Add coordinates if not provided
+            if (!poi.location?.coordinates?.latitude) {
+                poi.location = {
+                    ...poi.location,
+                    coordinates: getPoiCoordinates(index, nearbyPOIs.length)
+                };
+            }
             return {
                 id: poi._id,
                 name: poi.name,
@@ -133,7 +162,8 @@ export default function Location({ hotelData, nearbyPOIs, destination }) {
                 description: poi.description,
                 image: poi.images && poi.images.length > 0 ? poi.images[0] : null,
                 entry_fee: poi.entry_fee,
-                opening_hours: poi.opening_hours
+                opening_hours: poi.opening_hours,
+                location: poi.location
             };
         })
         : [];
@@ -197,43 +227,43 @@ export default function Location({ hotelData, nearbyPOIs, destination }) {
 
                         {/* POI Markers */}
                         {nearbyPOIs && nearbyPOIs.length > 0 && nearbyPOIs.map((poi, index) => {
-                            if (poi.location && poi.location.coordinates) {
-                                const categoryInfo = getCategoryInfo(poi.category);
-                                const poiPosition = [
-                                    poi.location.coordinates.latitude,
-                                    poi.location.coordinates.longitude
-                                ];
+                            // Calculate POI position
+                            const radius = 0.005; // Roughly 500m
+                            const angle = (360 / nearbyPOIs.length) * index * (Math.PI / 180);
+                            const poiPosition = [
+                                center[0] + radius * Math.cos(angle),
+                                center[1] + radius * Math.sin(angle)
+                            ];
+                            const categoryInfo = getCategoryInfo(poi.category);
 
-                                return (
-                                    <Marker
-                                        key={poi._id || index}
-                                        position={poiPosition}
-                                        icon={createPOIIcon(categoryInfo.icon)}
-                                    >
-                                        <Popup>
-                                            <div style={{ minWidth: '200px' }}>
-                                                <h4 style={{ margin: '0 0 8px 0', fontSize: '15px', fontWeight: '600' }}>
-                                                    {categoryInfo.icon} {poi.name}
-                                                </h4>
-                                                <p style={{ margin: '0 0 6px 0', fontSize: '12px', color: '#10b981' }}>
-                                                    {categoryInfo.name}
+                            return (
+                                <Marker
+                                    key={poi._id || index}
+                                    position={poiPosition}
+                                    icon={createPOIIcon(categoryInfo.icon)}
+                                >
+                                    <Popup>
+                                        <div style={{ minWidth: '200px' }}>
+                                            <h4 style={{ margin: '0 0 8px 0', fontSize: '15px', fontWeight: '600' }}>
+                                                {categoryInfo.icon} {poi.name}
+                                            </h4>
+                                            <p style={{ margin: '0 0 6px 0', fontSize: '12px', color: '#10b981' }}>
+                                                {categoryInfo.name}
+                                            </p>
+                                            {poi.rating && (
+                                                <p style={{ margin: '0 0 6px 0', fontSize: '13px', color: '#f59e0b' }}>
+                                                    ⭐ {poi.rating}
                                                 </p>
-                                                {poi.rating && (
-                                                    <p style={{ margin: '0 0 6px 0', fontSize: '13px', color: '#f59e0b' }}>
-                                                        ⭐ {poi.rating}
-                                                    </p>
-                                                )}
-                                                {poi.description && (
-                                                    <p style={{ margin: '0', fontSize: '12px', color: '#6b7280', lineHeight: '1.4' }}>
-                                                        {poi.description.substring(0, 100)}...
-                                                    </p>
-                                                )}
-                                            </div>
-                                        </Popup>
-                                    </Marker>
-                                );
-                            }
-                            return null;
+                                            )}
+                                            {poi.description && (
+                                                <p style={{ margin: '0', fontSize: '12px', color: '#6b7280', lineHeight: '1.4' }}>
+                                                    {poi.description.substring(0, 100)}...
+                                                </p>
+                                            )}
+                                        </div>
+                                    </Popup>
+                                </Marker>
+                            );
                         })}
                     </MapContainer>
 
@@ -354,7 +384,7 @@ export default function Location({ hotelData, nearbyPOIs, destination }) {
                                             color: '#059669',
                                             marginTop: '4px'
                                         }}>
-                                            🕐 {place.opening_hours}
+                                            🕐 Giờ mở cửa: {formatOpeningHours(place.opening_hours)}
                                         </p>
                                     )}
                                     {place.entry_fee && place.entry_fee.adult && (

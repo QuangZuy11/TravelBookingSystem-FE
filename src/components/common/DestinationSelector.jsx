@@ -16,9 +16,19 @@ const DestinationSelector = ({ selectedId, onChange, error }) => {
                 const response = await axios.get('http://localhost:3000/api/destinations');
 
                 if (response.data && response.data.success) {
-                    setDestinations(response.data.data || []);
+                    const mappedDestinations = (response.data.data || []).map(dest => ({
+                        _id: dest._id,
+                        name: dest.destination_name,
+                        country: dest.country,
+                        description: `${dest.region} - Nhiệt độ trung bình: ${dest.weather_info.avg_temp}°C`,
+                        region: dest.region,
+                        coordinates: dest.coordinates,
+                        popular_seasons: dest.popular_seasons
+                    }));
+
+                    setDestinations(mappedDestinations);
                 } else {
-                    throw new Error('Failed to fetch destinations');
+                    setFetchError('Không thể tải danh sách điểm đến. Vui lòng thử lại sau.');
                 }
             } catch (err) {
                 console.error('Error fetching destinations:', err);

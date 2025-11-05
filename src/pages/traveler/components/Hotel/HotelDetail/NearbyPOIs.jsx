@@ -1,4 +1,5 @@
 import { getProxiedGoogleDriveUrl } from '../../../../../utils/googleDriveImageHelper';
+import { formatOpeningHours } from '../../../../../utils/scheduleHelper';
 import './HotelDetail.css';
 
 // Helper function for category icons
@@ -65,7 +66,7 @@ const POICard = ({ poi }) => {
                     {poi.opening_hours && (
                         <div className="poi-detail-item">
                             <span className="detail-icon">🕐</span>
-                            <span>{poi.opening_hours}</span>
+                            <span>Giờ mở cửa: {formatOpeningHours(poi.opening_hours)}</span>
                         </div>
                     )}
 

@@ -25,6 +25,11 @@ const normalizeIconKey = (key) => {
     return "";
   }
 
+  // Ignore schedule-related keys
+  if (key.toUpperCase().includes('SCHED')) {
+    return '';
+  }
+
   return key.toUpperCase().replace(/[^A-Z0-9]/g, "");
 };
 
@@ -36,7 +41,6 @@ const ICON_MAP = {
   CANCEL: XCircle,
   CANCELLATION: XCircle,
   CALENDAR: Calendar,
-  SCHEDULE: Calendar,
   USERS: Users,
   CUSTOMER: Users,
   TRAVELER: Users,
@@ -298,9 +302,8 @@ export default function TermsAndConditions() {
                         return (
                           <div
                             key={`${item.text}-${idx}`}
-                            className={`item tone-${tone}${
-                              item.important ? " important" : ""
-                            }`}
+                            className={`item tone-${tone}${item.important ? " important" : ""
+                              }`}
                           >
                             <div className="item-icon">
                               <ItemIcon className="w-5 h-5" />

@@ -40,15 +40,36 @@ const HotelDetail = () => {
                 console.log('Hotel details API response:', data) // Debug log
 
                 if (data.success && data.data) {
-                    const { hotel, nearbyPOIs, destination } = data.data
+                    const { hotel, nearbyPOIs, destination } = data.data;
 
-                    setHotelData(hotel)
-                    setNearbyPOIs(nearbyPOIs || [])
-                    setDestination(destination)
+                    // Update hotel data
+                    setHotelData({
+                        ...hotel,
+                        destination_id: hotel.destination_id?._id // Lấy _id từ destination_id object
+                    });
 
-                    console.log('Hotel:', hotel)
-                    console.log('Nearby POIs:', nearbyPOIs)
-                    console.log('Destination:', destination)
+                    // Update POIs data
+                    if (Array.isArray(nearbyPOIs)) {
+                        setNearbyPOIs(nearbyPOIs.map(poi => ({
+                            ...poi,
+                            location: {
+                                ...poi.location,
+                                coordinates: poi.location.coordinates || {
+                                    latitude: 10.7756587,  // Default coordinates for HCMC
+                                    longitude: 106.7004238
+                                }
+                            }
+                        })));
+                    }
+
+                    // Update destination data
+                    if (destination) {
+                        setDestination(destination);
+                    }
+
+                    console.log('Hotel:', hotel);
+                    console.log('Nearby POIs:', nearbyPOIs);
+                    console.log('Destination:', destination);
                 } else {
                     throw new Error('Không tìm thấy thông tin khách sạn')
                 }
