@@ -104,7 +104,7 @@ const TourDashboard = () => {
                 justifyContent: 'center',
                 alignItems: 'center',
                 minHeight: '100vh',
-                background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)'
+                background: '#f3f4f6'
             }}>
                 <div style={{ textAlign: 'center', color: 'white' }}>
                     <div style={{
@@ -124,7 +124,7 @@ const TourDashboard = () => {
 
     const containerStyle = {
         minHeight: '100vh',
-        background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+        background: '#f3f4f6',
         padding: '1rem',
         fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif',
         maxWidth: '100vw',
@@ -183,7 +183,7 @@ const TourDashboard = () => {
     const statValueStyle = {
         fontSize: '2.5rem',
         fontWeight: '700',
-        background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+        background: '#f3f4f6',
         WebkitBackgroundClip: 'text',
         WebkitTextFillColor: 'transparent',
         backgroundClip: 'text'
@@ -198,7 +198,7 @@ const TourDashboard = () => {
     };
 
     const buttonPrimaryStyle = {
-        background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+        background: '#f3f4f6',
         color: 'white',
         padding: '1rem 2rem',
         borderRadius: '12px',
@@ -218,10 +218,10 @@ const TourDashboard = () => {
 
     const buttonSecondaryStyle = {
         background: 'white',
-        color: '#667eea',
+        color: '#10b981',
         padding: '1rem 2rem',
         borderRadius: '12px',
-        border: '2px solid #667eea',
+        border: '2px solid #10b981',
         fontSize: '1rem',
         fontWeight: '600',
         cursor: 'pointer',
@@ -260,7 +260,7 @@ const TourDashboard = () => {
     };
 
     const theadStyle = {
-        background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+        background: '#f3f4f6',
         color: 'white'
     };
 
@@ -331,7 +331,7 @@ const TourDashboard = () => {
         fontSize: '0.875rem',
         fontWeight: '600',
         cursor: 'pointer',
-        background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+        background: '#f3f4f6',
         color: 'white',
         boxShadow: '0 2px 8px rgba(102, 126, 234, 0.3)',
         transition: 'all 0.3s ease',
@@ -382,7 +382,7 @@ const TourDashboard = () => {
 
     const editButtonStyle = {
         ...actionButtonStyle,
-        background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+        background: '#f3f4f6',
         color: 'white',
         boxShadow: '0 2px 8px rgba(102, 126, 234, 0.3)'
     };
@@ -390,8 +390,8 @@ const TourDashboard = () => {
     const viewButtonStyle = {
         ...actionButtonStyle,
         background: 'white',
-        color: '#667eea',
-        border: '2px solid #667eea'
+        color: '#10b981',
+        border: '2px solid #10b981'
     };
 
     const deleteButtonStyle = {
@@ -470,12 +470,12 @@ const TourDashboard = () => {
                     style={buttonSecondaryStyle}
                     onClick={() => navigate('/provider/tours/bookings')}
                     onMouseEnter={(e) => {
-                        e.currentTarget.style.background = '#667eea';
+                        e.currentTarget.style.background = '#10b981';
                         e.currentTarget.style.color = 'white';
                     }}
                     onMouseLeave={(e) => {
                         e.currentTarget.style.background = 'white';
-                        e.currentTarget.style.color = '#667eea';
+                        e.currentTarget.style.color = '#10b981';
                     }}
                 >
                     Xem Tất Cả Bookings

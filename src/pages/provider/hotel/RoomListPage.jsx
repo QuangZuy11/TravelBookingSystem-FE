@@ -40,7 +40,7 @@ const RoomListPage = () => {
 
     const containerStyle = {
         minHeight: '100vh',
-        background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+        background: '#10b981',
         padding: '2rem',
         color: '#1a1a1a'
     };
@@ -64,14 +64,14 @@ const RoomListPage = () => {
     const titleStyle = {
         fontSize: '2.5rem',
         fontWeight: '700',
-        background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+        background: '#10b981',
         WebkitBackgroundClip: 'text',
         WebkitTextFillColor: 'transparent'
     };
 
     const buttonStyle = {
         padding: '0.75rem 1.5rem',
-        background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+        background: '#10b981',
         color: 'white',
         border: 'none',
         borderRadius: '12px',
@@ -88,7 +88,7 @@ const RoomListPage = () => {
     };
 
     const theadStyle = {
-        background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+        background: '#10b981',
         color: 'white'
     };
 
@@ -159,8 +159,8 @@ const RoomListPage = () => {
                             style={{
                                 ...buttonStyle,
                                 background: 'white',
-                                color: '#667eea',
-                                border: '2px solid #667eea'
+                                color: '#10b981',
+                                border: '2px solid #10b981'
                             }}
                             onClick={() => navigate(`/provider/hotels/${hotelId}/rooms/bulk-create`)}
                         >
@@ -188,8 +188,8 @@ const RoomListPage = () => {
                                 style={{
                                     ...buttonStyle,
                                     background: 'white',
-                                    color: '#667eea',
-                                    border: '2px solid #667eea'
+                                    color: '#10b981',
+                                    border: '2px solid #10b981'
                                 }}
                             >
                                 🏗️ Tạo nhiều phòng cùng lúc
@@ -243,7 +243,7 @@ const RoomListPage = () => {
                                         <td style={tdStyle}>
                                             <button
                                                 onClick={() => navigate(`/provider/hotels/${hotelId}/rooms/${room._id}/edit`)}
-                                                style={{ ...actionButtonStyle, background: '#667eea', color: 'white' }}
+                                                style={{ ...actionButtonStyle, background: '#10b981', color: 'white' }}
                                             >
                                                 View Details
                                             </button>

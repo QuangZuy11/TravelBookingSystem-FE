@@ -474,7 +474,7 @@ const BookingModal = ({
                                                         <Building size={16} color="#666" />
                                                         <div>
                                                             <span className="detail-label">Diện tích</span>
-                                                            <span className="detail-value">{selectedRoomNumber?.area || 25}m²</span>
+                                                            <span className="detail-value">25m²</span>
                                                         </div>
                                                     </div>
                                                     <div className="detail-item">

@@ -18,10 +18,12 @@ const BulkRoomCreator = () => {
         endFloor: 5,
         roomsPerFloor: 10,
         roomPrefix: 'A',
-        roomType: 'standard',
+        roomType: 'single',
         capacity: 2,
         pricePerNight: 500000,
         amenities: [],
+        status: 'available',
+        images: [],
         description: ''
     });
 
@@ -29,17 +31,48 @@ const BulkRoomCreator = () => {
     const [loading, setLoading] = useState(false);
     const [showPreview, setShowPreview] = useState(false);
 
+    // Reset form when component mounts or hotelId changes
+    React.useEffect(() => {
+        // Reset all states to initial values
+        setPreview([]);
+        setShowPreview(false);
+        setLoading(false);
+        setFormData({
+            startFloor: 1,
+            endFloor: 5,
+            roomsPerFloor: 10,
+            roomPrefix: 'A',
+            roomType: 'single',
+            capacity: 2,
+            pricePerNight: 500000,
+            amenities: [],
+            status: 'available',
+            images: [],
+            description: ''
+        });
+    }, [hotelId]); // Reset when hotelId changes
+
     const roomTypes = [
-        { value: 'standard', label: 'Standard Room' },
-        { value: 'deluxe', label: 'Deluxe Room' },
-        { value: 'suite', label: 'Suite' },
-        { value: 'family', label: 'Family Room' },
-        { value: 'executive', label: 'Executive Room' }
+        { value: 'single', label: '🛏️ Single Room', capacity: 1 },
+        { value: 'double', label: '🛏️🛏️ Double Room', capacity: 2 },
+        { value: 'twin', label: '👥 Twin Room', capacity: 2 },
+        { value: 'suite', label: '👑 Suite', capacity: 3 },
+        { value: 'deluxe', label: '✨ Deluxe', capacity: 4 },
+        { value: 'family', label: '👨‍👩‍👧‍👦 Family Room', capacity: 5 }
     ];
 
     const amenitiesList = [
-        'Wi-Fi', 'TV', 'Air Conditioning', 'Minibar', 'Safe',
-        'Balcony', 'Ocean View', 'City View', 'Bathtub', 'Shower'
+        'Wi-Fi', 'TV', 'Air Conditioning', 'Mini Bar', 'Safe Box',
+        'Balcony', 'City View', 'Ocean View', 'Mountain View',
+        'Bathtub', 'Shower', 'Hair Dryer', 'Iron', 'Coffee Maker',
+        'Room Service', 'Work Desk', 'Sofa', 'Wardrobe'
+    ];
+
+    const statusOptions = [
+        { value: 'available', label: '✅ Available', color: '#10b981' },
+        { value: 'occupied', label: '🔒 Occupied', color: '#ef4444' },
+        { value: 'maintenance', label: '🔧 Maintenance', color: '#f59e0b' },
+        { value: 'reserved', label: '📅 Reserved', color: '#3b82f6' }
     ];
 
     const handleInputChange = (e) => {
@@ -72,12 +105,13 @@ const BulkRoomCreator = () => {
                 rooms.push({
                     roomNumber,
                     floor,
-                    type: formData.roomType,
+                    type: formData.roomType, // Backend expects 'type' field
                     capacity: formData.capacity,
                     pricePerNight: formData.pricePerNight,
                     amenities: formData.amenities,
-                    description: formData.description,
-                    status: 'available'
+                    status: formData.status,
+                    images: formData.images, // Shared images for all rooms
+                    description: formData.description
                 });
             }
         }
@@ -94,19 +128,115 @@ const BulkRoomCreator = () => {
 
         setLoading(true);
         try {
-            const response = await axios.post(
-                `/api/hotel/provider/${providerId}/hotels/${hotelId}/rooms/bulk`,
-                { rooms: preview },
-                { headers: { Authorization: `Bearer ${token}` } }
-            );
+            // Prepare rooms data for bulk creation
+            const roomsData = preview.map(room => ({
+                hotelId: hotelId,
+                roomNumber: room.roomNumber,
+                type: room.type,
+                capacity: room.capacity,
+                pricePerNight: room.pricePerNight,
+                amenities: room.amenities,
+                status: room.status,
+                floor: room.floor,
+                description: room.description || '',
+                images: [] // Individual room images (empty for bulk shared images)
+            }));
+
+            console.log('Sending bulk rooms data:', roomsData);
+
+            // Check if we have shared images to upload
+            const hasSharedImages = formData.images && formData.images.length > 0;
+            let response;
+
+            if (hasSharedImages) {
+                // Use FormData for multipart/form-data when we have images
+                const formDataToSend = new FormData();
+
+                // Add rooms data as JSON string
+                formDataToSend.append('roomsData', JSON.stringify(roomsData));
+
+                // Add shared image files
+                formData.images.forEach(img => {
+                    if (img.file && img.file instanceof File) {
+                        formDataToSend.append('images', img.file);
+                    }
+                });
+
+                console.log(`📸 Uploading ${formData.images.length} shared images for ${roomsData.length} rooms`);
+
+                response = await axios.post(
+                    `/api/hotel/provider/${providerId}/hotels/${hotelId}/rooms/bulk`,
+                    formDataToSend,
+                    {
+                        headers: {
+                            Authorization: `Bearer ${token}`,
+                            'Content-Type': 'multipart/form-data'
+                        }
+                    }
+                );
+            } else {
+                // Use JSON when no images
+                response = await axios.post(
+                    `/api/hotel/provider/${providerId}/hotels/${hotelId}/rooms/bulk`,
+                    { rooms: roomsData },
+                    {
+                        headers: {
+                            Authorization: `Bearer ${token}`,
+                            'Content-Type': 'application/json'
+                        }
+                    }
+                );
+            }
 
             if (response.data.success) {
-                toast.success(`✅ Đã tạo thành công ${preview.length} phòng!`);
-                navigate(`/provider/hotels/${hotelId}/rooms`);
+                const { count, sharedImagesCount } = response.data;
+                const message = sharedImagesCount > 0
+                    ? `✅ Đã tạo thành công ${count} phòng với ${sharedImagesCount} hình ảnh chung!`
+                    : `✅ Đã tạo thành công ${count} phòng!`;
+
+                toast.success(message);
+
+                // Ask user what they want to do next
+                const shouldCreateMore = window.confirm(
+                    `Đã tạo thành công ${count} phòng! Bạn có muốn tạo tiếp không?\n\n` +
+                    `• OK: Tạo thêm phòng\n` +
+                    `• Cancel: Xem danh sách phòng`
+                );
+
+                if (shouldCreateMore) {
+                    // Reset form for next batch
+                    setPreview([]);
+                    setShowPreview(false);
+                    setFormData(prev => ({
+                        ...prev,
+                        images: [], // Clear images for next batch
+                        description: '' // Clear description
+                    }));
+                    toast.info('📝 Form đã được reset để tạo batch tiếp theo');
+                } else {
+                    // Navigate to hotel overview instead of rooms list (since 1 hotel per provider)
+                    navigate(`/provider/hotels/${hotelId}/overview`);
+                }
             }
         } catch (error) {
             console.error('Error creating rooms:', error);
-            toast.error(error.response?.data?.message || 'Có lỗi xảy ra khi tạo phòng!');
+            console.error('Error response:', error.response?.data);
+
+            // Enhanced error handling
+            let errorMessage = 'Có lỗi xảy ra khi tạo phòng!';
+
+            if (error.response?.data) {
+                const { error: errorText, details } = error.response.data;
+                errorMessage = errorText || errorMessage;
+
+                // Show detailed validation errors if available
+                if (details && Array.isArray(details)) {
+                    const detailsText = details.map(d => `${d.field}: ${d.message}`).join(', ');
+                    errorMessage += ` (${detailsText})`;
+                }
+            }
+
+            toast.error(errorMessage);
         } finally {
             setLoading(false);
         }
@@ -114,7 +244,7 @@ const BulkRoomCreator = () => {
 
     const containerStyle = {
         minHeight: '100vh',
-        background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+        background: '#10b981',
         padding: '2rem',
         fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif'
     };
@@ -130,14 +260,14 @@ const BulkRoomCreator = () => {
 
     const headerStyle = {
         marginBottom: '2.5rem',
-        borderBottom: '3px solid #667eea',
+        borderBottom: '3px solid #10b981',
         paddingBottom: '1.5rem'
     };
 
     const titleStyle = {
         fontSize: '2.5rem',
         fontWeight: '700',
-        background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+        background: '#10b981',
         WebkitBackgroundClip: 'text',
         WebkitTextFillColor: 'transparent',
         backgroundClip: 'text',
@@ -200,7 +330,7 @@ const BulkRoomCreator = () => {
 
     const primaryButtonStyle = {
         ...buttonStyle,
-        background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+        background: '#10b981',
         color: 'white',
         boxShadow: '0 4px 15px rgba(102, 126, 234, 0.4)'
     };
@@ -208,8 +338,8 @@ const BulkRoomCreator = () => {
     const secondaryButtonStyle = {
         ...buttonStyle,
         background: 'white',
-        color: '#667eea',
-        border: '2px solid #667eea'
+        color: '#10b981',
+        border: '2px solid #10b981'
     };
 
     const previewContainerStyle = {
@@ -217,7 +347,7 @@ const BulkRoomCreator = () => {
         background: 'white',
         borderRadius: '16px',
         padding: '2rem',
-        border: '2px solid #667eea'
+        border: '2px solid #10b981'
     };
 
     const previewGridStyle = {
@@ -238,8 +368,7 @@ const BulkRoomCreator = () => {
 
     const breadcrumbItems = [
         { label: 'Dashboard', path: '/provider' },
-        { label: 'Hotels', path: '/provider/hotels' },
-        { label: 'Rooms', path: `/provider/hotels/${hotelId}/rooms` },
+        { label: 'Hotel Management', path: `/provider/hotels/${hotelId}` },
         { label: 'Bulk Create Rooms' }
     ];
 
@@ -375,6 +504,56 @@ const BulkRoomCreator = () => {
                         />
                     </div>
 
+                    {/* Status */}
+                    <div style={{ marginBottom: '1.5rem' }}>
+                        <label style={labelStyle}>Trạng thái</label>
+                        <select
+                            name="status"
+                            value={formData.status}
+                            onChange={handleInputChange}
+                            style={inputStyle}
+                        >
+                            {statusOptions.map(option => (
+                                <option key={option.value} value={option.value}>
+                                    {option.label}
+                                </option>
+                            ))}
+                        </select>
+                    </div>
+
+                    {/* Images */}
+                    <div style={{ marginBottom: '1.5rem' }}>
+                        <label style={labelStyle}>Hình ảnh chung (cho tất cả phòng)</label>
+                        <input
+                            type="file"
+                            multiple
+                            accept="image/*"
+                            onChange={(e) => {
+                                const files = Array.from(e.target.files);
+                                // Wrap files like RoomForm does
+                                const wrappedFiles = files.map(file => ({
+                                    file: file,
+                                    preview: URL.createObjectURL(file),
+                                    name: file.name
+                                }));
+                                setFormData(prev => ({
+                                    ...prev,
+                                    images: wrappedFiles
+                                }));
+                            }}
+                            style={inputStyle}
+                        />
+                        {formData.images.length > 0 && (
+                            <div style={{
+                                marginTop: '0.5rem',
+                                fontSize: '0.9rem',
+                                color: '#666'
+                            }}>
+                                Đã chọn {formData.images.length} hình ảnh
+                            </div>
+                        )}
+                    </div>
+
                     {/* Amenities */}
                     <div>
                         <label style={labelStyle}>Tiện nghi</label>
@@ -393,7 +572,7 @@ const BulkRoomCreator = () => {
                                         padding: '0.5rem',
                                         background: formData.amenities.includes(amenity) ? '#e0e7ff' : 'white',
                                         border: '2px solid',
-                                        borderColor: formData.amenities.includes(amenity) ? '#667eea' : '#e5e7eb',
+                                        borderColor: formData.amenities.includes(amenity) ? '#10b981' : '#e5e7eb',
                                         borderRadius: '8px',
                                         cursor: 'pointer',
                                         transition: 'all 0.3s ease'
@@ -421,7 +600,7 @@ const BulkRoomCreator = () => {
                     padding: '1.5rem',
                     background: '#e0e7ff',
                     borderRadius: '12px',
-                    border: '2px solid #667eea',
+                    border: '2px solid #10b981',
                     marginBottom: '2rem'
                 }}>
                     <div>
@@ -485,7 +664,7 @@ const BulkRoomCreator = () => {
                 {/* Cancel Button */}
                 <div style={{ textAlign: 'center', marginTop: '2rem' }}>
                     <button
-                        onClick={() => navigate(`/provider/hotels/${hotelId}/rooms`)}
+                        onClick={() => navigate(`/provider/hotels/${hotelId}/overview`)}
                         style={{
                             ...secondaryButtonStyle,
                             background: '#f3f4f6',
@@ -493,7 +672,7 @@ const BulkRoomCreator = () => {
                             border: '2px solid #d1d5db'
                         }}
                     >
-                        ← Quay lại danh sách phòng
+                        ← Quay lại tổng quan
                     </button>
                 </div>
             </div>

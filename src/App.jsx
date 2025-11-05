@@ -36,6 +36,16 @@ import PromotionEditPage from "./pages/provider/promotions/PromotionEditPage";
 import HotelAdsPage from "./pages/provider/promotions/HotelAdsPage";
 import TourAdsPage from "./pages/provider/promotions/TourAdsPage";
 
+// Hotel Management - New Modular Pages
+import HotelOverviewPage from "./pages/provider/hotel/HotelOverviewPage";
+import HotelInfoPage from "./pages/provider/hotel/HotelInfoPage";
+import HotelLocationPage from "./pages/provider/hotel/HotelLocationPage";
+import HotelPoliciesPage from "./pages/provider/hotel/HotelPoliciesPage";
+import HotelContactPage from "./pages/provider/hotel/HotelContactPage";
+import HotelAmenitiesPage from "./pages/provider/hotel/HotelAmenitiesPage";
+import HotelGalleryPage from "./pages/provider/hotel/HotelGalleryPage";
+import HotelBookingsPage from "./pages/provider/hotel/HotelBookingsPage";
+
 // Provider Layout
 import ProviderLayout from "./pages/provider/ProviderLayout";
 
@@ -312,6 +322,18 @@ function App() {
                   <Route path="new" element={<CreateHotelPage />} />
                   <Route path=":hotelId/edit" element={<EditHotelPage />} />
                   <Route path=":hotelId" element={<HotelDetailsPage />} />
+
+                  {/* New Modular Hotel Pages */}
+                  <Route path=":hotelId/overview" element={<HotelOverviewPage />} />
+                  <Route path=":hotelId/info" element={<HotelInfoPage />} />
+                  <Route path=":hotelId/location" element={<HotelLocationPage />} />
+                  <Route path=":hotelId/policies" element={<HotelPoliciesPage />} />
+                  <Route path=":hotelId/contact" element={<HotelContactPage />} />
+                  <Route path=":hotelId/amenities" element={<HotelAmenitiesPage />} />
+                  <Route path=":hotelId/gallery" element={<HotelGalleryPage />} />
+                  <Route path=":hotelId/bookings" element={<HotelBookingsPage />} />
+
+                  {/* Room Management */}
                   <Route path=":hotelId/rooms" element={<RoomListPage />} />
                   <Route path=":hotelId/rooms/new" element={<RoomFormPage />} />
                   <Route path=":hotelId/rooms/bulk-create" element={<BulkRoomCreator />} />

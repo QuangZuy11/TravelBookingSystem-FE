@@ -125,7 +125,7 @@ const PassengerList = ({ bookingId }) => {
     };
 
     const badgeStyle = {
-        background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+        background: '#10b981',
         color: 'white',
         padding: '0.25rem 0.75rem',
         borderRadius: '20px',
@@ -513,7 +513,7 @@ const PassengerList = ({ bookingId }) => {
                                     fontWeight: '600',
                                     borderRadius: '10px',
                                     border: 'none',
-                                    background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                                    background: '#10b981',
                                     color: 'white',
                                     cursor: 'pointer'
                                 }}

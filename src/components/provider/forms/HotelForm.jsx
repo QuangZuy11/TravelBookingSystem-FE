@@ -301,7 +301,7 @@ export const HotelForm = ({ initialData, onSubmit }) => {
     // Styles
     const containerStyle = {
         minHeight: '100vh',
-        background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+        background: '#10b981',
         padding: '2rem',
         fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif'
     };
@@ -317,14 +317,14 @@ export const HotelForm = ({ initialData, onSubmit }) => {
 
     const headerStyle = {
         marginBottom: '2.5rem',
-        borderBottom: '3px solid #667eea',
+        borderBottom: '3px solid #10b981',
         paddingBottom: '1.5rem'
     };
 
     const titleStyle = {
         fontSize: '2.5rem',
         fontWeight: '700',
-        background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+        background: '#10b981',
         WebkitBackgroundClip: 'text',
         WebkitTextFillColor: 'transparent',
         backgroundClip: 'text',
@@ -348,7 +348,7 @@ export const HotelForm = ({ initialData, onSubmit }) => {
 
     const sectionActiveStyle = {
         ...sectionStyle,
-        border: '2px solid #667eea',
+        border: '2px solid #10b981',
         background: 'white',
         boxShadow: '0 4px 15px rgba(102, 126, 234, 0.1)',
         display: 'block'
@@ -418,16 +418,16 @@ export const HotelForm = ({ initialData, onSubmit }) => {
 
     const checkboxLabelActiveStyle = {
         ...checkboxLabelStyle,
-        background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+        background: '#10b981',
         color: 'white',
-        border: '2px solid #667eea'
+        border: '2px solid #10b981'
     };
 
     const checkboxStyle = {
         width: '18px',
         height: '18px',
         cursor: 'pointer',
-        accentColor: '#667eea'
+        accentColor: '#10b981'
     };
 
     const imageGridStyle = {
@@ -474,7 +474,7 @@ export const HotelForm = ({ initialData, onSubmit }) => {
 
     const submitButtonStyle = {
         ...buttonStyle,
-        background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+        background: '#10b981',
         color: 'white',
         boxShadow: '0 4px 15px rgba(102, 126, 234, 0.4)'
     };
@@ -513,7 +513,7 @@ export const HotelForm = ({ initialData, onSubmit }) => {
                             onChange={handleChange}
                             required
                             style={inputStyle}
-                            onFocus={(e) => e.target.style.borderColor = '#667eea'}
+                            onFocus={(e) => e.target.style.borderColor = '#10b981'}
                             onBlur={(e) => e.target.style.borderColor = '#e5e7eb'}
                             placeholder="Enter hotel name"
                         />
@@ -527,7 +527,7 @@ export const HotelForm = ({ initialData, onSubmit }) => {
                             required
                             rows="4"
                             style={inputStyle}
-                            onFocus={(e) => e.target.style.borderColor = '#667eea'}
+                            onFocus={(e) => e.target.style.borderColor = '#10b981'}
                             onBlur={(e) => e.target.style.borderColor = '#e5e7eb'}
                             placeholder="Describe your hotel"
                         />
@@ -555,7 +555,7 @@ export const HotelForm = ({ initialData, onSubmit }) => {
                                 onChange={handleChange}
                                 required
                                 style={inputStyle}
-                                onFocus={(e) => e.target.style.borderColor = '#667eea'}
+                                onFocus={(e) => e.target.style.borderColor = '#10b981'}
                                 onBlur={(e) => e.target.style.borderColor = '#e5e7eb'}
                             >
                                 <option value="1_star">⭐ 1 Star</option>
@@ -572,7 +572,7 @@ export const HotelForm = ({ initialData, onSubmit }) => {
                                 value={formData.status}
                                 onChange={handleChange}
                                 style={inputStyle}
-                                onFocus={(e) => e.target.style.borderColor = '#667eea'}
+                                onFocus={(e) => e.target.style.borderColor = '#10b981'}
                                 onBlur={(e) => e.target.style.borderColor = '#e5e7eb'}
                             >
                                 <option value="active">✅ Active</option>
@@ -602,7 +602,7 @@ export const HotelForm = ({ initialData, onSubmit }) => {
                                 onChange={handleChange}
                                 required
                                 style={inputStyle}
-                                onFocus={(e) => e.target.style.borderColor = '#667eea'}
+                                onFocus={(e) => e.target.style.borderColor = '#10b981'}
                                 onBlur={(e) => e.target.style.borderColor = '#e5e7eb'}
                                 placeholder="123 Main Street"
                             />
@@ -616,7 +616,7 @@ export const HotelForm = ({ initialData, onSubmit }) => {
                                 onChange={handleChange}
                                 required
                                 style={inputStyle}
-                                onFocus={(e) => e.target.style.borderColor = '#667eea'}
+                                onFocus={(e) => e.target.style.borderColor = '#10b981'}
                                 onBlur={(e) => e.target.style.borderColor = '#e5e7eb'}
                                 placeholder="Ho Chi Minh City"
                             />
@@ -629,7 +629,7 @@ export const HotelForm = ({ initialData, onSubmit }) => {
                                 value={formData.address.state}
                                 onChange={handleChange}
                                 style={inputStyle}
-                                onFocus={(e) => e.target.style.borderColor = '#667eea'}
+                                onFocus={(e) => e.target.style.borderColor = '#10b981'}
                                 onBlur={(e) => e.target.style.borderColor = '#e5e7eb'}
                                 placeholder="District 1"
                             />
@@ -643,7 +643,7 @@ export const HotelForm = ({ initialData, onSubmit }) => {
                                 onChange={handleChange}
                                 required
                                 style={inputStyle}
-                                onFocus={(e) => e.target.style.borderColor = '#667eea'}
+                                onFocus={(e) => e.target.style.borderColor = '#10b981'}
                                 onBlur={(e) => e.target.style.borderColor = '#e5e7eb'}
                                 placeholder="Vietnam"
                             />
@@ -656,7 +656,7 @@ export const HotelForm = ({ initialData, onSubmit }) => {
                                 value={formData.address.zipCode}
                                 onChange={handleChange}
                                 style={inputStyle}
-                                onFocus={(e) => e.target.style.borderColor = '#667eea'}
+                                onFocus={(e) => e.target.style.borderColor = '#10b981'}
                                 onBlur={(e) => e.target.style.borderColor = '#e5e7eb'}
                                 placeholder="70000"
                             />
@@ -664,12 +664,12 @@ export const HotelForm = ({ initialData, onSubmit }) => {
                     </div>
 
                     {/* Google Maps Link Input */}
-                    <div style={{ marginTop: '2rem', padding: '1.5rem', background: 'linear-gradient(135deg, #e0e7ff 0%, #f3e8ff 100%)', borderRadius: '12px', border: '2px solid #667eea' }}>
-                        <h3 style={{ fontSize: '1.1rem', fontWeight: '600', color: '#667eea', marginBottom: '1rem', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    <div style={{ marginTop: '2rem', padding: '1.5rem', background: 'linear-gradient(135deg, #e0e7ff 0%, #f3e8ff 100%)', borderRadius: '12px', border: '2px solid #10b981' }}>
+                        <h3 style={{ fontSize: '1.1rem', fontWeight: '600', color: '#10b981', marginBottom: '1rem', display: 'flex', alignItems: 'center', gap: '8px' }}>
                             <span style={{ fontSize: '1.5rem' }}>🗺️</span>
                             Vị Trí Google Maps (Tự động lấy tọa độ)
                         </h3>
-                        <label style={{ ...labelStyle, color: '#667eea' }}>
+                        <label style={{ ...labelStyle, color: '#10b981' }}>
                             Dán link Google Maps của khách sạn
                         </label>
                         <input
@@ -679,7 +679,7 @@ export const HotelForm = ({ initialData, onSubmit }) => {
                             style={{
                                 ...inputStyle,
                                 width: '100%',
-                                borderColor: coordinateError.includes('✅') ? '#10b981' : coordinateError.includes('❌') ? '#ef4444' : '#667eea'
+                                borderColor: coordinateError.includes('✅') ? '#10b981' : coordinateError.includes('❌') ? '#ef4444' : '#10b981'
                             }}
                             placeholder="https://www.google.com/maps/place/..."
                         />
@@ -740,7 +740,7 @@ export const HotelForm = ({ initialData, onSubmit }) => {
                                 required
                                 min="0"
                                 style={inputStyle}
-                                onFocus={(e) => e.target.style.borderColor = '#667eea'}
+                                onFocus={(e) => e.target.style.borderColor = '#10b981'}
                                 onBlur={(e) => e.target.style.borderColor = '#e5e7eb'}
                                 placeholder="500000"
                             />
@@ -755,7 +755,7 @@ export const HotelForm = ({ initialData, onSubmit }) => {
                                 required
                                 min={formData.priceRange.min}
                                 style={inputStyle}
-                                onFocus={(e) => e.target.style.borderColor = '#667eea'}
+                                onFocus={(e) => e.target.style.borderColor = '#10b981'}
                                 onBlur={(e) => e.target.style.borderColor = '#e5e7eb'}
                                 placeholder="2000000"
                             />
@@ -782,7 +782,7 @@ export const HotelForm = ({ initialData, onSubmit }) => {
                                 onChange={handleChange}
                                 required
                                 style={inputStyle}
-                                onFocus={(e) => e.target.style.borderColor = '#667eea'}
+                                onFocus={(e) => e.target.style.borderColor = '#10b981'}
                                 onBlur={(e) => e.target.style.borderColor = '#e5e7eb'}
                             />
                         </div>
@@ -795,7 +795,7 @@ export const HotelForm = ({ initialData, onSubmit }) => {
                                 onChange={handleChange}
                                 required
                                 style={inputStyle}
-                                onFocus={(e) => e.target.style.borderColor = '#667eea'}
+                                onFocus={(e) => e.target.style.borderColor = '#10b981'}
                                 onBlur={(e) => e.target.style.borderColor = '#e5e7eb'}
                             />
                         </div>
@@ -808,7 +808,7 @@ export const HotelForm = ({ initialData, onSubmit }) => {
                             onChange={handleChange}
                             rows="3"
                             style={inputStyle}
-                            onFocus={(e) => e.target.style.borderColor = '#667eea'}
+                            onFocus={(e) => e.target.style.borderColor = '#10b981'}
                             onBlur={(e) => e.target.style.borderColor = '#e5e7eb'}
                             placeholder="Free cancellation up to 24 hours before check-in..."
                         />
@@ -874,7 +874,7 @@ export const HotelForm = ({ initialData, onSubmit }) => {
                                 value={formData.contactInfo.phone}
                                 onChange={handleChange}
                                 style={inputStyle}
-                                onFocus={(e) => e.target.style.borderColor = '#667eea'}
+                                onFocus={(e) => e.target.style.borderColor = '#10b981'}
                                 onBlur={(e) => e.target.style.borderColor = '#e5e7eb'}
                                 placeholder="+84 123 456 789"
                             />
@@ -887,7 +887,7 @@ export const HotelForm = ({ initialData, onSubmit }) => {
                                 value={formData.contactInfo.email}
                                 onChange={handleChange}
                                 style={inputStyle}
-                                onFocus={(e) => e.target.style.borderColor = '#667eea'}
+                                onFocus={(e) => e.target.style.borderColor = '#10b981'}
                                 onBlur={(e) => e.target.style.borderColor = '#e5e7eb'}
                                 placeholder="contact@hotel.com"
                             />
@@ -900,7 +900,7 @@ export const HotelForm = ({ initialData, onSubmit }) => {
                                 value={formData.contactInfo.website}
                                 onChange={handleChange}
                                 style={inputStyle}
-                                onFocus={(e) => e.target.style.borderColor = '#667eea'}
+                                onFocus={(e) => e.target.style.borderColor = '#10b981'}
                                 onBlur={(e) => e.target.style.borderColor = '#e5e7eb'}
                                 placeholder="https://yourhotel.com"
                             />
@@ -1049,7 +1049,7 @@ export const HotelForm = ({ initialData, onSubmit }) => {
                                                             transition: 'all 0.2s'
                                                         }}
                                                         onMouseEnter={(e) => {
-                                                            e.currentTarget.style.background = '#667eea';
+                                                            e.currentTarget.style.background = '#10b981';
                                                             e.currentTarget.style.transform = 'scale(1.1)';
                                                         }}
                                                         onMouseLeave={(e) => {
@@ -1081,7 +1081,7 @@ export const HotelForm = ({ initialData, onSubmit }) => {
                                                             transition: 'all 0.2s'
                                                         }}
                                                         onMouseEnter={(e) => {
-                                                            e.currentTarget.style.background = '#667eea';
+                                                            e.currentTarget.style.background = '#10b981';
                                                             e.currentTarget.style.transform = 'scale(1.1)';
                                                         }}
                                                         onMouseLeave={(e) => {

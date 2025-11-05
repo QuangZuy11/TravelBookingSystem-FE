@@ -192,7 +192,7 @@ const TourDetails = () => {
         justifyContent: 'center',
         alignItems: 'center',
         minHeight: '100vh',
-        background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)'
+        background: '#f3f4f6'
       }}>
         <div style={{ textAlign: 'center', color: 'white' }}>
           <div style={{
@@ -213,7 +213,7 @@ const TourDetails = () => {
   return (
     <div style={{
       minHeight: '100vh',
-      background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+      background: '#f3f4f6',
       padding: '1rem',
       fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
       maxWidth: '100vw',
@@ -270,7 +270,7 @@ const TourDetails = () => {
                   onClick={() => navigate(`/provider/tours/${tourId}/edit`)}
                   style={{
                     padding: '0.75rem 1.5rem',
-                    background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                    background: '#f3f4f6',
                     color: 'white',
                     border: 'none',
                     borderRadius: '8px',
@@ -322,7 +322,7 @@ const TourDetails = () => {
                   disabled={saving}
                   style={{
                     padding: '0.75rem 1.5rem',
-                    background: saving ? '#9ca3af' : 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                    background: saving ? '#9ca3af' : '#10b981',
                     color: 'white',
                     border: 'none',
                     borderRadius: '8px',

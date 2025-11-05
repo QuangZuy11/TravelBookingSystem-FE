@@ -150,7 +150,7 @@ const MultiPassengerForm = ({ onSave, onCancel, defaultSeatClass = 'Economy' }) 
         fontWeight: '600',
         borderRadius: '10px',
         border: hasErrors ? '2px solid #ef4444' : '2px solid transparent',
-        background: isActive ? 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)' : 'white',
+        background: isActive ? '#10b981' : 'white',
         color: isActive ? 'white' : '#374151',
         cursor: 'pointer',
         transition: 'all 0.3s ease',
@@ -215,7 +215,7 @@ const MultiPassengerForm = ({ onSave, onCancel, defaultSeatClass = 'Economy' }) 
     };
 
     const countBadgeStyle = {
-        background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+        background: '#10b981',
         color: 'white',
         padding: '0.25rem 0.75rem',
         borderRadius: '20px',
@@ -225,7 +225,7 @@ const MultiPassengerForm = ({ onSave, onCancel, defaultSeatClass = 'Economy' }) 
 
     const saveAllButtonStyle = {
         ...buttonStyle,
-        background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+        background: '#10b981',
         color: 'white',
         boxShadow: '0 4px 15px rgba(102, 126, 234, 0.4)',
         padding: '0.875rem 2rem'

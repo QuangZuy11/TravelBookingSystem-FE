@@ -12,8 +12,7 @@ export const RoomForm = ({ initialData, onSubmit, hotelId }) => {
         status: 'available',
         floor: 1,
         images: [],
-        description: '',
-        area: 0
+        description: ''
     });
 
     const [activeSection, setActiveSection] = useState(null);
@@ -196,7 +195,7 @@ export const RoomForm = ({ initialData, onSubmit, hotelId }) => {
     // Styles
     const containerStyle = {
         minHeight: '100vh',
-        background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+        background: '#10b981',
         padding: '2rem',
         fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif'
     };
@@ -212,14 +211,14 @@ export const RoomForm = ({ initialData, onSubmit, hotelId }) => {
 
     const headerStyle = {
         marginBottom: '2.5rem',
-        borderBottom: '3px solid #667eea',
+        borderBottom: '3px solid #10b981',
         paddingBottom: '1.5rem'
     };
 
     const titleStyle = {
         fontSize: '2.5rem',
         fontWeight: '700',
-        background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+        background: '#10b981',
         WebkitBackgroundClip: 'text',
         WebkitTextFillColor: 'transparent',
         backgroundClip: 'text',
@@ -242,7 +241,7 @@ export const RoomForm = ({ initialData, onSubmit, hotelId }) => {
 
     const sectionActiveStyle = {
         ...sectionStyle,
-        border: '2px solid #667eea',
+        border: '2px solid #10b981',
         background: 'white',
         boxShadow: '0 4px 15px rgba(102, 126, 234, 0.1)'
     };
@@ -287,9 +286,9 @@ export const RoomForm = ({ initialData, onSubmit, hotelId }) => {
 
     const roomTypeCardStyle = (isSelected) => ({
         padding: '1.5rem',
-        background: isSelected ? 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)' : 'white',
+        background: isSelected ? '#10b981' : 'white',
         color: isSelected ? 'white' : '#374151',
-        border: `2px solid ${isSelected ? '#667eea' : '#e5e7eb'}`,
+        border: `2px solid ${isSelected ? '#10b981' : '#e5e7eb'}`,
         borderRadius: '12px',
         cursor: 'pointer',
         transition: 'all 0.3s ease',
@@ -319,9 +318,9 @@ export const RoomForm = ({ initialData, onSubmit, hotelId }) => {
 
     const checkboxLabelActiveStyle = {
         ...checkboxLabelStyle,
-        background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+        background: '#10b981',
         color: 'white',
-        borderColor: '#667eea'
+        borderColor: '#10b981'
     };
 
     const imageGridStyle = {
@@ -368,7 +367,7 @@ export const RoomForm = ({ initialData, onSubmit, hotelId }) => {
 
     const submitButtonStyle = {
         ...buttonStyle,
-        background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+        background: '#10b981',
         color: 'white',
         boxShadow: '0 4px 15px rgba(102, 126, 234, 0.4)'
     };
@@ -403,7 +402,7 @@ export const RoomForm = ({ initialData, onSubmit, hotelId }) => {
                                 onChange={handleChange}
                                 required
                                 style={inputStyle}
-                                onFocus={(e) => e.target.style.borderColor = '#667eea'}
+                                onFocus={(e) => e.target.style.borderColor = '#10b981'}
                                 onBlur={(e) => e.target.style.borderColor = '#e5e7eb'}
                                 placeholder="e.g., 101, A-205"
                             />
@@ -418,24 +417,9 @@ export const RoomForm = ({ initialData, onSubmit, hotelId }) => {
                                 required
                                 min="1"
                                 style={inputStyle}
-                                onFocus={(e) => e.target.style.borderColor = '#667eea'}
+                                onFocus={(e) => e.target.style.borderColor = '#10b981'}
                                 onBlur={(e) => e.target.style.borderColor = '#e5e7eb'}
                                 placeholder="Floor number"
-                            />
-                        </div>
-                        <div>
-                            <label style={labelStyle}>Area (m²)</label>
-                            <input
-                                type="number"
-                                name="area"
-                                value={formData.area}
-                                onChange={handleChange}
-                                required
-                                min="0"
-                                style={inputStyle}
-                                onFocus={(e) => e.target.style.borderColor = '#667eea'}
-                                onBlur={(e) => e.target.style.borderColor = '#e5e7eb'}
-                                placeholder="Room size"
                             />
                         </div>
                     </div>
@@ -448,7 +432,7 @@ export const RoomForm = ({ initialData, onSubmit, hotelId }) => {
                             onChange={handleChange}
                             rows="4"
                             style={inputStyle}
-                            onFocus={(e) => e.target.style.borderColor = '#667eea'}
+                            onFocus={(e) => e.target.style.borderColor = '#10b981'}
                             onBlur={(e) => e.target.style.borderColor = '#e5e7eb'}
                             placeholder="Describe the room features and highlights..."
                         />
@@ -479,7 +463,7 @@ export const RoomForm = ({ initialData, onSubmit, hotelId }) => {
                                 }}
                                 onMouseEnter={(e) => {
                                     if (formData.type !== roomType.value) {
-                                        e.currentTarget.style.borderColor = '#667eea';
+                                        e.currentTarget.style.borderColor = '#10b981';
                                         e.currentTarget.style.transform = 'translateY(-2px)';
                                     }
                                 }}
@@ -511,7 +495,7 @@ export const RoomForm = ({ initialData, onSubmit, hotelId }) => {
                             required
                             min="1"
                             style={{ ...inputStyle, maxWidth: '200px' }}
-                            onFocus={(e) => e.target.style.borderColor = '#667eea'}
+                            onFocus={(e) => e.target.style.borderColor = '#10b981'}
                             onBlur={(e) => e.target.style.borderColor = '#e5e7eb'}
                         />
                     </div>
@@ -538,7 +522,7 @@ export const RoomForm = ({ initialData, onSubmit, hotelId }) => {
                                 required
                                 min="0"
                                 style={inputStyle}
-                                onFocus={(e) => e.target.style.borderColor = '#667eea'}
+                                onFocus={(e) => e.target.style.borderColor = '#10b981'}
                                 onBlur={(e) => e.target.style.borderColor = '#e5e7eb'}
                                 placeholder="500000"
                             />
@@ -550,7 +534,7 @@ export const RoomForm = ({ initialData, onSubmit, hotelId }) => {
                                 value={formData.status}
                                 onChange={handleChange}
                                 style={inputStyle}
-                                onFocus={(e) => e.target.style.borderColor = '#667eea'}
+                                onFocus={(e) => e.target.style.borderColor = '#10b981'}
                                 onBlur={(e) => e.target.style.borderColor = '#e5e7eb'}
                             >
                                 {statusOptions.map(option => (
@@ -587,7 +571,7 @@ export const RoomForm = ({ initialData, onSubmit, hotelId }) => {
                                     value={amenity}
                                     checked={formData.amenities.includes(amenity)}
                                     onChange={handleChange}
-                                    style={{ width: '18px', height: '18px', cursor: 'pointer', accentColor: '#667eea' }}
+                                    style={{ width: '18px', height: '18px', cursor: 'pointer', accentColor: '#10b981' }}
                                 />
                                 <span>{amenity}</span>
                             </label>
@@ -691,7 +675,7 @@ export const RoomForm = ({ initialData, onSubmit, hotelId }) => {
                                                             transition: 'all 0.2s'
                                                         }}
                                                         onMouseEnter={(e) => {
-                                                            e.currentTarget.style.background = '#667eea';
+                                                            e.currentTarget.style.background = '#10b981';
                                                             e.currentTarget.style.transform = 'scale(1.1)';
                                                         }}
                                                         onMouseLeave={(e) => {
@@ -723,7 +707,7 @@ export const RoomForm = ({ initialData, onSubmit, hotelId }) => {
                                                             transition: 'all 0.2s'
                                                         }}
                                                         onMouseEnter={(e) => {
-                                                            e.currentTarget.style.background = '#667eea';
+                                                            e.currentTarget.style.background = '#10b981';
                                                             e.currentTarget.style.transform = 'scale(1.1)';
                                                         }}
                                                         onMouseLeave={(e) => {

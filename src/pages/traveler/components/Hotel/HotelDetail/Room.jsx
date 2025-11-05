@@ -148,7 +148,6 @@ export default function Rooms({ roomsData, loading, error, hotelData }) {
                     type: roomType,
                     roomNumber: roomObj?.roomNumber || "TBA", // Sẽ được backend assign
                     floor: roomObj?.floor ?? 1,
-                    area: roomObj?.area ?? 25,
                     capacity: roomObj?.capacity ?? roomsData?.roomsByType?.[roomType]?.avgCapacity ?? 2,
                     pricePerNight: derivedPrice
                 },
@@ -286,7 +285,6 @@ export default function Rooms({ roomsData, loading, error, hotelData }) {
                     type: previewData.room.type,
                     roomNumber: previewData.room.roomNumber,
                     floor: previewData.room.floor,
-                    area: previewData.room.area,
                     capacity: previewData.room.capacity,
                     pricePerNight: previewData.room.pricePerNight
                 },
@@ -421,7 +419,7 @@ export default function Rooms({ roomsData, loading, error, hotelData }) {
             price: formatPrice(roomType.avgPrice),
             rawPrice: roomType.avgPrice, // Giá gốc để tính toán
             image: roomImage,
-            size: `${sampleRoom?.area || 25}m²`,
+            size: `25m²`, // Default size since area is removed
             bed: getBedType(roomType.type),
             guests: `${roomType.avgCapacity} người`,
             amenities: sampleRoom?.amenities?.map(translateAmenity) || [],

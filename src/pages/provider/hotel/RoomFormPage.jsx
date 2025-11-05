@@ -83,7 +83,7 @@ const RoomFormPage = () => {
   return (
     <div style={{
       minHeight: '100vh',
-      background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+      background: '#10b981',
       padding: '2rem'
     }}>
       <div style={{
@@ -100,7 +100,7 @@ const RoomFormPage = () => {
             borderRadius: '12px',
             fontSize: '1rem',
             fontWeight: '600',
-            color: '#667eea',
+            color: '#10b981',
             cursor: 'pointer',
             display: 'flex',
             alignItems: 'center',

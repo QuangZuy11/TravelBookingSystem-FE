@@ -8,6 +8,7 @@ import HotelForm from '../../../components/provider/forms/HotelForm';
 import RoomForm from '../../../components/provider/forms/RoomForm';
 import Modal from '../../../components/shared/Modal';
 import { getProxiedGoogleDriveUrl } from '../../../utils/googleDriveImageHelper';
+import { formatAddress } from '../../../utils/addressHelpers';
 
 const HotelDetailsPage = () => {
     // Get provider _id from localStorage
@@ -191,7 +192,7 @@ const HotelDetailsPage = () => {
     // Styles
     const containerStyle = {
         minHeight: '100vh',
-        background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+        background: '#10b981',
         padding: '2rem',
         fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif'
     };
@@ -210,7 +211,7 @@ const HotelDetailsPage = () => {
     const titleStyle = {
         fontSize: '2.5rem',
         fontWeight: '700',
-        background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+        background: '#10b981',
         WebkitBackgroundClip: 'text',
         WebkitTextFillColor: 'transparent',
         backgroundClip: 'text'
@@ -297,7 +298,7 @@ const HotelDetailsPage = () => {
     const tagStyle = {
         display: 'inline-block',
         padding: '0.5rem 1rem',
-        background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+        background: '#10b981',
         color: 'white',
         borderRadius: '20px',
         fontSize: '0.875rem',
@@ -326,8 +327,8 @@ const HotelDetailsPage = () => {
         fontWeight: '600',
         background: 'transparent',
         border: 'none',
-        borderBottom: isActive ? '3px solid #667eea' : '3px solid transparent',
-        color: isActive ? '#667eea' : '#6b7280',
+        borderBottom: isActive ? '3px solid #10b981' : '3px solid transparent',
+        color: isActive ? '#10b981' : '#6b7280',
         cursor: 'pointer',
         transition: 'all 0.3s ease',
         marginBottom: '-3px'
@@ -335,7 +336,7 @@ const HotelDetailsPage = () => {
 
     const addButtonStyle = {
         padding: '1rem 2rem',
-        background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
+        background: '#10b981',
         color: 'white',
         borderRadius: '12px',
         border: 'none',
@@ -354,7 +355,7 @@ const HotelDetailsPage = () => {
     };
 
     const theadStyle = {
-        background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)'
+        background: '#10b981'
     };
 
     const thStyle = {
@@ -380,9 +381,9 @@ const HotelDetailsPage = () => {
 
     const statusBadgeStyle = (status) => {
         const colors = {
-            active: 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
+            active: '#10b981',
             inactive: 'linear-gradient(135deg, #ef4444 0%, #dc2626 100%)',
-            confirmed: 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
+            confirmed: '#10b981',
             pending: 'linear-gradient(135deg, #f59e0b 0%, #d97706 100%)',
             cancelled: 'linear-gradient(135deg, #ef4444 0%, #dc2626 100%)'
         };
@@ -411,7 +412,7 @@ const HotelDetailsPage = () => {
 
     const viewLinkStyle = {
         ...actionLinkStyle,
-        background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+        background: '#10b981',
         color: 'white'
     };
 
@@ -497,7 +498,7 @@ const HotelDetailsPage = () => {
                                                     zIndex: 10
                                                 }}
                                                 onMouseEnter={(e) => {
-                                                    e.currentTarget.style.background = '#667eea';
+                                                    e.currentTarget.style.background = '#10b981';
                                                     e.currentTarget.style.transform = 'translateY(-50%) scale(1.1)';
                                                 }}
                                                 onMouseLeave={(e) => {
@@ -531,7 +532,7 @@ const HotelDetailsPage = () => {
                                                     zIndex: 10
                                                 }}
                                                 onMouseEnter={(e) => {
-                                                    e.currentTarget.style.background = '#667eea';
+                                                    e.currentTarget.style.background = '#10b981';
                                                     e.currentTarget.style.transform = 'translateY(-50%) scale(1.1)';
                                                 }}
                                                 onMouseLeave={(e) => {
@@ -565,7 +566,7 @@ const HotelDetailsPage = () => {
                                                     overflow: 'hidden',
                                                     cursor: 'pointer',
                                                     border: currentImageIndex === index
-                                                        ? '3px solid #667eea'
+                                                        ? '3px solid #10b981'
                                                         : '3px solid transparent',
                                                     opacity: currentImageIndex === index ? 1 : 0.6,
                                                     transition: 'all 0.3s',
@@ -617,7 +618,7 @@ const HotelDetailsPage = () => {
                         <div style={infoBlockStyle}>
                             <p style={labelStyle}>📍 Address</p>
                             <p style={valueStyle}>
-                                {hotel.address.street}, {hotel.address.city}, {hotel.address.state}, {hotel.address.country} {hotel.address.zipCode}
+                                {formatAddress(hotel.address)}
                             </p>
                         </div>
                         <div>
@@ -666,7 +667,7 @@ const HotelDetailsPage = () => {
                             <p style={valueStyle}>Phone: {hotel.contactInfo.phone}</p>
                             {hotel.contactInfo.website && (
                                 <p style={valueStyle}>
-                                    Website: <a href={hotel.contactInfo.website} target="_blank" rel="noopener noreferrer" style={{ color: '#667eea', textDecoration: 'none', fontWeight: '600' }}>
+                                    Website: <a href={hotel.contactInfo.website} target="_blank" rel="noopener noreferrer" style={{ color: '#10b981', textDecoration: 'none', fontWeight: '600' }}>
                                         {hotel.contactInfo.website}
                                     </a>
                                 </p>

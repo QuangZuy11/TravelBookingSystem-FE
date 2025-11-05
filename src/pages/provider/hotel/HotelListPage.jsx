@@ -1,13 +1,14 @@
 import React, { useState, useEffect } from 'react';
-import { useParams, Link } from 'react-router-dom';
+import { useParams, Link, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import LoadingSpinner from '../../../components/shared/LoadingSpinner';
 import ErrorAlert from '../../../components/shared/ErrorAlert';
 import HotelForm from '../../../components/provider/forms/HotelForm';
-import Modal from '../../../components/shared/Modal';
+import { formatAddress } from '../../../utils/addressHelpers';
 
 const HotelListPage = () => {
     const { providerId } = useParams();
+    const navigate = useNavigate();
     const [hotels, setHotels] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
@@ -22,7 +23,15 @@ const HotelListPage = () => {
             const response = await axios.get(`/api/provider/${providerId}/hotels`, {
                 headers: { Authorization: `Bearer ${token}` }
             });
-            setHotels(response.data.data);
+            const hotelsData = response.data.data;
+            setHotels(hotelsData);
+
+            // NEW LOGIC: If provider already has a hotel, redirect to hotel overview
+            if (hotelsData && hotelsData.length > 0) {
+                const existingHotel = hotelsData[0]; // Get the first (and only) hotel
+                navigate(`/provider/hotels/${existingHotel._id}/overview`);
+                return;
+            }
         } catch (err) {
             setError('Failed to fetch hotels.');
             console.error(err);
@@ -66,19 +75,24 @@ const HotelListPage = () => {
 
     const handleFormSubmit = async (formData) => {
         try {
+            let hotelResponse;
             if (editingHotel) {
-                await axios.put(`/api/provider/${providerId}/hotels/${editingHotel._id}`, formData, {
+                hotelResponse = await axios.put(`/api/provider/${providerId}/hotels/${editingHotel._id}`, formData, {
                     headers: { Authorization: `Bearer ${token}` }
                 });
                 alert('Hotel updated successfully!');
             } else {
-                await axios.post(`/api/provider/${providerId}/hotels`, formData, {
+                hotelResponse = await axios.post(`/api/provider/${providerId}/hotels`, formData, {
                     headers: { Authorization: `Bearer ${token}` }
                 });
                 alert('Hotel created successfully!');
             }
+
             setIsFormModalOpen(false);
-            fetchHotels();
+
+            // NEW LOGIC: After creating/updating hotel, redirect to hotel overview
+            const hotelId = editingHotel ? editingHotel._id : hotelResponse.data.data._id;
+            navigate(`/provider/hotels/${hotelId}/overview`);
         } catch (err) {
             alert('Failed to save hotel.');
             console.error(err);
@@ -92,6 +106,26 @@ const HotelListPage = () => {
     if (loading) return <LoadingSpinner />;
     if (error) return <ErrorAlert message={error} />;
 
+    // NEW LOGIC: If no hotels, show create hotel page instead of empty list
+    if (hotels.length === 0) {
+        return (
+            <div className="p-6 bg-gray-100 min-h-screen">
+                <div className="max-w-4xl mx-auto">
+                    <div className="bg-white rounded-lg shadow-md p-8">
+                        <div className="text-center mb-8">
+                            <h1 className="text-3xl font-bold text-gray-900 mb-4">🏨 Tạo khách sạn của bạn</h1>
+                            <p className="text-gray-600">
+                                Chào mừng! Bạn chưa có khách sạn nào. Hãy tạo khách sạn đầu tiên để bắt đầu quản lý.
+                            </p>
+                        </div>
+                        <HotelForm onSubmit={handleFormSubmit} />
+                    </div>
+                </div>
+            </div>
+        );
+    }
+
+    // This code should never be reached due to redirect in fetchHotels
     return (
         <div className="p-6 bg-gray-100 min-h-screen">
             <h1 className="text-3xl font-bold text-gray-900 mb-6">Manage Hotels</h1>
@@ -108,8 +142,8 @@ const HotelListPage = () => {
                     onClick={handleAddHotel}
                     disabled={hotels.length >= 1}
                     className={`px-4 py-2 rounded-md ${hotels.length >= 1
-                            ? 'bg-gray-400 text-gray-200 cursor-not-allowed'
-                            : 'bg-blue-600 text-white hover:bg-blue-700'
+                        ? 'bg-gray-400 text-gray-200 cursor-not-allowed'
+                        : 'bg-blue-600 text-white hover:bg-blue-700'
                         }`}
                     title={hotels.length >= 1 ? 'Bạn chỉ được phép tạo 1 khách sạn' : 'Thêm khách sạn mới'}
                 >
@@ -136,7 +170,9 @@ const HotelListPage = () => {
                             {filteredHotels.map((hotel) => (
                                 <tr key={hotel._id} className="hover:bg-gray-50">
                                     <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{hotel.name}</td>
-                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{hotel.address}</td>
+                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                                        {formatAddress(hotel.address)}
+                                    </td>
                                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{hotel.starRating}</td>
                                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{hotel.totalRooms || 'N/A'}</td>
                                     <td className="px-6 py-4 whitespace-nowrap text-sm">
@@ -171,17 +207,6 @@ const HotelListPage = () => {
                     </table>
                 </div>
             )}
-
-            <Modal
-                isOpen={isFormModalOpen}
-                onClose={() => setIsFormModalOpen(false)}
-                title={editingHotel ? 'Edit Hotel' : 'Add New Hotel'}
-            >
-                <HotelForm
-                    initialData={editingHotel}
-                    onSubmit={handleFormSubmit}
-                />
-            </Modal>
         </div>
     );
 };
