@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { Spinner } from '../../../components/ui/Spinner';
 import { ErrorAlert } from '../../../components/shared/ErrorAlert';
+import EmptyHotelState from './EmptyHotelState';
 
 const OverviewPage = () => {
     const [hotels, setHotels] = useState([]);
@@ -21,6 +22,7 @@ const OverviewPage = () => {
 
     useEffect(() => {
         fetchHotels();
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
     const fetchHotels = async () => {
@@ -59,6 +61,11 @@ const OverviewPage = () => {
 
     if (loading) return <Spinner />;
     if (error) return <ErrorAlert message={error} />;
+
+    // Show empty state if no hotels
+    if (!hotels || hotels.length === 0) {
+        return <EmptyHotelState />;
+    }
 
     const containerStyle = {
         minHeight: '100vh',

@@ -54,12 +54,17 @@ const CreateHotelPage = () => {
         return;
       }
 
-      try {
-        const response = await hotelService.createHotel(providerId, formData);
-        toast.success('Hotel added successfully!');
+      const response = await hotelService.createHotel(providerId, formData);
+      toast.success('Hotel added successfully!');
+      
+      // 🔄 Trigger refresh: Set a flag in localStorage to tell DashboardLayout to re-fetch
+      localStorage.setItem('hotelJustCreated', 'true');
+      
+      // Navigate to hotel overview
+      if (response.data?._id) {
+        navigate(`/provider/hotels/${response.data._id}/overview`);
+      } else {
         navigate('/provider/hotels');
-      } catch (createError) {
-        throw createError;
       }
     } catch (err) {
       if (err.response?.status === 403 && err.response?.data?.error?.includes('Service provider ID not found')) {

@@ -23,12 +23,20 @@ const DashboardLayout = () => {
 
   useEffect(() => {
     const providerStr = localStorage.getItem("provider");
-    if (!providerStr) return;
+    console.log("🔍 Provider from localStorage:", providerStr);
+    
+    if (!providerStr) {
+      console.warn("⚠️ No provider data in localStorage");
+      return;
+    }
 
     try {
       const provider = JSON.parse(providerStr);
+      console.log("📦 Parsed provider object:", provider);
+      
       if (provider?.licenses && Array.isArray(provider.licenses)) {
         const types = [...new Set(provider.licenses.map((item) => item.service_type))];
+        console.log("✅ Provider types from licenses:", types);
         setProviderTypes(types);
 
         // Fetch hotel ID if provider has hotel service
@@ -36,14 +44,18 @@ const DashboardLayout = () => {
           fetchHotelId(provider._id);
         }
       } else if (Array.isArray(provider?.type)) {
+        console.log("✅ Provider types from type array:", provider.type);
         setProviderTypes(provider.type);
 
         if (provider.type.includes('hotel')) {
           fetchHotelId(provider._id);
         }
+      } else {
+        console.warn("⚠️ No valid licenses or type array found in provider");
+        console.log("Provider structure:", JSON.stringify(provider, null, 2));
       }
     } catch (error) {
-      console.error("Error parsing provider types from localStorage:", error);
+      console.error("❌ Error parsing provider types from localStorage:", error);
     }
   }, []);
 
@@ -80,13 +92,36 @@ const DashboardLayout = () => {
     }
 
     // Extract hotelId from URL if available
-    const hotelIdMatch = location.pathname.match(/\/hotels\/([^\/]+)/);
+    const hotelIdMatch = location.pathname.match(/\/hotels\/([^/]+)/);
     if (hotelIdMatch && hotelIdMatch[1] && hotelIdMatch[1] !== 'manage' && hotelIdMatch[1] !== 'new') {
       setHotelId(hotelIdMatch[1]);
+    }
+    
+    // 🔄 Check if hotel was just created - refresh provider data
+    const hotelJustCreated = localStorage.getItem('hotelJustCreated');
+    if (hotelJustCreated === 'true') {
+      console.log('🔄 Hotel just created - refreshing provider data...');
+      localStorage.removeItem('hotelJustCreated'); // Clear flag
+      
+      // Re-fetch provider data
+      const providerStr = localStorage.getItem("provider");
+      if (providerStr) {
+        try {
+          const provider = JSON.parse(providerStr);
+          if (provider._id) {
+            fetchHotelId(provider._id);
+          }
+        } catch (error) {
+          console.error('Error refreshing hotel data:', error);
+        }
+      }
     }
   }, [location.pathname]);
 
   const menuItems = [];
+  
+  console.log("🎯 Current providerTypes:", providerTypes);
+  console.log("🏨 Current hotelId:", hotelId);
 
   if (providerTypes.includes('hotel')) {
     // If hotelId is available, use hotel-specific routes
@@ -146,12 +181,13 @@ const DashboardLayout = () => {
         }
       );
     } else {
-      // Fallback to hotel list if no hotelId yet
+      // Provider has hotel license but no hotel created yet
+      // ONLY show "Create Hotel" option - hide all other items
+      console.log("⚠️ Hotel provider but no hotel found - showing ONLY create hotel option");
       menuItems.push({
-        path: '/provider/hotels',
-        label: 'Tổng quan',
-        icon: BarChart3,
-        exact: true
+        path: '/provider/hotels/new',
+        label: 'Tạo Khách Sạn',
+        icon: Building2,
       });
     }
   } else {
@@ -196,6 +232,9 @@ const DashboardLayout = () => {
       icon: Calendar,
     },
   ];
+
+  console.log("📋 Final menuItems:", menuItems);
+  console.log("📋 Menu items count:", menuItems.length);
 
   return (
     <div className="dashboard-container">
