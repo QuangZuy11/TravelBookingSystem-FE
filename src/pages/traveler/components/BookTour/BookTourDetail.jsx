@@ -534,7 +534,7 @@ const BookTourDetail = () => {
                               typeof dest === "object" ? dest.name : dest
                             )
                             .join(", ")
-                        : tour.description || "Chưa có địa điểm"}
+                        : tour.name || "Chưa có địa điểm"}
                     </span>
                   </div>
                   <div className="meta-item">

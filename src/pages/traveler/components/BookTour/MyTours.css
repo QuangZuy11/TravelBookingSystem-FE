@@ -144,6 +144,14 @@
   color: #6b7280;
 }
 
+.my-tours-bullet {
+  color: #06b6d4;
+  font-size: 18px;
+  font-weight: bold;
+  flex-shrink: 0;
+  margin-right: 4px;
+}
+
 .my-tours-booking-price {
   font-weight: 600;
   color: #06b6d4;

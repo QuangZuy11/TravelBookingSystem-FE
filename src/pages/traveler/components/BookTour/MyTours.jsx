@@ -296,7 +296,6 @@ const MyTours = () => {
             {bookings.map((booking) => {
               const tour = booking.tour_id;
               const pricing = booking.pricing || {};
-              const contactInfo = booking.contact_info || {};
 
               return (
                 <div
@@ -333,6 +332,26 @@ const MyTours = () => {
                         </h3>
 
                         <div className="my-tours-booking-info">
+                          {tour.meeting_point && (
+                            <>
+                              {tour.meeting_point.address && (
+                                <div className="my-tours-info-row">
+                                  <span className="my-tours-bullet">•</span>
+                                  <span>
+                                    Điểm tập trung: {tour.meeting_point.address}
+                                  </span>
+                                </div>
+                              )}
+                              {tour.meeting_point.instructions && (
+                                <div className="my-tours-info-row">
+                                  <span className="my-tours-bullet">•</span>
+                                  <span>
+                                    Hướng dẫn: {tour.meeting_point.instructions}
+                                  </span>
+                                </div>
+                              )}
+                            </>
+                          )}
                           <div className="my-tours-info-row">
                             <svg
                               className="my-tours-info-icon"

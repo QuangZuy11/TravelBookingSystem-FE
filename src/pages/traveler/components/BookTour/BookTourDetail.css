@@ -119,6 +119,74 @@
   font-size: 15px;
 }
 
+/* Meeting Point Section */
+.meeting-point-section {
+  margin-top: 24px;
+  padding: 20px;
+  background: #f0f9ff;
+  border-radius: 12px;
+  border-left: 4px solid #06b6d4;
+}
+
+.meeting-point-item-inline {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.meeting-point-label-inline {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 600;
+  color: #111827;
+  font-size: 15px;
+}
+
+.meeting-point-icon-inline {
+  width: 20px;
+  height: 20px;
+  color: #06b6d4;
+  flex-shrink: 0;
+}
+
+.meeting-point-title {
+  color: #111827;
+}
+
+.meeting-point-value-inline {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-left: 28px;
+}
+
+.meeting-point-address {
+  color: #374151;
+  font-size: 15px;
+  line-height: 1.6;
+}
+
+.meeting-point-instructions {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  padding: 12px;
+  background: white;
+  border-radius: 8px;
+  color: #4b5563;
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+.meeting-point-icon-small {
+  width: 16px;
+  height: 16px;
+  color: #06b6d4;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
 /* === ĐÃ SỬA PHẦN NÀY === */
 .tour-highlights-detail {
   display: flex;
