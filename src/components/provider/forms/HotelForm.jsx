@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import Breadcrumb from '../../shared/Breadcrumb';
+import { Hotel, MapPin, Star, Image, FileText, CreditCard, Phone, Globe, Calendar, Clock, CheckCircle2, XCircle, Upload, Trash2 } from 'lucide-react';
 import DestinationSelector from '../../common/DestinationSelector';
-import { getProxiedGoogleDriveUrl, isGoogleDriveUrl, getShareUrl } from '../../../utils/googleDriveImageHelper';
+import { getProxiedGoogleDriveUrl, isGoogleDriveUrl } from '../../../utils/googleDriveImageHelper';
 
 export const HotelForm = ({ initialData, onSubmit }) => {
     const [formData, setFormData] = useState({
@@ -323,9 +323,9 @@ export const HotelForm = ({ initialData, onSubmit }) => {
     };
 
     const amenitiesList = [
-        'Wi-Fi', 'Parking', 'Pool', 'Gym', 'Restaurant', 'Spa',
-        'Bar', 'Room Service', 'Business Center', 'Airport Shuttle',
-        'Air Conditioning', 'Conference Room', 'Laundry Service'
+        'Wifi', 'Bãi đậu xe', 'Hồ bơi', 'Phòng gym', 'Nhà hàng', 'Spa',
+        'Quầy bar', 'Trung tâm thương mại', 'Thang máy', 'Đưa đón sân bay',
+        'Điều hòa', 'Dịch vụ giặt là'
     ];
 
     const paymentOptionsList = [
@@ -335,8 +335,7 @@ export const HotelForm = ({ initialData, onSubmit }) => {
     // Styles
     const containerStyle = {
         minHeight: '100vh',
-        // background: '#10b981',
-        padding: '2rem',
+        background: '#ffffff',
         fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif'
     };
 
@@ -344,55 +343,51 @@ export const HotelForm = ({ initialData, onSubmit }) => {
         maxWidth: '1200px',
         margin: '0 auto',
         background: 'white',
-        borderRadius: '24px',
-        padding: '3rem',
-        boxShadow: '0 20px 60px rgba(0,0,0,0.2)'
+        padding: '2rem'
     };
 
     const headerStyle = {
-        marginBottom: '2.5rem',
-        borderBottom: '3px solid #10b981',
-        paddingBottom: '1.5rem'
+        marginBottom: '2rem',
+        paddingBottom: '1.5rem',
+        borderBottom: '2px solid #10b981'
     };
 
     const titleStyle = {
-        fontSize: '2.5rem',
+        fontSize: '2rem',
         fontWeight: '700',
-        // background: '#10b981',
-        color: '#111827',
-        WebkitBackgroundClip: 'text',
-        WebkitTextFillColor: 'transparent',
-        backgroundClip: 'text',
-        marginBottom: '0.5rem'
+        color: '#047857',
+        marginBottom: '0.5rem',
+        display: 'flex',
+        alignItems: 'center',
+        gap: '0.75rem'
     };
 
     const subtitleStyle = {
-        fontSize: '1rem',
-        color: '#6b7280'
+        fontSize: '0.95rem',
+        color: '#6b7280',
+        marginLeft: '2.5rem'
     };
 
     const sectionStyle = {
-        marginBottom: '2.5rem',
-        padding: '2rem',
+        marginBottom: '2rem',
+        padding: '1.5rem',
         background: '#f9fafb',
-        borderRadius: '16px',
-        border: '2px solid transparent',
-        transition: 'all 0.3s ease',
-        display: 'block'
+        borderRadius: '12px',
+        border: '2px solid #e5e7eb',
+        transition: 'all 0.3s ease'
     };
 
     const sectionActiveStyle = {
         ...sectionStyle,
         border: '2px solid #10b981',
         background: 'white',
-        boxShadow: '0 4px 15px rgba(102, 126, 234, 0.1)',
-        display: 'block'
+        boxShadow: '0 2px 8px rgba(16, 185, 129, 0.1)'
     };
 
     const sectionTitleStyle = {
-        fontSize: '1.5rem',
+        fontSize: '1.25rem',
         fontWeight: '700',
-        color: '#1f2937',
+        color: '#047857',
         marginBottom: '1.5rem',
         display: 'flex',
         alignItems: 'center',
@@ -400,15 +395,17 @@ export const HotelForm = ({ initialData, onSubmit }) => {
     };
 
     const iconStyle = {
-        fontSize: '1.75rem'
+        width: '20px',
+        height: '20px',
+        color: '#10b981'
     };
 
     const inputStyle = {
-        width: '80%',
-        padding: '0.875rem 1rem',
-        fontSize: '1rem',
+        width: '100%',
+        padding: '0.75rem 1rem',
+        fontSize: '0.95rem',
         border: '2px solid #e5e7eb',
-        borderRadius: '12px',
+        borderRadius: '8px',
         transition: 'all 0.3s ease',
         outline: 'none',
         background: 'white'
@@ -418,37 +415,36 @@ export const HotelForm = ({ initialData, onSubmit }) => {
         display: 'block',
         fontSize: '0.875rem',
         fontWeight: '600',
-        color: '#374151',
-        marginBottom: '0.5rem',
-        textTransform: 'uppercase',
-        letterSpacing: '0.05em'
+        color: '#047857',
+        marginBottom: '0.5rem'
     };
 
     const gridStyle = {
         display: 'grid',
         gridTemplateColumns: '1fr',
-        gap: '1.5rem',
-        marginBottom: '1.5rem'
+        gap: '1.25rem',
+        marginBottom: '1.25rem'
     };
 
     const checkboxContainerStyle = {
         display: 'grid',
         gridTemplateColumns: 'repeat(auto-fill, minmax(180px, 1fr))',
-        gap: '1rem'
+        gap: '0.75rem'
     };
 
     const checkboxLabelStyle = {
         display: 'flex',
         alignItems: 'center',
         gap: '0.5rem',
-        padding: '0.75rem 1rem',
+        padding: '0.65rem 0.875rem',
         background: 'white',
         border: '2px solid #e5e7eb',
-        borderRadius: '10px',
+        borderRadius: '8px',
         cursor: 'pointer',
         transition: 'all 0.3s ease',
         fontSize: '0.875rem',
-        fontWeight: '500'
+        fontWeight: '500',
+        color: '#374151'
     };
 
     const checkboxLabelActiveStyle = {
@@ -476,8 +472,8 @@ export const HotelForm = ({ initialData, onSubmit }) => {
         height: '150px',
         width: '100%',
         objectFit: 'cover',
-        borderRadius: '12px',
-        boxShadow: '0 4px 10px rgba(0,0,0,0.1)',
+        borderRadius: '8px',
+        boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
         transition: 'transform 0.3s ease'
     };
 
@@ -485,19 +481,22 @@ export const HotelForm = ({ initialData, onSubmit }) => {
         display: 'flex',
         justifyContent: 'flex-end',
         gap: '1rem',
-        marginTop: '2.5rem',
-        paddingTop: '2rem',
+        marginTop: '2rem',
+        paddingTop: '1.5rem',
         borderTop: '2px solid #e5e7eb'
     };
 
     const buttonStyle = {
-        padding: '1rem 2.5rem',
-        fontSize: '1rem',
+        padding: '0.75rem 2rem',
+        fontSize: '0.95rem',
         fontWeight: '600',
-        borderRadius: '12px',
+        borderRadius: '8px',
         border: 'none',
         cursor: 'pointer',
-        transition: 'all 0.3s ease'
+        transition: 'all 0.3s ease',
+        display: 'flex',
+        alignItems: 'center',
+        gap: '0.5rem'
     };
 
     const cancelButtonStyle = {
@@ -511,20 +510,15 @@ export const HotelForm = ({ initialData, onSubmit }) => {
         ...buttonStyle,
         background: '#10b981',
         color: 'white',
-        boxShadow: '0 4px 15px rgba(102, 126, 234, 0.4)'
+        boxShadow: '0 2px 8px rgba(16, 185, 129, 0.3)'
     };
-    const breadcrumbItems = [
-        { label: 'Dashboard', path: '/provider' },
-        { label: 'Hotels', path: '/provider/hotels' },
-        { label: 'Add New Hotel' }
-    ];
+
     return (
         <div style={containerStyle}>
-            <Breadcrumb items={breadcrumbItems} />
-
             <form onSubmit={handleSubmit} style={formContainerStyle}>
                 <div style={headerStyle}>
                     <h1 style={titleStyle}>
+                        <Hotel style={iconStyle} size={32} />
                         {initialData ? 'Cập Nhật Khách Sạn' : 'Thêm Khách Sạn Mới'}
                     </h1>
                     <p style={subtitleStyle}>Điền thông tin chi tiết để thêm cơ sở kinh doanh của bạn</p>
@@ -536,7 +530,7 @@ export const HotelForm = ({ initialData, onSubmit }) => {
                     onFocus={() => setActiveSection('basic')}
                 >
                     <h2 style={sectionTitleStyle}>
-                        <span style={iconStyle}>🏨</span>
+                        <Hotel style={iconStyle} />
                         Thông Tin Cơ Bản
                     </h2>
                     <div style={{ ...gridStyle, marginBottom: '1.5rem' }}>
@@ -624,7 +618,7 @@ export const HotelForm = ({ initialData, onSubmit }) => {
                     onFocus={() => setActiveSection('address')}
                 >
                     <h2 style={sectionTitleStyle}>
-                        <span style={iconStyle}>📍</span>
+                        <MapPin style={iconStyle} />
                         Thông Tin Địa Chỉ
                     </h2>
                     <div style={gridStyle}>
@@ -669,7 +663,7 @@ export const HotelForm = ({ initialData, onSubmit }) => {
                                 placeholder="Quận 1"
                             />
                         </div>
-                        <div>
+                        {/* <div>
                             <label style={labelStyle}>Quốc Gia</label>
                             <input
                                 type="text"
@@ -695,7 +689,7 @@ export const HotelForm = ({ initialData, onSubmit }) => {
                                 onBlur={(e) => e.target.style.borderColor = '#e5e7eb'}
                                 placeholder="70000"
                             />
-                        </div>
+                        </div> */}
                     </div>
 
                     {/* Google Maps Link Input */}
@@ -761,7 +755,7 @@ export const HotelForm = ({ initialData, onSubmit }) => {
                     onFocus={() => setActiveSection('price')}
                 >
                     <h2 style={sectionTitleStyle}>
-                        <span style={iconStyle}>💰</span>
+                        <CreditCard style={iconStyle} />
                         Thông Tin Giá
                     </h2>
                     <div style={gridStyle}>
@@ -804,7 +798,7 @@ export const HotelForm = ({ initialData, onSubmit }) => {
                     onFocus={() => setActiveSection('policies')}
                 >
                     <h2 style={sectionTitleStyle}>
-                        <span style={iconStyle}>📋</span>
+                        <FileText style={iconStyle} />
                         Chính Sách
                     </h2>
                     <div style={gridStyle}>
@@ -897,7 +891,7 @@ export const HotelForm = ({ initialData, onSubmit }) => {
                     onFocus={() => setActiveSection('contact')}
                 >
                     <h2 style={sectionTitleStyle}>
-                        <span style={iconStyle}>📞</span>
+                        <Phone style={iconStyle} />
                         Thông tin liên lạc
                     </h2>
                     <div style={gridStyle}>
@@ -949,7 +943,7 @@ export const HotelForm = ({ initialData, onSubmit }) => {
                     onFocus={() => setActiveSection('amenities')}
                 >
                     <h2 style={sectionTitleStyle}>
-                        <span style={iconStyle}>✨</span>
+                        <Star style={iconStyle} />
                         Tiện nghi
                     </h2>
                     <div style={checkboxContainerStyle}>
@@ -980,31 +974,53 @@ export const HotelForm = ({ initialData, onSubmit }) => {
                     onFocus={() => setActiveSection('images')}
                 >
                     <h2 style={sectionTitleStyle}>
-                        <span style={iconStyle}>📸</span>
+                        <Image style={iconStyle} />
                         Hình Ảnh
                         <span style={{
                             marginLeft: 'auto',
-                            fontSize: '1rem',
+                            fontSize: '0.875rem',
                             fontWeight: '600',
                             color: formData.images.length >= 7 ? '#10b981' : '#ef4444',
                             background: formData.images.length >= 7 ? '#d1fae5' : '#fee2e2',
                             padding: '0.5rem 1rem',
-                            borderRadius: '8px'
+                            borderRadius: '8px',
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '0.5rem'
                         }}>
-                            {formData.images.length}/7 ảnh {formData.images.length >= 7 ? '✓' : '(Tối thiểu 7 ảnh)'}
+                            {formData.images.length >= 7 ? <CheckCircle2 size={16} /> : <XCircle size={16} />}
+                            {formData.images.length}/7 ảnh {formData.images.length < 7 && '(Tối thiểu 7 ảnh)'}
                         </span>
                     </h2>
-                    <input
-                        type="file"
-                        multiple
-                        onChange={handleImageUpload}
-                        accept="image/*"
-                        style={{
-                            ...inputStyle,
-                            padding: '1rem',
-                            cursor: 'pointer'
-                        }}
-                    />
+                    <div style={{ position: 'relative' }}>
+                        <input
+                            type="file"
+                            multiple
+                            onChange={handleImageUpload}
+                            accept="image/*"
+                            id="image-upload"
+                            style={{ display: 'none' }}
+                        />
+                        <label
+                            htmlFor="image-upload"
+                            style={{
+                                ...inputStyle,
+                                padding: '1.5rem',
+                                cursor: 'pointer',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                gap: '0.75rem',
+                                border: '2px dashed #10b981',
+                                background: '#f0fdf4',
+                                color: '#047857',
+                                fontWeight: '600'
+                            }}
+                        >
+                            <Upload size={20} />
+                            Chọn ảnh để tải lên (tối thiểu 7 ảnh)
+                        </label>
+                    </div>
                     {formData.images.length > 0 && (
                         <div style={imageGridStyle}>
                             {formData.images.map((image, index) => {
@@ -1143,7 +1159,6 @@ export const HotelForm = ({ initialData, onSubmit }) => {
                                                         display: 'flex',
                                                         alignItems: 'center',
                                                         justifyContent: 'center',
-                                                        fontSize: '1.1rem',
                                                         color: 'white',
                                                         transition: 'all 0.2s'
                                                     }}
@@ -1157,7 +1172,7 @@ export const HotelForm = ({ initialData, onSubmit }) => {
                                                     }}
                                                     title="Xóa ảnh"
                                                 >
-                                                    🗑️
+                                                    <Trash2 size={16} />
                                                 </button>
                                             </div>
                                         </div>
@@ -1198,6 +1213,7 @@ export const HotelForm = ({ initialData, onSubmit }) => {
                             e.currentTarget.style.background = 'white';
                         }}
                     >
+                        <XCircle size={18} />
                         Hủy
                     </button>
                     <button
@@ -1211,17 +1227,18 @@ export const HotelForm = ({ initialData, onSubmit }) => {
                         onMouseEnter={(e) => {
                             if (formData.images.length >= 7) {
                                 e.currentTarget.style.transform = 'translateY(-2px)';
-                                e.currentTarget.style.boxShadow = '0 6px 20px rgba(102, 126, 234, 0.5)';
+                                e.currentTarget.style.boxShadow = '0 4px 15px rgba(16, 185, 129, 0.5)';
                             }
                         }}
                         onMouseLeave={(e) => {
                             if (formData.images.length >= 7) {
                                 e.currentTarget.style.transform = 'translateY(0)';
-                                e.currentTarget.style.boxShadow = '0 4px 15px rgba(102, 126, 234, 0.4)';
+                                e.currentTarget.style.boxShadow = '0 2px 8px rgba(16, 185, 129, 0.3)';
                             }
                         }}
                     >
-                        {initialData ? '✅ Cập nhật khách sạn' : '✨ Tạo khách sạn'}
+                        <CheckCircle2 size={18} />
+                        {initialData ? 'Cập nhật khách sạn' : 'Tạo khách sạn'}
                     </button>
                 </div>
             </form>

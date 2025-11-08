@@ -60,11 +60,12 @@ const CreateHotelPage = () => {
       // 🔄 Trigger refresh: Set a flag in localStorage to tell DashboardLayout to re-fetch
       localStorage.setItem('hotelJustCreated', 'true');
 
-      // Navigate to hotel overview
+      // Navigate to hotel overview (always redirect to overview page)
       if (response.data?._id) {
         navigate(`/provider/hotels/${response.data._id}/overview`);
       } else {
-        navigate('/provider/hotels');
+        // If no hotel ID returned, navigate to provider dashboard
+        navigate('/provider');
       }
     } catch (err) {
       if (err.response?.status === 403 && err.response?.data?.error?.includes('Service provider ID not found')) {
