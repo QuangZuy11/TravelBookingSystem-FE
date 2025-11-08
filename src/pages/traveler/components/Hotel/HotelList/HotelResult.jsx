@@ -49,6 +49,7 @@ import {
 } from '@mui/icons-material';
 import '../../Hotel/HotelList/HotelList.css';
 import { getProxiedGoogleDriveUrl } from '../../../../../utils/googleDriveImageHelper';
+import { calculateDiscountedPrice, formatPromotionDiscount } from '../../../../../utils/promotionHelpers';
 
 // 12 Amenities chuẩn từ Backend API
 // Backend đã chuẩn hóa và luôn trả về format tiếng Việt này
@@ -136,6 +137,13 @@ function HotelResult({
         // Remove duplicates (phòng trường hợp data cũ vẫn còn tồn tại)
         const uniqueAmenities = [...new Set(rawAmenities)];
 
+        // Lấy promotion đầu tiên nếu có (active promotions from backend)
+        const promotions = Array.isArray(h.promotions) ? h.promotions : [];
+        const activePromotion = promotions.length > 0 ? promotions[0] : null;
+        const discountPercent = activePromotion?.discountValue && activePromotion?.discountType === 'percent'
+            ? activePromotion.discountValue
+            : 0;
+
         const normalized = {
             id: h._id,
             name: h.name || 'Khách sạn',
@@ -143,7 +151,8 @@ function HotelResult({
             rating: stars, // FE rating = số sao (map từ category)
             reviews: typeof h.bookingsCount === 'number' ? h.bookingsCount : 0, // dùng cho "Phổ biến"
             price: typeof h?.priceRange?.min === 'number' ? h.priceRange.min : 0,
-            discount: 0, // chưa có trường discount ở BE
+            discount: discountPercent, // Lấy từ promotions
+            promotion: activePromotion, // Lưu toàn bộ promotion object
             freeCancel: false, // có thể map từ policies nếu có quy ước
             image: Array.isArray(h.images) && h.images[0]
                 ? getProxiedGoogleDriveUrl(h.images[0])
@@ -159,12 +168,20 @@ function HotelResult({
             name: normalized.name,
             amenities_raw: rawAmenities,
             amenities_final: uniqueAmenities,
+            promotion: normalized.promotion,
+            discount: normalized.discount,
             availableRooms_raw: h?.availableRooms,
             availableRooms: normalized.availableRooms
         });
 
         return normalized;
     };
+
+    // ============================================================================
+    // USING REAL BACKEND PROMOTIONS DATA
+    // ============================================================================
+    // Backend already returns filtered active promotions, no need for mock data
+    // ============================================================================
 
     // NEW: Gọi API theo search + filter + sort (giữ nguyên các phần còn lại)
     useEffect(() => {
@@ -238,13 +255,19 @@ function HotelResult({
                 const rawHotels = json?.data?.hotels || [];
                 const normalized = rawHotels.map(normalizeHotel);
 
+                // ============================================================================
+                // USING REAL BACKEND PROMOTIONS DATA - No mock data needed
+                // ============================================================================
+
                 if (!aborted) {
                     setHotels(normalized);
                     setPage(1);
-                    // DEBUG: sau set state
+                    // DEBUG: after set state
                     console.log('Hotels state set:', normalized.map(h => ({
                         id: h.id,
                         name: h.name,
+                        promotion: h.promotion,
+                        discount: h.discount,
                         availableRooms: h.availableRooms
                     })));
                 }
@@ -418,8 +441,9 @@ function HotelResult({
 
 function HotelCard({ hotel, isFavorite, onToggleFavorite, onBook }) {
     const navigate = useNavigate();
-    const discountPrice =
-        hotel.discount > 0 ? Math.round(hotel.price * (1 - hotel.discount / 100)) : hotel.price;
+
+    // Use the utility function for price calculation
+    const discountPrice = calculateDiscountedPrice(hotel.price, hotel.promotion);
 
     // DEBUG: Log khi hotel/availableRooms thay đổi
     ReactUseEffect(() => {
@@ -447,12 +471,18 @@ function HotelCard({ hotel, isFavorite, onToggleFavorite, onBook }) {
             <Grid container spacing={0} alignItems="stretch" className="hotel-card-grid" wrap="nowrap">
                 {/* Cột ảnh */}
                 <Grid item xs="auto" className="image-col">
-                    <Box className="image-wrap list">
+                    <Box className="image-wrap list" sx={{ position: 'relative' }}>
                         <Badge
                             color="error"
-                            badgeContent={hotel.discount > 0 ? `-${hotel.discount}%` : null}
+                            badgeContent={hotel.promotion ? formatPromotionDiscount(hotel.promotion) : null}
                             anchorOrigin={{ vertical: 'top', horizontal: 'left' }}
                             className="hotel-result-badge"
+                            sx={{
+                                '& .MuiBadge-badge': {
+                                    left: '16px', // Đẩy badge sang phải để tránh border radius
+                                    top: '12px',
+                                }
+                            }}
                         >
                             <SmartImage
                                 src={hotel.image}
@@ -462,6 +492,31 @@ function HotelCard({ hotel, isFavorite, onToggleFavorite, onBook }) {
                                 style={{ cursor: 'pointer' }}
                             />
                         </Badge>
+
+                        {/* Mã giảm giá - góc trái dưới */}
+                        {hotel.promotion && hotel.promotion.code && (
+                            <Box
+                                sx={{
+                                    position: 'absolute',
+                                    bottom: '8px',
+                                    left: '8px',
+                                    backgroundColor: '#10b981',
+                                    color: 'white',
+                                    padding: '4px 12px',
+                                    borderRadius: '6px',
+                                    fontSize: '0.75rem',
+                                    fontWeight: '700',
+                                    boxShadow: '0 2px 8px rgba(0,0,0,0.15)',
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    gap: '4px',
+                                    zIndex: 2
+                                }}
+                            >
+                                <LocalOfferIcon sx={{ fontSize: '14px' }} />
+                                {hotel.promotion.code}
+                            </Box>
+                        )}
 
                         <Tooltip title={isFavorite ? 'Bỏ yêu thích' : 'Thêm yêu thích'}>
                             <Button
@@ -544,8 +599,10 @@ function HotelCard({ hotel, isFavorite, onToggleFavorite, onBook }) {
 
                             {/* Giá + CTA */}
                             <Stack className="booking-col" spacing={1} alignItems="flex-end">
+
+
                                 <Box textAlign="right">
-                                    {hotel.discount > 0 && (
+                                    {hotel.promotion && (
                                         <Typography
                                             variant="body2"
                                             color="text.secondary"
@@ -570,12 +627,12 @@ function HotelCard({ hotel, isFavorite, onToggleFavorite, onBook }) {
                                 </Box>
 
                                 <Stack direction="row" spacing={1} alignItems="center">
-                                    {hotel.discount > 0 && (
+                                    {hotel.promotion && (
                                         <Chip
                                             size="small"
                                             color="primary"
                                             icon={<LocalOfferIcon />}
-                                            label="Ưu đãi hôm nay"
+                                            label={`Ưu đãi: ${hotel.promotion.name || 'Khuyến mãi'}`}
                                             variant="filled"
                                         />
                                     )}

@@ -1,22 +1,30 @@
 import {
-    Pool as PoolIcon,
-    Spa as SpaIcon,
-    FitnessCenter as GymIcon,
+    Waves as PoolIcon,
+    Sparkles as SpaIcon,
+    Dumbbell as GymIcon,
     Wifi as WifiIcon,
-    DirectionsCar as ParkingIcon,
-    Liquor as BarIcon,
-    Restaurant as RestaurantIcon,
-    RoomPreferences as RoomServiceIcon,
-    Work as BusinessCenterIcon,
-    FlightTakeoff as AirportShuttleIcon,
-    AcUnit as AirConditioningIcon,
-    MeetingRoom as ConferenceRoomIcon,
-    LocalLaundryService as LaundryServiceIcon,
-    Star as DefaultIcon
-} from '@mui/icons-material';
+    Car as ParkingIcon,
+    Wine as BarIcon,
+    UtensilsCrossed as RestaurantIcon,
+    Building2 as BusinessCenterIcon,
+    Plane as AirportShuttleIcon,
+    Snowflake as AirConditioningIcon,
+    Users as ConferenceRoomIcon,
+    Shirt as LaundryServiceIcon,
+    Star as DefaultIcon,
+    Tag as LocalOfferIcon,
+    Building as ElevatorIcon,
+    Bell as RoomServiceIcon,
+    MapPin as LocationIcon,
+    Layers as ServicesIcon,
+    UserCheck as UsersIcon,
+    Smile as SmileIcon,
+    MessageCircle as MessageIcon
+} from 'lucide-react';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import SmartImage from '../../../../../components/common/SmartImage';
+import { calculateDiscountedPrice, formatPromotionDiscount } from '../../../../../utils/promotionHelpers';
 
 export default function Overview({ hotelData }) {
     // State for image carousel
@@ -52,10 +60,30 @@ export default function Overview({ hotelData }) {
         return new Intl.NumberFormat('vi-VN').format(price);
     };
 
-    // Helper function to get amenity name in Vietnamese
+    // Get active promotion (first one from backend - already filtered for active promotions)
+    const getActivePromotion = () => {
+        if (!hotelData.promotions || hotelData.promotions.length === 0) return null;
+        return hotelData.promotions[0]; // Backend đã filter active promotions
+    };
+
+    // Helper function to get amenity name in Vietnamese (matching HotelResult)
     const getAmenityName = (amenity) => {
         const amenityMap = {
-            // Lowercase versions (for consistency with old data)
+            // 12 amenities chuẩn từ Backend API (matching HotelResult)
+            'Wifi': 'Wifi',
+            'Bãi đậu xe': 'Bãi đậu xe',
+            'Hồ bơi': 'Hồ bơi',
+            'Phòng gym': 'Phòng gym',
+            'Nhà hàng': 'Nhà hàng',
+            'Spa': 'Spa',
+            'Quầy bar': 'Quầy bar',
+            'Trung tâm thương mại': 'Trung tâm thương mại',
+            'Thang máy': 'Thang máy',
+            'Đưa đón sân bay': 'Đưa đón sân bay',
+            'Điều hòa': 'Điều hòa',
+            'Dịch vụ giặt là': 'Dịch vụ giặt là',
+
+            // Legacy support for old data format
             'pool': 'Hồ bơi',
             'gym': 'Phòng tập',
             'spa': 'Spa',
@@ -74,9 +102,7 @@ export default function Overview({ hotelData }) {
 
             // Backend format (Title Case with spaces)
             'Pool': 'Hồ bơi',
-            'Spa': 'Spa',
             'Gym': 'Phòng tập',
-            'Wifi': 'WiFi miễn phí',
             'Wi-Fi': 'Wi-Fi',
             'Bar': 'Quầy bar',
             'Parking': 'Đỗ xe miễn phí',
@@ -91,10 +117,24 @@ export default function Overview({ hotelData }) {
         return amenityMap[amenity] || amenity;
     };
 
-    // Helper function to get amenity icon component
+    // Helper function to get amenity icon component (using lucide-react icons)
     const getAmenityIconComponent = (amenity) => {
         const iconMap = {
-            // Lowercase versions (for consistency with old data)
+            // 12 amenities chuẩn từ Backend API (matching HotelResult)
+            'Wifi': WifiIcon,
+            'Bãi đậu xe': ParkingIcon,
+            'Hồ bơi': PoolIcon,
+            'Phòng gym': GymIcon,
+            'Nhà hàng': RestaurantIcon,
+            'Spa': SpaIcon,
+            'Quầy bar': BarIcon,
+            'Trung tâm thương mại': BusinessCenterIcon,
+            'Thang máy': ElevatorIcon,
+            'Đưa đón sân bay': AirportShuttleIcon,
+            'Điều hòa': AirConditioningIcon,
+            'Dịch vụ giặt là': LaundryServiceIcon,
+
+            // Legacy support for old data format
             'pool': PoolIcon,
             'gym': GymIcon,
             'spa': SpaIcon,
@@ -113,9 +153,7 @@ export default function Overview({ hotelData }) {
 
             // Backend format (Title Case with spaces)
             'Pool': PoolIcon,
-            'Spa': SpaIcon,
             'Gym': GymIcon,
-            'Wifi': WifiIcon,
             'Wi-Fi': WifiIcon,
             'Bar': BarIcon,
             'Parking': ParkingIcon,
@@ -333,10 +371,7 @@ export default function Overview({ hotelData }) {
                                 <span className="hotel-detail-stars">{getStarDisplay(hotelData.category)}</span>
                             </div>
                             <div className="hotel-detail-location">
-                                <svg className="hotel-detail-location-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                                    <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
-                                    <circle cx="12" cy="10" r="3"></circle>
-                                </svg>
+                                <LocationIcon className="hotel-detail-location-icon" size={16} />
                                 <span>
                                     {hotelData.address?.street && `${hotelData.address.street}, `}
                                     {hotelData.address?.city}, {hotelData.address?.country}
@@ -347,8 +382,61 @@ export default function Overview({ hotelData }) {
                         <div className="hotel-detail-booking-card">
                             <div className="hotel-detail-price-section">
                                 <span className="hotel-detail-price-label">Giá phòng/ đêm từ</span>
+
+                                {/* Show promotion info if available */}
+                                {getActivePromotion() && (
+                                    <div style={{
+                                        backgroundColor: '#10b981',
+                                        color: 'white',
+                                        padding: '4px 8px',
+                                        borderRadius: '4px',
+                                        fontSize: '0.75rem',
+                                        fontWeight: '700',
+                                        marginBottom: '8px',
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        gap: '4px'
+                                    }}>
+                                        <LocalOfferIcon size={14} />
+                                        {getActivePromotion().name} - {getActivePromotion().code}
+                                    </div>
+                                )}
+
                                 <div className="hotel-detail-price">
-                                    {formatPrice(hotelData.priceRange?.min || 0)} <span className="hotel-detail-currency">VNĐ</span>
+                                    {/* Show original price with strikethrough if there's a promotion */}
+                                    {getActivePromotion() && (
+                                        <div style={{
+                                            fontSize: '0.9rem',
+                                            textDecoration: 'line-through',
+                                            color: '#64748b',
+                                            marginBottom: '4px'
+                                        }}>
+                                            {formatPrice(hotelData.priceRange?.min || 0)} VNĐ
+                                        </div>
+                                    )}
+
+                                    {/* Show discounted price or regular price */}
+                                    {formatPrice(
+                                        getActivePromotion()
+                                            ? calculateDiscountedPrice(hotelData.priceRange?.min || 0, getActivePromotion())
+                                            : (hotelData.priceRange?.min || 0)
+                                    )} <span className="hotel-detail-currency">VNĐ</span>
+
+                                    {/* Show discount badge */}
+                                    {getActivePromotion() && (
+                                        <div style={{
+                                            backgroundColor: '#ef4444',
+                                            color: 'white',
+                                            padding: '2px 6px',
+                                            borderRadius: '4px',
+                                            fontSize: '0.7rem',
+                                            fontWeight: '700',
+                                            marginLeft: '8px',
+                                            display: 'inline-block'
+                                        }}>
+                                            {formatPromotionDiscount(getActivePromotion())}
+                                        </div>
+                                    )}
                                 </div>
                             </div>
                             <button className="hotel-detail-book-button" onClick={handleSelectRooms}>Chọn Phòng</button>
@@ -363,12 +451,76 @@ export default function Overview({ hotelData }) {
 
             {/* Info Cards */}
             <div className="hotel-detail-info-cards">
+                {/* Promotions Card - Show only if there are active promotions */}
+                {hotelData.promotions && hotelData.promotions.length > 0 && (
+                    <div className="hotel-detail-info-card">
+                        <h3 className="hotel-detail-card-title">
+                            <LocalOfferIcon className="hotel-detail-card-icon" size={20} />
+                            Khuyến mãi đặc biệt
+                        </h3>
+                        <div className="hotel-detail-promotion-list">
+                            {hotelData.promotions.map((promotion, index) => (
+                                <div key={index} className="hotel-detail-promotion-item" style={{
+                                    backgroundColor: '#f0fdf4',
+                                    border: '1px solid #10b981',
+                                    borderRadius: '8px',
+                                    padding: '12px',
+                                    marginBottom: '8px'
+                                }}>
+                                    <div style={{
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        justifyContent: 'space-between',
+                                        marginBottom: '4px'
+                                    }}>
+                                        <span style={{
+                                            fontWeight: '600',
+                                            color: '#059669'
+                                        }}>
+                                            {promotion.name}
+                                        </span>
+                                        <span style={{
+                                            backgroundColor: '#10b981',
+                                            color: 'white',
+                                            padding: '2px 8px',
+                                            borderRadius: '4px',
+                                            fontSize: '0.75rem',
+                                            fontWeight: '700'
+                                        }}>
+                                            {formatPromotionDiscount(promotion)}
+                                        </span>
+                                    </div>
+                                    <div style={{
+                                        fontSize: '0.875rem',
+                                        color: '#065f46',
+                                        marginBottom: '4px'
+                                    }}>
+                                        Mã: <strong>{promotion.code}</strong>
+                                    </div>
+                                    {promotion.description && (
+                                        <div style={{
+                                            fontSize: '0.875rem',
+                                            color: '#047857'
+                                        }}>
+                                            {promotion.description}
+                                        </div>
+                                    )}
+                                    <div style={{
+                                        fontSize: '0.75rem',
+                                        color: '#6b7280',
+                                        marginTop: '4px'
+                                    }}>
+                                        Có hiệu lực đến {new Date(promotion.endDate).toLocaleDateString('vi-VN')}
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                )}
+
                 <div className="hotel-detail-info-card">
                     <h3 className="hotel-detail-card-title">
-                        <svg className="hotel-detail-card-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                            <path d="M12 2L2 7l10 5 10-5z"></path>
-                            <path d="M2 17l10 5 10-5M2 12l10 5 10-5"></path>
-                        </svg>
+                        <ServicesIcon className="hotel-detail-card-icon" size={20} />
                         Tiện ích chính
                     </h3>
                     <div className="hotel-detail-amenity-list">
@@ -377,14 +529,14 @@ export default function Overview({ hotelData }) {
                                 const IconComponent = getAmenityIconComponent(amenity);
                                 return (
                                     <div key={index} className="hotel-detail-amenity-item">
-                                        <IconComponent className="hotel-detail-amenity-icon" />
+                                        <IconComponent className="hotel-detail-amenity-icon" size={20} />
                                         <span>{getAmenityName(amenity)}</span>
                                     </div>
                                 );
                             })
                         ) : (
                             <div className="hotel-detail-amenity-item">
-                                <DefaultIcon className="hotel-detail-amenity-icon" />
+                                <DefaultIcon className="hotel-detail-amenity-icon" size={20} />
                                 <span>Không có thông tin tiện ích</span>
                             </div>
                         )}
@@ -393,35 +545,24 @@ export default function Overview({ hotelData }) {
 
                 <div className="hotel-detail-info-card">
                     <h3 className="hotel-detail-card-title">
-                        <svg className="hotel-detail-card-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                            <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
-                            <circle cx="12" cy="10" r="3"></circle>
-                        </svg>
+                        <LocationIcon className="hotel-detail-card-icon" size={20} />
                         Trong khu vực
                     </h3>
                     <div className="hotel-detail-location-list">
                         <div className="hotel-detail-location-item">
-                            <svg className="hotel-detail-location-marker" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                                <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
-                            </svg>
+                            <LocationIcon className="hotel-detail-location-marker" size={16} />
                             <span>Hồ Hoàn Kiếm</span>
                         </div>
                         <div className="hotel-detail-location-item">
-                            <svg className="hotel-detail-location-marker" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                                <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
-                            </svg>
+                            <LocationIcon className="hotel-detail-location-marker" size={16} />
                             <span>Phố Ẩm Thực Tạ Hiện</span>
                         </div>
                         <div className="hotel-detail-location-item">
-                            <svg className="hotel-detail-location-marker" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                                <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
-                            </svg>
+                            <LocationIcon className="hotel-detail-location-marker" size={16} />
                             <span>Nhà Hát Lớn</span>
                         </div>
                         <div className="hotel-detail-location-item">
-                            <svg className="hotel-detail-location-marker" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                                <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
-                            </svg>
+                            <LocationIcon className="hotel-detail-location-marker" size={16} />
                             <span>Cổng Viên Thống Nhất</span>
                         </div>
                     </div>
@@ -429,34 +570,20 @@ export default function Overview({ hotelData }) {
 
                 <div className="hotel-detail-info-card">
                     <h3 className="hotel-detail-card-title">
-                        <svg className="hotel-detail-card-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                            <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
-                        </svg>
+                        <DefaultIcon className="hotel-detail-card-icon" size={20} />
                         Đánh giá
                     </h3>
                     <div className="hotel-detail-review-stats">
                         <div className="hotel-detail-review-item">
-                            <svg className="hotel-detail-review-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                                <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
-                                <circle cx="9" cy="7" r="4"></circle>
-                                <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
-                                <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
-                            </svg>
+                            <UsersIcon className="hotel-detail-review-icon" size={20} />
                             <span>{hotelData.bookingsCount || 0} lượt book</span>
                         </div>
                         <div className="hotel-detail-review-item">
-                            <svg className="hotel-detail-review-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                                <circle cx="12" cy="12" r="10"></circle>
-                                <path d="M8 14s1.5 2 4 2 4-2 4-2"></path>
-                                <line x1="9" y1="9" x2="9.01" y2="9"></line>
-                                <line x1="15" y1="9" x2="15.01" y2="9"></line>
-                            </svg>
+                            <SmileIcon className="hotel-detail-review-icon" size={20} />
                             <span>{hotelData.rating || 0} / 10 điểm đánh giá</span>
                         </div>
                         <div className="hotel-detail-review-item">
-                            <svg className="hotel-detail-review-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                                <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
-                            </svg>
+                            <MessageIcon className="hotel-detail-review-icon" size={20} />
                             <span>{hotelData.reviews ? hotelData.reviews.length : 0} Reviews</span>
                         </div>
                     </div>
