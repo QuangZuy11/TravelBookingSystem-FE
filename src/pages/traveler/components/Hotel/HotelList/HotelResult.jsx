@@ -50,44 +50,43 @@ import {
 import '../../Hotel/HotelList/HotelList.css';
 import { getProxiedGoogleDriveUrl } from '../../../../../utils/googleDriveImageHelper';
 
+// 12 Amenities chuẩn từ Backend API
+// Backend đã chuẩn hóa và luôn trả về format tiếng Việt này
 const amenitiesData = [
-    { label: 'Bể bơi', value: 'Pool', icon: PoolIcon },
+    { label: 'Wifi', value: 'Wifi', icon: WifiIcon },
+    { label: 'Bãi đậu xe', value: 'Bãi đậu xe', icon: ParkingIcon },
+    { label: 'Hồ bơi', value: 'Hồ bơi', icon: PoolIcon },
+    { label: 'Phòng gym', value: 'Phòng gym', icon: GymIcon },
+    { label: 'Nhà hàng', value: 'Nhà hàng', icon: RestaurantIcon },
     { label: 'Spa', value: 'Spa', icon: SpaIcon },
-    { label: 'Phòng Gym', value: 'Gym', icon: GymIcon },
-    { label: 'Wi-Fi', value: 'Wi-Fi', icon: WifiIcon },
-    { label: 'Quầy bar', value: 'Bar', icon: BarIcon },
-    { label: 'Chỗ đậu xe', value: 'Parking', icon: ParkingIcon },
-    { label: 'Nhà hàng', value: 'Restaurant', icon: RestaurantIcon },
-    { label: 'Dịch vụ phòng', value: 'Room Service', icon: RoomServiceIcon },
-    { label: 'Trung tâm thương mại', value: 'Business Center', icon: BusinessCenterIcon },
-    { label: 'Đưa đón sân bay', value: 'Airport Shuttle', icon: AirportShuttleIcon },
-    { label: 'Điều hòa', value: 'Air Conditioning', icon: AirConditioningIcon },
-    { label: 'Phòng hội nghị', value: 'Conference Room', icon: ConferenceRoomIcon },
-    { label: 'Dịch vụ giặt ủi', value: 'Laundry Service', icon: LaundryServiceIcon },
+    { label: 'Quầy bar', value: 'Quầy bar', icon: BarIcon },
+    { label: 'Trung tâm thương mại', value: 'Trung tâm thương mại', icon: BusinessCenterIcon },
+    { label: 'Thang máy', value: 'Thang máy', icon: BusinessCenterIcon },
+    { label: 'Đưa đón sân bay', value: 'Đưa đón sân bay', icon: AirportShuttleIcon },
+    { label: 'Điều hòa', value: 'Điều hòa', icon: AirConditioningIcon },
+    { label: 'Dịch vụ giặt là', value: 'Dịch vụ giặt là', icon: LaundryServiceIcon },
 ];
 
+// Icon mapping - Backend đã chuẩn hóa, giữ map này cho backward compatibility
 const amenityIconMap = {
-    // Lowercase versions (for consistency with old data)
-    pool: PoolIcon,
-    spa: SpaIcon,
-    gym: GymIcon,
-    wifi: WifiIcon,
-    bar: BarIcon,
-    parking: ParkingIcon,
-    restaurant: RestaurantIcon,
-    room_service: RoomServiceIcon,
-    business_center: BusinessCenterIcon,
-    airport_shuttle: AirportShuttleIcon,
-    air_conditioning: AirConditioningIcon,
-    conference_room: ConferenceRoomIcon,
-    laundry_service: LaundryServiceIcon,
-
-    // Backend format (Title Case with spaces)
-    'Pool': PoolIcon,
-    'Spa': SpaIcon,
-    'Gym': GymIcon,
+    // 12 amenities chuẩn
     'Wifi': WifiIcon,
-    'Wi-Fi': WifiIcon, // Backend trả về Wi-Fi
+    'Bãi đậu xe': ParkingIcon,
+    'Hồ bơi': PoolIcon,
+    'Phòng gym': GymIcon,
+    'Nhà hàng': RestaurantIcon,
+    'Spa': SpaIcon,
+    'Quầy bar': BarIcon,
+    'Trung tâm thương mại': BusinessCenterIcon,
+    'Thang máy': BusinessCenterIcon,
+    'Đưa đón sân bay': AirportShuttleIcon,
+    'Điều hòa': AirConditioningIcon,
+    'Dịch vụ giặt là': LaundryServiceIcon,
+
+    // Legacy support (old data might still exist)
+    'Wi-Fi': WifiIcon,
+    'Pool': PoolIcon,
+    'Gym': GymIcon,
     'Bar': BarIcon,
     'Parking': ParkingIcon,
     'Restaurant': RestaurantIcon,
@@ -95,7 +94,6 @@ const amenityIconMap = {
     'Business Center': BusinessCenterIcon,
     'Airport Shuttle': AirportShuttleIcon,
     'Air Conditioning': AirConditioningIcon,
-    'Conference Room': ConferenceRoomIcon,
     'Laundry Service': LaundryServiceIcon,
 };
 
@@ -130,6 +128,14 @@ function HotelResult({
             return Number.isFinite(n) ? n : 0;
         })();
 
+        // Backend đã chuẩn hóa amenities, chỉ cần lấy trực tiếp
+        // 12 amenities chuẩn: 'Wifi', 'Bãi đậu xe', 'Hồ bơi', 'Phòng gym', 'Nhà hàng', 'Spa',
+        // 'Quầy bar', 'Trung tâm thương mại', 'Thang máy', 'Đưa đón sân bay', 'Điều hòa', 'Dịch vụ giặt là'
+        const rawAmenities = Array.isArray(h.amenities) ? h.amenities.map(a => String(a)) : [];
+
+        // Remove duplicates (phòng trường hợp data cũ vẫn còn tồn tại)
+        const uniqueAmenities = [...new Set(rawAmenities)];
+
         const normalized = {
             id: h._id,
             name: h.name || 'Khách sạn',
@@ -142,7 +148,7 @@ function HotelResult({
             image: Array.isArray(h.images) && h.images[0]
                 ? getProxiedGoogleDriveUrl(h.images[0])
                 : 'https://images.unsplash.com/photo-1566073771259-6a8506099945?w=1200&h=800&fit=crop',
-            amenities: Array.isArray(h.amenities) ? h.amenities.map(a => String(a)) : [], // Giữ nguyên format từ backend
+            amenities: uniqueAmenities, // Đã normalize và loại bỏ duplicate
             availableRooms: h?.availableRooms != null ? Number(h.availableRooms) : 0, // map số phòng trống
         };
 
@@ -151,6 +157,8 @@ function HotelResult({
         console.log('Normalized hotel:', {
             id: normalized.id,
             name: normalized.name,
+            amenities_raw: rawAmenities,
+            amenities_final: uniqueAmenities,
             availableRooms_raw: h?.availableRooms,
             availableRooms: normalized.availableRooms
         });

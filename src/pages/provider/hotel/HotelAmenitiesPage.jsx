@@ -19,19 +19,18 @@ const HotelAmenitiesPage = () => {
     const [amenities, setAmenities] = useState([]);
 
     const amenitiesOptions = [
-        'Wi-Fi',
-        'Parking',
-        'Air Conditioning',
-        'Restaurant',
-        'Bar',
-        'Pool',
+        'Wifi',
+        'Bãi đậu xe',
+        'Hồ bơi',
+        'Phòng gym',
+        'Nhà hàng',
         'Spa',
-        'Gym',
-        'Room Service',
-        'Business Center',
-        'Airport Shuttle',
-        'Conference Room',
-        'Laundry Service'
+        'Quầy bar',
+        'Trung tâm thương mại',
+        'Thang máy',
+        'Đưa đón sân bay',
+        'Điều hòa',
+        'Dịch vụ giặt là'
     ];
 
     useEffect(() => {

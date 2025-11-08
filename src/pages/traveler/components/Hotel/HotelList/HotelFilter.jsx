@@ -33,29 +33,31 @@ import {
 
 import '../HotelList/HotelList.css';
 
-// Map icon & nhãn (đồng bộ với Hotel List)
+// 12 Amenities chuẩn từ Backend API
+// Backend đã chuẩn hóa và trả về format tiếng Việt
+// API: GET /api/traveler/hotels/amenities
+// 'Wifi', 'Bãi đậu xe', 'Hồ bơi', 'Phòng gym', 'Nhà hàng', 'Spa',
+// 'Quầy bar', 'Trung tâm thương mại', 'Thang máy', 'Đưa đón sân bay',
+// 'Điều hòa', 'Dịch vụ giặt là'
 const AMENITY_ICON_MAP = {
-    // Lowercase versions (for consistency with old data)
-    pool: PoolIcon,
-    spa: SpaIcon,
-    gym: GymIcon,
-    wifi: WifiIcon,
-    bar: BarIcon,
-    parking: ParkingIcon,
-    restaurant: RestaurantIcon,
-    room_service: RoomServiceIcon,
-    business_center: BusinessCenterIcon,
-    airport_shuttle: AirportShuttleIcon,
-    air_conditioning: AirConditioningIcon,
-    conference_room: ConferenceRoomIcon,
-    laundry_service: LaundryServiceIcon,
-
-    // Backend format (Title Case with spaces)
-    'Pool': PoolIcon,
-    'Spa': SpaIcon,
-    'Gym': GymIcon,
+    // 12 amenities chuẩn
     'Wifi': WifiIcon,
-    'Wi-Fi': WifiIcon, // Backend trả về Wi-Fi
+    'Bãi đậu xe': ParkingIcon,
+    'Hồ bơi': PoolIcon,
+    'Phòng gym': GymIcon,
+    'Nhà hàng': RestaurantIcon,
+    'Spa': SpaIcon,
+    'Quầy bar': BarIcon,
+    'Trung tâm thương mại': BusinessCenterIcon,
+    'Thang máy': BusinessCenterIcon,
+    'Đưa đón sân bay': AirportShuttleIcon,
+    'Điều hòa': AirConditioningIcon,
+    'Dịch vụ giặt là': LaundryServiceIcon,
+
+    // Legacy support (old data might still exist)
+    'Wi-Fi': WifiIcon,
+    'Pool': PoolIcon,
+    'Gym': GymIcon,
     'Bar': BarIcon,
     'Parking': ParkingIcon,
     'Restaurant': RestaurantIcon,
@@ -63,41 +65,36 @@ const AMENITY_ICON_MAP = {
     'Business Center': BusinessCenterIcon,
     'Airport Shuttle': AirportShuttleIcon,
     'Air Conditioning': AirConditioningIcon,
-    'Conference Room': ConferenceRoomIcon,
     'Laundry Service': LaundryServiceIcon,
 };
 
 const AMENITY_LABEL_MAP = {
-    // Lowercase versions (for consistency with old data)
-    pool: 'Bể bơi',
-    spa: 'Spa',
-    gym: 'Phòng Gym',
-    wifi: 'Wifi',
-    bar: 'Quầy Bar',
-    parking: 'Chỗ Đậu Xe',
-    restaurant: 'Nhà hàng',
-    room_service: 'Dịch vụ phòng',
-    business_center: 'Trung tâm thương mại',
-    airport_shuttle: 'Đưa đón sân bay',
-    air_conditioning: 'Máy lạnh',
-    conference_room: 'Phòng hội nghị',
-    laundry_service: 'Dịch vụ giặt ủi',
-
-    // Backend format (Title Case with spaces)
-    'Pool': 'Bể bơi',
-    'Spa': 'Spa',
-    'Gym': 'Phòng Gym',
+    // 12 amenities chuẩn
     'Wifi': 'Wifi',
-    'Wi-Fi': 'Wi-Fi', // Backend trả về Wi-Fi
-    'Bar': 'Quầy Bar',
-    'Parking': 'Chỗ Đậu Xe',
+    'Bãi đậu xe': 'Bãi đậu xe',
+    'Hồ bơi': 'Hồ bơi',
+    'Phòng gym': 'Phòng gym',
+    'Nhà hàng': 'Nhà hàng',
+    'Spa': 'Spa',
+    'Quầy bar': 'Quầy bar',
+    'Trung tâm thương mại': 'Trung tâm thương mại',
+    'Thang máy': 'Thang máy',
+    'Đưa đón sân bay': 'Đưa đón sân bay',
+    'Điều hòa': 'Điều hòa',
+    'Dịch vụ giặt là': 'Dịch vụ giặt là',
+
+    // Legacy support (old data might still exist)
+    'Wi-Fi': 'Wi-Fi',
+    'Pool': 'Hồ bơi',
+    'Gym': 'Phòng gym',
+    'Bar': 'Quầy bar',
+    'Parking': 'Bãi đậu xe',
     'Restaurant': 'Nhà hàng',
     'Room Service': 'Dịch vụ phòng',
     'Business Center': 'Trung tâm thương mại',
     'Airport Shuttle': 'Đưa đón sân bay',
-    'Air Conditioning': 'Máy lạnh',
-    'Conference Room': 'Phòng hội nghị',
-    'Laundry Service': 'Dịch vụ giặt ủi',
+    'Air Conditioning': 'Điều hòa',
+    'Laundry Service': 'Dịch vụ giặt là',
 };
 
 // Cố định khoảng giá filter: 100.000 - 10.000.000
@@ -176,7 +173,7 @@ function HotelFilter({
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []); // chỉ chạy khi mount
 
-    // Amenities từ BE (không đổi API prop)
+    // Amenities từ BE (backend đã trả về 12 amenities chuẩn)
     useEffect(() => {
         let aborted = false;
         async function fetchAmenities() {
@@ -186,9 +183,12 @@ function HotelFilter({
                 const res = await fetch('http://localhost:3000/api/traveler/hotels/amenities');
                 if (!res.ok) throw new Error(`HTTP ${res.status}`);
                 const json = await res.json();
-                const list = (json?.data || [])
-                    .filter((x) => typeof x === 'string' && x.trim() !== '')
-                    .map((x) => x.trim()); // Giữ nguyên format từ backend (Title Case)
+
+                // Backend trả về: { success: true, data: { amenities: [...], details: [...] } }
+                const list = Array.isArray(json?.data?.amenities)
+                    ? json.data.amenities
+                    : (json?.data || []);
+
                 if (!aborted) setAmenities(list);
             } catch (e) {
                 if (!aborted) setErrorAmenities(e.message || 'Lỗi tải tiện nghi');
@@ -201,8 +201,12 @@ function HotelFilter({
     }, []);
 
     const amenityOptions = useMemo(() => {
+        // Backend đã trả về 12 amenities chuẩn, không cần normalize
+        // Remove duplicates (phòng trường hợp)
         const unique = Array.from(new Set(amenities));
-        const toLabel = (value) => AMENITY_LABEL_MAP[value] || value.charAt(0).toUpperCase() + value.slice(1);
+
+        const toLabel = (value) => AMENITY_LABEL_MAP[value] || value;
+
         return unique
             .map((value) => ({
                 value,
