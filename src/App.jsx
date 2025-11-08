@@ -66,10 +66,11 @@ import ChatPage from "./pages/traveler/ChatPage";
 import ChatWidget from "./pages/traveler/ChatWidget";
 
 // Admin Pages
-import PendingProvidersList from "./pages/admin/PendingProvidersList";
-import ProviderDetailPage from "./pages/admin/ProviderDetailPage";
+import AdminLayout from "./pages/admin/AdminLayout";
 import AdminDashboardPage from "./pages/admin/AdminDashboardPage";
 import UserListPage from "./pages/admin/UserListPage";
+import PendingProvidersList from "./pages/admin/PendingProvidersList";
+import ProviderDetailPage from "./pages/admin/ProviderDetailPage";
 import AdminPolicyTermsPage from "./pages/admin/AdminPolicyTermsPage";
 import AdminPolicyTermCreatePage from "./pages/admin/AdminPolicyTermCreatePage";
 import AdminPolicyTermDetailPage from "./pages/admin/AdminPolicyTermDetailPage";
@@ -221,72 +222,6 @@ function App() {
               }
             />
 
-            {/* Protected Routes - Admin */}
-            <Route
-              path="/admin/providers"
-              element={
-                <ProtectedRoute requiredRole="Admin">
-                  <PendingProvidersList />
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/admin/providers/:id"
-              element={
-                <ProtectedRoute requiredRole="Admin">
-                  <ProviderDetailPage />
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/admin/dashboard"
-              element={
-                // <ProtectedRoute requiredRole="Admin">
-                <AdminDashboardPage />
-                // </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/admin/users"
-              element={
-                // <ProtectedRoute requiredRole="Admin">
-                <UserListPage />
-                // </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/admin/terms-policies"
-              element={
-                <ProtectedRoute requiredRole="Admin">
-                  <AdminPolicyTermsPage />
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/admin/terms-policies/create"
-              element={
-                <ProtectedRoute requiredRole="Admin">
-                  <AdminPolicyTermCreatePage />
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/admin/terms-policies/:id"
-              element={
-                <ProtectedRoute requiredRole="Admin">
-                  <AdminPolicyTermDetailPage />
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/admin/terms-policies/:id/edit"
-              element={
-                <ProtectedRoute requiredRole="Admin">
-                  <AdminPolicyTermEditPage />
-                </ProtectedRoute>
-              }
-            />
-
             {/* Protected Routes - Provider */}
             <Route
               path="/provider"
@@ -358,6 +293,26 @@ function App() {
                   />
                 </Route>
               </Route>
+            </Route>
+
+            {/* Admin Routes (Navbar trái giữ nguyên, nội dung đổi qua Outlet) */}
+            <Route
+              path="/admin"
+              element={
+                <ProtectedRoute requiredRole="Admin">
+                  <AdminLayout />
+                </ProtectedRoute>
+              }
+            >
+              <Route index element={<AdminDashboardPage />} />
+              <Route path="dashboard" element={<AdminDashboardPage />} />
+              <Route path="users" element={<UserListPage />} />
+              <Route path="providers" element={<PendingProvidersList />} />
+              <Route path="providers/:id" element={<ProviderDetailPage />} />
+              <Route path="terms-policies" element={<AdminPolicyTermsPage />} />
+              <Route path="terms-policies/create" element={<AdminPolicyTermCreatePage />} />
+              <Route path="terms-policies/:id" element={<AdminPolicyTermDetailPage />} />
+              <Route path="terms-policies/:id/edit" element={<AdminPolicyTermEditPage />} />
             </Route>
 
             {/* Auth flows */}

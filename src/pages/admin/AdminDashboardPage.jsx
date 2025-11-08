@@ -21,31 +21,19 @@ const AdminDashboardPage = () => {
     fetchStats();
   }, []);
 
-  const formatCurrency = (amount) => {
-    return new Intl.NumberFormat("vi-VN", {
-      style: "currency",
-      currency: "VND",
-    }).format(amount);
-  };
+  const formatCurrency = (amount) =>
+    new Intl.NumberFormat("vi-VN", { style: "currency", currency: "VND" }).format(amount);
 
-  if (loading) {
-    return <div className="admin-page-loading">Đang tải dashboard...</div>;
-  }
+  if (loading) return <div className="admin-page-loading">Đang tải dashboard...</div>;
 
   return (
-    <div className="admin-page-container">
+    <>
       <header className="admin-page-header">
-        <div className="header-left">
-          <h1>Admin Dashboard</h1>
-        </div>
-        <div className="header-right">
-          <Link to="/" className="btn-secondary">
-            ← Về Trang Chủ
-          </Link>
-        </div>
+        <div className="header-left"><h1>Admin Dashboard</h1></div>
+        <div className="header-right"><Link to="/" className="btn-secondary">← Về Trang Chủ</Link></div>
       </header>
 
-      <div className="stats-cards-grid">
+      <div className="admin-stats">
         <div className="stat-card">
           <h3>Tổng người dùng</h3>
           <p className="stat-value">{stats?.totalUsers || 0}</p>
@@ -60,36 +48,12 @@ const AdminDashboardPage = () => {
         </div>
         <div className="stat-card">
           <h3>Doanh thu tháng</h3>
-          <p className="stat-value">
-            {formatCurrency(stats?.revenueThisMonth || 0)}
-          </p>
+          <p className="stat-value">{formatCurrency(stats?.revenueThisMonth || 0)}</p>
         </div>
       </div>
 
-      <div className="widget-cards-grid">
-        <div className="widget-card">
-          <h2>Quản lý người dùng</h2>
-          <p>Quản lý tài khoản du khách và nhà cung cấp dịch vụ.</p>
-          <Link to="/admin/users" className="widget-button">
-            Xem chi tiết
-          </Link>
-        </div>
-        <div className="widget-card">
-          <h2>Quản lý Service Provider</h2>
-          <p>Duyệt và quản lý các nhà cung cấp dịch vụ trong hệ thống.</p>
-          <Link to="/admin/providers" className="widget-button">
-            Xem chi tiết
-          </Link>
-        </div>
-        <div className="widget-card">
-          <h2>Điều khoản quảng cáo</h2>
-          <p>Tạo mới và theo dõi điều khoản áp dụng cho chương trình khuyến mãi.</p>
-          <Link to="/admin/terms-policies" className="widget-button">
-            Quản lý điều khoản
-          </Link>
-        </div>
-      </div>
-    </div>
+      {/* Bỏ 3 widget-card vì đã có navbar trái */}
+    </>
   );
 };
 
