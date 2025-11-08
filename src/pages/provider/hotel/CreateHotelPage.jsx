@@ -56,10 +56,10 @@ const CreateHotelPage = () => {
 
       const response = await hotelService.createHotel(providerId, formData);
       toast.success('Hotel added successfully!');
-      
+
       // 🔄 Trigger refresh: Set a flag in localStorage to tell DashboardLayout to re-fetch
       localStorage.setItem('hotelJustCreated', 'true');
-      
+
       // Navigate to hotel overview
       if (response.data?._id) {
         navigate(`/provider/hotels/${response.data._id}/overview`);

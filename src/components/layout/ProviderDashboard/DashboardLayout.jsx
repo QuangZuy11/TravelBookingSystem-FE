@@ -24,7 +24,7 @@ const DashboardLayout = () => {
   useEffect(() => {
     const providerStr = localStorage.getItem("provider");
     console.log("🔍 Provider from localStorage:", providerStr);
-    
+
     if (!providerStr) {
       console.warn("⚠️ No provider data in localStorage");
       return;
@@ -33,7 +33,7 @@ const DashboardLayout = () => {
     try {
       const provider = JSON.parse(providerStr);
       console.log("📦 Parsed provider object:", provider);
-      
+
       if (provider?.licenses && Array.isArray(provider.licenses)) {
         const types = [...new Set(provider.licenses.map((item) => item.service_type))];
         console.log("✅ Provider types from licenses:", types);
@@ -96,13 +96,13 @@ const DashboardLayout = () => {
     if (hotelIdMatch && hotelIdMatch[1] && hotelIdMatch[1] !== 'manage' && hotelIdMatch[1] !== 'new') {
       setHotelId(hotelIdMatch[1]);
     }
-    
+
     // 🔄 Check if hotel was just created - refresh provider data
     const hotelJustCreated = localStorage.getItem('hotelJustCreated');
     if (hotelJustCreated === 'true') {
       console.log('🔄 Hotel just created - refreshing provider data...');
       localStorage.removeItem('hotelJustCreated'); // Clear flag
-      
+
       // Re-fetch provider data
       const providerStr = localStorage.getItem("provider");
       if (providerStr) {
@@ -119,7 +119,7 @@ const DashboardLayout = () => {
   }, [location.pathname]);
 
   const menuItems = [];
-  
+
   console.log("🎯 Current providerTypes:", providerTypes);
   console.log("🏨 Current hotelId:", hotelId);
 
