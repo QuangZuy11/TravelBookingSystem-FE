@@ -17,11 +17,14 @@ export default function DetailTour() {
 
       try {
         // Fetch tour detail with itineraries included
-        const tourRes = await fetch(`http://localhost:3000/api/traveler/tours/${id}`, {
-          headers: {
-            'Content-Type': 'application/json',
+        const tourRes = await fetch(
+          `http://localhost:3000/api/traveler/tours/${id}`,
+          {
+            headers: {
+              "Content-Type": "application/json",
+            },
           }
-        });
+        );
 
         if (!tourRes.ok) {
           throw new Error(`Lỗi tải tour: ${tourRes.status}`);
@@ -36,7 +39,6 @@ export default function DetailTour() {
         } else {
           throw new Error("Dữ liệu tour không hợp lệ");
         }
-
       } catch (err) {
         console.error("Error loading data:", err);
         setError(err.message);
@@ -68,7 +70,7 @@ export default function DetailTour() {
               {tour.rating} ({tour.total_rating})
             </span>
             <span className="location">
-              {tour.destination || 'Chưa có địa điểm'}
+              {tour.destination || "Chưa có địa điểm"}
             </span>
           </div>
           <div className="hero-price">
@@ -121,7 +123,10 @@ export default function DetailTour() {
               {day.activities && day.activities.length > 0 && (
                 <ul className="activities-list">
                   {day.activities.map((activity, actIndex) => (
-                    <li key={activity._id || actIndex} className="activity-item">
+                    <li
+                      key={activity._id || actIndex}
+                      className="activity-item"
+                    >
                       <strong>{activity.time}:</strong> {activity.action}
                     </li>
                   ))}

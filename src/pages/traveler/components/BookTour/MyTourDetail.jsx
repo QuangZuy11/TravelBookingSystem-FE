@@ -655,6 +655,61 @@ const MyTourDetail = () => {
                     ))}
                   </div>
                 )}
+
+                {/* Meeting Point Section */}
+                {tour.meeting_point && (
+                  <div className="meeting-point-section">
+                    <div className="meeting-point-item-inline">
+                      <div className="meeting-point-label-inline">
+                        <svg
+                          className="meeting-point-icon-inline"
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"
+                          />
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
+                          />
+                        </svg>
+                        <span className="meeting-point-title">
+                          Điểm tập trung:
+                        </span>
+                      </div>
+                      <div className="meeting-point-value-inline">
+                        <div className="meeting-point-address">
+                          {tour.meeting_point.address || "Chưa có thông tin"}
+                        </div>
+                        {tour.meeting_point.instructions && (
+                          <div className="meeting-point-instructions">
+                            <svg
+                              className="meeting-point-icon-small"
+                              fill="none"
+                              stroke="currentColor"
+                              viewBox="0 0 24 24"
+                            >
+                              <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                strokeWidth={2}
+                                d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                              />
+                            </svg>
+                            <span>{tour.meeting_point.instructions}</span>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                )}
               </div>
             </div>
 
