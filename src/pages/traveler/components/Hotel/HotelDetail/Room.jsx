@@ -5,6 +5,7 @@ import { AuthContext } from '../../../../../contexts/AuthContext';
 import { getProxiedGoogleDriveUrl } from '../../../../../utils/googleDriveImageHelper';
 import SmartImage from '../../../../../components/common/SmartImage';
 import BookingModal from './BookingModal';
+import { calculateDiscountedPrice, formatPromotionDiscount } from '../../../../../utils/promotionHelpers';
 import './HotelDetail.css';
 
 export default function Rooms({ roomsData, loading, error, hotelData }) {
@@ -87,29 +88,76 @@ export default function Rooms({ roomsData, loading, error, hotelData }) {
         return new Intl.NumberFormat('vi-VN').format(price);
     };
 
+    // Get active promotion (first one from backend - already filtered for active promotions)
+    const getActivePromotion = () => {
+        if (!hotelData.promotions || hotelData.promotions.length === 0) return null;
+        return hotelData.promotions[0]; // Backend đã filter active promotions
+    };
+
     const getBedType = (type) => {
-        // Fix cứng theo yêu cầu: type single = "1 giường đôi"
-        if (type === 'single') return '1 giường đôi';
-        if (type === 'double') return '2 giường đôi';
-        if (type === 'suite') return '1 giường King + Sofa';
-        return '1 giường đôi';
+        if (type === 'single') return '1 giường';
+        if (type === 'double') return '2 giường';
+        if (type === 'twin') return '1 giường lớn';
+        if (type === 'suite') return 'Phòng hạng sang';
+        if (type === 'deluxe') return 'Phòng cao cấp';
+        if (type === 'family') return 'Phòng gia đình';
+        return '1 giường';
     };
 
     const getRoomTypeName = (type) => {
-        if (type === 'single') return 'Phòng Đơn';
-        if (type === 'double') return 'Phòng Đôi';
-        if (type === 'suite') return 'Phòng Suite';
-        return 'Phòng Tiêu Chuẩn';
+        if (type === 'single') return 'Single Room';
+        if (type === 'double') return 'Double Room';
+        if (type === 'twin') return 'Twin Room';
+        if (type === 'suite') return 'Suite';
+        if (type === 'deluxe') return 'Deluxe';
+        if (type === 'family') return 'Family Room';
+        return 'Standard Room';
+    };
+
+    const getRoomCapacity = (type) => {
+        if (type === 'single') return 1;
+        if (type === 'double') return 4;
+        if (type === 'twin') return 2;
+        if (type === 'suite') return 3;
+        if (type === 'deluxe') return 4;
+        if (type === 'family') return 5;
+        return 2;
     };
 
     const translateAmenity = (amenity) => {
         const translations = {
-            'Wi-Fi': 'Wifi miễn phí',
+            'Wi-Fi': 'Wi-Fi',
             'TV': 'TV',
-            'Air Conditioning': 'Điều hòa',
-            'Mini Bar': 'Minibar',
+            'Điều Hòa 2 chiều ': 'Điều Hòa 2 chiều',
+            'Air Conditioning': 'Điều Hòa 2 chiều',
+            'Quầy bar mini': 'Quầy bar mini',
+            'Mini Bar': 'Quầy bar mini',
+            'Két sắt': 'Két sắt',
+            'Safe Box': 'Két sắt',
+            'Ban công': 'Ban công',
             'Balcony': 'Ban công',
-            'Safe Box': 'Safe Box',
+            'View thành phố': 'View thành phố',
+            'City View': 'View thành phố',
+            'View biển': 'View biển',
+            'Ocean View': 'View biển',
+            'View núi': 'View núi',
+            'Mountain View': 'View núi',
+            'Bồn tắm': 'Bồn tắm',
+            'Bathtub': 'Bồn tắm',
+            'Vòi sen': 'Vòi sen',
+            'Shower': 'Vòi sen',
+            'Máy sấy tóc': 'Máy sấy tóc',
+            'Hair Dryer': 'Máy sấy tóc',
+            'Bàn ủi': 'Bàn ủi',
+            'Iron': 'Bàn ủi',
+            'Máy pha cà phê': 'Máy pha cà phê',
+            'Coffee Maker': 'Máy pha cà phê',
+            'Bàn làm việc': 'Bàn làm việc',
+            'Work Desk': 'Bàn làm việc',
+            'Ghế sofa': 'Ghế sofa',
+            'Sofa': 'Ghế sofa',
+            'Tủ quần áo': 'Tủ quần áo',
+            'Wardrobe': 'Tủ quần áo',
             'Pool': 'Hồ bơi',
             'Spa': 'Spa',
             'Gym': 'Phòng tập gym',
@@ -413,18 +461,30 @@ export default function Rooms({ roomsData, loading, error, hotelData }) {
             ? getProxiedGoogleDriveUrl(sampleRoom.images[0])
             : "/placeholder.svg";
 
+        // Calculate capacity from type if not available from backend
+        const capacity = roomType.avgCapacity || getRoomCapacity(roomType.type);
+
+        // Get active promotion and calculate discounted price
+        const activePromotion = getActivePromotion();
+        const originalPrice = roomType.avgPrice;
+        const discountedPrice = activePromotion
+            ? calculateDiscountedPrice(originalPrice, activePromotion)
+            : originalPrice;
+
         return {
             id: roomType.type,
             name: getRoomTypeName(roomType.type),
-            price: formatPrice(roomType.avgPrice),
-            rawPrice: roomType.avgPrice, // Giá gốc để tính toán
+            price: formatPrice(discountedPrice),
+            originalPrice: originalPrice,
+            rawPrice: discountedPrice, // Giá sau giảm giá để tính toán
             image: roomImage,
-            size: `25m²`, // Default size since area is removed
             bed: getBedType(roomType.type),
-            guests: `${roomType.avgCapacity} người`,
+            guests: `${capacity} người`,
             amenities: sampleRoom?.amenities?.map(translateAmenity) || [],
             availableCount: roomType.availableCount, // Số lượng phòng trống
-            totalCount: roomType.count // Tổng số phòng
+            totalCount: roomType.count, // Tổng số phòng
+            hasPromotion: !!activePromotion,
+            promotionDiscount: activePromotion ? formatPromotionDiscount(activePromotion) : null
         };
     });
 
@@ -455,13 +515,7 @@ export default function Rooms({ roomsData, loading, error, hotelData }) {
                                 </span>
                             </h3>
                             <div className="room-details">
-                                <div className="room-detail-item">
-                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                                        <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
-                                        <line x1="3" y1="9" x2="21" y2="9"></line>
-                                    </svg>
-                                    <span>{room.size}</span>
-                                </div>
+
                                 <div className="room-detail-item">
                                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                                         <path d="M2 4v16"></path>
@@ -488,8 +542,36 @@ export default function Rooms({ roomsData, loading, error, hotelData }) {
                             </div>
                             <div className="room-footer">
                                 <div className="room-price">
-                                    <span className="price-amount">{room.price}</span>
-                                    <span className="price-unit">VNĐ/đêm</span>
+                                    {room.hasPromotion && (
+                                        <>
+                                            <div style={{
+                                                fontSize: '0.85rem',
+                                                textDecoration: 'line-through',
+                                                color: '#64748b',
+                                                marginBottom: '2px'
+                                            }}>
+                                                {formatPrice(room.originalPrice)} VNĐ
+                                            </div>
+                                        </>
+                                    )}
+                                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                        <div>
+                                            <span className="price-amount">{room.price}</span>
+                                            <span className="price-unit">VNĐ/đêm</span>
+                                        </div>
+                                        {room.hasPromotion && (
+                                            <div style={{
+                                                backgroundColor: '#ef4444',
+                                                color: 'white',
+                                                padding: '2px 8px',
+                                                borderRadius: '4px',
+                                                fontSize: '0.7rem',
+                                                fontWeight: '700'
+                                            }}>
+                                                {room.promotionDiscount}
+                                            </div>
+                                        )}
+                                    </div>
                                 </div>
                                 <button
                                     className="room-book-btn"

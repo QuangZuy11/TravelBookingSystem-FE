@@ -53,19 +53,19 @@ const BulkRoomCreator = () => {
     }, [hotelId]); // Reset when hotelId changes
 
     const roomTypes = [
-        { value: 'single', label: '🛏️ Single Room', capacity: 1 },
-        { value: 'double', label: '🛏️🛏️ Double Room', capacity: 2 },
-        { value: 'twin', label: '👥 Twin Room', capacity: 2 },
-        { value: 'suite', label: '👑 Suite', capacity: 3 },
-        { value: 'deluxe', label: '✨ Deluxe', capacity: 4 },
-        { value: 'family', label: '👨‍👩‍👧‍👦 Family Room', capacity: 5 }
+        { value: 'single', label: '🛏️ Single Room ( 1 giường )', capacity: 1 },
+        { value: 'double', label: '🛏️🛏️ Double Room ( 2 giường )', capacity: 4 },
+        { value: 'twin', label: '👥 Twin Room ( 1 giường lớn)', capacity: 2 },
+        { value: 'suite', label: '👑 Suite (Phòng hạng sang)', capacity: 3 },
+        { value: 'deluxe', label: '✨ Deluxe (Phòng cao cấp)', capacity: 4 },
+        { value: 'family', label: '👨‍👩‍👧‍👦 Family Room (Phòng gia đình)', capacity: 5 }
     ];
 
     const amenitiesList = [
-        'Wi-Fi', 'TV', 'Air Conditioning', 'Mini Bar', 'Safe Box',
-        'Balcony', 'City View', 'Ocean View', 'Mountain View',
-        'Bathtub', 'Shower', 'Hair Dryer', 'Iron', 'Coffee Maker',
-        'Room Service', 'Work Desk', 'Sofa', 'Wardrobe'
+        'Wi-Fi', 'TV', 'Điều Hòa 2 chiều ', 'Quầy bar mini', 'Két sắt',
+        'Ban công', 'View thành phố', 'View biển', 'View núi',
+        'Bồn tắm', 'Vòi sen', 'Máy sấy tóc', 'Bàn ủi', 'Máy pha cà phê',
+        'Bàn làm việc', 'Ghế sofa', 'Tủ quần áo'
     ];
 
     const statusOptions = [
