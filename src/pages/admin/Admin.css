@@ -29,6 +29,158 @@
     color: #6b7280;
 }
 
+/* --- Layout mới --- */
+.admin-dashboard__layout {
+  display: grid;
+  grid-template-columns: 240px 1fr;
+  gap: 16px;
+  align-items: start;
+}
+
+/* Sidebar */
+.admin-sidebar {
+  position: sticky;
+  top: 72px; /* tùy header của bạn */
+  align-self: start;
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  padding: 12px;
+  box-shadow: 0 8px 30px rgba(0,0,0,.06);
+}
+
+.admin-sidebar__title {
+  font-weight: 600;
+  margin-bottom: 8px;
+}
+
+.admin-sidebar__nav {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.admin-sidebar__item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid #e5e7eb;
+  background: #f8fafc;
+  color: #0f172a;
+  border-radius: 10px;
+  cursor: pointer;
+  text-align: left;
+  transition: all .15s ease;
+}
+.admin-sidebar__item .icon { width: 20px; text-align: center; }
+.admin-sidebar__item:hover { background: #eef2ff; border-color: #c7d2fe; color: #3730a3; }
+.admin-sidebar__item.active { background: #e0e7ff; border-color: #a5b4fc; color: #3730a3; }
+
+/* Sidebar kiểu Hotel */
+.hotel-like-nav {
+  position: sticky;
+  top: 72px; /* adjust nếu header cao khác */
+  align-self: start;
+  width: 100%;
+  max-width: 280px;
+  background: #fff;
+  border: 1px solid #e5e7eb;
+  border-radius: 14px;
+  padding: 12px;
+  box-shadow: 0 8px 24px rgba(0,0,0,.06);
+}
+
+.hotel-like-nav__title {
+  font-weight: 600;
+  margin-bottom: 10px;
+  color: #0f3f3a; /* xanh đậm như Hotel */
+}
+
+.hotel-like-nav__list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.hotel-like-nav__item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid #e2e8f0;
+  background: #f8fafc;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all .15s ease;
+  color: #0f172a;
+  text-align: left;
+}
+
+.hotel-like-nav__item .badge {
+  width: 34px;
+  height: 34px;
+  border-radius: 999px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: #e6f4f1;         /* nền nhạt kiểu Hotel */
+  color: #0b5b53;               /* xanh chủ đạo */
+  font-size: 16px;
+}
+
+.hotel-like-nav__item .text {
+  flex: 1;
+  font-weight: 500;
+}
+
+.hotel-like-nav__item:hover {
+  background: #eefcf8;
+  border-color: #b7e3da;
+}
+
+.hotel-like-nav__item.active {
+  background: #e6fff6;
+  border-color: #20b486;        /* xanh ngọc đậm */
+  color: #075e54;
+}
+
+.hotel-like-nav__item.active .badge {
+  background: #c9f7ec;
+  color: #0a7a6e;
+}
+
+/* Main */
+.admin-dashboard__main {
+  min-width: 0;
+}
+
+/* Nhóm thống kê phía trên giữ sẵn class .admin-stats của bạn; 
+   nếu chưa có, có thể dùng grid cơ bản: */
+.admin-stats {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 16px;
+  margin-bottom: 16px;
+}
+
+/* Responsive: co sidebar xuống dưới khi màn nhỏ */
+@media (max-width: 1024px) {
+  .admin-dashboard__layout {
+    grid-template-columns: 1fr;
+  }
+  .admin-sidebar {
+    position: static;
+    order: 1;
+  }
+  .admin-dashboard__main {
+    order: 2;
+  }
+  .hotel-like-nav { position: static; max-width: 100%; }
+}
+
 /* Dashboard Stats */
 .stats-cards-grid {
     display: grid;
@@ -294,4 +446,147 @@
     justify-content: space-between;
     align-items: center;
     margin-bottom: 2rem;
+}
+
+/* --- Layout shell --- */
+.admin-shell {
+  display: flex;
+  min-height: calc(100vh - 64px); /* tùy chiều cao header global */
+  background: #f4f6f8;
+}
+
+/* Sidebar giống hotel */
+.admin-sidebar-hotel {
+  width: 228px;
+  background: #ffffff;
+  border-right: 1px solid #e5e7eb;
+  padding: 16px 14px 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.admin-sidebar-hotel__header {
+  font-weight: 600;
+  font-size: 15px;
+  padding: 6px 10px 4px;
+  color: #0f3f3a;
+  border-bottom: 1px solid #e5e7eb;
+  margin-bottom: 4px;
+}
+
+.admin-sidebar-hotel__nav {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.admin-sidebar-hotel__item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  height: 46px;
+  padding: 0 14px;
+  border-radius: 10px;
+  font-size: 14px;
+  font-weight: 500;
+  color: #0f172a;
+  text-decoration: none;
+  background: #f8fafb;
+  border: 1px solid #e2e8f0;
+  transition: all .15s;
+}
+
+.admin-sidebar-hotel__item .icon {
+  width: 34px;
+  height: 34px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #e6f4f1;
+  font-size: 18px;
+  flex-shrink: 0;
+  color: #066e63;
+}
+
+.admin-sidebar-hotel__item:hover {
+  background: #eefcf8;
+  border-color: #b7e3da;
+}
+
+.admin-sidebar-hotel__item.active {
+  background: #06b6a9;
+  border-color: #06b6a9;
+  color: #ffffff;
+  box-shadow: 0 4px 14px rgba(6,182,169,.25);
+}
+
+.admin-sidebar-hotel__item.active .icon {
+  background: rgba(255,255,255,.25);
+  color: #ffffff;
+}
+
+/* Main content area */
+.admin-content {
+  flex: 1;
+  padding: 28px 32px 60px;
+  overflow-y: auto;
+}
+
+/* Dashboard stats cards (giữ) */
+.admin-stats {
+  display: grid;
+  gap: 18px;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  margin-top: 8px;
+}
+
+.stat-card {
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 14px;
+  padding: 16px 18px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  box-shadow: 0 4px 10px rgba(15,63,58,0.04);
+}
+
+.stat-card h3 {
+  font-size: 13px;
+  font-weight: 600;
+  color: #0f3f3a;
+  margin: 0;
+  text-transform: uppercase;
+  letter-spacing: .5px;
+}
+
+.stat-value {
+  font-size: 26px;
+  font-weight: 600;
+  color: #0f3f3a;
+  margin: 0;
+}
+
+.admin-page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 22px;
+}
+
+.admin-page-header h1 {
+  font-size: 24px;
+  font-weight: 600;
+  margin: 0;
+  color: #0f3f3a;
+}
+
+/* Responsive */
+@media (max-width: 1024px) {
+  .admin-shell { flex-direction: column; }
+  .admin-sidebar-hotel { width: 100%; flex-direction: row; overflow-x: auto; }
+  .admin-sidebar-hotel__nav { flex-direction: row; }
+  .admin-sidebar-hotel__item { flex: 0 0 auto; }
 }

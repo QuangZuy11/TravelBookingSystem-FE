@@ -158,9 +158,6 @@ const UserListPage = () => {
             <p>Tổng số: {pagination.total_users || 0} tài khoản</p>
           </div>
           <div className="header-right">
-            <Link to="/admin/dashboard" className="btn-secondary">
-              ← Quay lại Dashboard
-            </Link>
             <button onClick={() => openEditModal(null)} className="btn-primary">
               + Thêm người dùng
             </button>
