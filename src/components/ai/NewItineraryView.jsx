@@ -24,17 +24,34 @@ const NewItineraryView = ({ data, showActions = true }) => {
         );
     }
 
+    // Map the API response structure to our component's expected structure
     const {
-        aiGeneratedId,
-        destination,
-        duration,
-        totalCost,
-        days = [],
-        isOriginal = true,
-        isCustomizable = true,
-        hasCustomized = false,
-        customizedId
+        id: aiGeneratedId,
+        destination: destinationObj,
+        duration_days: duration,
+        budget_total: totalCost,
+        itinerary_data: apiDays = [],
+        status,
+        user_id,
     } = data;
+
+    // Default properties for customization functionality
+    const isCustomizable = true;
+    const isOriginal = true;
+    const hasCustomized = false;
+    const customizedId = null;
+
+    // Transform API days structure to component's expected structure
+    const days = apiDays.map(dayData => ({
+        dayNumber: dayData.itinerary.day_number,
+        theme: dayData.itinerary.title,
+        description: dayData.itinerary.description,
+        activities: dayData.itinerary.activities.map(activity => ({
+            ...activity,
+            activityId: activity._id,
+        })),
+        dayTotal: dayData.itinerary.day_total
+    }));
 
     const styles = {
         container: {
@@ -251,11 +268,7 @@ const NewItineraryView = ({ data, showActions = true }) => {
     const selectedDayData = days.find(day => day.dayNumber === selectedDay) || days[0];
 
     const handleCustomize = () => {
-        if (hasCustomized && customizedId) {
-            navigate(`/ai-itinerary/${customizedId}/customize`);
-        } else {
-            navigate(`/ai-itinerary/${aiGeneratedId}/customize`);
-        }
+        navigate(`/ai-itinerary/${aiGeneratedId}/customize`);
     };
 
     const handleViewDetails = () => {
@@ -275,10 +288,10 @@ const NewItineraryView = ({ data, showActions = true }) => {
             <div style={styles.header}>
                 <div>
                     <h2 style={styles.title}>
-                        🎯 Your Perfect Trip to {destination}
+                        🎯 Your Perfect Trip to {destinationObj?.name || 'Unknown Destination'}
                     </h2>
                     <p style={styles.subtitle}>
-                        {isOriginal ? '✨ AI-Generated Itinerary' : '🎨 Customized Version'}
+                        ✨ AI-Generated Itinerary
                     </p>
                 </div>
 
@@ -367,21 +380,21 @@ const NewItineraryView = ({ data, showActions = true }) => {
                                                 {activity.timeSlot.charAt(0).toUpperCase() + activity.timeSlot.slice(1)}
                                             </div>
                                         )}
-                                        {activity.duration && (
+                                        {activity.duration > 0 && (
                                             <div style={styles.metaItem}>
                                                 <span>⏰</span>
-                                                <span>{activity.duration} minutes</span>
+                                                <span>{Math.floor(activity.duration / 60)} hours {activity.duration % 60} minutes</span>
                                             </div>
                                         )}
                                         {activity.activityType && (
                                             <div style={styles.metaItem}>
                                                 <span>🎯</span>
-                                                <span>{activity.activityType}</span>
+                                                <span>{activity.activityType.charAt(0).toUpperCase() + activity.activityType.slice(1)}</span>
                                             </div>
                                         )}
-                                        {activity.cost > 0 && (
+                                        {activity.cost !== undefined && (
                                             <div style={styles.costBadge}>
-                                                💰 {formatCurrency(activity.cost)}
+                                                💰 {activity.cost > 0 ? formatCurrency(activity.cost) : 'Free'}
                                             </div>
                                         )}
                                     </div>
@@ -433,13 +446,14 @@ const NewItineraryView = ({ data, showActions = true }) => {
 
                     <button
                         onClick={() => {
+                            const url = `${window.location.origin}/ai-itinerary/${aiGeneratedId}`;
                             navigator.share?.({
-                                title: `My ${destination} Itinerary`,
-                                text: `Check out my perfect ${duration}-day trip to ${destination}!`,
-                                url: window.location.href
+                                title: `My ${destinationObj?.name} Itinerary`,
+                                text: `Check out my perfect ${duration}-day trip to ${destinationObj?.name}!`,
+                                url: url
                             }).catch(() => {
                                 // Fallback - copy to clipboard
-                                navigator.clipboard.writeText(window.location.href);
+                                navigator.clipboard.writeText(url);
                                 toast.success('Link copied to clipboard!');
                             });
                         }}
