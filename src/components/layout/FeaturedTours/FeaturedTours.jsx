@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import "./FeaturedTours.css";
+import "../../../../src/pages/traveler/components/BookTour/TourCard.css";
 import { Clock, MapPin, Star } from "lucide-react";
 import { Link } from "react-router-dom";
 import { getProxiedGoogleDriveUrl } from "../../../utils/googleDriveImageHelper";
@@ -20,12 +21,6 @@ export default function FeaturedTours() {
     fetchTours();
   }, []);
 
-  const formatPrice = (price) =>
-    new Intl.NumberFormat("vi-VN", {
-      style: "currency",
-      currency: "VND",
-    }).format(price);
-
   return (
     <div className="featured-tours-wrapper">
       <div className="featured-tours-container">
@@ -43,77 +38,107 @@ export default function FeaturedTours() {
           {tours.length === 0 ? (
             <p className="no-data">Đang tải dữ liệu...</p>
           ) : (
-            tours.map((tour) => (
-              <div key={tour._id} className="tour-card-new">
-                {/* Image */}
-                <div className="tour-card-image-wrapper">
-                  <img
-                    className="tour-card-image"
-                    src={getProxiedGoogleDriveUrl(
-                      tour.image || "/placeholder.svg"
-                    )}
-                    alt={tour.title}
-                  />
-                  <div className="tour-card-badge">Nổi bật</div>
-                </div>
+            tours.map((tour) => {
+              // Đảm bảo highlights là mảng
+              const highlights = Array.isArray(tour.highlights)
+                ? tour.highlights
+                : typeof tour.highlights === "string"
+                ? [tour.highlights]
+                : [];
 
-                {/* Content */}
-                <div className="tour-card-content">
-                  <h3 className="tour-card-title">{tour.title}</h3>
+              // Tính giá hiển thị
+              const hasPromotion =
+                tour.promotion &&
+                tour.originalPrice &&
+                tour.originalPrice > tour.price;
+              const displayPrice = tour.price || 0;
+              const displayOriginalPrice = hasPromotion
+                ? tour.originalPrice
+                : null;
 
-                  {/* Location */}
-                  <div className="tour-card-location">
-                    <MapPin className="tour-card-icon" />
-                    <span>{tour.location}</span>
+              return (
+                <div key={tour._id} className="tour-card">
+                  <div className="tour-image-container">
+                    <img
+                      src={getProxiedGoogleDriveUrl(
+                        tour.image || "/placeholder.svg"
+                      )}
+                      alt={tour.title || tour.name}
+                      className="tour-image"
+                    />
+                    <div className="promotion-badge">Nổi bật</div>
                   </div>
 
-                  {/* Duration */}
-                  <div className="tour-card-duration">
-                    <Clock className="tour-card-icon" />
-                    <span>{tour.duration_hours}</span>
-                  </div>
+                  <div className="tour-info">
+                    <h3 className="tour-name">{tour.title || tour.name}</h3>
 
-                  {/* Description */}
-                  {tour.description && (
-                    <div className="tour-card-description">
-                      {Array.isArray(tour.description) ? (
-                        <ul>
-                          {tour.description.slice(0, 3).map((item, i) => (
-                            <li key={i}>{item}</li>
-                          ))}
-                        </ul>
-                      ) : (
-                        <p>
-                          {tour.description.slice(0, 150)}
-                          {tour.description.length > 150 ? "..." : ""}
-                        </p>
+                    <div className="tour-meta">
+                      {tour.location && (
+                        <div className="tour-destination">
+                          <MapPin size={16} />
+                          <span>{tour.location}</span>
+                        </div>
+                      )}
+                      {tour.duration && (
+                        <div className="tour-duration">
+                          <Clock size={16} />
+                          <span>{tour.duration}</span>
+                        </div>
                       )}
                     </div>
-                  )}
 
-                  {/* Rating */}
-                  <div className="tour-card-rating">
-                    <Star className="tour-card-star-icon" />
-                    <span>
-                      {tour.rating} ({tour.total_rating} đánh giá)
-                    </span>
-                  </div>
+                    {highlights.length > 0 && (
+                      <ul className="tour-highlights">
+                        {highlights.slice(0, 3).map((h, index) => (
+                          <li key={index}>{h}</li>
+                        ))}
+                      </ul>
+                    )}
 
-                  {/* Footer */}
-                  <div className="tour-card-footer">
-                    <span className="tour-card-price">
-                      {formatPrice(tour.price)}
-                    </span>
-                    <Link
-                      to={`/tour/${tour?._id || tour?.id}`}
-                      className="tour-card-button"
-                    >
-                      Đặt Ngay
-                    </Link>
+                    <div className="tour-rating">
+                      <Star size={16} fill="#FFD700" color="#FFD700" />
+                      <span className="rating-value">{tour.rating || 0}</span>
+                      <span className="rating-reviews">
+                        ({tour.total_rating || 0} đánh giá)
+                      </span>
+                    </div>
+
+                    <div className="tour-footer">
+                      <div className="tour-price">
+                        {displayPrice === 0 ? (
+                          <span className="free">Miễn phí</span>
+                        ) : (
+                          <>
+                            {displayOriginalPrice &&
+                            displayOriginalPrice > displayPrice ? (
+                              <>
+                                <span className="original-price">
+                                  {displayOriginalPrice.toLocaleString("vi-VN")}{" "}
+                                  ₫
+                                </span>
+                                <span className="price">
+                                  {displayPrice.toLocaleString("vi-VN")} ₫
+                                </span>
+                              </>
+                            ) : (
+                              <span className="price">
+                                {displayPrice.toLocaleString("vi-VN")} ₫
+                              </span>
+                            )}
+                          </>
+                        )}
+                      </div>
+                      <Link
+                        to={`/tour/${tour?._id || tour?.id}`}
+                        className="btn-book"
+                      >
+                        Đặt Ngay
+                      </Link>
+                    </div>
                   </div>
                 </div>
-              </div>
-            ))
+              );
+            })
           )}
         </div>
 
