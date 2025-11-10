@@ -389,19 +389,31 @@ const ItineraryDetailNew = () => {
             return;
         }
 
-        // Get provider from localStorage
-        const providerStr = localStorage.getItem('provider');
-        let provider = null;
+        // Get userId from localStorage or context
+        const userIdFromStorage = localStorage.getItem('userId');
+        const userStr = localStorage.getItem('user');
+        let userFromStorage = null;
         try {
-            provider = providerStr ? JSON.parse(providerStr) : null;
+            userFromStorage = userStr ? JSON.parse(userStr) : null;
         } catch (error) {
-            console.error('Error parsing provider:', error);
+            console.error('Error parsing user from storage:', error);
         }
 
-        // Use user_id from provider or fallback to user if not a provider
-        const effectiveUserId = provider?.user_id || user?._id;
+        // Try different sources for userId in this order:
+        // 1. Context user 
+        // 2. localStorage userId
+        // 3. localStorage user object
+        const effectiveUserId = user?.userId || userIdFromStorage || userFromStorage?.userId;
+
+        console.log('🔍 Auth Check - User IDs:', {
+            contextUserId: user?.userId,
+            storageUserId: userIdFromStorage,
+            userObjectId: userFromStorage?.userId,
+            effectiveUserId
+        });
 
         if (!effectiveUserId) {
+            console.error('No userId found in any source');
             toast.error('Please login to view itinerary');
             setTimeout(() => navigate('/auth'), 2000);
             return;

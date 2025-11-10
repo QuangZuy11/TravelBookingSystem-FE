@@ -13,16 +13,17 @@ const apiClient = axios.create({
 // Request interceptor - Add auth token to requests
 apiClient.interceptors.request.use(
     (config) => {
-        // Try different token keys for compatibility
-        const token = localStorage.getItem('token') ||
-            localStorage.getItem('accessToken') ||
-            localStorage.getItem('authToken');
+        // Get token from localStorage
+        const token = localStorage.getItem('token');
 
         if (token) {
             config.headers.Authorization = `Bearer ${token}`;
-            console.log('🔑 Adding token to request:', config.url, 'Token present:', !!token);
+            console.log('🔑 Adding token to request:', config.url);
         } else {
-            console.warn('⚠️ No auth token found for request:', config.url);
+            // Only log warning for endpoints that require auth
+            if (!config.url.includes('/auth/login') && !config.url.includes('/auth/register')) {
+                console.warn('⚠️ No auth token found for request:', config.url);
+            }
         }
 
         return config;
@@ -66,10 +67,10 @@ apiClient.interceptors.response.use(
                     { refreshToken }
                 );
 
-                const { accessToken, refreshToken: newRefreshToken } = response.data;
+                const { token, refreshToken: newRefreshToken } = response.data;
 
                 // Store new tokens
-                localStorage.setItem('accessToken', accessToken);
+                localStorage.setItem('token', token);
                 if (newRefreshToken) {
                     localStorage.setItem('refreshToken', newRefreshToken);
                 }
@@ -80,16 +81,18 @@ apiClient.interceptors.response.use(
             } catch (refreshError) {
                 console.error('🔄 Token refresh failed:', refreshError);
 
-                // Don't auto-logout for customize/itinerary APIs - preserve user session
-                if (originalRequest.url?.includes('/ai-itinerary/')) {
-                    console.log('🛡️ Preserving user session despite token issues for itinerary API');
+                // Check if token exists in localStorage before clearing
+                const currentToken = localStorage.getItem('token');
+                if (!currentToken) {
+                    console.log('� No valid token found, redirecting to login');
+                    clearAuthData();
+                    window.location.href = '/auth';
                     return Promise.reject(error);
                 }
 
-                // Only clear auth and redirect for critical auth endpoints
-                console.log('🚪 Auto-logout triggered for critical auth failure');
-                clearAuthData();
-                window.location.href = '/auth/login';
+                // If token exists but request still failed, just reject without clearing auth
+                console.log('�️ Request failed but preserving valid token');
+                return Promise.reject(error);
                 return Promise.reject(refreshError);
             }
         }

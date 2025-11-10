@@ -15,7 +15,7 @@ import Footer from '../layout/Footer/Footer';
 const AIItineraryDetail = () => {
     const { aiGeneratedId } = useParams();
     const navigate = useNavigate();
-    const { user } = useAuth();
+    const { user, loading: authLoading } = useAuth();
 
     const [itineraryData, setItineraryData] = useState(null);
     const [loading, setLoading] = useState(true);
@@ -23,7 +23,40 @@ const AIItineraryDetail = () => {
     const [activeView, setActiveView] = useState('original'); // 'original' | 'customized'
     const [showComparison, setShowComparison] = useState(false);
 
+    // Debug logs
+    console.log('🔍 AIItineraryDetail Debug:', {
+        user,
+        authLoading,
+        token: localStorage.getItem('token'),
+        userFromStorage: localStorage.getItem('user'),
+        userId: localStorage.getItem('userId')
+    });
+
     useEffect(() => {
+        // Wait for auth loading to complete
+        if (authLoading) {
+            console.log('⏳ Auth is still loading...');
+            return;
+        }
+
+        // Try to get user from localStorage if not in context
+        const userStr = localStorage.getItem('user');
+        const token = localStorage.getItem('token');
+
+        console.log('🔑 Auth Check:', {
+            contextUser: user,
+            localStorageUser: userStr ? JSON.parse(userStr) : null,
+            token: token
+        });
+
+        // Check for authentication using both context and localStorage
+        if (!user && (!userStr || !token)) {
+            console.log('❌ No authentication found');
+            toast.error('Please login to view itinerary');
+            navigate('/auth');
+            return;
+        }
+
         if (!aiGeneratedId) {
             setError('Invalid itinerary ID');
             setLoading(false);
@@ -59,10 +92,8 @@ const AIItineraryDetail = () => {
             }
         };
 
-        if (user) {
-            loadItineraryDetails();
-        }
-    }, [aiGeneratedId, user]);
+        loadItineraryDetails();
+    }, [aiGeneratedId, user, navigate, authLoading]);
 
     const handleDelete = async () => {
         if (!window.confirm('Are you sure you want to delete this entire itinerary? This action cannot be undone.')) {
