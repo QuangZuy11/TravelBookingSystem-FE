@@ -26,7 +26,14 @@ export default function Rooms({ roomsData, loading, error, hotelData }) {
         specialRequests: ''
     });
     const [selectedRoomNumber, setSelectedRoomNumber] = useState(null);
-    const [discountPercent] = useState(0); // Giảm giá 0%
+    
+    // Get active promotion from hotelData
+    const getActivePromotion = () => {
+        if (!hotelData?.promotions || hotelData.promotions.length === 0) return null;
+        return hotelData.promotions[0]; // Backend đã filter active promotions
+    };
+    
+    const activePromotion = getActivePromotion();
 
     // Preview & Payment states
     const [previewData, setPreviewData] = useState(null);
@@ -88,11 +95,7 @@ export default function Rooms({ roomsData, loading, error, hotelData }) {
         return new Intl.NumberFormat('vi-VN').format(price);
     };
 
-    // Get active promotion (first one from backend - already filtered for active promotions)
-    const getActivePromotion = () => {
-        if (!hotelData.promotions || hotelData.promotions.length === 0) return null;
-        return hotelData.promotions[0]; // Backend đã filter active promotions
-    };
+    // Active promotion is already defined above
 
     const getBedType = (type) => {
         if (type === 'single') return '1 giường';
@@ -105,13 +108,13 @@ export default function Rooms({ roomsData, loading, error, hotelData }) {
     };
 
     const getRoomTypeName = (type) => {
-        if (type === 'single') return 'Single Room';
-        if (type === 'double') return 'Double Room';
-        if (type === 'twin') return 'Twin Room';
-        if (type === 'suite') return 'Suite';
-        if (type === 'deluxe') return 'Deluxe';
-        if (type === 'family') return 'Family Room';
-        return 'Standard Room';
+        if (type === 'single') return 'Phòng Đơn';
+        if (type === 'double') return 'Phòng Đôi';
+        if (type === 'twin') return 'Phòng 2 Giường';
+        if (type === 'suite') return 'Phòng Suite';
+        if (type === 'deluxe') return 'Phòng Deluxe';
+        if (type === 'family') return 'Phòng Gia Đình';
+        return 'Phòng Tiêu Chuẩn';
     };
 
     const getRoomCapacity = (type) => {
@@ -179,11 +182,13 @@ export default function Rooms({ roomsData, loading, error, hotelData }) {
             console.log('Fetching preview for room:', roomType, 'hotel:', hotelId);
             await new Promise(resolve => setTimeout(resolve, 1000)); // Simulate API delay
 
-            // Lấy giá/phòng chi tiết từ roomObj nếu có, fallback về avgPrice của loại phòng, sau đó mới đến 300000
+            // Lấy giá/phòng chi tiết từ roomObj nếu có, fallback về avgPrice của loại phòng
+            // QUAN TRỌNG: Sử dụng giá GỐC (originalPrice) chứ không phải rawPrice (đã giảm)
+            // vì discount sẽ được tính riêng trong BookingModal
             const derivedPrice = Number(
                 (roomObj && roomObj.pricePerNight) ??
                 roomsData?.roomsByType?.[roomType]?.avgPrice ??
-                selectedRoom?.rawPrice ??
+                selectedRoom?.originalPrice ??
                 300000
             );
 
@@ -242,13 +247,10 @@ export default function Rooms({ roomsData, loading, error, hotelData }) {
     // Function để mở modal booking
     const handleBookRoom = async (room) => {
         setSelectedRoom(room);
-        // Tìm phòng available đầu tiên và gán số phòng
-        const availableRoomFromType = roomsData?.roomsByType?.[room.id]?.rooms?.find(r => r.status === 'available');
-        setSelectedRoomNumber(availableRoomFromType);
+        // Không tự động chọn phòng - để user chọn sau khi chọn ngày
+        setSelectedRoomNumber(null);
 
-        // Gọi preview API để lấy thông tin đầy đủ
-        await fetchBookingPreview(room.id, hotelData?.id, availableRoomFromType);
-
+        // Không cần gọi preview API ngay - sẽ fetch phòng trống sau khi chọn ngày
         setIsModalOpen(true);
     };
 
@@ -295,7 +297,20 @@ export default function Rooms({ roomsData, loading, error, hotelData }) {
     };
 
     const calculateDiscount = () => {
-        return Math.round((calculateSubtotal() * discountPercent) / 100);
+        if (!activePromotion) return 0;
+        const subtotal = calculateSubtotal();
+        
+        if (activePromotion.discountType === 'percent') {
+            return Math.round((subtotal * activePromotion.discountValue) / 100);
+        } else if (activePromotion.discountType === 'amount' || activePromotion.discountType === 'fixed') {
+            // For amount discounts, return the discount value directly
+            // But need to calculate per night and multiply by nights
+            const nights = calculateNights();
+            if (nights <= 0) return 0;
+            // Discount amount applies per night
+            return activePromotion.discountValue * nights;
+        }
+        return 0;
     };
 
     const calculateTotalPrice = () => {
@@ -627,7 +642,7 @@ export default function Rooms({ roomsData, loading, error, hotelData }) {
                 onSubmit={handleSubmitBooking}
                 isProcessingPayment={isProcessingPayment}
                 paymentError={paymentError}
-                discountPercent={discountPercent}
+                promotion={activePromotion}
             />
         </section>
     )

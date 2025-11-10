@@ -228,7 +228,7 @@ const HotelDetail = () => {
             <Location hotelData={hotelData} nearbyPOIs={nearbyPOIs} destination={destination} />
             <Amenities />
             <Policies hotelData={hotelData} />
-            <Reviews />
+            <Reviews hotelData={hotelData} />
         </div>
     )
 }

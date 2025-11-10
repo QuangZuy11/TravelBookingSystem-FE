@@ -3,9 +3,10 @@ import { AuthContext } from '../../../../../contexts/AuthContext';
 import {
     Hotel, User, Phone, Mail, Bed, Calendar, CreditCard,
     QrCode, MapPin, ArrowLeft, Clock, X, AlertCircle,
-    CheckCircle, Loader, DollarSign, Users, Building
+    CheckCircle, Loader, DollarSign, Users, Building, ExternalLink
 } from 'lucide-react';
 import './BookingModal.css';
+import { calculateSavings, formatPromotionDiscount } from '../../../../../utils/promotionHelpers';
 
 const BookingModal = ({
     isOpen,
@@ -19,7 +20,7 @@ const BookingModal = ({
     onRetryPreview,
     bookingForm,
     onFormChange,
-    discountPercent = 0
+    promotion = null
 }) => {
     const { user } = useContext(AuthContext);
     const [currentStep, setCurrentStep] = useState(1);
@@ -30,6 +31,14 @@ const BookingModal = ({
     const [conflictDates, setConflictDates] = useState([]);
     const [paymentData, setPaymentData] = useState(null);
     const [isCreatingPayment, setIsCreatingPayment] = useState(false);
+    
+    // Room selection states
+    const [availableRooms, setAvailableRooms] = useState([]);
+    const [loadingAvailableRooms, setLoadingAvailableRooms] = useState(false);
+    const [selectedRoomId, setSelectedRoomId] = useState(null);
+    
+    // Payment success modal states
+    const [showPaymentSuccessModal, setShowPaymentSuccessModal] = useState(false);
 
     // Handle cancel reservation
     const handleCancelReservation = useCallback(async () => {
@@ -84,8 +93,79 @@ const BookingModal = ({
             setError(null);
             setConflictDates([]);
             setCountdown(120);
+            setAvailableRooms([]);
+            setSelectedRoomId(null);
         }
     }, [isOpen]);
+    
+    // Fetch available rooms when dates are selected
+    useEffect(() => {
+        const fetchAvailableRooms = async () => {
+            if (!bookingForm.checkInDate || !bookingForm.checkOutDate || !selectedRoom || !hotelData?.id) {
+                setAvailableRooms([]);
+                setSelectedRoomId(null);
+                return;
+            }
+            
+            setLoadingAvailableRooms(true);
+            setError(null);
+            
+            try {
+                // Call API to get available rooms for this room type and dates
+                const params = new URLSearchParams({
+                    checkIn: bookingForm.checkInDate,
+                    checkOut: bookingForm.checkOutDate,
+                    type: selectedRoom.id, // room type
+                });
+                
+                const response = await fetch(`http://localhost:3000/api/traveler/hotels/${hotelData.id}/rooms?${params.toString()}`);
+                
+                if (!response.ok) {
+                    throw new Error('Không thể tải danh sách phòng');
+                }
+                
+                const data = await response.json();
+                
+                if (data.success && data.data?.roomsByType?.[selectedRoom.id]) {
+                    const roomTypeData = data.data.roomsByType[selectedRoom.id];
+                    // Filter rooms that are available (no conflicting bookings)
+                    const available = roomTypeData.rooms.filter(room => {
+                        // Check if room has any conflicting bookings
+                        if (!room.bookings || room.bookings.length === 0) return true;
+                        
+                        const checkIn = new Date(bookingForm.checkInDate);
+                        const checkOut = new Date(bookingForm.checkOutDate);
+                        
+                        return !room.bookings.some(booking => {
+                            const bookingCheckIn = new Date(booking.checkIn);
+                            const bookingCheckOut = new Date(booking.checkOut);
+                            return bookingCheckIn < checkOut && bookingCheckOut > checkIn;
+                        });
+                    });
+                    
+                    setAvailableRooms(available);
+                    
+                    // Auto-select first available room if none selected
+                    if (available.length > 0 && !selectedRoomId) {
+                        const firstRoom = available[0];
+                        setSelectedRoomId(firstRoom._id);
+                        // Update selectedRoomNumber for display
+                        // Note: This will be passed to Room.jsx parent component if needed
+                    }
+                } else {
+                    setAvailableRooms([]);
+                }
+            } catch (err) {
+                console.error('Error fetching available rooms:', err);
+                setError('Không thể tải danh sách phòng trống');
+                setAvailableRooms([]);
+            } finally {
+                setLoadingAvailableRooms(false);
+            }
+        };
+        
+        fetchAvailableRooms();
+    }, [bookingForm.checkInDate, bookingForm.checkOutDate, selectedRoom, hotelData?.id]);
 
     // Format countdown time
     const formatCountdown = (seconds) => {
@@ -104,11 +184,17 @@ const BookingModal = ({
             setError('Vui lòng chọn ngày nhận và trả phòng hợp lệ');
             return;
         }
+        
+        // Check if room is selected
+        if (!selectedRoomId) {
+            setError('Vui lòng chọn phòng');
+            return;
+        }
 
         setIsReserving(true);
 
-        // Get room ID - prioritize selectedRoomNumber (actual room instance)
-        const roomId = selectedRoomNumber?._id || selectedRoomNumber?.id;
+        // Get room ID - use selectedRoomId from room selection
+        const roomId = selectedRoomId;
 
         console.log('🔍 Booking Data Debug:', {
             selectedRoom,
@@ -224,6 +310,10 @@ const BookingModal = ({
 
         console.log('🔄 Creating payment for booking:', bookingId);
 
+        // Calculate final amount with discount to send to backend
+        const finalAmount = calculateTotalPrice();
+        console.log('💰 Final amount (with discount):', finalAmount);
+
         try {
             const response = await fetch('http://localhost:3000/api/traveler/hotel-payments/create', {
                 method: 'POST',
@@ -232,7 +322,8 @@ const BookingModal = ({
                     'Authorization': `Bearer ${localStorage.getItem('token')}`
                 },
                 body: JSON.stringify({
-                    booking_id: bookingId
+                    booking_id: bookingId,
+                    finalAmount: finalAmount // Send discounted amount to backend
                 })
             });
 
@@ -291,7 +382,7 @@ const BookingModal = ({
     const startPaymentStatusPolling = (paymentId) => {
         const pollInterval = setInterval(async () => {
             try {
-                const response = await fetch(`http://localhost:5178/api/traveler/hotel-payments/${paymentId}/status`, {
+                const response = await fetch(`http://localhost:3000/api/traveler/hotel-payments/${paymentId}/status`, {
                     headers: {
                         'Authorization': `Bearer ${localStorage.getItem('token')}`
                     }
@@ -304,9 +395,8 @@ const BookingModal = ({
 
                     if (status === 'completed') {
                         clearInterval(pollInterval);
-                        // Payment successful
-                        alert('✅ Thanh toán thành công! Booking đã được xác nhận.');
-                        onClose();
+                        // Payment successful - show feedback modal
+                        setShowPaymentSuccessModal(true);
                     } else if (['failed', 'cancelled', 'expired'].includes(status)) {
                         clearInterval(pollInterval);
                         setError(`Thanh toán ${status === 'failed' ? 'thất bại' : status === 'cancelled' ? 'đã hủy' : 'hết hạn'}`);
@@ -329,17 +419,17 @@ const BookingModal = ({
     const handleBackToStep1 = async () => {
         // Cancel payment first if exists
         if (paymentData?.paymentId) {
-            try {
-                await fetch(`http://localhost:5178/api/traveler/hotel-payments/${paymentData.paymentId}/cancel`, {
-                    method: 'POST',
-                    headers: {
-                        'Authorization': `Bearer ${localStorage.getItem('token')}`
-                    }
-                });
-            } catch (error) {
-                console.error('Error cancelling payment:', error);
+                try {
+                    await fetch(`http://localhost:3000/api/traveler/hotel-payments/${paymentData.paymentId}/cancel`, {
+                        method: 'POST',
+                        headers: {
+                            'Authorization': `Bearer ${localStorage.getItem('token')}`
+                        }
+                    });
+                } catch (error) {
+                    console.error('Error cancelling payment:', error);
+                }
             }
-        }
 
         // Then cancel reservation
         handleCancelReservation();
@@ -375,15 +465,83 @@ const BookingModal = ({
         return diffDays > 0 ? diffDays : 0;
     };
 
+    // Helper function: Lấy giá gốc (chưa giảm) một cách nhất quán
+    const getOriginalPricePerNight = () => {
+        // Ưu tiên 1: Giá từ phòng đã chọn (availableRooms) - giá gốc từ backend (chính xác nhất)
+        if (selectedRoomId && availableRooms.length > 0) {
+            const selectedRoomObj = availableRooms.find(r => r._id === selectedRoomId);
+            if (selectedRoomObj?.pricePerNight) {
+                return selectedRoomObj.pricePerNight;
+            }
+        }
+        // Ưu tiên 2: Giá gốc từ selectedRoom.originalPrice (luôn có giá trị từ Room.jsx)
+        if (selectedRoom?.originalPrice) {
+            return selectedRoom.originalPrice;
+        }
+        // Ưu tiên 3: Giá từ previewData
+        if (previewData?.room?.pricePerNight) {
+            return previewData.room.pricePerNight;
+        }
+        
+        // QUAN TRỌNG: Nếu có promotion, KHÔNG BAO GIỜ dùng rawPrice trực tiếp
+        // Phải tính ngược lại giá gốc từ rawPrice
+        if (promotion && selectedRoom?.rawPrice) {
+            if (promotion.discountType === 'percent') {
+                // rawPrice = originalPrice * (1 - discount/100)
+                // originalPrice = rawPrice / (1 - discount/100)
+                const calculatedOriginal = selectedRoom.rawPrice / (1 - promotion.discountValue / 100);
+                console.log('🔄 Tính ngược giá gốc từ rawPrice (percent):', {
+                    rawPrice: selectedRoom.rawPrice,
+                    discount: promotion.discountValue,
+                    calculatedOriginal
+                });
+                return calculatedOriginal;
+            } else if (promotion.discountType === 'amount' || promotion.discountType === 'fixed') {
+                // rawPrice = originalPrice - discount
+                // originalPrice = rawPrice + discount
+                const calculatedOriginal = selectedRoom.rawPrice + promotion.discountValue;
+                console.log('🔄 Tính ngược giá gốc từ rawPrice (amount):', {
+                    rawPrice: selectedRoom.rawPrice,
+                    discount: promotion.discountValue,
+                    calculatedOriginal
+                });
+                return calculatedOriginal;
+            }
+        }
+        
+        // Fallback: Chỉ dùng rawPrice nếu KHÔNG có promotion
+        // (rawPrice = originalPrice khi không có promotion)
+        if (!promotion && selectedRoom?.rawPrice) {
+            return selectedRoom.rawPrice;
+        }
+        
+        // Nếu không có giá, return 0
+        console.warn('⚠️ Không thể lấy giá gốc. selectedRoom:', selectedRoom, 'selectedRoomId:', selectedRoomId, 'availableRooms:', availableRooms.length);
+        return 0;
+    };
+
     // Function tính tổng giá với giảm giá
     const calculateSubtotal = () => {
         const nights = calculateNights();
-        const pricePerNight = previewData?.room?.pricePerNight || selectedRoom?.rawPrice || 0;
+        if (nights <= 0) return 0;
+        
+        const pricePerNight = getOriginalPricePerNight();
         return nights * pricePerNight;
     };
 
     const calculateDiscount = () => {
-        return calculateSubtotal() * (discountPercent / 100);
+        if (!promotion) return 0;
+        const subtotal = calculateSubtotal();
+        const nights = calculateNights();
+        
+        if (promotion.discountType === 'percent') {
+            return Math.round((subtotal * promotion.discountValue) / 100);
+        } else if (promotion.discountType === 'amount' || promotion.discountType === 'fixed') {
+            // For amount discounts, discount applies per night
+            if (nights <= 0) return 0;
+            return promotion.discountValue * nights;
+        }
+        return 0;
     };
 
     const calculateTotalPrice = () => {
@@ -455,36 +613,53 @@ const BookingModal = ({
                                                     <Bed size={20} style={{ marginRight: '8px' }} />
                                                     {selectedRoom?.name}
                                                 </h4>
-                                                <div className="room-details-grid">
-                                                    <div className="detail-item">
-                                                        <Building size={16} color="#666" />
-                                                        <div>
-                                                            <span className="detail-label">Phòng số</span>
-                                                            <span className="detail-value">#{selectedRoomNumber?.roomNumber || 'TBA'}</span>
-                                                        </div>
+                                                {selectedRoomId ? (
+                                                    <div className="room-details-grid">
+                                                        {(() => {
+                                                            const selectedRoomObj = availableRooms.find(r => r._id === selectedRoomId);
+                                                            return selectedRoomObj ? (
+                                                                <>
+                                                                    <div className="detail-item">
+                                                                        <Building size={16} color="#666" />
+                                                                        <div>
+                                                                            <span className="detail-label">Phòng số</span>
+                                                                            <span className="detail-value">#{selectedRoomObj.roomNumber || 'TBA'}</span>
+                                                                        </div>
+                                                                    </div>
+                                                                    <div className="detail-item">
+                                                                        <Building size={16} color="#666" />
+                                                                        <div>
+                                                                            <span className="detail-label">Tầng</span>
+                                                                            <span className="detail-value">{selectedRoomObj.floor || 1}</span>
+                                                                        </div>
+                                                                    </div>
+                                                                    <div className="detail-item">
+                                                                        <Building size={16} color="#666" />
+                                                                        <div>
+                                                                            <span className="detail-label">Diện tích</span>
+                                                                            <span className="detail-value">25m²</span>
+                                                                        </div>
+                                                                    </div>
+                                                                    <div className="detail-item">
+                                                                        <Users size={16} color="#666" />
+                                                                        <div>
+                                                                            <span className="detail-label">Sức chứa</span>
+                                                                            <span className="detail-value">{selectedRoomObj.capacity || 2} người</span>
+                                                                        </div>
+                                                                    </div>
+                                                                </>
+                                                            ) : (
+                                                                <div style={{ padding: '12px', textAlign: 'center', color: '#666' }}>
+                                                                    Vui lòng chọn phòng ở bên dưới
+                                                                </div>
+                                                            );
+                                                        })()}
                                                     </div>
-                                                    <div className="detail-item">
-                                                        <Building size={16} color="#666" />
-                                                        <div>
-                                                            <span className="detail-label">Tầng</span>
-                                                            <span className="detail-value">{selectedRoomNumber?.floor || 1}</span>
-                                                        </div>
+                                                ) : (
+                                                    <div style={{ padding: '12px', textAlign: 'center', color: '#666' }}>
+                                                        Vui lòng chọn ngày và phòng để tiếp tục
                                                     </div>
-                                                    <div className="detail-item">
-                                                        <Building size={16} color="#666" />
-                                                        <div>
-                                                            <span className="detail-label">Diện tích</span>
-                                                            <span className="detail-value">25m²</span>
-                                                        </div>
-                                                    </div>
-                                                    <div className="detail-item">
-                                                        <Users size={16} color="#666" />
-                                                        <div>
-                                                            <span className="detail-label">Sức chứa</span>
-                                                            <span className="detail-value">{selectedRoomNumber?.capacity || 2} người</span>
-                                                        </div>
-                                                    </div>
-                                                </div>
+                                                )}
                                             </div>
                                         </div>
                                     </div>
@@ -608,6 +783,58 @@ const BookingModal = ({
                                             )}
                                         </div>
 
+                                        {/* Room Selection */}
+                                        {calculateNights() > 0 && (
+                                            <div className="booking-section" style={{ marginTop: '16px' }}>
+                                                <h4>
+                                                    <Bed size={20} />
+                                                    Chọn phòng
+                                                </h4>
+                                                {loadingAvailableRooms ? (
+                                                    <div style={{ padding: '20px', textAlign: 'center' }}>
+                                                        <Loader className="loading-spinner-icon" size={24} />
+                                                        <p>Đang tải danh sách phòng trống...</p>
+                                                    </div>
+                                                ) : availableRooms.length > 0 ? (
+                                                    <div style={{ display: 'grid', gap: '12px', marginTop: '12px' }}>
+                                                        {availableRooms.map((room) => (
+                                                            <div
+                                                                key={room._id}
+                                                                onClick={() => setSelectedRoomId(room._id)}
+                                                                style={{
+                                                                    border: selectedRoomId === room._id ? '2px solid #2d6a4f' : '1px solid #e0e0e0',
+                                                                    borderRadius: '8px',
+                                                                    padding: '12px',
+                                                                    cursor: 'pointer',
+                                                                    backgroundColor: selectedRoomId === room._id ? '#f0f9f4' : 'white',
+                                                                    transition: 'all 0.2s'
+                                                                }}
+                                                            >
+                                                                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                                                                    <div>
+                                                                        <div style={{ fontWeight: '600', fontSize: '16px' }}>
+                                                                            Phòng {room.roomNumber}
+                                                                        </div>
+                                                                        <div style={{ fontSize: '14px', color: '#666', marginTop: '4px' }}>
+                                                                            Tầng {room.floor} • Sức chứa: {room.capacity} người
+                                                                        </div>
+                                                                    </div>
+                                                                    {selectedRoomId === room._id && (
+                                                                        <CheckCircle size={24} color="#2d6a4f" />
+                                                                    )}
+                                                                </div>
+                                                            </div>
+                                                        ))}
+                                                    </div>
+                                                ) : (
+                                                    <div style={{ padding: '20px', textAlign: 'center', color: '#d32f2f' }}>
+                                                        <AlertCircle size={24} color="#d32f2f" />
+                                                        <p style={{ marginTop: '8px' }}>Không có phòng trống trong khoảng thời gian này</p>
+                                                    </div>
+                                                )}
+                                            </div>
+                                        )}
+
                                         <div className="form-group">
                                             <label>
                                                 <AlertCircle size={16} />
@@ -658,17 +885,23 @@ const BookingModal = ({
                                             <div className="payment-item">
                                                 <span>
                                                     <Bed size={16} />
-                                                    {formatPrice(previewData?.room?.pricePerNight || selectedRoom?.rawPrice || 0)} VNĐ × {calculateNights()} đêm
+                                                    {(() => {
+                                                        // Hiển thị giá gốc (chưa giảm) - dùng cùng logic với calculateSubtotal
+                                                        const nights = calculateNights();
+                                                        if (nights <= 0) return '0 VNĐ × 0 đêm';
+                                                        const pricePerNight = getOriginalPricePerNight();
+                                                        return `${formatPrice(pricePerNight)} VNĐ × ${nights} đêm`;
+                                                    })()}
                                                 </span>
                                                 <span>{formatPrice(calculateSubtotal())} VNĐ</span>
                                             </div>
 
-                                            {discountPercent > 0 && (
+                                            {promotion && calculateDiscount() > 0 && (
                                                 <>
                                                     <div className="payment-item discount">
                                                         <span>
                                                             <DollarSign size={16} />
-                                                            Giảm giá ({discountPercent}%)
+                                                            Giảm giá {formatPromotionDiscount(promotion)}
                                                         </span>
                                                         <span className="discount-amount">-{formatPrice(calculateDiscount())} VNĐ</span>
                                                     </div>
@@ -692,10 +925,10 @@ const BookingModal = ({
                                         <button
                                             type="submit"
                                             className="btn-confirm"
-                                            disabled={isReserving || calculateNights() <= 0}
+                                            disabled={isReserving || calculateNights() <= 0 || !selectedRoomId || availableRooms.length === 0}
                                             style={{
-                                                opacity: (isReserving || calculateNights() <= 0) ? 0.7 : 1,
-                                                cursor: (isReserving || calculateNights() <= 0) ? 'not-allowed' : 'pointer',
+                                                opacity: (isReserving || calculateNights() <= 0 || !selectedRoomId || availableRooms.length === 0) ? 0.7 : 1,
+                                                cursor: (isReserving || calculateNights() <= 0 || !selectedRoomId || availableRooms.length === 0) ? 'not-allowed' : 'pointer',
                                                 display: 'flex',
                                                 alignItems: 'center',
                                                 justifyContent: 'center',
@@ -758,7 +991,19 @@ const BookingModal = ({
                                                     <Bed size={16} color="#666" />
                                                     Phòng:
                                                 </span>
-                                                <span>#{reservationData.room.roomNumber} - {reservationData.room.type}</span>
+                                                <span>
+                                                    #{reservationData.room?.roomNumber || 'TBA'} - {
+                                                        reservationData.room?.type ? (
+                                                            reservationData.room.type === 'single' ? 'Phòng Đơn' :
+                                                            reservationData.room.type === 'double' ? 'Phòng Đôi' :
+                                                            reservationData.room.type === 'twin' ? 'Phòng 2 Giường' :
+                                                            reservationData.room.type === 'suite' ? 'Phòng Suite' :
+                                                            reservationData.room.type === 'deluxe' ? 'Phòng Deluxe' :
+                                                            reservationData.room.type === 'family' ? 'Phòng Gia Đình' :
+                                                            reservationData.room.type
+                                                        ) : selectedRoom?.name || 'N/A'
+                                                    }
+                                                </span>
                                             </div>
                                             <div className="summary-item">
                                                 <span>
@@ -771,13 +1016,59 @@ const BookingModal = ({
                                                     ({reservationData.booking.nights} đêm)
                                                 </span>
                                             </div>
-                                            <div className="summary-item total">
-                                                <span>
-                                                    <DollarSign size={16} color="#2d6a4f" />
-                                                    <strong>Tổng tiền:</strong>
-                                                </span>
-                                                <span className="total-amount"><strong>{formatPrice(reservationData.booking.totalAmount)} VNĐ</strong></span>
-                                            </div>
+                                            {/* Payment Summary with Discount */}
+                                            {promotion && (() => {
+                                                // Backend totalAmount là giá gốc (chưa giảm) = room.pricePerNight * nights
+                                                const baseAmount = parseFloat(reservationData.booking.totalAmount);
+                                                
+                                                // Tính discount từ baseAmount (giá gốc từ backend)
+                                                const nights = reservationData.booking.nights || calculateNights();
+                                                let discountAmount = 0;
+                                                
+                                                if (promotion.discountType === 'percent') {
+                                                    discountAmount = Math.round((baseAmount * promotion.discountValue) / 100);
+                                                } else if (promotion.discountType === 'amount' || promotion.discountType === 'fixed') {
+                                                    // For amount discounts, discount applies per night
+                                                    discountAmount = promotion.discountValue * nights;
+                                                }
+                                                
+                                                const finalAmount = Math.max(0, baseAmount - discountAmount);
+                                                
+                                                return (
+                                                    <>
+                                                        <div className="summary-item">
+                                                            <span>
+                                                                <DollarSign size={16} color="#666" />
+                                                                Tổng tiền (chưa giảm):
+                                                            </span>
+                                                            <span>{formatPrice(baseAmount)} VNĐ</span>
+                                                        </div>
+                                                        <div className="summary-item discount">
+                                                            <span>
+                                                                <DollarSign size={16} color="#2d6a4f" />
+                                                                Giảm giá {formatPromotionDiscount(promotion)}:
+                                                            </span>
+                                                            <span className="discount-amount">-{formatPrice(discountAmount)} VNĐ</span>
+                                                        </div>
+                                                        <div className="summary-item total">
+                                                            <span>
+                                                                <DollarSign size={16} color="#2d6a4f" />
+                                                                <strong>Tổng thanh toán:</strong>
+                                                            </span>
+                                                            <span className="total-amount"><strong>{formatPrice(finalAmount)} VNĐ</strong></span>
+                                                        </div>
+                                                    </>
+                                                );
+                                            })()}
+                                            {!promotion && (
+                                                <div className="summary-item total">
+                                                    <span>
+                                                        <DollarSign size={16} color="#2d6a4f" />
+                                                        <strong>Tổng tiền:</strong>
+                                                    </span>
+                                                    <span className="total-amount"><strong>{formatPrice(reservationData.booking.totalAmount)} VNĐ</strong></span>
+                                                </div>
+                                            )}
                                         </div>
                                     </div>
 
@@ -922,25 +1213,8 @@ const BookingModal = ({
                                     {/* Step 2 Footer */}
                                     <div className="booking-modal-footer">
                                         <button type="button" className="btn-cancel" onClick={handleBackToStep1}>
-                                            <ArrowLeft size={18} style={{ marginRight: '6px' }} />
-                                            Quay lại
-                                        </button>
-                                        <button
-                                            type="button"
-                                            className="btn-confirm"
-                                            onClick={() => {
-                                                alert('Thanh toán thành công! (Demo)');
-                                                onClose();
-                                            }}
-                                            style={{
-                                                display: 'flex',
-                                                alignItems: 'center',
-                                                justifyContent: 'center',
-                                                gap: '8px'
-                                            }}
-                                        >
-                                            <CheckCircle size={18} />
-                                            Đã thanh toán
+                                            <X size={18} style={{ marginRight: '6px' }} />
+                                            Hủy
                                         </button>
                                     </div>
                                 </div>
@@ -949,6 +1223,96 @@ const BookingModal = ({
                     )}
                 </div>
             </div>
+            
+            {/* Payment Success Modal */}
+            {showPaymentSuccessModal && (
+                <div className="booking-modal-overlay" style={{ zIndex: 10000 }}>
+                    <div className="booking-modal" style={{ maxWidth: '500px' }} onClick={(e) => e.stopPropagation()}>
+                        <div className="booking-modal-header">
+                            <h3>
+                                <CheckCircle size={24} color="#2d6a4f" style={{ marginRight: '8px' }} />
+                                Thanh toán thành công!
+                            </h3>
+                            <button className="modal-close-btn" onClick={() => {
+                                setShowPaymentSuccessModal(false);
+                                onClose();
+                            }}>
+                                <X size={20} />
+                            </button>
+                        </div>
+                        
+                        <div className="booking-modal-content">
+                            <div style={{ textAlign: 'center', padding: '20px' }}>
+                                <CheckCircle size={64} color="#2d6a4f" style={{ marginBottom: '16px' }} />
+                                <h3 style={{ marginBottom: '8px', color: '#2d6a4f' }}>Cảm ơn bạn đã đặt phòng!</h3>
+                                <p style={{ color: '#666', marginBottom: '24px' }}>
+                                    Booking của bạn đã được xác nhận. Chúng tôi đã gửi thông tin đặt phòng đến email của bạn.
+                                </p>
+                                
+                                {reservationData && (
+                                    <div style={{ 
+                                        backgroundColor: '#f0f9f4', 
+                                        borderRadius: '8px', 
+                                        padding: '16px', 
+                                        marginBottom: '24px',
+                                        textAlign: 'left'
+                                    }}>
+                                        <div style={{ marginBottom: '8px' }}>
+                                            <strong>Mã booking:</strong> {reservationData.bookingId || reservationData._id}
+                                        </div>
+                                        <div style={{ marginBottom: '8px' }}>
+                                            <strong>Khách sạn:</strong> {reservationData.hotel?.name || hotelData?.name}
+                                        </div>
+                                        <div>
+                                            <strong>Phòng:</strong> #{reservationData.room?.roomNumber || 'TBA'}
+                                        </div>
+                                    </div>
+                                )}
+                            </div>
+                        </div>
+                        
+                        <div className="booking-modal-footer" style={{ display: 'flex', gap: '12px', justifyContent: 'flex-end' }}>
+                            <button
+                                type="button"
+                                className="btn-cancel"
+                                onClick={() => {
+                                    setShowPaymentSuccessModal(false);
+                                    onClose();
+                                }}
+                                style={{
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'center',
+                                    gap: '8px',
+                                    padding: '12px 24px'
+                                }}
+                            >
+                                <X size={18} />
+                                Đóng
+                            </button>
+                            <button
+                                type="button"
+                                className="btn-confirm"
+                                onClick={() => {
+                                    setShowPaymentSuccessModal(false);
+                                    onClose();
+                                    window.location.href = '/my-booked-hotels';
+                                }}
+                                style={{
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'center',
+                                    gap: '8px',
+                                    padding: '12px 24px'
+                                }}
+                            >
+                                <ExternalLink size={18} />
+                                Xem phòng đã đặt
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     );
 };

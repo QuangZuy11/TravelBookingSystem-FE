@@ -120,8 +120,9 @@ function HotelResult({
     // Chuẩn hóa dữ liệu từ BE về shape của UI
     const normalizeHotel = (h) => {
         const locationParts = [
-            h?.address?.city,
+            h?.address?.street,
             h?.address?.state,
+            h?.address?.city,
         ].filter(Boolean);
         const stars = (() => {
             const raw = String(h?.category || '').trim(); // '3_star'
@@ -479,7 +480,7 @@ function HotelCard({ hotel, isFavorite, onToggleFavorite, onBook }) {
                             className="hotel-result-badge"
                             sx={{
                                 '& .MuiBadge-badge': {
-                                    left: '16px', // Đẩy badge sang phải để tránh border radius
+                                    left: '20px', // Đẩy badge sang phải để tránh border radius và không bị che
                                     top: '12px',
                                 }
                             }}

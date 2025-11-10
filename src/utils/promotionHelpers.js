@@ -16,7 +16,8 @@ export const calculateDiscountedPrice = (originalPrice, promotion) => {
         return Math.round(originalPrice * (1 - promotion.discountValue / 100));
     }
 
-    if (promotion.discountType === 'amount') {
+    if (promotion.discountType === 'amount' || promotion.discountType === 'fixed') {
+        // Support both 'amount' and 'fixed' for backward compatibility
         return Math.max(0, originalPrice - promotion.discountValue);
     }
 
@@ -48,7 +49,8 @@ export const formatPromotionDiscount = (promotion) => {
         return `-${promotion.discountValue}%`;
     }
 
-    if (promotion.discountType === 'amount') {
+    if (promotion.discountType === 'amount' || promotion.discountType === 'fixed') {
+        // Support both 'amount' and 'fixed' for backward compatibility
         return `-${new Intl.NumberFormat('vi-VN').format(promotion.discountValue)}đ`;
     }
 
@@ -164,7 +166,8 @@ export const generatePromotionDescription = (promotion) => {
         return `Giảm ${promotion.discountValue}% cho đặt phòng`;
     }
 
-    if (promotion.discountType === 'amount') {
+    if (promotion.discountType === 'amount' || promotion.discountType === 'fixed') {
+        // Support both 'amount' and 'fixed' for backward compatibility
         const formattedAmount = new Intl.NumberFormat('vi-VN').format(promotion.discountValue);
         return `Giảm ${formattedAmount}đ cho đặt phòng`;
     }

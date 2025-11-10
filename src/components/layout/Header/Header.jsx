@@ -229,6 +229,10 @@ const Header = () => {
                     <FaSuitcase className="dropdown-icon" />
                     <span>Tour Đã Đặt</span>
                   </a>
+                  <a href="/my-booked-hotels" className="dropdown-item">
+                    <FaSuitcase className="dropdown-icon" />
+                    <span>Khách sạn đã đặt</span>
+                  </a>
                   <a href="/my-itineraries" className="dropdown-item">
                     <FaSuitcase className="dropdown-icon" />
                     <span>My Itineraries</span>

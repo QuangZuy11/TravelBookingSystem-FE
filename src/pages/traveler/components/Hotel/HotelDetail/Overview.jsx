@@ -373,8 +373,11 @@ export default function Overview({ hotelData }) {
                             <div className="hotel-detail-location">
                                 <LocationIcon className="hotel-detail-location-icon" size={16} />
                                 <span>
-                                    {hotelData.address?.street && `${hotelData.address.street}, `}
-                                    {hotelData.address?.city}, {hotelData.address?.country}
+                                    {[
+                                        hotelData.address?.street,
+                                        hotelData.address?.state,
+                                        hotelData.address?.city
+                                    ].filter(Boolean).join(', ')}
                                 </span>
                             </div>
                         </div>

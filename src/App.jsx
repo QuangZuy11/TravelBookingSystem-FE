@@ -62,6 +62,7 @@ import HotelDetailPage from "./pages/traveler/HotelDetailPage";
 import BookTourDetailPage from "./pages/traveler/BookTourDetailPage";
 import MyToursPage from "./pages/traveler/MyToursPage";
 import MyTourDetailPage from "./pages/traveler/MyTourDetailPage";
+import MyBookedHotelsPage from "./pages/traveler/MyBookedHotelsPage";
 import ChatPage from "./pages/traveler/ChatPage";
 import ChatWidget from "./pages/traveler/ChatWidget";
 
@@ -185,6 +186,15 @@ function App() {
               element={
                 <ProtectedRoute>
                   <MyTourDetailPage />
+                </ProtectedRoute>
+              }
+            />
+
+            <Route
+              path="/my-booked-hotels"
+              element={
+                <ProtectedRoute>
+                  <MyBookedHotelsPage />
                 </ProtectedRoute>
               }
             />
