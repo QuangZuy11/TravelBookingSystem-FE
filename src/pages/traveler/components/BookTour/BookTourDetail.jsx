@@ -469,7 +469,14 @@ const BookTourDetail = () => {
     );
   }
 
-  const totalPrice = tour.price * bookingData.guests;
+  // Tính giá với promotion
+  const hasPromotion =
+    tour.promotion && tour.originalPrice && tour.originalPrice > tour.price;
+  const basePrice = tour.price || 0;
+  const originalBasePrice = tour.originalPrice || basePrice;
+  const totalPrice = basePrice * bookingData.guests;
+  const totalOriginalPrice = originalBasePrice * bookingData.guests;
+  const totalDiscount = hasPromotion ? totalOriginalPrice - totalPrice : 0;
   const maxGuests = 20;
 
   return (
@@ -493,9 +500,11 @@ const BookTourDetail = () => {
                       "https://images.unsplash.com/photo-1559592413-7cec4d0cae2b?w=800";
                   }}
                 />
-                {tour.discount && (
-                  <div className="discount-badge">Giảm {tour.discount}%</div>
-                )}
+                {tour.promotion &&
+                  tour.originalPrice &&
+                  tour.originalPrice > tour.price && (
+                    <div className="discount-badge">{tour.promotion.name}</div>
+                  )}
               </div>
 
               <div className="tour-details">
@@ -1041,32 +1050,45 @@ const BookTourDetail = () => {
                 <div className="price-summary">
                   <div className="price-row">
                     <span>Giá tour ({bookingData.guests} khách)</span>
-                    <span>{formatPrice(tour.price * bookingData.guests)}</span>
+                    {hasPromotion ? (
+                      <div
+                        style={{
+                          display: "flex",
+                          flexDirection: "column",
+                          alignItems: "flex-end",
+                        }}
+                      >
+                        <span
+                          style={{
+                            textDecoration: "line-through",
+                            color: "#999",
+                            fontSize: "14px",
+                          }}
+                        >
+                          {formatPrice(totalOriginalPrice)}
+                        </span>
+                        <span>{formatPrice(totalPrice)}</span>
+                      </div>
+                    ) : (
+                      <span>{formatPrice(totalPrice)}</span>
+                    )}
                   </div>
-                  {tour.discount && (
+                  {hasPromotion && totalDiscount > 0 && (
                     <div className="price-row discount">
-                      <span>Giảm giá</span>
                       <span>
-                        -
-                        {formatPrice(
-                          (tour.price * bookingData.guests * tour.discount) /
-                            100
-                        )}
+                        Giảm giá {tour.promotion?.name || ""}
+                        {tour.promotion?.discountType === "percent"
+                          ? ` (${tour.promotion.discountValue}%)`
+                          : ` (${formatPrice(tour.promotion.discountValue)})`}
                       </span>
+                      <span>-{formatPrice(totalDiscount)}</span>
                     </div>
                   )}
                   <div className="separator"></div>
                   <div className="price-row total">
                     <span>Tổng cộng</span>
                     <span className="total-price">
-                      {formatPrice(
-                        tour.discount
-                          ? (tour.price *
-                              bookingData.guests *
-                              (100 - tour.discount)) /
-                              100
-                          : totalPrice
-                      )}
+                      {formatPrice(totalPrice)}
                     </span>
                   </div>
                 </div>
