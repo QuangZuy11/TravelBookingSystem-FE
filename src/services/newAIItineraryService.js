@@ -775,9 +775,7 @@ export const validateActivity = (activity) => {
 export const validateGenerationRequest = (request) => {
     const errors = [];
 
-    if (!request.destination || request.destination.trim() === '') {
-        errors.push('Destination is required');
-    }
+    // Remove destination validation
 
     if (!request.duration || request.duration < 1 || request.duration > 30) {
         errors.push('Duration must be between 1 and 30 days');
