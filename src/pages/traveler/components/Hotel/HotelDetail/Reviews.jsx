@@ -6,7 +6,7 @@ export default function Reviews({ hotelData }) {
         if (!hotelData?.reviews || !Array.isArray(hotelData.reviews)) {
             return [];
         }
-        
+
         return hotelData.reviews
             .filter(review => review.comment && review.rating)
             .map(review => ({
@@ -29,12 +29,12 @@ export default function Reviews({ hotelData }) {
                 stats[review.rating]++;
             }
         });
-        
+
         const totalReviews = reviews.length;
         const avgRating = totalReviews > 0
             ? reviews.reduce((sum, r) => sum + r.rating, 0) / totalReviews
             : 0;
-        
+
         return {
             stats: [5, 4, 3, 2, 1].map(stars => ({
                 stars,
@@ -64,10 +64,10 @@ export default function Reviews({ hotelData }) {
                             </div>
                             <div className="hotel-detail-rating-text">
                                 {parseFloat(ratingStats.avgRating) >= 4.5 ? 'Xuất sắc' :
-                                 parseFloat(ratingStats.avgRating) >= 4 ? 'Rất tốt' :
-                                 parseFloat(ratingStats.avgRating) >= 3.5 ? 'Tốt' :
-                                 parseFloat(ratingStats.avgRating) >= 3 ? 'Khá tốt' :
-                                 parseFloat(ratingStats.avgRating) >= 2 ? 'Trung bình' : 'Cần cải thiện'}
+                                    parseFloat(ratingStats.avgRating) >= 4 ? 'Rất tốt' :
+                                        parseFloat(ratingStats.avgRating) >= 3.5 ? 'Tốt' :
+                                            parseFloat(ratingStats.avgRating) >= 3 ? 'Khá tốt' :
+                                                parseFloat(ratingStats.avgRating) >= 2 ? 'Trung bình' : 'Cần cải thiện'}
                             </div>
                             <div className="hotel-detail-rating-count">Dựa trên {ratingStats.totalReviews} đánh giá</div>
                         </div>
@@ -85,13 +85,7 @@ export default function Reviews({ hotelData }) {
                         ))}
                     </div>
 
-                    <button className="hotel-detail-write-review-btn">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                            <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
-                            <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
-                        </svg>
-                        Viết đánh giá
-                    </button>
+
                 </div>
 
                 <div className="hotel-detail-reviews-list">
