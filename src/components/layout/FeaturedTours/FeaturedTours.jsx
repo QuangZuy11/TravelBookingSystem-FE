@@ -11,7 +11,7 @@ export default function FeaturedTours() {
   useEffect(() => {
     const fetchTours = async () => {
       try {
-        const res = await fetch("http://localhost:3000/api/ad-bookings/active");
+        const res = await fetch("http://localhost:3000/api/ad-bookings/active?type=tour");
         const data = await res.json();
         setTours(data);
       } catch (error) {
@@ -39,22 +39,15 @@ export default function FeaturedTours() {
             <p className="no-data">Đang tải dữ liệu...</p>
           ) : (
             tours.map((tour) => {
-              // Đảm bảo highlights là mảng
-              const highlights = Array.isArray(tour.highlights)
-                ? tour.highlights
-                : typeof tour.highlights === "string"
-                ? [tour.highlights]
-                : [];
+              // Đảm bảo included_services là mảng
+              const highlights = Array.isArray(tour.included_services)
+                ? tour.included_services
+                : typeof tour.included_services === "string"
+                  ? [tour.included_services]
+                  : [];
 
-              // Tính giá hiển thị
-              const hasPromotion =
-                tour.promotion &&
-                tour.originalPrice &&
-                tour.originalPrice > tour.price;
-              const displayPrice = tour.price || 0;
-              const displayOriginalPrice = hasPromotion
-                ? tour.originalPrice
-                : null;
+              // Hiện tại chưa có thông tin giá, hiển thị placeholder
+              const displayPrice = 0; // Placeholder, cần cập nhật khi có API giá
 
               return (
                 <div key={tour._id} className="tour-card">
@@ -63,14 +56,14 @@ export default function FeaturedTours() {
                       src={getProxiedGoogleDriveUrl(
                         tour.image || "/placeholder.svg"
                       )}
-                      alt={tour.title || tour.name}
+                      alt={tour.title}
                       className="tour-image"
                     />
                     <div className="promotion-badge">Nổi bật</div>
                   </div>
 
                   <div className="tour-info">
-                    <h3 className="tour-name">{tour.title || tour.name}</h3>
+                    <h3 className="tour-name">{tour.title}</h3>
 
                     <div className="tour-meta">
                       {tour.location && (
@@ -79,10 +72,10 @@ export default function FeaturedTours() {
                           <span>{tour.location}</span>
                         </div>
                       )}
-                      {tour.duration && (
+                      {tour.difficulty && (
                         <div className="tour-duration">
                           <Clock size={16} />
-                          <span>{tour.duration}</span>
+                          <span>Độ khó: {tour.difficulty}</span>
                         </div>
                       )}
                     </div>
@@ -106,33 +99,18 @@ export default function FeaturedTours() {
                     <div className="tour-footer">
                       <div className="tour-price">
                         {displayPrice === 0 ? (
-                          <span className="free">Miễn phí</span>
+                          <span className="free">Liên hệ</span>
                         ) : (
-                          <>
-                            {displayOriginalPrice &&
-                            displayOriginalPrice > displayPrice ? (
-                              <>
-                                <span className="original-price">
-                                  {displayOriginalPrice.toLocaleString("vi-VN")}{" "}
-                                  ₫
-                                </span>
-                                <span className="price">
-                                  {displayPrice.toLocaleString("vi-VN")} ₫
-                                </span>
-                              </>
-                            ) : (
-                              <span className="price">
-                                {displayPrice.toLocaleString("vi-VN")} ₫
-                              </span>
-                            )}
-                          </>
+                          <span className="price">
+                            {displayPrice.toLocaleString("vi-VN")} ₫
+                          </span>
                         )}
                       </div>
                       <Link
                         to={`/tour/${tour?._id || tour?.id}`}
                         className="btn-book"
                       >
-                        Đặt Ngay
+                        Xem Chi Tiết
                       </Link>
                     </div>
                   </div>

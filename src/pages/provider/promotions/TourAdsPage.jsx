@@ -92,8 +92,8 @@ const TourAdsPage = () => {
   const [successMessage, setSuccessMessage] = useState("");
   const [showPaymentModal, setShowPaymentModal] = useState(false);
   const [paymentData, setPaymentData] = useState(null);
-  const [isCreatingAd, setIsCreatingAd] = useState(false);
-  const [isCreatingPayment, setIsCreatingPayment] = useState(false);
+  const [, setIsCreatingAd] = useState(false);
+  const [isCreatingPayment] = useState(false);
   const [adBookingCreated, setAdBookingCreated] = useState(null);
   const [countdown, setCountdown] = useState(120);
 
@@ -284,8 +284,7 @@ const TourAdsPage = () => {
             alert("✅ Thanh toán thành công! Quảng cáo đã được kích hoạt.");
             setShowPaymentModal(false);
             setSuccessMessage(
-              `Đã đăng ký quảng cáo thành công cho tour "${
-                pendingTour?.title || "Không tên"
+              `Đã đăng ký quảng cáo thành công cho tour "${pendingTour?.title || "Không tên"
               }".`
             );
             // Reload tours
@@ -577,8 +576,7 @@ const TourAdsPage = () => {
                           marginBottom: "8px",
                         }}
                       >
-                        <span>Tour:</span>
-                        <strong>{pendingTour?.title || "Không tên"}</strong>
+
                       </div>
                       {adBookingCreated.schedule && (
                         <>
@@ -632,7 +630,7 @@ const TourAdsPage = () => {
                       Quét mã QR để thanh toán
                     </h4>
                     {paymentData.qr_code_base64 &&
-                    paymentData.qr_code_base64.startsWith("data:image") ? (
+                      paymentData.qr_code_base64.startsWith("data:image") ? (
                       <div>
                         <img
                           src={paymentData.qr_code_base64}

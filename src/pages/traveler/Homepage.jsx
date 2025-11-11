@@ -6,6 +6,7 @@ import Footer from "../../components/layout/Footer/Footer.jsx";
 import AITitle from "../../components/layout/AITitle/AITitle.jsx";
 import WhyVietTravel from "../../components/layout/WhyVietTravel/WhyVietTravel.jsx";
 import FeaturedTours from "../../components/layout/FeaturedTours/FeaturedTours.jsx";
+import HotelFeatured from "../../components/layout/FeaturedHotel/FeatureHotel.jsx";
 function Homepage() {
   return (
     <>
@@ -14,6 +15,7 @@ function Homepage() {
       <HeroSection />
       <TourSearchForm />
       <FeaturedTours />
+      <HotelFeatured />
       <AITitle />
       <WhyVietTravel />
       <Footer />

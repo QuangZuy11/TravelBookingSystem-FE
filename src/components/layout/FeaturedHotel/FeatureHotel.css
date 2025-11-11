@@ -1,0 +1,118 @@
+/* Featured Hotels Wrapper - Chỉ style cho container và header */
+.featured-hotels-wrapper {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #ffffff;
+  padding: 2.5rem 0;
+}
+
+.featured-hotels-container {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 0 1rem;
+  width: 100%;
+}
+
+/* Header */
+.featured-hotels-header {
+  text-align: center;
+  margin-bottom: 3rem;
+}
+
+.featured-hotels-header h2 {
+  font-size: 2.5rem;
+  font-weight: bold;
+  color: #1f2937;
+  margin-bottom: 1rem;
+}
+
+.featured-hotels-header p {
+  color: #6b7280;
+  font-size: 1.125rem;
+}
+
+/* Grid Layout */
+.featured-hotels-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 2rem;
+  margin-bottom: 3rem;
+}
+
+.no-data {
+  text-align: center;
+  color: #6b7280;
+  grid-column: 1 / -1;
+  padding: 2rem;
+}
+
+/* Override promotion badge cho Featured Hotels - màu xanh thay vì đỏ */
+.featured-hotels-grid .promotion-badge {
+  background: linear-gradient(135deg, #14b8a6 0%, #0d9488 100%);
+  color: white;
+  padding: 6px 12px;
+  border-radius: 8px;
+  font-size: 12px;
+  font-weight: 700;
+  box-shadow: 0 2px 8px rgba(20, 184, 166, 0.4);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  white-space: nowrap;
+  max-width: 120px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* View All Button */
+.featured-hotels-view-all {
+  text-align: center;
+  margin-top: 3rem;
+}
+
+.featured-hotels-button {
+  padding: 0.75rem 1.5rem;
+  background-color: #1f2937;
+  color: white;
+  font-weight: 600;
+  border-radius: 0.5rem;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1),
+    0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  text-decoration: none;
+  transition: background-color 0.3s ease;
+  display: inline-block;
+}
+
+.featured-hotels-button:hover {
+  background-color: #0f766e;
+  color: white;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .featured-hotels-header h2 {
+    font-size: 2rem;
+  }
+
+  .featured-hotels-header p {
+    font-size: 1rem;
+  }
+
+  .featured-hotels-grid {
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+  }
+}
+
+@media (min-width: 768px) {
+  .featured-hotels-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (min-width: 1024px) {
+  .featured-hotels-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
