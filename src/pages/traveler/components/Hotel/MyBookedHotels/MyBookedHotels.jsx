@@ -398,7 +398,7 @@ const MyBookedHotels = () => {
         ) : (
           filteredBookings.map((booking) => {
             const hotel = booking.hotel_room_id?.hotelId;
-            const room = booking.hotel_room_id;
+            // const room = booking.hotel_room_id; // Not used after hiding room details
 
             return (
               <div
@@ -442,21 +442,23 @@ const MyBookedHotels = () => {
                       </span>
                     </div>
 
-                    <div className="booking-card-detail-item">
+                    {/* Hidden: Room number and type */}
+                    {/* <div className="booking-card-detail-item">
                       <Bed size={16} color="#666" />
                       <span>
                         Phòng #{room?.roomNumber || "N/A"} -{" "}
                         {getRoomTypeName(room?.type)}
                       </span>
-                    </div>
+                    </div> */}
 
-                    <div className="booking-card-detail-item">
+                    {/* Hidden: Check-in and check-out dates */}
+                    {/* <div className="booking-card-detail-item">
                       <Clock size={16} color="#666" />
                       <span>
                         {formatDate(booking.check_in_date)} -{" "}
                         {formatDate(booking.check_out_date)}
                       </span>
-                    </div>
+                    </div> */}
 
                     <div className="booking-card-detail-item">
                       <DollarSign size={16} color="#666" />
@@ -476,7 +478,7 @@ const MyBookedHotels = () => {
                     className="btn-details"
                     onClick={() => handleViewDetails(booking)}
                   >
-                    <Info size={18} />
+                    <Info size={16} />
                     Chi Tiết
                   </button>
 
@@ -486,7 +488,7 @@ const MyBookedHotels = () => {
                       className="btn-complete"
                       onClick={() => handleCompleteBooking(booking)}
                     >
-                      <CheckCircle size={18} />
+                      <CheckCircle size={16} />
                       Hoàn thành
                     </button>
                   )}
@@ -497,7 +499,7 @@ const MyBookedHotels = () => {
                       className="btn-cancel"
                       onClick={() => handleCancelBooking(booking)}
                     >
-                      <X size={18} />
+                      <X size={16} />
                       Hủy phòng
                     </button>
                   )}
