@@ -42,8 +42,13 @@ const AuthPage = () => {
           password: formData.password,
         };
 
-    if (isRegister && formData.password !== formData.confirmPassword) {
-      return alert("Mật khẩu xác nhận không khớp!");
+    if (isRegister) {
+      if (formData.password.length < 6) {
+        return alert("Mật khẩu phải có ít nhất 6 ký tự!");
+      }
+      if (formData.password !== formData.confirmPassword) {
+        return alert("Mật khẩu xác nhận không khớp!");
+      }
     }
 
     try {
