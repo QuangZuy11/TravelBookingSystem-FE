@@ -13,6 +13,8 @@ import {
   Building,
   Bed,
   Clock,
+  Star,
+  CheckCircle,
 } from "lucide-react";
 import { getProxiedGoogleDriveUrl } from "../../../../../utils/googleDriveImageHelper";
 import "./MyBookedHotels.css";
@@ -26,7 +28,12 @@ const MyBookedHotels = () => {
   const [filterStatus, setFilterStatus] = useState("all");
   const [selectedBooking, setSelectedBooking] = useState(null);
   const [showCancelModal, setShowCancelModal] = useState(false);
+  const [showReviewModal, setShowReviewModal] = useState(false);
+  const [showDetailModal, setShowDetailModal] = useState(false);
   const [cancelling, setCancelling] = useState(false);
+  const [submittingReview, setSubmittingReview] = useState(false);
+  const [review, setReview] = useState({ rating: 5, comment: "" });
+  const [bookingToComplete, setBookingToComplete] = useState(null);
 
   // Define fetchBookings BEFORE useEffect to avoid initialization error
   const fetchBookings = useCallback(async () => {
@@ -45,6 +52,8 @@ const MyBookedHotels = () => {
         apiStatus = "reserved,confirmed";
       } else if (filterStatus === "cancelled") {
         apiStatus = "cancelled";
+      } else if (filterStatus === "completed") {
+        apiStatus = "completed";
       }
 
       const url = `http://localhost:3000/api/traveler/bookings?${apiStatus ? `status=${apiStatus}&` : ""
@@ -156,10 +165,10 @@ const MyBookedHotels = () => {
 
   const getStatusBadge = (status) => {
     const statusConfig = {
-      reserved: { label: "Đã đặt", color: "#3b82f6", icon: Bookmark },
-      confirmed: { label: "Đã xác nhận", color: "#10b981", icon: Bookmark },
+      reserved: { label: "Đã đặt", color: "#2d6a4f", icon: Bookmark },
+      confirmed: { label: "Đã đặt", color: "#2d6a4f", icon: Bookmark },
+      completed: { label: "Hoàn thành", color: "#40916c", icon: CheckCircle },
       cancelled: { label: "Đã hủy", color: "#ef4444", icon: XCircle },
-      completed: { label: "Hoàn thành", color: "#8b5cf6", icon: Bookmark },
     };
 
     const config = statusConfig[status] || {
@@ -193,11 +202,85 @@ const MyBookedHotels = () => {
 
   const handleViewDetails = (booking) => {
     setSelectedBooking(booking);
+    setShowDetailModal(true);
   };
 
-  const handleCancelBooking = async (booking) => {
+  const handleCancelBooking = (booking) => {
     setSelectedBooking(booking);
     setShowCancelModal(true);
+    setShowDetailModal(false); // Close detail modal if open
+  };
+
+  const handleCompleteBooking = (booking) => {
+    setBookingToComplete(booking);
+    setShowReviewModal(true);
+    setShowDetailModal(false); // Close detail modal if open
+  };
+
+  const submitReviewAndComplete = async () => {
+    if (!bookingToComplete || !review.comment.trim()) {
+      alert("Vui lòng nhập đánh giá");
+      return;
+    }
+
+    try {
+      setSubmittingReview(true);
+      const token = localStorage.getItem("token");
+
+      // First, complete the booking
+      const completeResponse = await fetch(
+        `http://localhost:3000/api/traveler/bookings/${bookingToComplete._id}/complete`,
+        {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+        }
+      );
+
+      const completeResult = await completeResponse.json();
+
+      if (!completeResult.success) {
+        alert(completeResult.message || "Không thể hoàn thành booking");
+        return;
+      }
+
+      // Then submit review
+      const hotelId = completeResult.data.hotelId;
+      const reviewResponse = await fetch(
+        `http://localhost:3000/api/traveler/hotels/${hotelId}/reviews`,
+        {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            rating: review.rating,
+            comment: review.comment,
+            bookingId: bookingToComplete._id
+          }),
+        }
+      );
+
+      const reviewResult = await reviewResponse.json();
+
+      if (reviewResult.success) {
+        setShowReviewModal(false);
+        setBookingToComplete(null);
+        setReview({ rating: 5, comment: "" });
+        fetchBookings(); // Refresh list
+        alert("Cảm ơn bạn đã đánh giá!");
+      } else {
+        alert(reviewResult.message || "Không thể gửi đánh giá");
+      }
+    } catch (err) {
+      console.error("Error completing booking and submitting review:", err);
+      alert("Có lỗi xảy ra khi hoàn thành booking");
+    } finally {
+      setSubmittingReview(false);
+    }
   };
 
   const confirmCancel = async () => {
@@ -282,6 +365,13 @@ const MyBookedHotels = () => {
         >
           <Bookmark size={18} />
           Đã đặt
+        </button>
+        <button
+          className={`filter-btn ${filterStatus === "completed" ? "active" : ""}`}
+          onClick={() => setFilterStatus("completed")}
+        >
+          <CheckCircle size={18} />
+          Hoàn thành
         </button>
         <button
           className={`filter-btn ${filterStatus === "cancelled" ? "active" : ""}`}
@@ -390,16 +480,27 @@ const MyBookedHotels = () => {
                     Chi Tiết
                   </button>
 
-                  {booking.booking_status !== "cancelled" &&
-                    booking.booking_status !== "completed" && (
-                      <button
-                        className="btn-cancel"
-                        onClick={() => handleCancelBooking(booking)}
-                      >
-                        <X size={18} />
-                        Hủy phòng
-                      </button>
-                    )}
+                  {/* Complete button: only show for confirmed or reserved status (not cancelled or completed) */}
+                  {(booking.booking_status === "confirmed" || booking.booking_status === "reserved") && (
+                    <button
+                      className="btn-complete"
+                      onClick={() => handleCompleteBooking(booking)}
+                    >
+                      <CheckCircle size={18} />
+                      Hoàn thành
+                    </button>
+                  )}
+
+                  {/* Cancel button: only show for reserved or confirmed status (not cancelled or completed) */}
+                  {(booking.booking_status === "reserved" || booking.booking_status === "confirmed") && (
+                    <button
+                      className="btn-cancel"
+                      onClick={() => handleCancelBooking(booking)}
+                    >
+                      <X size={18} />
+                      Hủy phòng
+                    </button>
+                  )}
                 </div>
               </div>
             );
@@ -408,10 +509,13 @@ const MyBookedHotels = () => {
       </div>
 
       {/* Details Modal - Matching Mockup */}
-      {selectedBooking && (
+      {showDetailModal && selectedBooking && (
         <div
           className="booking-details-modal-overlay"
-          onClick={() => setSelectedBooking(null)}
+          onClick={() => {
+            setShowDetailModal(false);
+            setSelectedBooking(null);
+          }}
         >
           <div
             className="booking-details-modal"
@@ -422,7 +526,10 @@ const MyBookedHotels = () => {
               <h2>Thông tin phòng đã đặt</h2>
               <button
                 className="modal-close-btn"
-                onClick={() => setSelectedBooking(null)}
+                onClick={() => {
+                  setShowDetailModal(false);
+                  setSelectedBooking(null);
+                }}
               >
                 <X size={24} />
               </button>
@@ -643,7 +750,10 @@ const MyBookedHotels = () => {
             <div className="booking-details-modal-footer">
               <button
                 className="btn-secondary"
-                onClick={() => setSelectedBooking(null)}
+                onClick={() => {
+                  setShowDetailModal(false);
+                  setSelectedBooking(null);
+                }}
               >
                 Đóng
               </button>
@@ -652,37 +762,184 @@ const MyBookedHotels = () => {
         </div>
       )}
 
-      {/* Cancel Confirmation Modal */}
-      {showCancelModal && (
+      {/* Review Modal - Shown when clicking "Hoàn thành" */}
+      {showReviewModal && bookingToComplete && (
         <div
           className="booking-details-modal-overlay"
-          onClick={() => setShowCancelModal(false)}
+          onClick={() => {
+            setShowReviewModal(false);
+            setBookingToComplete(null);
+            setReview({ rating: 5, comment: "" });
+          }}
         >
           <div
             className="booking-details-modal"
+            style={{ maxWidth: "600px" }}
             onClick={(e) => e.stopPropagation()}
           >
             <div className="booking-details-modal-header">
-              <h2>Xác nhận hủy đặt phòng</h2>
+              <h2>Đánh giá khách sạn</h2>
               <button
                 className="modal-close-btn"
-                onClick={() => setShowCancelModal(false)}
+                onClick={() => {
+                  setShowReviewModal(false);
+                  setBookingToComplete(null);
+                  setReview({ rating: 5, comment: "" });
+                }}
               >
                 <X size={24} />
               </button>
             </div>
 
             <div className="booking-details-modal-content">
-              <p>
-                Bạn có chắc chắn muốn hủy đặt phòng này không? Hành động này
-                không thể hoàn tác.
-              </p>
+              <div style={{ padding: "20px 0" }}>
+                <p style={{ fontSize: "16px", color: "#333", marginBottom: "20px", textAlign: "center" }}>
+                  Cảm ơn bạn đã sử dụng dịch vụ của chúng tôi! Vui lòng đánh giá khách sạn.
+                </p>
+
+                {/* Rating */}
+                <div style={{ marginBottom: "24px" }}>
+                  <label style={{ display: "block", marginBottom: "12px", fontWeight: "600", color: "#333" }}>
+                    Đánh giá của bạn:
+                  </label>
+                  <div style={{ display: "flex", gap: "8px", justifyContent: "center" }}>
+                    {[1, 2, 3, 4, 5].map((star) => (
+                      <button
+                        key={star}
+                        type="button"
+                        onClick={() => setReview(prev => ({ ...prev, rating: star }))}
+                        style={{
+                          fontSize: "36px",
+                          border: "none",
+                          background: "none",
+                          cursor: "pointer",
+                          color: star <= review.rating ? "#ffc107" : "#e0e0e0",
+                          padding: "4px",
+                          transition: "all 0.2s ease",
+                        }}
+                        onMouseEnter={(e) => {
+                          if (star > review.rating) {
+                            e.target.style.color = "#ffd54f";
+                          }
+                        }}
+                        onMouseLeave={(e) => {
+                          if (star > review.rating) {
+                            e.target.style.color = "#e0e0e0";
+                          }
+                        }}
+                      >
+                        <Star size={36} fill={star <= review.rating ? "currentColor" : "none"} />
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Comment */}
+                <div>
+                  <label style={{ display: "block", marginBottom: "12px", fontWeight: "600", color: "#333" }}>
+                    Nhận xét của bạn:
+                  </label>
+                  <textarea
+                    value={review.comment}
+                    onChange={(e) => setReview(prev => ({ ...prev, comment: e.target.value }))}
+                    placeholder="Chia sẻ trải nghiệm của bạn về khách sạn..."
+                    rows="5"
+                    style={{
+                      width: "100%",
+                      padding: "12px",
+                      borderRadius: "8px",
+                      border: "2px solid #e5e7eb",
+                      fontSize: "14px",
+                      fontFamily: "inherit",
+                      resize: "vertical",
+                      transition: "border-color 0.2s ease",
+                    }}
+                    onFocus={(e) => {
+                      e.target.style.borderColor = "#2d6a4f";
+                    }}
+                    onBlur={(e) => {
+                      e.target.style.borderColor = "#e5e7eb";
+                    }}
+                  />
+                </div>
+              </div>
             </div>
 
             <div className="booking-details-modal-footer">
               <button
                 className="btn-secondary"
-                onClick={() => setShowCancelModal(false)}
+                onClick={() => {
+                  setShowReviewModal(false);
+                  setBookingToComplete(null);
+                  setReview({ rating: 5, comment: "" });
+                }}
+                disabled={submittingReview}
+              >
+                Hủy
+              </button>
+              <button
+                className="btn-primary"
+                onClick={submitReviewAndComplete}
+                disabled={submittingReview || !review.comment.trim()}
+                style={{
+                  backgroundColor: "#2d6a4f",
+                  color: "white",
+                  opacity: !review.comment.trim() ? 0.5 : 1,
+                }}
+              >
+                {submittingReview ? "Đang xử lý..." : "Hoàn thành"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Cancel Confirmation Modal - Separate from detail modal */}
+      {showCancelModal && selectedBooking && (
+        <div
+          className="booking-details-modal-overlay"
+          onClick={() => {
+            setShowCancelModal(false);
+            setSelectedBooking(null);
+          }}
+        >
+          <div
+            className="booking-details-modal"
+            style={{ maxWidth: "500px" }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="booking-details-modal-header">
+              <h2>Xác nhận hủy đặt phòng</h2>
+              <button
+                className="modal-close-btn"
+                onClick={() => {
+                  setShowCancelModal(false);
+                  setSelectedBooking(null);
+                }}
+              >
+                <X size={24} />
+              </button>
+            </div>
+
+            <div className="booking-details-modal-content">
+              <div style={{ textAlign: "center", padding: "20px 0" }}>
+                <XCircle size={64} color="#ef4444" style={{ marginBottom: "16px" }} />
+                <p style={{ fontSize: "16px", color: "#333", marginBottom: "8px", fontWeight: "600" }}>
+                  Bạn có chắc chắn muốn hủy đặt phòng này không?
+                </p>
+                <p style={{ fontSize: "14px", color: "#666" }}>
+                  Hành động này không thể hoàn tác.
+                </p>
+              </div>
+            </div>
+
+            <div className="booking-details-modal-footer">
+              <button
+                className="btn-secondary"
+                onClick={() => {
+                  setShowCancelModal(false);
+                  setSelectedBooking(null);
+                }}
                 disabled={cancelling}
               >
                 Không
