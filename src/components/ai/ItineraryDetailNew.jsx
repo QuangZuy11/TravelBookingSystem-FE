@@ -371,9 +371,7 @@ const ItineraryDetailNew = () => {
     const navigate = useNavigate();
 
     // Log params để debug
-    console.log('URL Params:', params);
     const aiGeneratedId = params.itineraryId;  // Sửa tên param để khớp với route
-    console.log('aiGeneratedId:', aiGeneratedId);
 
     const [itinerary, setItinerary] = useState(null);
     const [loading, setLoading] = useState(true);
@@ -389,45 +387,36 @@ const ItineraryDetailNew = () => {
             return;
         }
 
-        // Get provider from localStorage
-        const providerStr = localStorage.getItem('provider');
-        let provider = null;
+        // Get userId from localStorage or context
+        const userIdFromStorage = localStorage.getItem('userId');
+        const userStr = localStorage.getItem('user');
+        let userFromStorage = null;
         try {
-            provider = providerStr ? JSON.parse(providerStr) : null;
+            userFromStorage = userStr ? JSON.parse(userStr) : null;
         } catch (error) {
-            console.error('Error parsing provider:', error);
+            console.error('Error parsing user from storage:', error);
         }
 
-        // Use user_id from provider or fallback to user if not a provider
-        const effectiveUserId = provider?.user_id || user?._id;
-
+        // Try different sources for userId in this order:
+        // 1. Context user 
+        // 2. localStorage userId
+        // 3. localStorage user object
+        const effectiveUserId = user?.userId || userIdFromStorage || userFromStorage?.userId;
+        
         if (!effectiveUserId) {
             toast.error('Please login to view itinerary');
             setTimeout(() => navigate('/auth'), 2000);
             return;
         }
 
-        console.log('Loading itinerary with ID:', aiGeneratedId);
         loadItinerary();
-    }, [aiGeneratedId, user, authLoading, navigate]);    // Auto-reload on window focus (when user comes back from another tab)
-    useEffect(() => {
-        const handleFocus = () => {
-            if (itinerary) {
-                console.log('🔄 Window focused - reloading itinerary');
-                loadItinerary(true); // Force reload with cache busting
-            }
-        };
-
-        window.addEventListener('focus', handleFocus);
-        return () => window.removeEventListener('focus', handleFocus);
-    }, [itinerary]);
+    }, [aiGeneratedId, user, authLoading, navigate]);
 
     const loadItinerary = async (forceReload = false) => {
         try {
             setLoading(true);
             setError(null);
 
-            // Add cache busting for force reload
             const response = await getItineraryById(aiGeneratedId, {
                 headers: forceReload ? {
                     'Cache-Control': 'no-cache',
@@ -435,8 +424,6 @@ const ItineraryDetailNew = () => {
                 } : {}
             });
 
-            // Normalize response shape: some services return { success, data: {...} }
-            // while others return the payload directly. Support both.
             const payload = response?.data ?? response;
             setItinerary(payload);
         } catch (err) {
@@ -460,12 +447,10 @@ const ItineraryDetailNew = () => {
         });
     };
 
-    // Handle Share functionality
     const handleShare = async () => {
         try {
             const currentUrl = window.location.href;
 
-            // Try to use modern Clipboard API
             if (navigator.clipboard && window.isSecureContext) {
                 await navigator.clipboard.writeText(currentUrl);
                 toast.success('Itinerary URL copied to clipboard!', {
@@ -473,7 +458,6 @@ const ItineraryDetailNew = () => {
                     icon: '📋',
                 });
             } else {
-                // Fallback for older browsers or non-HTTPS
                 const textArea = document.createElement('textarea');
                 textArea.value = currentUrl;
                 textArea.style.position = 'fixed';
@@ -508,7 +492,6 @@ const ItineraryDetailNew = () => {
 
     // Handle Customize functionality 
     const handleCustomize = () => {
-        // Navigate to customize page (will be created)
         navigate(`/ai-itinerary/${aiGeneratedId}/customize`);
     };
 
@@ -570,17 +553,6 @@ const ItineraryDetailNew = () => {
     const { summary } = itinerary;
     const destination = itinerary.request?.destination || itinerary.destination || 'Unknown Destination';
 
-    console.log('🔍 Itinerary Detail Debug:', {
-        itinerary,
-        itinerary_data,
-        destination,
-        hasOriginal: !!itinerary.original,
-        hasDays: !!itinerary.days,
-        hasOriginalDays: !!itinerary.original?.days,
-        daysLength: itinerary_data.length
-    });
-
-    // Calculate totals - Updated for new API structure
     const totalDays = itinerary_data?.length || 0;
     const totalActivities = itinerary_data?.reduce((sum, day) => sum + (day.activities?.length || 0), 0) || 0;
     const totalCost = itinerary.totalCost || itinerary.original?.totalCost ||

@@ -33,6 +33,21 @@ const BookTourDetail = () => {
     emergencyPhone: "",
   });
 
+  // Initialize guests based on tour capacity when tour loads
+  useEffect(() => {
+    if (tour && tour.capacity) {
+      const minGuests = tour.capacity.min_participants || 1;
+      const maxGuests = tour.capacity.max_participants || 20;
+      setBookingData((prev) => ({
+        ...prev,
+        guests: Math.max(
+          minGuests,
+          Math.min(maxGuests, prev.guests || minGuests)
+        ),
+      }));
+    }
+  }, [tour]);
+
   useEffect(() => {
     const fetchTourData = async () => {
       try {
@@ -74,6 +89,18 @@ const BookTourDetail = () => {
 
     if (!bookingData.startDate) {
       newErrors.startDate = "Vui lòng chọn ngày khởi hành";
+    }
+
+    // Validate số khách dựa trên capacity
+    if (tour?.capacity) {
+      const minGuests = tour.capacity.min_participants || 1;
+      const maxGuests = tour.capacity.max_participants || 20;
+
+      if (bookingData.guests < minGuests) {
+        newErrors.guests = `Số khách tối thiểu là ${minGuests}`;
+      } else if (bookingData.guests > maxGuests) {
+        newErrors.guests = `Số khách tối đa là ${maxGuests}`;
+      }
     }
 
     if (!bookingData.contactName.trim()) {
@@ -469,8 +496,18 @@ const BookTourDetail = () => {
     );
   }
 
-  const totalPrice = tour.price * bookingData.guests;
-  const maxGuests = 20;
+  // Tính giá với promotion
+  const hasPromotion =
+    tour.promotion && tour.originalPrice && tour.originalPrice > tour.price;
+  const basePrice = tour.price || 0;
+  const originalBasePrice = tour.originalPrice || basePrice;
+  const totalPrice = basePrice * bookingData.guests;
+  const totalOriginalPrice = originalBasePrice * bookingData.guests;
+  const totalDiscount = hasPromotion ? totalOriginalPrice - totalPrice : 0;
+
+  // Lấy capacity từ tour
+  const minGuests = tour?.capacity?.min_participants || 1;
+  const maxGuests = tour?.capacity?.max_participants || 20;
 
   return (
     <div className="book-tour-page">
@@ -493,9 +530,11 @@ const BookTourDetail = () => {
                       "https://images.unsplash.com/photo-1559592413-7cec4d0cae2b?w=800";
                   }}
                 />
-                {tour.discount && (
-                  <div className="discount-badge">Giảm {tour.discount}%</div>
-                )}
+                {tour.promotion &&
+                  tour.originalPrice &&
+                  tour.originalPrice > tour.price && (
+                    <div className="discount-badge">{tour.promotion.name}</div>
+                  )}
               </div>
 
               <div className="tour-details">
@@ -567,7 +606,11 @@ const BookTourDetail = () => {
                         d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"
                       />
                     </svg>
-                    <span>Tối đa {maxGuests} khách</span>
+                    <span>
+                      {minGuests === maxGuests
+                        ? `${minGuests} khách`
+                        : `${minGuests} - ${maxGuests} khách`}
+                    </span>
                   </div>
                   <div className="meta-item">
                     <svg
@@ -753,24 +796,61 @@ const BookTourDetail = () => {
                 <div className="form-group">
                   <label htmlFor="guests" className="form-label">
                     Số khách
+                    {tour?.capacity && (
+                      <span
+                        style={{
+                          fontSize: "12px",
+                          color: "#6b7280",
+                          fontWeight: "normal",
+                          marginLeft: "4px",
+                        }}
+                      >
+                        ({minGuests} - {maxGuests} khách)
+                      </span>
+                    )}
                   </label>
                   <select
                     id="guests"
                     className="form-select"
-                    value={bookingData.guests}
-                    onChange={(e) =>
+                    value={
+                      bookingData.guests >= minGuests &&
+                      bookingData.guests <= maxGuests
+                        ? bookingData.guests
+                        : minGuests
+                    }
+                    onChange={(e) => {
+                      const selectedGuests = Number(e.target.value);
                       setBookingData({
                         ...bookingData,
-                        guests: Number(e.target.value),
-                      })
-                    }
+                        guests: selectedGuests,
+                      });
+                      // Clear error khi user chọn giá trị hợp lệ
+                      if (errors.guests) {
+                        setErrors({ ...errors, guests: null });
+                      }
+                    }}
                   >
-                    {[...Array(maxGuests)].map((_, i) => (
-                      <option key={i + 1} value={i + 1}>
-                        {i + 1} khách
+                    {Array.from(
+                      { length: maxGuests - minGuests + 1 },
+                      (_, i) => minGuests + i
+                    ).map((num) => (
+                      <option key={num} value={num}>
+                        {num} khách
                       </option>
                     ))}
                   </select>
+                  {errors.guests && (
+                    <span
+                      style={{
+                        color: "#ef4444",
+                        fontSize: "14px",
+                        marginTop: "4px",
+                        display: "block",
+                      }}
+                    >
+                      {errors.guests}
+                    </span>
+                  )}
                 </div>
 
                 <div className="form-group">
@@ -1041,32 +1121,45 @@ const BookTourDetail = () => {
                 <div className="price-summary">
                   <div className="price-row">
                     <span>Giá tour ({bookingData.guests} khách)</span>
-                    <span>{formatPrice(tour.price * bookingData.guests)}</span>
+                    {hasPromotion ? (
+                      <div
+                        style={{
+                          display: "flex",
+                          flexDirection: "column",
+                          alignItems: "flex-end",
+                        }}
+                      >
+                        <span
+                          style={{
+                            textDecoration: "line-through",
+                            color: "#999",
+                            fontSize: "14px",
+                          }}
+                        >
+                          {formatPrice(totalOriginalPrice)}
+                        </span>
+                        <span>{formatPrice(totalPrice)}</span>
+                      </div>
+                    ) : (
+                      <span>{formatPrice(totalPrice)}</span>
+                    )}
                   </div>
-                  {tour.discount && (
+                  {hasPromotion && totalDiscount > 0 && (
                     <div className="price-row discount">
-                      <span>Giảm giá</span>
                       <span>
-                        -
-                        {formatPrice(
-                          (tour.price * bookingData.guests * tour.discount) /
-                            100
-                        )}
+                        Giảm giá {tour.promotion?.name || ""}
+                        {tour.promotion?.discountType === "percent"
+                          ? ` (${tour.promotion.discountValue}%)`
+                          : ` (${formatPrice(tour.promotion.discountValue)})`}
                       </span>
+                      <span>-{formatPrice(totalDiscount)}</span>
                     </div>
                   )}
                   <div className="separator"></div>
                   <div className="price-row total">
                     <span>Tổng cộng</span>
                     <span className="total-price">
-                      {formatPrice(
-                        tour.discount
-                          ? (tour.price *
-                              bookingData.guests *
-                              (100 - tour.discount)) /
-                              100
-                          : totalPrice
-                      )}
+                      {formatPrice(totalPrice)}
                     </span>
                   </div>
                 </div>

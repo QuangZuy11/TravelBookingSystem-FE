@@ -55,15 +55,7 @@ const AIItineraryGenerator = () => {
     setError(null);
     setResult(null);
 
-    // Enhanced validation based on new API spec
-    if (!formData.destination.trim()) {
-      toast.error("Vui lòng nhập điểm đến.");
-      return;
-    }
-    if (formData.destination.trim().length < 2) {
-      toast.error("Vui lòng nhập điểm đến hợp lệ (ít nhất 2 ký tự).");
-      return;
-    }
+    // Remove destination validation
     if (formData.preferences.length < 2) {
       toast.error(
         "Vui lòng chọn ít nhất 2 sở thích để có lộ trình phù hợp hơn."
@@ -592,7 +584,6 @@ const AIItineraryGenerator = () => {
                         fontSize: "1rem",
                         fontWeight: "500",
                       }}
-                      required
                     />
                   </div>
 
@@ -1041,7 +1032,7 @@ const AIItineraryGenerator = () => {
                 <span style={{ fontSize: "1.5rem" }}>✨</span>
               </div>
 
-              <NewItineraryView data={result} showActions={true} />
+              <NewItineraryView data={result} showActions={true} isCustomizable={true} />
             </div>
           )}
         </div>

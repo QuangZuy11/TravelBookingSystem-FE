@@ -11,10 +11,19 @@ export function TourCard({ tour }) {
     ? [tour.highlights]
     : [];
 
+  // Tính giá hiển thị
+  const hasPromotion =
+    tour.promotion && tour.originalPrice && tour.originalPrice > tour.price;
+  const displayPrice = tour.price || 0;
+  const displayOriginalPrice = hasPromotion ? tour.originalPrice : null;
+
   return (
     <div className="tour-card">
       <div className="tour-image-container">
         <img src={tour.image} alt={tour.title} className="tour-image" />
+        {hasPromotion && tour.promotion && (
+          <div className="promotion-badge">{tour.promotion.name}</div>
+        )}
       </div>
 
       <div className="tour-info">
@@ -56,16 +65,22 @@ export function TourCard({ tour }) {
 
         <div className="tour-footer">
           <div className="tour-price">
-            {tour.price === 0 ? (
+            {displayPrice === 0 ? (
               <span className="free">Miễn phí</span>
             ) : (
               <>
-                <span className="price">
-                  {tour.price.toLocaleString("vi-VN")} ₫
-                </span>
-                {tour.originalPrice && (
-                  <span className="original-price">
-                    {tour.originalPrice.toLocaleString("vi-VN")}₫
+                {displayOriginalPrice && displayOriginalPrice > displayPrice ? (
+                  <>
+                    <span className="original-price">
+                      {displayOriginalPrice.toLocaleString("vi-VN")} ₫
+                    </span>
+                    <span className="price">
+                      {displayPrice.toLocaleString("vi-VN")} ₫
+                    </span>
+                  </>
+                ) : (
+                  <span className="price">
+                    {displayPrice.toLocaleString("vi-VN")} ₫
                   </span>
                 )}
               </>

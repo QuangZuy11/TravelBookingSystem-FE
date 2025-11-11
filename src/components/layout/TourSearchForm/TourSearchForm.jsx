@@ -4,7 +4,6 @@ import "./TourSearchForm.css";
 
 const TourSearchForm = () => {
   const [destination, setDestination] = useState("");
-  const [date, setDate] = useState("");
   const [guests, setGuests] = useState("");
   const [loading, setLoading] = useState(false);
 
@@ -62,7 +61,6 @@ const TourSearchForm = () => {
       <div className="tour-search-form-wrapper">
         <div className="tour-search-labels-row">
           <div className="tour-search-label">Điểm Đến</div>
-          <div className="tour-search-label">Ngày Khởi Hành</div>
           <div className="tour-search-label">Số Khách</div>
           <div></div>
         </div>
@@ -99,27 +97,6 @@ const TourSearchForm = () => {
           </div>
 
           {/* Ngày khởi hành */}
-          <div className="tour-search-input-wrapper">
-            <svg
-              className="tour-search-icon"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
-              />
-            </svg>
-            <input
-              type="date"
-              value={date}
-              onChange={(e) => setDate(e.target.value)}
-              className="tour-search-input"
-            />
-          </div>
 
           {/* Số khách */}
           <div className="tour-search-input-wrapper">

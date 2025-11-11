@@ -71,7 +71,7 @@ export const AuthProvider = ({ children }) => {
       email: data.email,
       phone: data.phone,
       providerId: data.provider?._id,
-      userId: data.provider?.user_id || data._id, // Use user_id from provider or _id from user
+      userId: data.provider?.user_id || data.id, // Use user_id from provider or id from user
       role: data.role,
       token: data.token,
       provider: data.provider || null
@@ -83,7 +83,7 @@ export const AuthProvider = ({ children }) => {
     localStorage.setItem('email', data.email || '');
     localStorage.setItem('phone', data.phone || '');
     localStorage.setItem('providerId', data.provider?._id || '');
-    localStorage.setItem('userId', data.provider?.user_id || data._id || '');
+    localStorage.setItem('userId', data.provider?.user_id || data.id || '');
     localStorage.setItem('role', data.role);
     localStorage.setItem('user', JSON.stringify(userToSet));
 
