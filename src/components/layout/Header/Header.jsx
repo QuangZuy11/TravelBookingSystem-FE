@@ -24,43 +24,10 @@ const Header = () => {
   const notificationRef = useRef(null);
   const navigate = useNavigate();
 
-  // Mock notifications data (hardcoded)
-  const [notifications] = useState([
-    {
-      id: 1,
-      type: "success",
-      title: "Booking Confirmed",
-      message: "Your hotel booking #HB-001 has been confirmed",
-      time: "5 phút trước",
-      isRead: false,
-    },
-    {
-      id: 2,
-      type: "info",
-      title: "New Promotion",
-      message: "Summer sale 30% off - Book now!",
-      time: "1 giờ trước",
-      isRead: false,
-    },
-    {
-      id: 3,
-      type: "warning",
-      title: "Payment Reminder",
-      message: "Complete payment for tour #T-2025-001",
-      time: "3 giờ trước",
-      isRead: true,
-    },
-    {
-      id: 4,
-      type: "success",
-      title: "Review Request",
-      message: "Share your experience at Hanoi Hotel",
-      time: "1 ngày trước",
-      isRead: true,
-    },
-  ]);
-
-  const unreadCount = notifications.filter((n) => !n.isRead).length;
+  // Notifications state
+  const [notifications, setNotifications] = useState([]);
+  const [unreadCount, setUnreadCount] = useState(0);
+  const [loadingNotifications, setLoadingNotifications] = useState(false);
 
   // Kiểm tra trạng thái đăng nhập khi component được tải
   useEffect(() => {
@@ -84,6 +51,137 @@ const Header = () => {
       window.removeEventListener("storage", checkLoginStatus);
     };
   }, []);
+
+  // Fetch notifications from API
+  const fetchNotifications = async () => {
+    const token = localStorage.getItem("token");
+    if (!token || !user) return;
+
+    try {
+      setLoadingNotifications(true);
+      const response = await fetch(
+        "http://localhost:3000/api/traveler/notifications?limit=10",
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+        }
+      );
+
+      if (response.ok) {
+        const data = await response.json();
+        if (data.success) {
+          console.log('📬 Notifications fetched:', {
+            count: data.data.notifications?.length || 0,
+            unreadCount: data.data.unreadCount || 0
+          });
+          setNotifications(data.data.notifications || []);
+          setUnreadCount(data.data.unreadCount || 0);
+        } else {
+          console.error('❌ Failed to fetch notifications:', data.message);
+        }
+      } else {
+        console.error('❌ Failed to fetch notifications:', response.status, response.statusText);
+        if (response.status === 401) {
+          console.error('   User not authenticated');
+        }
+      }
+    } catch (error) {
+      console.error("❌ Error fetching notifications:", error);
+    } finally {
+      setLoadingNotifications(false);
+    }
+  };
+
+  // Fetch unread count
+  const fetchUnreadCount = async () => {
+    const token = localStorage.getItem("token");
+    if (!token || !user) return;
+
+    try {
+      const response = await fetch(
+        "http://localhost:3000/api/traveler/notifications/unread-count",
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+        }
+      );
+
+      if (response.ok) {
+        const data = await response.json();
+        if (data.success) {
+          setUnreadCount(data.data.unreadCount || 0);
+        }
+      }
+    } catch (error) {
+      console.error("Error fetching unread count:", error);
+    }
+  };
+
+  // Fetch notifications when user is logged in
+  useEffect(() => {
+    if (user) {
+      fetchNotifications();
+      // Poll for new notifications every 30 seconds
+      const interval = setInterval(() => {
+        fetchUnreadCount();
+      }, 30000);
+
+      // Listen for notification refresh event
+      const handleNotificationRefresh = () => {
+        console.log('🔄 Refreshing notifications...');
+        fetchNotifications();
+        fetchUnreadCount();
+      };
+
+      window.addEventListener('notificationRefresh', handleNotificationRefresh);
+
+      return () => {
+        clearInterval(interval);
+        window.removeEventListener('notificationRefresh', handleNotificationRefresh);
+      };
+    } else {
+      setNotifications([]);
+      setUnreadCount(0);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user]);
+
+  // Mark notification as read
+  const handleMarkAsRead = async (notificationId) => {
+    const token = localStorage.getItem("token");
+    if (!token) return;
+
+    try {
+      const response = await fetch(
+        `http://localhost:3000/api/traveler/notifications/${notificationId}/read`,
+        {
+          method: "PUT",
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+        }
+      );
+
+      if (response.ok) {
+        // Update local state
+        setNotifications((prev) =>
+          prev.map((notif) =>
+            notif.id === notificationId
+              ? { ...notif, isRead: true, status: "read" }
+              : notif
+          )
+        );
+        setUnreadCount((prev) => Math.max(0, prev - 1));
+      }
+    } catch (error) {
+      console.error("Error marking notification as read:", error);
+    }
+  };
 
   // Đóng dropdown khi click ra bên ngoài
   useEffect(() => {
@@ -117,6 +215,10 @@ const Header = () => {
   };
 
   const toggleNotifications = () => {
+    if (!showNotifications && user) {
+      // Fetch latest notifications when opening dropdown
+      fetchNotifications();
+    }
     setShowNotifications(!showNotifications);
   };
 
@@ -323,29 +425,45 @@ const Header = () => {
                   </div>
 
                   <div className="notification-list">
-                    {notifications.map((notif) => (
-                      <div
-                        key={notif.id}
-                        className={`notification-item ${notif.isRead ? "read" : "unread"
-                          }`}
-                      >
-                        <div className="notification-icon">
-                          {getNotificationIcon(notif.type)}
-                        </div>
-                        <div className="notification-content">
-                          <h4 className="notification-title">{notif.title}</h4>
-                          <p className="notification-message">
-                            {notif.message}
-                          </p>
-                          <span className="notification-time">
-                            {notif.time}
-                          </span>
-                        </div>
-                        {!notif.isRead && (
-                          <div className="unread-dot"></div>
-                        )}
+                    {loadingNotifications ? (
+                      <div style={{ padding: "20px", textAlign: "center" }}>
+                        Đang tải...
                       </div>
-                    ))}
+                    ) : notifications.length === 0 ? (
+                      <div style={{ padding: "20px", textAlign: "center", color: "#666" }}>
+                        Chưa có thông báo nào
+                      </div>
+                    ) : (
+                      notifications.map((notif) => (
+                        <div
+                          key={notif.id}
+                          className={`notification-item ${notif.isRead ? "read" : "unread"
+                            }`}
+                          onClick={() => {
+                            if (!notif.isRead) {
+                              handleMarkAsRead(notif.id);
+                            }
+                          }}
+                          style={{ cursor: "pointer" }}
+                        >
+                          <div className="notification-icon">
+                            {getNotificationIcon(notif.type)}
+                          </div>
+                          <div className="notification-content">
+                            <h4 className="notification-title">{notif.title}</h4>
+                            <p className="notification-message">
+                              {notif.message}
+                            </p>
+                            <span className="notification-time">
+                              {notif.time}
+                            </span>
+                          </div>
+                          {!notif.isRead && (
+                            <div className="unread-dot"></div>
+                          )}
+                        </div>
+                      ))
+                    )}
                   </div>
 
                   <div className="notification-footer">
