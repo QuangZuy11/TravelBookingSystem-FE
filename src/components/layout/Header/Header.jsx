@@ -260,18 +260,22 @@ const Header = () => {
                     <FaUser className="dropdown-icon" />
                     <span>Hồ Sơ Của Tôi</span>
                   </a>
-                  <a href="/my-tours" className="dropdown-item">
-                    <FaSuitcase className="dropdown-icon" />
-                    <span>Tour Đã Đặt</span>
-                  </a>
-                  <a href="/my-booked-hotels" className="dropdown-item">
-                    <FaSuitcase className="dropdown-icon" />
-                    <span>Khách sạn đã đặt</span>
-                  </a>
-                  <a href="/my-itineraries" className="dropdown-item">
-                    <FaSuitcase className="dropdown-icon" />
-                    <span>My Itineraries</span>
-                  </a>
+                  {user.role !== "ServiceProvider" && (
+                    <>
+                      <a href="/my-tours" className="dropdown-item">
+                        <FaSuitcase className="dropdown-icon" />
+                        <span>Tour Đã Đặt</span>
+                      </a>
+                      <a href="/my-booked-hotels" className="dropdown-item">
+                        <FaSuitcase className="dropdown-icon" />
+                        <span>Khách sạn đã đặt</span>
+                      </a>
+                      <a href="/my-itineraries" className="dropdown-item">
+                        <FaSuitcase className="dropdown-icon" />
+                        <span>My Itineraries</span>
+                      </a>
+                    </>
+                  )}
                   {user.role === "ServiceProvider" && (
                     <a
                       href="#"
