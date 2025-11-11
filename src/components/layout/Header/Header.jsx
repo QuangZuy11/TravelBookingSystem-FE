@@ -170,15 +170,50 @@ const Header = () => {
       const serviceTypes = provider.licenses.map(l => l.service_type);
 
       if (serviceTypes.includes('tour')) {
-        // Tour provider
+        // Tour provider - vào tổng quan
         navigate('/provider/tours');
       } else if (serviceTypes.includes('hotel')) {
-        // Hotel provider  
-        navigate('/provider/hotels');
+        // Hotel provider - vào tổng quan của hotel đầu tiên
+        // Fetch hotel ID và redirect
+        fetchFirstHotelAndRedirect();
       } else {
         // Fallback
         navigate('/provider/tours');
       }
+    }
+  };
+
+  // Hàm lấy hotel đầu tiên của provider và redirect vào overview
+  const fetchFirstHotelAndRedirect = async () => {
+    try {
+      const token = localStorage.getItem('token');
+      const providerStr = localStorage.getItem('provider');
+      const provider = providerStr ? JSON.parse(providerStr) : null;
+
+      if (!provider || !provider._id) {
+        navigate('/provider/hotels');
+        return;
+      }
+
+      const response = await fetch(`/api/hotel/provider/${provider._id}/hotels`, {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+
+      const data = await response.json();
+
+      if (data.success && data.data && data.data.length > 0) {
+        // Có hotel -> redirect vào overview của hotel đầu tiên
+        const firstHotelId = data.data[0]._id;
+        navigate(`/provider/hotels/${firstHotelId}/overview`);
+      } else {
+        // Chưa có hotel -> vào danh sách hotels
+        navigate('/provider/hotels');
+      }
+    } catch (error) {
+      console.error('Error fetching hotels:', error);
+      navigate('/provider/hotels');
     }
   };
 

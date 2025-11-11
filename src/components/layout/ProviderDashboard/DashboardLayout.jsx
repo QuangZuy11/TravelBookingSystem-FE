@@ -178,6 +178,11 @@ const DashboardLayout = () => {
           path: `/provider/promotions`,
           label: 'Giảm giá',
           icon: Tag,
+        },
+        {
+          path: `/provider/hotel-ads`,
+          label: 'Hotel Ads',
+          icon: Tag,
         }
       );
     } else {

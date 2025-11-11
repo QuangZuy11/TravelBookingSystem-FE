@@ -47,6 +47,12 @@ const HotelOverviewPage = () => {
     const [hotel, setHotel] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
+    const [stats, setStats] = useState({
+        totalRooms: 0,
+        availableRooms: 0,
+        todayBookings: 0,
+        monthlyRevenue: 0
+    });
     const token = localStorage.getItem('token');
 
     // Get provider _id from localStorage
@@ -55,6 +61,8 @@ const HotelOverviewPage = () => {
 
     useEffect(() => {
         fetchHotel();
+        fetchStats();
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [hotelId]);
 
     const fetchHotel = async () => {
@@ -71,6 +79,72 @@ const HotelOverviewPage = () => {
             setError('Failed to load hotel details');
         } finally {
             setLoading(false);
+        }
+    };
+
+    const fetchStats = async () => {
+        try {
+            // Fetch room statistics
+            const roomsResponse = await axios.get(`/api/hotel/provider/${providerId}/hotels/${hotelId}/rooms`, {
+                headers: { Authorization: `Bearer ${token}` }
+            });
+
+            if (roomsResponse.data.success) {
+                const rooms = roomsResponse.data.data;
+                const availableRooms = rooms.filter(r => r.status === 'available').length;
+
+                setStats(prev => ({
+                    ...prev,
+                    totalRooms: rooms.length,
+                    availableRooms: availableRooms
+                }));
+            }
+
+            // Fetch booking statistics (today and monthly)
+            const today = new Date();
+            const firstDayOfMonth = new Date(today.getFullYear(), today.getMonth(), 1);
+
+            // Get statistics with date filter
+            const statsResponse = await axios.get(`/api/provider/hotel-bookings/statistics`, {
+                headers: { Authorization: `Bearer ${token}` },
+                params: {
+                    hotel_id: hotelId,
+                    start_date: firstDayOfMonth.toISOString(),
+                    end_date: today.toISOString()
+                }
+            });
+
+            if (statsResponse.data.success) {
+                const { total_revenue } = statsResponse.data.data;
+                setStats(prev => ({
+                    ...prev,
+                    monthlyRevenue: total_revenue || 0
+                }));
+            }
+
+            // Get today's bookings count
+            const todayStart = new Date(today.setHours(0, 0, 0, 0));
+            const todayEnd = new Date(today.setHours(23, 59, 59, 999));
+
+            const todayStatsResponse = await axios.get(`/api/provider/hotel-bookings/statistics`, {
+                headers: { Authorization: `Bearer ${token}` },
+                params: {
+                    hotel_id: hotelId,
+                    start_date: todayStart.toISOString(),
+                    end_date: todayEnd.toISOString()
+                }
+            });
+
+            if (todayStatsResponse.data.success) {
+                const { total_bookings } = todayStatsResponse.data.data;
+                setStats(prev => ({
+                    ...prev,
+                    todayBookings: total_bookings || 0
+                }));
+            }
+
+        } catch (err) {
+            console.error('Error fetching stats:', err);
         }
     };
 
@@ -142,23 +216,11 @@ const HotelOverviewPage = () => {
                         }}>
                             <div style={{ fontSize: '2rem', marginBottom: '0.5rem' }}>🛏️</div>
                             <div style={{ fontSize: '2rem', fontWeight: '700', color: '#0ea5e9' }}>
-                                {hotel.totalRooms || 0}
+                                {stats.totalRooms}
                             </div>
                             <div style={{ color: '#6b7280' }}>Tổng số phòng</div>
                         </div>
-                        <div style={{
-                            background: '#f0fdf4',
-                            padding: '1.5rem',
-                            borderRadius: '12px',
-                            textAlign: 'center',
-                            border: '2px solid #10b981'
-                        }}>
-                            <div style={{ fontSize: '2rem', marginBottom: '0.5rem' }}>⭐</div>
-                            <div style={{ fontSize: '2rem', fontWeight: '700', color: '#10b981' }}>
-                                {hotel.starRating || 0}
-                            </div>
-                            <div style={{ color: '#6b7280' }}>Xếp hạng sao</div>
-                        </div>
+
                         <div style={{
                             background: '#fefce8',
                             padding: '1.5rem',
@@ -168,7 +230,7 @@ const HotelOverviewPage = () => {
                         }}>
                             <div style={{ fontSize: '2rem', marginBottom: '0.5rem' }}>📅</div>
                             <div style={{ fontSize: '2rem', fontWeight: '700', color: '#eab308' }}>
-                                0
+                                {stats.todayBookings}
                             </div>
                             <div style={{ color: '#6b7280' }}>Đặt phòng hôm nay</div>
                         </div>
@@ -181,7 +243,11 @@ const HotelOverviewPage = () => {
                         }}>
                             <div style={{ fontSize: '2rem', marginBottom: '0.5rem' }}>💰</div>
                             <div style={{ fontSize: '2rem', fontWeight: '700', color: '#ec4899' }}>
-                                0đ
+                                {new Intl.NumberFormat('vi-VN', {
+                                    style: 'currency',
+                                    currency: 'VND',
+                                    maximumFractionDigits: 0
+                                }).format(stats.monthlyRevenue)}
                             </div>
                             <div style={{ color: '#6b7280' }}>Doanh thu tháng</div>
                         </div>
