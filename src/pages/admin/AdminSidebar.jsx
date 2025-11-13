@@ -7,6 +7,7 @@ const items = [
   { key: "users", label: "Người dùng", to: "users", icon: "👥" },
   { key: "providers", label: "Service Provider", to: "providers", icon: "🏨" },
   { key: "terms", label: "Điều khoản", to: "terms-policies", icon: "📜" },
+  { key: "ai-bookings", label: "AI Bookings", to: "ai-bookings", icon: "✨" },
 ];
 
 export default function AdminSidebar() {

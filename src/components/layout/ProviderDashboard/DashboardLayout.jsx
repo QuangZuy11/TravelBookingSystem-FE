@@ -236,6 +236,11 @@ const DashboardLayout = () => {
       label: 'Tour Bookings',
       icon: Calendar,
     },
+    {
+      path: '/provider/ai-bookings',
+      label: 'AI Bookings',
+      icon: Sparkles,
+    },
   ];
 
   console.log("📋 Final menuItems:", menuItems);

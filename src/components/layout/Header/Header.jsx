@@ -376,16 +376,26 @@ const Header = () => {
                         <FaSuitcase className="dropdown-icon" />
                         <span>My Itineraries</span>
                       </a>
+                      <a href="/my-booking-itineraries" className="dropdown-item">
+                        <FaSuitcase className="dropdown-icon" />
+                        <span>My AI Bookings</span>
+                      </a>
                     </>
                   )}
                   {user.role === "ServiceProvider" && (
-                    <a
-                      href="#"
-                      onClick={handleServiceManagement}
-                      className="dropdown-item"
-                    >
-                      Quản lý dịch vụ
-                    </a>
+                    <>
+                      <a
+                        href="#"
+                        onClick={handleServiceManagement}
+                        className="dropdown-item"
+                      >
+                        Quản lý dịch vụ
+                      </a>
+                      <a href="/provider/ai-bookings" className="dropdown-item">
+                        <FaSuitcase className="dropdown-icon" />
+                        <span>Quản lý AI Bookings</span>
+                      </a>
+                    </>
                   )}
                   {user && user.role === "Admin" && (
                     <Link to="/admin/dashboard" className="dropdown-item">
