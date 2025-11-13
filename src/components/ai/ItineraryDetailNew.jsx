@@ -6,6 +6,7 @@ import { getItineraryById } from '../../services/aiItineraryService';
 import TopBar from '../layout/Topbar/Topbar';
 import Header from '../layout/Header/Header';
 import Footer from '../layout/Footer/Footer';
+import AIItineraryBooking from './AIItineraryBooking';
 
 // Modern Travel Itinerary styles matching the design
 const styles = {
@@ -104,6 +105,13 @@ const styles = {
         backgroundColor: '#3b82f6',
         color: 'white',
         border: 'none'
+    },
+    bookButton: {
+        background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
+        color: 'white',
+        border: 'none',
+        fontWeight: '600',
+        boxShadow: '0 4px 6px rgba(16, 185, 129, 0.3)'
     },
     dayCard: {
         backgroundColor: 'white',
@@ -377,6 +385,7 @@ const ItineraryDetailNew = () => {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [expandedDays, setExpandedDays] = useState(new Set([1]));
+    const [showBookingModal, setShowBookingModal] = useState(false);
 
     useEffect(() => {
         if (authLoading) return;
@@ -402,7 +411,7 @@ const ItineraryDetailNew = () => {
         // 2. localStorage userId
         // 3. localStorage user object
         const effectiveUserId = user?.userId || userIdFromStorage || userFromStorage?.userId;
-        
+
         if (!effectiveUserId) {
             toast.error('Please login to view itinerary');
             setTimeout(() => navigate('/auth'), 2000);
@@ -623,6 +632,26 @@ const ItineraryDetailNew = () => {
 
                         {/* Action Buttons */}
                         <div style={styles.actionButtons}>
+                            <button
+                                style={{ ...styles.actionButton, ...styles.bookButton }}
+                                onClick={() => {
+                                    console.log('🎯 Button clicked!');
+                                    console.log('📊 Current showBookingModal:', showBookingModal);
+                                    console.log('🗺️ Itinerary:', itinerary);
+                                    console.log('🆔 AI Generated ID:', aiGeneratedId);
+                                    setShowBookingModal(true);
+                                }}
+                                onMouseOver={(e) => {
+                                    e.target.style.transform = 'translateY(-2px)';
+                                    e.target.style.boxShadow = '0 6px 12px rgba(16, 185, 129, 0.4)';
+                                }}
+                                onMouseOut={(e) => {
+                                    e.target.style.transform = 'translateY(0)';
+                                    e.target.style.boxShadow = '0 4px 6px rgba(16, 185, 129, 0.3)';
+                                }}
+                            >
+                                🎫 Đặt Chuyến Đi Này
+                            </button>
                             <button style={{ ...styles.actionButton, ...styles.saveButton }}>
                                 Save to My Trips
                             </button>
@@ -893,6 +922,28 @@ const ItineraryDetailNew = () => {
                     </div>
                 </div>
             </div>
+
+            {/* Booking Modal */}
+            {showBookingModal && itinerary && (
+                <AIItineraryBooking
+                    aiItineraryId={aiGeneratedId}
+                    itineraryData={itinerary}
+                    onClose={() => {
+                        console.log('🚪 Closing booking modal');
+                        setShowBookingModal(false);
+                    }}
+                    onSuccess={() => {
+                        console.log('✅ Booking success!');
+                        setShowBookingModal(false);
+                        toast.success('Đã gửi yêu cầu đặt chuyến đi thành công!');
+                        navigate('/my-booking-itineraries');
+                    }}
+                />
+            )}
+
+            {/* Debug: Modal State */}
+            {console.log('🔍 Render - showBookingModal:', showBookingModal, 'itinerary:', !!itinerary)}
+
             <Footer />
         </>
     );

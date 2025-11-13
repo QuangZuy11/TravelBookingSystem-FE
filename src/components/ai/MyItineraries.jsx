@@ -475,13 +475,35 @@ const MyItineraries = () => {
                                                 {/* Enhanced Actions */}
                                                 <div style={styles.buttonGroup}>
                                                     <button
-                                                        onClick={() => handleView(itinerary._id)}
+                                                        onClick={() => navigate(`/ai-itinerary/${itinerary._id}`)}
                                                         style={styles.viewButton}
                                                         onMouseOver={(e) => e.target.style.backgroundColor = '#0d9488'}
                                                         onMouseOut={(e) => e.target.style.backgroundColor = '#14b8a6'}
                                                     >
                                                         👁️ View
                                                     </button>
+
+                                                    {/* Book Button - Chỉ hiện nếu status là done hoặc custom */}
+                                                    {(itinerary.status === 'done' || itinerary.status === 'custom') && (
+                                                        <button
+                                                            onClick={() => navigate(`/ai-itinerary/${itinerary._id}`)}
+                                                            style={{
+                                                                ...styles.viewButton,
+                                                                background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
+                                                                fontWeight: '600'
+                                                            }}
+                                                            onMouseOver={(e) => {
+                                                                e.target.style.transform = 'translateY(-2px)';
+                                                                e.target.style.boxShadow = '0 4px 12px rgba(16, 185, 129, 0.4)';
+                                                            }}
+                                                            onMouseOut={(e) => {
+                                                                e.target.style.transform = 'translateY(0)';
+                                                                e.target.style.boxShadow = '0 2px 4px rgba(0, 0, 0, 0.1)';
+                                                            }}
+                                                        >
+                                                            🎫 Book
+                                                        </button>
+                                                    )}
 
                                                     {/* Customize/Edit Button */}
                                                     {(itinerary.status === 'done' || itinerary.status === 'custom') && (

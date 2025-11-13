@@ -18,7 +18,7 @@ const AIItineraryGenerator = () => {
   const navigate = useNavigate();
 
   const [formData, setFormData] = useState({
-    destination: "",
+    destinations: [""], // Array of destinations
     participants: 1,
     ageRange: "",
     duration_days: 3,
@@ -55,7 +55,13 @@ const AIItineraryGenerator = () => {
     setError(null);
     setResult(null);
 
-    // Remove destination validation
+    // Validate destinations
+    const validDestinations = formData.destinations.filter(d => d.trim() !== "");
+    if (validDestinations.length === 0) {
+      toast.error("Vui lòng nhập ít nhất một điểm đến.");
+      return;
+    }
+
     if (formData.preferences.length < 2) {
       toast.error(
         "Vui lòng chọn ít nhất 2 sở thích để có lộ trình phù hợp hơn."
@@ -87,8 +93,12 @@ const AIItineraryGenerator = () => {
 
     try {
       // Build request data according to new API spec
+      // Convert destinations array to comma-separated string
+      const validDestinations = formData.destinations.filter(d => d.trim() !== "");
+      const destinationString = validDestinations.join(", ");
+
       const requestData = {
-        destination: formData.destination.trim(),
+        destination: destinationString,
         duration_days: formData.duration_days,
         participant_number: formData.participants,
         budget_level: formData.budget_level,
@@ -566,25 +576,92 @@ const AIItineraryGenerator = () => {
                     marginBottom: "2rem",
                   }}
                 >
-                  {/* Destination */}
+                  {/* Destinations - Multiple inputs */}
                   <div style={{ gridColumn: "span 2" }}>
                     <label style={styles.label}>✈️ Điểm đến</label>
-                    <input
-                      type="text"
-                      placeholder="Nhập điểm đến (VD: Hà Nội, Đà Nẵng, TP. Hồ Chí Minh...)"
-                      value={formData.destination}
-                      onChange={(e) =>
+                    {formData.destinations.map((destination, index) => (
+                      <div key={index} style={{ display: 'flex', gap: '0.5rem', marginBottom: '0.75rem' }}>
+                        <input
+                          type="text"
+                          placeholder={`Điểm đến ${index + 1} (VD: Hà Nội, Đà Nẵng...)`}
+                          value={destination}
+                          onChange={(e) => {
+                            const newDestinations = [...formData.destinations];
+                            newDestinations[index] = e.target.value;
+                            setFormData((prev) => ({
+                              ...prev,
+                              destinations: newDestinations,
+                            }));
+                          }}
+                          style={{
+                            ...styles.input,
+                            fontSize: "1rem",
+                            fontWeight: "500",
+                            flex: 1
+                          }}
+                        />
+                        {formData.destinations.length > 1 && (
+                          <button
+                            type="button"
+                            onClick={() => {
+                              const newDestinations = formData.destinations.filter((_, i) => i !== index);
+                              setFormData((prev) => ({
+                                ...prev,
+                                destinations: newDestinations,
+                              }));
+                            }}
+                            style={{
+                              padding: '0.75rem 1rem',
+                              background: 'linear-gradient(135deg, #ef4444 0%, #dc2626 100%)',
+                              color: 'white',
+                              border: 'none',
+                              borderRadius: '8px',
+                              cursor: 'pointer',
+                              fontWeight: '600',
+                              transition: 'all 0.2s ease'
+                            }}
+                            onMouseEnter={(e) => e.target.style.transform = 'scale(1.05)'}
+                            onMouseLeave={(e) => e.target.style.transform = 'scale(1)'}
+                          >
+                            🗑️
+                          </button>
+                        )}
+                      </div>
+                    ))}
+                    <button
+                      type="button"
+                      onClick={() => {
                         setFormData((prev) => ({
                           ...prev,
-                          destination: e.target.value,
-                        }))
-                      }
-                      style={{
-                        ...styles.input,
-                        fontSize: "1rem",
-                        fontWeight: "500",
+                          destinations: [...prev.destinations, ""],
+                        }));
                       }}
-                    />
+                      style={{
+                        padding: '0.75rem 1.5rem',
+                        background: 'linear-gradient(135deg, #14b8a6 0%, #0d9488 100%)',
+                        color: 'white',
+                        border: 'none',
+                        borderRadius: '8px',
+                        cursor: 'pointer',
+                        fontWeight: '600',
+                        fontSize: '0.9rem',
+                        transition: 'all 0.2s ease',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '0.5rem'
+                      }}
+                      onMouseEnter={(e) => {
+                        e.target.style.transform = 'translateY(-2px)';
+                        e.target.style.boxShadow = '0 4px 12px rgba(20, 184, 166, 0.4)';
+                      }}
+                      onMouseLeave={(e) => {
+                        e.target.style.transform = 'translateY(0)';
+                        e.target.style.boxShadow = 'none';
+                      }}
+                    >
+                      <span style={{ fontSize: '1.2rem' }}>+</span>
+                      Thêm điểm đến
+                    </button>
                   </div>
 
                   {/* Participants */}
