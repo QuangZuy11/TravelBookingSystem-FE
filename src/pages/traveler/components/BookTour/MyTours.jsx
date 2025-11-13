@@ -74,6 +74,7 @@ const MyTours = () => {
       confirmed: { label: "Đã xác nhận", color: "#3b82f6" },
       cancelled: { label: "Đã hủy", color: "#ef4444" },
       completed: { label: "Hoàn thành", color: "#8b5cf6" },
+      "no-show": { label: "Không đến", color: "#dc2626" },
     };
 
     const config = statusConfig[status] || {

@@ -2,8 +2,15 @@
  * Utility functions for the Tour Module
  */
 
-import { format, parseISO, isAfter, isBefore, addDays, differenceInDays } from 'date-fns';
-import { vi } from 'date-fns/locale';
+import {
+  format,
+  parseISO,
+  isAfter,
+  isBefore,
+  addDays,
+  differenceInDays,
+} from "date-fns";
+import { vi } from "date-fns/locale";
 
 /**
  * Format currency to VND
@@ -11,9 +18,9 @@ import { vi } from 'date-fns/locale';
  * @returns {string} Formatted currency string
  */
 export const formatCurrency = (amount) => {
-  return new Intl.NumberFormat('vi-VN', {
-    style: 'currency',
-    currency: 'VND',
+  return new Intl.NumberFormat("vi-VN", {
+    style: "currency",
+    currency: "VND",
   }).format(amount);
 };
 
@@ -23,13 +30,13 @@ export const formatCurrency = (amount) => {
  * @param {string} formatStr - Format string (default: 'dd/MM/yyyy')
  * @returns {string} Formatted date string
  */
-export const formatDate = (date, formatStr = 'dd/MM/yyyy') => {
+export const formatDate = (date, formatStr = "dd/MM/yyyy") => {
   try {
-    const dateObj = typeof date === 'string' ? parseISO(date) : date;
+    const dateObj = typeof date === "string" ? parseISO(date) : date;
     return format(dateObj, formatStr, { locale: vi });
   } catch (error) {
-    console.error('Error formatting date:', error);
-    return '';
+    console.error("Error formatting date:", error);
+    return "";
   }
 };
 
@@ -39,7 +46,7 @@ export const formatDate = (date, formatStr = 'dd/MM/yyyy') => {
  * @returns {string} Formatted datetime string
  */
 export const formatDateTime = (datetime) => {
-  return formatDate(datetime, 'dd/MM/yyyy HH:mm');
+  return formatDate(datetime, "dd/MM/yyyy HH:mm");
 };
 
 /**
@@ -48,7 +55,7 @@ export const formatDateTime = (datetime) => {
  * @returns {boolean} True if date is in the past
  */
 export const isPastDate = (date) => {
-  const dateObj = typeof date === 'string' ? parseISO(date) : date;
+  const dateObj = typeof date === "string" ? parseISO(date) : date;
   return isBefore(dateObj, new Date());
 };
 
@@ -58,7 +65,7 @@ export const isPastDate = (date) => {
  * @returns {boolean} True if date is in the future
  */
 export const isFutureDate = (date) => {
-  const dateObj = typeof date === 'string' ? parseISO(date) : date;
+  const dateObj = typeof date === "string" ? parseISO(date) : date;
   return isAfter(dateObj, new Date());
 };
 
@@ -68,7 +75,7 @@ export const isFutureDate = (date) => {
  * @returns {number} Number of days until date
  */
 export const daysUntil = (date) => {
-  const dateObj = typeof date === 'string' ? parseISO(date) : date;
+  const dateObj = typeof date === "string" ? parseISO(date) : date;
   return differenceInDays(dateObj, new Date());
 };
 
@@ -86,7 +93,7 @@ export const calculateBookingAmount = (participants, pricing, discount = 0) => {
   const adultTotal = adults * adult_price;
   const childTotal = children * child_price;
   const infantTotal = infants * infant_price;
-  
+
   const subtotal = adultTotal + childTotal + infantTotal;
   const discountAmount = subtotal * (discount / 100);
   const total = subtotal - discountAmount;
@@ -109,28 +116,29 @@ export const calculateBookingAmount = (participants, pricing, discount = 0) => {
 export const getStatusColor = (status) => {
   const colors = {
     // Tour status
-    draft: 'bg-gray-100 text-gray-800',
-    active: 'bg-green-100 text-green-800',
-    inactive: 'bg-red-100 text-red-800',
-    archived: 'bg-gray-100 text-gray-600',
-    
+    draft: "bg-gray-100 text-gray-800",
+    active: "bg-green-100 text-green-800",
+    inactive: "bg-red-100 text-red-800",
+    archived: "bg-gray-100 text-gray-600",
+
     // Booking status
-    pending: 'bg-yellow-100 text-yellow-800',
-    confirmed: 'bg-blue-100 text-blue-800',
-    cancelled: 'bg-red-100 text-red-800',
-    completed: 'bg-green-100 text-green-800',
-    
+    pending: "bg-yellow-100 text-yellow-800",
+    confirmed: "bg-blue-100 text-blue-800",
+    cancelled: "bg-red-100 text-red-800",
+    completed: "bg-green-100 text-green-800",
+    "no-show": "bg-red-100 text-red-800",
+
     // Payment status
-    paid: 'bg-green-100 text-green-800',
-    failed: 'bg-red-100 text-red-800',
-    refunded: 'bg-orange-100 text-orange-800',
-    
+    paid: "bg-green-100 text-green-800",
+    failed: "bg-red-100 text-red-800",
+    refunded: "bg-orange-100 text-orange-800",
+
     // Date status
-    available: 'bg-green-100 text-green-800',
-    full: 'bg-red-100 text-red-800',
+    available: "bg-green-100 text-green-800",
+    full: "bg-red-100 text-red-800",
   };
 
-  return colors[status?.toLowerCase()] || 'bg-gray-100 text-gray-800';
+  return colors[status?.toLowerCase()] || "bg-gray-100 text-gray-800";
 };
 
 /**
@@ -139,30 +147,31 @@ export const getStatusColor = (status) => {
  * @param {string} type - Type of status (tour, booking, payment)
  * @returns {string} Vietnamese status text
  */
-export const getStatusText = (status, type = 'tour') => {
+export const getStatusText = (status, type = "tour") => {
   const statusTexts = {
     tour: {
-      draft: 'Bản nháp',
-      active: 'Đang hoạt động',
-      inactive: 'Tạm dừng',
-      archived: 'Đã lưu trữ',
+      draft: "Bản nháp",
+      active: "Đang hoạt động",
+      inactive: "Tạm dừng",
+      archived: "Đã lưu trữ",
     },
     booking: {
-      pending: 'Chờ xác nhận',
-      confirmed: 'Đã xác nhận',
-      cancelled: 'Đã hủy',
-      completed: 'Hoàn thành',
+      pending: "Chờ xác nhận",
+      confirmed: "Đã xác nhận",
+      cancelled: "Đã hủy",
+      completed: "Hoàn thành",
+      "no-show": "Không đến",
     },
     payment: {
-      pending: 'Chờ thanh toán',
-      paid: 'Đã thanh toán',
-      failed: 'Thanh toán thất bại',
-      refunded: 'Đã hoàn tiền',
+      pending: "Chờ thanh toán",
+      paid: "Đã thanh toán",
+      failed: "Thanh toán thất bại",
+      refunded: "Đã hoàn tiền",
     },
     date: {
-      available: 'Còn chỗ',
-      full: 'Đã đầy',
-      cancelled: 'Đã hủy',
+      available: "Còn chỗ",
+      full: "Đã đầy",
+      cancelled: "Đã hủy",
     },
   };
 
@@ -176,13 +185,13 @@ export const getStatusText = (status, type = 'tour') => {
  */
 export const getDifficultyColor = (difficulty) => {
   const colors = {
-    easy: 'bg-green-100 text-green-800',
-    moderate: 'bg-yellow-100 text-yellow-800',
-    challenging: 'bg-orange-100 text-orange-800',
-    expert: 'bg-red-100 text-red-800',
+    easy: "bg-green-100 text-green-800",
+    moderate: "bg-yellow-100 text-yellow-800",
+    challenging: "bg-orange-100 text-orange-800",
+    expert: "bg-red-100 text-red-800",
   };
 
-  return colors[difficulty?.toLowerCase()] || 'bg-gray-100 text-gray-800';
+  return colors[difficulty?.toLowerCase()] || "bg-gray-100 text-gray-800";
 };
 
 /**
@@ -192,10 +201,10 @@ export const getDifficultyColor = (difficulty) => {
  */
 export const getDifficultyText = (difficulty) => {
   const texts = {
-    easy: 'Dễ',
-    moderate: 'Trung bình',
-    challenging: 'Khó',
-    expert: 'Chuyên gia',
+    easy: "Dễ",
+    moderate: "Trung bình",
+    challenging: "Khó",
+    expert: "Chuyên gia",
   };
 
   return texts[difficulty?.toLowerCase()] || difficulty;
@@ -209,7 +218,7 @@ export const getDifficultyText = (difficulty) => {
  */
 export const truncateText = (text, length = 100) => {
   if (!text || text.length <= length) return text;
-  return text.substring(0, length) + '...';
+  return text.substring(0, length) + "...";
 };
 
 /**
@@ -263,7 +272,7 @@ export const isValidPhone = (phone) => {
 export const parseDuration = (durationStr) => {
   const daysMatch = durationStr.match(/(\d+)\s*ngày|(\d+)\s*days?/i);
   const nightsMatch = durationStr.match(/(\d+)\s*đêm|(\d+)\s*nights?/i);
-  
+
   return {
     days: daysMatch ? parseInt(daysMatch[1] || daysMatch[2]) : 0,
     nights: nightsMatch ? parseInt(nightsMatch[1] || nightsMatch[2]) : 0,
@@ -278,11 +287,11 @@ export const parseDuration = (durationStr) => {
 export const formatDuration = (duration) => {
   const { days = 0, nights = 0 } = duration;
   const parts = [];
-  
+
   if (days > 0) parts.push(`${days} ngày`);
   if (nights > 0) parts.push(`${nights} đêm`);
-  
-  return parts.join(' ');
+
+  return parts.join(" ");
 };
 
 /**
@@ -319,9 +328,9 @@ export const calculateAverageRating = (reviews) => {
  * @param {string} fallback - Fallback URL
  * @returns {string} Image URL
  */
-export const getImageUrl = (imageUrl, fallback = '/placeholder-tour.jpg') => {
+export const getImageUrl = (imageUrl, fallback = "/placeholder-tour.jpg") => {
   if (!imageUrl) return fallback;
-  if (imageUrl.startsWith('http')) return imageUrl;
+  if (imageUrl.startsWith("http")) return imageUrl;
   return `${import.meta.env.VITE_API_BASE_URL}/${imageUrl}`;
 };
 
@@ -349,5 +358,5 @@ export const debounce = (func, wait = 300) => {
  * @returns {string} Merged class names
  */
 export const cn = (...classes) => {
-  return classes.filter(Boolean).join(' ');
+  return classes.filter(Boolean).join(" ");
 };

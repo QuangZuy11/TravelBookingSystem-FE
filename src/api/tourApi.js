@@ -1,6 +1,6 @@
-import axiosInstance from './axiosConfig';
+import axiosInstance from "./axiosConfig";
 
-const TOUR_BASE_URL = '/tour';
+const TOUR_BASE_URL = "/tour";
 
 /**
  * Tour API Service
@@ -15,7 +15,9 @@ export const tourApi = {
    * @returns {Promise} Dashboard data
    */
   getProviderDashboard: async (providerId) => {
-    return await axiosInstance.get(`${TOUR_BASE_URL}/provider/${providerId}/dashboard`);
+    return await axiosInstance.get(
+      `${TOUR_BASE_URL}/provider/${providerId}/dashboard`
+    );
   },
 
   // ============ TOUR MANAGEMENT ============
@@ -27,9 +29,12 @@ export const tourApi = {
    * @returns {Promise} List of tours
    */
   getProviderTours: async (providerId, filters = {}) => {
-    return await axiosInstance.get(`${TOUR_BASE_URL}/provider/${providerId}/tours`, {
-      params: filters
-    });
+    return await axiosInstance.get(
+      `${TOUR_BASE_URL}/provider/${providerId}/tours`,
+      {
+        params: filters,
+      }
+    );
   },
 
   /**
@@ -39,7 +44,9 @@ export const tourApi = {
    * @returns {Promise} Tour details
    */
   getTourDetails: async (providerId, tourId) => {
-    return await axiosInstance.get(`${TOUR_BASE_URL}/provider/${providerId}/tours/${tourId}`);
+    return await axiosInstance.get(
+      `${TOUR_BASE_URL}/provider/${providerId}/tours/${tourId}`
+    );
   },
 
   /**
@@ -49,7 +56,10 @@ export const tourApi = {
    * @returns {Promise} Created tour
    */
   createTour: async (providerId, tourData) => {
-    return await axiosInstance.post(`${TOUR_BASE_URL}/provider/${providerId}/tours`, tourData);
+    return await axiosInstance.post(
+      `${TOUR_BASE_URL}/provider/${providerId}/tours`,
+      tourData
+    );
   },
 
   /**
@@ -60,7 +70,10 @@ export const tourApi = {
    * @returns {Promise} Updated tour
    */
   updateTour: async (providerId, tourId, tourData) => {
-    return await axiosInstance.put(`${TOUR_BASE_URL}/provider/${providerId}/tours/${tourId}`, tourData);
+    return await axiosInstance.put(
+      `${TOUR_BASE_URL}/provider/${providerId}/tours/${tourId}`,
+      tourData
+    );
   },
 
   /**
@@ -70,7 +83,9 @@ export const tourApi = {
    * @returns {Promise} Deletion result
    */
   deleteTour: async (providerId, tourId) => {
-    return await axiosInstance.delete(`${TOUR_BASE_URL}/provider/${providerId}/tours/${tourId}`);
+    return await axiosInstance.delete(
+      `${TOUR_BASE_URL}/provider/${providerId}/tours/${tourId}`
+    );
   },
 
   /**
@@ -81,7 +96,10 @@ export const tourApi = {
    * @returns {Promise} Updated tour
    */
   updateTourStatus: async (providerId, tourId, status) => {
-    return await axiosInstance.patch(`${TOUR_BASE_URL}/provider/${providerId}/tours/${tourId}/status`, { status });
+    return await axiosInstance.patch(
+      `${TOUR_BASE_URL}/provider/${providerId}/tours/${tourId}/status`,
+      { status }
+    );
   },
 
   // ============ TOUR DATES MANAGEMENT ============
@@ -93,7 +111,10 @@ export const tourApi = {
    * @returns {Promise} Created date
    */
   addTourDate: async (tourId, dateData) => {
-    return await axiosInstance.post(`${TOUR_BASE_URL}/${tourId}/dates`, dateData);
+    return await axiosInstance.post(
+      `${TOUR_BASE_URL}/${tourId}/dates`,
+      dateData
+    );
   },
 
   /**
@@ -103,7 +124,10 @@ export const tourApi = {
    * @returns {Promise} Created dates
    */
   bulkAddTourDates: async (tourId, bulkDateData) => {
-    return await axiosInstance.post(`${TOUR_BASE_URL}/${tourId}/dates/bulk`, bulkDateData);
+    return await axiosInstance.post(
+      `${TOUR_BASE_URL}/${tourId}/dates/bulk`,
+      bulkDateData
+    );
   },
 
   /**
@@ -122,7 +146,9 @@ export const tourApi = {
    * @returns {Promise} Availability data
    */
   getDateAvailability: async (tourId, date) => {
-    return await axiosInstance.get(`${TOUR_BASE_URL}/${tourId}/dates/${date}/availability`);
+    return await axiosInstance.get(
+      `${TOUR_BASE_URL}/${tourId}/dates/${date}/availability`
+    );
   },
 
   /**
@@ -133,7 +159,10 @@ export const tourApi = {
    * @returns {Promise} Updated date
    */
   updateTourDate: async (tourId, date, dateData) => {
-    return await axiosInstance.put(`${TOUR_BASE_URL}/${tourId}/dates/${date}`, dateData);
+    return await axiosInstance.put(
+      `${TOUR_BASE_URL}/${tourId}/dates/${date}`,
+      dateData
+    );
   },
 
   /**
@@ -143,7 +172,9 @@ export const tourApi = {
    * @returns {Promise} Deletion result
    */
   deleteTourDate: async (tourId, date) => {
-    return await axiosInstance.delete(`${TOUR_BASE_URL}/${tourId}/dates/${date}`);
+    return await axiosInstance.delete(
+      `${TOUR_BASE_URL}/${tourId}/dates/${date}`
+    );
   },
 
   /**
@@ -153,7 +184,9 @@ export const tourApi = {
    * @returns {Promise} Cancellation result
    */
   cancelTourDate: async (tourId, date) => {
-    return await axiosInstance.put(`${TOUR_BASE_URL}/${tourId}/dates/${date}/cancel`);
+    return await axiosInstance.put(
+      `${TOUR_BASE_URL}/${tourId}/dates/${date}/cancel`
+    );
   },
 
   /**
@@ -163,7 +196,7 @@ export const tourApi = {
    */
   searchToursByDate: async (date) => {
     return await axiosInstance.get(`${TOUR_BASE_URL}/search/by-date`, {
-      params: { date }
+      params: { date },
     });
   },
 
@@ -176,7 +209,10 @@ export const tourApi = {
    * @returns {Promise} Created itinerary
    */
   createItinerary: async (tourId, itineraryData) => {
-    return await axiosInstance.post(`${TOUR_BASE_URL}/${tourId}/itineraries`, itineraryData);
+    return await axiosInstance.post(
+      `${TOUR_BASE_URL}/${tourId}/itineraries`,
+      itineraryData
+    );
   },
 
   /**
@@ -194,7 +230,9 @@ export const tourApi = {
    * @returns {Promise} Itinerary details
    */
   getItineraryDetails: async (itineraryId) => {
-    return await axiosInstance.get(`${TOUR_BASE_URL}/itineraries/${itineraryId}`);
+    return await axiosInstance.get(
+      `${TOUR_BASE_URL}/itineraries/${itineraryId}`
+    );
   },
 
   /**
@@ -204,7 +242,10 @@ export const tourApi = {
    * @returns {Promise} Updated itinerary
    */
   updateItinerary: async (itineraryId, itineraryData) => {
-    return await axiosInstance.put(`${TOUR_BASE_URL}/itineraries/${itineraryId}`, itineraryData);
+    return await axiosInstance.put(
+      `${TOUR_BASE_URL}/itineraries/${itineraryId}`,
+      itineraryData
+    );
   },
 
   /**
@@ -213,7 +254,9 @@ export const tourApi = {
    * @returns {Promise} Deletion result
    */
   deleteItinerary: async (itineraryId) => {
-    return await axiosInstance.delete(`${TOUR_BASE_URL}/itineraries/${itineraryId}`);
+    return await axiosInstance.delete(
+      `${TOUR_BASE_URL}/itineraries/${itineraryId}`
+    );
   },
 
   // ============ ACTIVITY MANAGEMENT ============
@@ -227,16 +270,21 @@ export const tourApi = {
    */
   addActivity: async (itineraryId, activityData) => {
     // First get current itinerary
-    const currentItinerary = await axiosInstance.get(`${TOUR_BASE_URL}/itineraries/${itineraryId}`);
+    const currentItinerary = await axiosInstance.get(
+      `${TOUR_BASE_URL}/itineraries/${itineraryId}`
+    );
     const activities = currentItinerary.data.data.activities || [];
 
     // Add new activity
     activities.push(activityData);
 
     // Update itinerary with new activities array
-    return await axiosInstance.put(`${TOUR_BASE_URL}/itineraries/${itineraryId}`, {
-      activities: activities
-    });
+    return await axiosInstance.put(
+      `${TOUR_BASE_URL}/itineraries/${itineraryId}`,
+      {
+        activities: activities,
+      }
+    );
   },
 
   /**
@@ -249,18 +297,26 @@ export const tourApi = {
    */
   updateActivity: async (itineraryId, activityIndex, activityData) => {
     // First get current itinerary
-    const currentItinerary = await axiosInstance.get(`${TOUR_BASE_URL}/itineraries/${itineraryId}`);
+    const currentItinerary = await axiosInstance.get(
+      `${TOUR_BASE_URL}/itineraries/${itineraryId}`
+    );
     const activities = currentItinerary.data.data.activities || [];
 
     // Update specific activity
     if (activityIndex >= 0 && activityIndex < activities.length) {
-      activities[activityIndex] = { ...activities[activityIndex], ...activityData };
+      activities[activityIndex] = {
+        ...activities[activityIndex],
+        ...activityData,
+      };
     }
 
     // Update itinerary with modified activities array
-    return await axiosInstance.put(`${TOUR_BASE_URL}/itineraries/${itineraryId}`, {
-      activities: activities
-    });
+    return await axiosInstance.put(
+      `${TOUR_BASE_URL}/itineraries/${itineraryId}`,
+      {
+        activities: activities,
+      }
+    );
   },
 
   /**
@@ -272,7 +328,9 @@ export const tourApi = {
    */
   deleteActivity: async (itineraryId, activityIndex) => {
     // First get current itinerary
-    const currentItinerary = await axiosInstance.get(`${TOUR_BASE_URL}/itineraries/${itineraryId}`);
+    const currentItinerary = await axiosInstance.get(
+      `${TOUR_BASE_URL}/itineraries/${itineraryId}`
+    );
     const activities = currentItinerary.data.data.activities || [];
 
     // Remove activity by index
@@ -281,9 +339,12 @@ export const tourApi = {
     }
 
     // Update itinerary with modified activities array
-    return await axiosInstance.put(`${TOUR_BASE_URL}/itineraries/${itineraryId}`, {
-      activities: activities
-    });
+    return await axiosInstance.put(
+      `${TOUR_BASE_URL}/itineraries/${itineraryId}`,
+      {
+        activities: activities,
+      }
+    );
   },
 
   // ============ BUDGET MANAGEMENT ============
@@ -295,7 +356,10 @@ export const tourApi = {
    * @returns {Promise} Created budget item
    */
   addBudgetItem: async (itineraryId, budgetData) => {
-    return await axiosInstance.post(`${TOUR_BASE_URL}/itineraries/${itineraryId}/budget`, budgetData);
+    return await axiosInstance.post(
+      `${TOUR_BASE_URL}/itineraries/${itineraryId}/budget`,
+      budgetData
+    );
   },
 
   /**
@@ -304,7 +368,9 @@ export const tourApi = {
    * @returns {Promise} Budget breakdown
    */
   getBudgetBreakdown: async (itineraryId) => {
-    return await axiosInstance.get(`${TOUR_BASE_URL}/itineraries/${itineraryId}/budget`);
+    return await axiosInstance.get(
+      `${TOUR_BASE_URL}/itineraries/${itineraryId}/budget`
+    );
   },
 
   /**
@@ -315,7 +381,10 @@ export const tourApi = {
    * @returns {Promise} Updated budget item
    */
   updateBudgetItem: async (itineraryId, budgetId, budgetData) => {
-    return await axiosInstance.put(`${TOUR_BASE_URL}/itineraries/${itineraryId}/budget/${budgetId}`, budgetData);
+    return await axiosInstance.put(
+      `${TOUR_BASE_URL}/itineraries/${itineraryId}/budget/${budgetId}`,
+      budgetData
+    );
   },
 
   /**
@@ -325,7 +394,9 @@ export const tourApi = {
    * @returns {Promise} Deletion result
    */
   deleteBudgetItem: async (itineraryId, budgetId) => {
-    return await axiosInstance.delete(`${TOUR_BASE_URL}/itineraries/${itineraryId}/budget/${budgetId}`);
+    return await axiosInstance.delete(
+      `${TOUR_BASE_URL}/itineraries/${itineraryId}/budget/${budgetId}`
+    );
   },
 
   // ============ BOOKING MANAGEMENT ============
@@ -363,7 +434,7 @@ export const tourApi = {
    */
   getProviderBookings: async (filters = {}) => {
     return await axiosInstance.get(`${TOUR_BASE_URL}/bookings/provider/all`, {
-      params: filters
+      params: filters,
     });
   },
 
@@ -373,7 +444,9 @@ export const tourApi = {
    * @returns {Promise} Updated booking
    */
   confirmBooking: async (bookingId) => {
-    return await axiosInstance.put(`${TOUR_BASE_URL}/bookings/${bookingId}/confirm`);
+    return await axiosInstance.put(
+      `${TOUR_BASE_URL}/bookings/${bookingId}/confirm`
+    );
   },
 
   /**
@@ -383,7 +456,10 @@ export const tourApi = {
    * @returns {Promise} Updated booking
    */
   cancelBooking: async (bookingId, cancellationData) => {
-    return await axiosInstance.put(`${TOUR_BASE_URL}/bookings/${bookingId}/cancel`, cancellationData);
+    return await axiosInstance.put(
+      `${TOUR_BASE_URL}/bookings/${bookingId}/cancel`,
+      cancellationData
+    );
   },
 
   /**
@@ -392,7 +468,9 @@ export const tourApi = {
    * @returns {Promise} Updated booking
    */
   completeBooking: async (bookingId) => {
-    return await axiosInstance.put(`${TOUR_BASE_URL}/bookings/${bookingId}/complete`);
+    return await axiosInstance.put(
+      `${TOUR_BASE_URL}/bookings/${bookingId}/complete`
+    );
   },
 
   /**
@@ -402,7 +480,10 @@ export const tourApi = {
    * @returns {Promise} Updated booking
    */
   updatePayment: async (bookingId, paymentData) => {
-    return await axiosInstance.put(`${TOUR_BASE_URL}/bookings/${bookingId}/payment`, paymentData);
+    return await axiosInstance.put(
+      `${TOUR_BASE_URL}/bookings/${bookingId}/payment`,
+      paymentData
+    );
   },
 
   /**
@@ -411,6 +492,28 @@ export const tourApi = {
    */
   getBookingStats: async () => {
     return await axiosInstance.get(`${TOUR_BASE_URL}/bookings/stats/summary`);
+  },
+
+  /**
+   * Check-in a traveler (mark as attended)
+   * @param {string} bookingId - Booking ID
+   * @returns {Promise} Updated booking
+   */
+  checkInBooking: async (bookingId) => {
+    return await axiosInstance.put(
+      `${TOUR_BASE_URL}/bookings/${bookingId}/check-in`
+    );
+  },
+
+  /**
+   * Mark booking as no-show
+   * @param {string} bookingId - Booking ID
+   * @returns {Promise} Updated booking
+   */
+  markNoShow: async (bookingId) => {
+    return await axiosInstance.put(
+      `${TOUR_BASE_URL}/bookings/${bookingId}/mark-no-show`
+    );
   },
 
   // ============ CUSTOMER TOUR SEARCH ============
@@ -422,7 +525,7 @@ export const tourApi = {
    */
   searchTours: async (searchParams) => {
     return await axiosInstance.get(`${TOUR_BASE_URL}/search`, {
-      params: searchParams
+      params: searchParams,
     });
   },
 
