@@ -23,7 +23,6 @@ const TourBookingsPage = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [filterDate, setFilterDate] = useState("");
-  const [filterStatus, setFilterStatus] = useState("all");
   const [filterAttendance, setFilterAttendance] = useState("all");
   const [processingBooking, setProcessingBooking] = useState(null);
 
@@ -123,19 +122,19 @@ const TourBookingsPage = () => {
   const getStatusLabel = (status) => {
     switch (status) {
       case "confirmed":
-        return "✅ Đã xác nhận";
+        return "Đã xác nhận";
       case "paid":
-        return "💰 Đã thanh toán";
+        return "Đã thanh toán";
       case "pending":
-        return "⏳ Chờ xử lý";
+        return "Chờ xử lý";
       case "in_progress":
-        return "🚌 Đang diễn ra";
+        return "Đang diễn ra";
       case "completed":
-        return "🎉 Hoàn thành";
+        return "Hoàn thành";
       case "cancelled":
-        return "❌ Đã hủy";
+        return "Đã hủy";
       case "no-show":
-        return "🚫 Không đến";
+        return "Không đến";
       default:
         return status;
     }
@@ -157,28 +156,29 @@ const TourBookingsPage = () => {
   const getAttendanceLabel = (attendanceStatus) => {
     switch (attendanceStatus) {
       case "attended":
-        return "✅ Đã đến";
+        return "Đã đến";
       case "no-show":
-        return "🚫 Không đến";
+        return "Không đến";
       case "pending":
-        return "⏳ Chờ check-in";
+        return "Chờ check-in";
       default:
         return attendanceStatus || "Chưa xác định";
     }
   };
 
-  // Filter bookings by date, status, and attendance
+  // Filter bookings by date and attendance, exclude cancelled/refunded bookings
   const filteredBookings = bookings.filter((booking) => {
-    // Filter by status
-    const statusMatch =
-      filterStatus === "all" || booking.status === filterStatus;
+    // Exclude cancelled and refunded bookings
+    if (booking.status === "cancelled" || booking.status === "refunded") {
+      return false;
+    }
 
     // Filter by attendance
     const attendanceMatch =
       filterAttendance === "all" ||
       booking.attendance_status === filterAttendance;
 
-    return statusMatch && attendanceMatch;
+    return attendanceMatch;
   });
 
   const canCheckIn = (booking) => {
@@ -229,33 +229,17 @@ const TourBookingsPage = () => {
           }}
         >
           <div>
-            <button
-              onClick={() => navigate("/provider/tours")}
-              style={{
-                background: "none",
-                border: "none",
-                color: "#667eea",
-                fontSize: "1rem",
-                cursor: "pointer",
-                marginBottom: "1rem",
-                display: "flex",
-                alignItems: "center",
-                gap: "0.5rem",
-              }}
-            >
-              ← Quay lại danh sách tour
-            </button>
             <h1
               style={{
                 fontSize: "2.5rem",
                 fontWeight: "700",
-                background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
+                background: "#000000",
                 WebkitBackgroundClip: "text",
                 WebkitTextFillColor: "transparent",
                 marginBottom: "0.5rem",
               }}
             >
-              ✅ Check-in & Quản lý tham gia tour
+              Check-in & Quản lý tham gia tour
             </h1>
             <p style={{ color: "#6b7280" }}>
               Tổng cộng {filteredBookings.length} đặt tour
@@ -334,51 +318,6 @@ const TourBookingsPage = () => {
             )}
           </div>
 
-          {/* Status Filter */}
-          <div
-            style={{
-              display: "flex",
-              flexWrap: "wrap",
-              gap: "1rem",
-              alignItems: "center",
-              marginTop: "1.5rem",
-            }}
-          >
-            <span
-              style={{ fontWeight: "600", color: "#374151", width: "100%" }}
-            >
-              Lọc theo trạng thái:
-            </span>
-            {[
-              "all",
-              "pending",
-              "paid",
-              "confirmed",
-              "in_progress",
-              "completed",
-              "cancelled",
-              "no-show",
-            ].map((status) => (
-              <button
-                key={status}
-                onClick={() => setFilterStatus(status)}
-                style={{
-                  padding: "0.5rem 1rem",
-                  borderRadius: "8px",
-                  border: "2px solid",
-                  borderColor: filterStatus === status ? "#667eea" : "#e5e7eb",
-                  background: filterStatus === status ? "#667eea" : "white",
-                  color: filterStatus === status ? "white" : "#374151",
-                  cursor: "pointer",
-                  fontWeight: "600",
-                  fontSize: "0.9rem",
-                }}
-              >
-                {status === "all" ? "Tất cả" : getStatusLabel(status)}
-              </button>
-            ))}
-          </div>
-
           {/* Attendance Filter */}
           <div
             style={{
@@ -403,9 +342,9 @@ const TourBookingsPage = () => {
                   borderRadius: "8px",
                   border: "2px solid",
                   borderColor:
-                    filterAttendance === attendance ? "#667eea" : "#e5e7eb",
+                    filterAttendance === attendance ? "#003C3C" : "#e5e7eb",
                   background:
-                    filterAttendance === attendance ? "#667eea" : "white",
+                    filterAttendance === attendance ? "#003C3C" : "white",
                   color: filterAttendance === attendance ? "white" : "#374151",
                   cursor: "pointer",
                   fontWeight: "600",
@@ -446,7 +385,7 @@ const TourBookingsPage = () => {
                   ? `Không có tour nào vào ngày ${new Date(
                       filterDate
                     ).toLocaleDateString("vi-VN")} phù hợp với bộ lọc`
-                  : filterStatus !== "all" || filterAttendance !== "all"
+                  : filterAttendance !== "all"
                   ? "Không có đặt tour nào phù hợp với bộ lọc"
                   : "Chưa có khách hàng nào đặt tour của bạn"}
               </p>
