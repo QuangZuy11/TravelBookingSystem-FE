@@ -16,6 +16,7 @@ import TourDashboardPage from "./pages/provider/tour/TourDashboard";
 import TourListPage from "./pages/provider/tour/TourList";
 import CreateTourWizard from "./pages/provider/tour/CreateTourWizard";
 import TourDetailsPage from "./pages/provider/tour/TourDetailsPage";
+import TourBookingsPage from "./pages/provider/tour/TourBookingsPage";
 import TermsAndConditions from "./pages/terms/TermsOfService";
 
 // Hotel Management
@@ -246,7 +247,10 @@ function App() {
                 <Route index element={<ProviderTypeRouter />} />
 
                 <Route path="bookings" element={<BookingManagementPage />} />
-                <Route path="revenue-statistics" element={<RevenueStatisticsPage />} />
+                <Route
+                  path="revenue-statistics"
+                  element={<RevenueStatisticsPage />}
+                />
 
                 {/* Tour Management - NEW MODULE */}
                 <Route path="tours">
@@ -259,6 +263,7 @@ function App() {
                     element={<TourItineraryManager />}
                   />
                   <Route path="bookings" element={<BookingManagementPage />} />
+                  <Route path="check-in" element={<TourBookingsPage />} />
                 </Route>
                 {/* Hotel Management */}
                 <Route path="hotels">
@@ -269,19 +274,43 @@ function App() {
                   <Route path=":hotelId" element={<HotelDetailsPage />} />
 
                   {/* New Modular Hotel Pages */}
-                  <Route path=":hotelId/overview" element={<HotelOverviewPage />} />
+                  <Route
+                    path=":hotelId/overview"
+                    element={<HotelOverviewPage />}
+                  />
                   <Route path=":hotelId/info" element={<HotelInfoPage />} />
-                  <Route path=":hotelId/location" element={<HotelLocationPage />} />
-                  <Route path=":hotelId/policies" element={<HotelPoliciesPage />} />
-                  <Route path=":hotelId/contact" element={<HotelContactPage />} />
-                  <Route path=":hotelId/amenities" element={<HotelAmenitiesPage />} />
-                  <Route path=":hotelId/gallery" element={<HotelGalleryPage />} />
-                  <Route path=":hotelId/bookings" element={<HotelBookingsPage />} />
+                  <Route
+                    path=":hotelId/location"
+                    element={<HotelLocationPage />}
+                  />
+                  <Route
+                    path=":hotelId/policies"
+                    element={<HotelPoliciesPage />}
+                  />
+                  <Route
+                    path=":hotelId/contact"
+                    element={<HotelContactPage />}
+                  />
+                  <Route
+                    path=":hotelId/amenities"
+                    element={<HotelAmenitiesPage />}
+                  />
+                  <Route
+                    path=":hotelId/gallery"
+                    element={<HotelGalleryPage />}
+                  />
+                  <Route
+                    path=":hotelId/bookings"
+                    element={<HotelBookingsPage />}
+                  />
 
                   {/* Room Management */}
                   <Route path=":hotelId/rooms" element={<RoomListPage />} />
                   <Route path=":hotelId/rooms/new" element={<RoomFormPage />} />
-                  <Route path=":hotelId/rooms/bulk-create" element={<BulkRoomCreator />} />
+                  <Route
+                    path=":hotelId/rooms/bulk-create"
+                    element={<BulkRoomCreator />}
+                  />
                   <Route
                     path=":hotelId/rooms/:roomId"
                     element={<RoomTypeDetailsPage />}
@@ -320,9 +349,18 @@ function App() {
               <Route path="providers" element={<PendingProvidersList />} />
               <Route path="providers/:id" element={<ProviderDetailPage />} />
               <Route path="terms-policies" element={<AdminPolicyTermsPage />} />
-              <Route path="terms-policies/create" element={<AdminPolicyTermCreatePage />} />
-              <Route path="terms-policies/:id" element={<AdminPolicyTermDetailPage />} />
-              <Route path="terms-policies/:id/edit" element={<AdminPolicyTermEditPage />} />
+              <Route
+                path="terms-policies/create"
+                element={<AdminPolicyTermCreatePage />}
+              />
+              <Route
+                path="terms-policies/:id"
+                element={<AdminPolicyTermDetailPage />}
+              />
+              <Route
+                path="terms-policies/:id/edit"
+                element={<AdminPolicyTermEditPage />}
+              />
             </Route>
 
             {/* Auth flows */}
