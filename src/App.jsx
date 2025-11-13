@@ -82,6 +82,11 @@ import MyItineraries from "./components/ai/MyItineraries";
 import AIItineraryErrorBoundary from "./components/ai/AIItineraryErrorBoundary";
 import TourItineraryManager from "./components/tour/TourItineraryManager";
 
+// AI Itinerary Booking Pages
+import MyAIBookings from "./components/ai/MyAIBookings";
+import ProviderAIBookingsPage from "./pages/provider/ProviderAIBookingsPage";
+import AdminAIBookingsPage from "./pages/admin/AdminAIBookingsPage";
+
 // Auth Pages
 import ForgotPasswordPage from "./pages/auth/ForgotPasswordPage";
 import ResetPasswordPage from "./pages/auth/ResetPasswordPage";
@@ -233,6 +238,18 @@ function App() {
               }
             />
 
+            {/* AI Itinerary Bookings - Traveler */}
+            <Route
+              path="/my-booking-itineraries"
+              element={
+                <ProtectedRoute>
+                  <AIItineraryErrorBoundary>
+                    <MyAIBookings />
+                  </AIItineraryErrorBoundary>
+                </ProtectedRoute>
+              }
+            />
+
             {/* Protected Routes - Provider */}
             <Route
               path="/provider"
@@ -247,10 +264,10 @@ function App() {
                 <Route index element={<ProviderTypeRouter />} />
 
                 <Route path="bookings" element={<BookingManagementPage />} />
-                <Route
-                  path="revenue-statistics"
-                  element={<RevenueStatisticsPage />}
-                />
+                <Route path="revenue-statistics" element={<RevenueStatisticsPage />} />
+
+                {/* AI Itinerary Bookings - Provider */}
+                <Route path="ai-bookings" element={<ProviderAIBookingsPage />} />
 
                 {/* Tour Management - NEW MODULE */}
                 <Route path="tours">
@@ -349,18 +366,12 @@ function App() {
               <Route path="providers" element={<PendingProvidersList />} />
               <Route path="providers/:id" element={<ProviderDetailPage />} />
               <Route path="terms-policies" element={<AdminPolicyTermsPage />} />
-              <Route
-                path="terms-policies/create"
-                element={<AdminPolicyTermCreatePage />}
-              />
-              <Route
-                path="terms-policies/:id"
-                element={<AdminPolicyTermDetailPage />}
-              />
-              <Route
-                path="terms-policies/:id/edit"
-                element={<AdminPolicyTermEditPage />}
-              />
+              <Route path="terms-policies/create" element={<AdminPolicyTermCreatePage />} />
+              <Route path="terms-policies/:id" element={<AdminPolicyTermDetailPage />} />
+              <Route path="terms-policies/:id/edit" element={<AdminPolicyTermEditPage />} />
+
+              {/* AI Itinerary Bookings - Admin */}
+              <Route path="ai-bookings" element={<AdminAIBookingsPage />} />
             </Route>
 
             {/* Auth flows */}

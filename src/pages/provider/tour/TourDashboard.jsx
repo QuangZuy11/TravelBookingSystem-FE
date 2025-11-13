@@ -123,70 +123,61 @@ const TourDashboard = () => {
     }
 
     const containerStyle = {
-        minHeight: '100vh',
-        background: '#f3f4f6',
-        padding: '1rem',
-        fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif',
-        maxWidth: '100vw',
-        overflowX: 'hidden',
-        boxSizing: 'border-box'
+        padding: '2rem',
+        maxWidth: '1400px',
+        margin: '0 auto'
     };
 
     const headerStyle = {
         marginBottom: '2rem',
+        background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+        padding: '2rem',
+        borderRadius: '12px',
         color: 'white',
-        maxWidth: '100%'
+        boxShadow: '0 4px 15px rgba(102, 126, 234, 0.3)'
     };
 
     const titleStyle = {
-        fontSize: '2.5rem',
-        fontWeight: '700',
-        marginBottom: '0.5rem',
-        textShadow: '0 2px 4px rgba(0,0,0,0.1)'
+        fontSize: '2rem',
+        fontWeight: 'bold',
+        marginBottom: '0.5rem'
     };
 
     const statsContainerStyle = {
         display: 'grid',
         gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))',
         gap: '1.5rem',
-        marginBottom: '2rem',
-        maxWidth: '100%'
+        marginBottom: '2rem'
     };
 
     const statCardStyle = {
         background: 'white',
-        borderRadius: '20px',
         padding: '1.5rem',
-        minHeight: '180px',
-        boxShadow: '0 10px 30px rgba(0,0,0,0.15)',
+        borderRadius: '12px',
+        boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
         transition: 'all 0.3s ease',
-        cursor: 'pointer',
-        position: 'relative',
-        overflow: 'hidden',
-        minWidth: 0 // Important for grid items to prevent overflow
+        textAlign: 'center'
     };
 
     const statCardHoverStyle = {
-        transform: 'translateY(-5px)',
-        boxShadow: '0 15px 40px rgba(0,0,0,0.2)'
+        transform: 'translateY(-4px)',
+        boxShadow: '0 4px 16px rgba(0,0,0,0.15)'
     };
 
     const statTitleStyle = {
-        fontSize: '0.875rem',
-        fontWeight: '600',
+        fontSize: '0.9rem',
         color: '#6b7280',
+        marginBottom: '0.5rem',
+        fontWeight: '600',
         textTransform: 'uppercase',
-        letterSpacing: '0.05em',
-        marginBottom: '0.75rem'
+        letterSpacing: '0.5px'
     };
 
     const statValueStyle = {
-        fontSize: '2.5rem',
-        fontWeight: '700',
-        background: '#f3f4f6',
-        WebkitBackgroundClip: 'text',
-        WebkitTextFillColor: 'transparent',
-        backgroundClip: 'text'
+        fontSize: '2rem',
+        fontWeight: 'bold',
+        color: '#1f2937',
+        margin: 0
     };
 
     const actionsContainerStyle = {
@@ -198,55 +189,47 @@ const TourDashboard = () => {
     };
 
     const buttonPrimaryStyle = {
-        background: '#f3f4f6',
+        background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
         color: 'white',
-        padding: '1rem 2rem',
-        borderRadius: '12px',
+        padding: '0.875rem 1.75rem',
+        borderRadius: '8px',
         border: 'none',
         fontSize: '1rem',
         fontWeight: '600',
         cursor: 'pointer',
-        boxShadow: '0 4px 15px rgba(102, 126, 234, 0.4)',
+        boxShadow: '0 2px 8px rgba(102, 126, 234, 0.3)',
         transition: 'all 0.3s ease',
-        display: 'flex',
+        display: 'inline-flex',
         alignItems: 'center',
-        gap: '0.5rem',
-        flex: '1 1 auto',
-        minWidth: '180px',
-        justifyContent: 'center'
+        gap: '0.5rem'
     };
 
     const buttonSecondaryStyle = {
         background: 'white',
-        color: '#10b981',
-        padding: '1rem 2rem',
-        borderRadius: '12px',
-        border: '2px solid #10b981',
+        color: '#667eea',
+        padding: '0.875rem 1.75rem',
+        borderRadius: '8px',
+        border: '2px solid #667eea',
         fontSize: '1rem',
         fontWeight: '600',
         cursor: 'pointer',
         transition: 'all 0.3s ease',
-        display: 'flex',
+        display: 'inline-flex',
         alignItems: 'center',
-        gap: '0.5rem',
-        flex: '1 1 auto',
-        minWidth: '180px',
-        justifyContent: 'center'
+        gap: '0.5rem'
     };
 
     const toursListStyle = {
         background: 'white',
-        borderRadius: '20px',
-        padding: '1.5rem',
-        boxShadow: '0 10px 30px rgba(0,0,0,0.15)',
-        maxWidth: '100%',
-        overflowX: 'auto',
-        WebkitOverflowScrolling: 'touch' // Smooth scrolling on mobile
+        borderRadius: '12px',
+        padding: '2rem',
+        boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
+        overflowX: 'auto'
     };
 
     const sectionTitleStyle = {
-        fontSize: '1.75rem',
-        fontWeight: '700',
+        fontSize: '1.5rem',
+        fontWeight: 'bold',
         color: '#1f2937',
         marginBottom: '1.5rem'
     };
@@ -260,7 +243,7 @@ const TourDashboard = () => {
     };
 
     const theadStyle = {
-        background: '#f3f4f6',
+        background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
         color: 'white'
     };
 
@@ -269,8 +252,7 @@ const TourDashboard = () => {
         textAlign: 'left',
         fontWeight: '600',
         fontSize: '0.875rem',
-        textTransform: 'uppercase',
-        letterSpacing: '0.05em',
+        color: 'white',
         whiteSpace: 'nowrap'
     };
 
@@ -331,7 +313,7 @@ const TourDashboard = () => {
         fontSize: '0.875rem',
         fontWeight: '600',
         cursor: 'pointer',
-        background: '#f3f4f6',
+        background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
         color: 'white',
         boxShadow: '0 2px 8px rgba(102, 126, 234, 0.3)',
         transition: 'all 0.3s ease',
@@ -422,17 +404,17 @@ const TourDashboard = () => {
     return (
         <div style={containerStyle}>
             <div style={headerStyle}>
-                <h1 style={titleStyle}>Tour Management Dashboard</h1>
-                <p style={{ fontSize: '1rem', opacity: '0.9' }}>Manage your tours and monitor performance</p>
+                <h1 style={titleStyle}>🗺️ Tour Management Dashboard</h1>
+                <p style={{ margin: 0, opacity: 0.9 }}>Quản lý tours và theo dõi hiệu suất</p>
             </div>
 
             {/* Stats Section */}
             <div style={statsContainerStyle}>
                 {[
-                    { title: 'Total Tours', value: stats.totalTours, icon: '🗺️' },
-                    { title: 'Total Bookings', value: stats.totalBookings, icon: '👥' },
-                    { title: 'Active Tours', value: stats.activeTours, icon: '✅' },
-                    { title: 'Average Rating', value: `⭐ ${stats.averageRating}`, icon: '' }
+                    { title: '📊 Tổng Tours', value: stats.totalTours, color: '#667eea' },
+                    { title: '👥 Tổng Bookings', value: stats.totalBookings, color: '#f59e0b' },
+                    { title: '✅ Tours Hoạt Động', value: stats.activeTours, color: '#10b981' },
+                    { title: '⭐ Đánh Giá TB', value: stats.averageRating, color: '#764ba2' }
                 ].map((stat, index) => (
                     <div
                         key={index}
@@ -443,9 +425,8 @@ const TourDashboard = () => {
                         onMouseEnter={() => setHoveredCard(index)}
                         onMouseLeave={() => setHoveredCard(null)}
                     >
-                        <div style={{ fontSize: '2rem', marginBottom: '0.5rem' }}>{stat.icon}</div>
-                        <h3 style={statTitleStyle}>{stat.title}</h3>
-                        <p style={statValueStyle}>{stat.value}</p>
+                        <div style={statTitleStyle}>{stat.title}</div>
+                        <p style={{ ...statValueStyle, color: stat.color }}>{stat.value}</p>
                     </div>
                 ))}
             </div>
@@ -457,34 +438,34 @@ const TourDashboard = () => {
                     onClick={() => navigate('/provider/tours/create')}
                     onMouseEnter={(e) => {
                         e.currentTarget.style.transform = 'translateY(-2px)';
-                        e.currentTarget.style.boxShadow = '0 6px 20px rgba(102, 126, 234, 0.5)';
+                        e.currentTarget.style.boxShadow = '0 4px 12px rgba(102, 126, 234, 0.4)';
                     }}
                     onMouseLeave={(e) => {
                         e.currentTarget.style.transform = 'translateY(0)';
-                        e.currentTarget.style.boxShadow = '0 4px 15px rgba(102, 126, 234, 0.4)';
+                        e.currentTarget.style.boxShadow = '0 2px 8px rgba(102, 126, 234, 0.3)';
                     }}
                 >
-                    <span style={{ fontSize: '1.5rem' }}>+</span> Tạo Tour Mới
+                    <span style={{ fontSize: '1.25rem' }}>+</span> Tạo Tour Mới
                 </button>
                 <button
                     style={buttonSecondaryStyle}
                     onClick={() => navigate('/provider/tours/bookings')}
                     onMouseEnter={(e) => {
-                        e.currentTarget.style.background = '#10b981';
+                        e.currentTarget.style.background = '#667eea';
                         e.currentTarget.style.color = 'white';
                     }}
                     onMouseLeave={(e) => {
                         e.currentTarget.style.background = 'white';
-                        e.currentTarget.style.color = '#10b981';
+                        e.currentTarget.style.color = '#667eea';
                     }}
                 >
-                    Xem Tất Cả Bookings
+                    📋 Xem Tất Cả Bookings
                 </button>
             </div>
 
             {/* Tours List */}
             <div style={toursListStyle}>
-                <h2 style={sectionTitleStyle}>Your Tours</h2>
+                <h2 style={sectionTitleStyle}>📋 Danh Sách Tours</h2>
                 {tours.length === 0 ? (
                     <div style={emptyStateStyle}>
                         <div style={emptyIconStyle}>🗺️</div>
@@ -595,14 +576,8 @@ const TourDashboard = () => {
                                                         e.stopPropagation();
                                                         setOpenDropdown(openDropdown === tour._id ? null : tour._id);
                                                     }}
-                                                    onMouseEnter={(e) => {
-                                                        e.currentTarget.style.transform = 'translateY(-2px)';
-                                                    }}
-                                                    onMouseLeave={(e) => {
-                                                        e.currentTarget.style.transform = 'translateY(0)';
-                                                    }}
                                                 >
-                                                    ⚙️ Actions
+                                                    ⚙️ Thao Tác
                                                 </button>
 
                                                 {openDropdown === tour._id && (
