@@ -1,7 +1,8 @@
 import React from "react";
 import "./TourCard.css";
-import { Star, MapPin, Clock } from "lucide-react";
+import { Star, MapPin, Clock, TrendingUp } from "lucide-react";
 import { Link } from "react-router-dom";
+import { getDifficultyText } from "../../../../utils/tourHelpers";
 
 export function TourCard({ tour }) {
   // Đảm bảo highlights là mảng
@@ -22,7 +23,7 @@ export function TourCard({ tour }) {
       <div className="tour-image-container">
         <img src={tour.image} alt={tour.title} className="tour-image" />
         {hasPromotion && tour.promotion && (
-          <div className="promotion-badge">{tour.promotion.name}</div>
+          <div className="promotion-badge">{tour.promotion.code}</div>
         )}
       </div>
 
@@ -45,10 +46,19 @@ export function TourCard({ tour }) {
                 : tour.name || "Chưa có địa điểm"}
             </span>
           </div>
+
           <div className="tour-duration">
             <Clock size={16} />
             <span>{tour.duration}</span>
           </div>
+          {tour.difficulty && (
+            <div className="tour-duration">
+              <TrendingUp size={16} />
+              <span>
+                Độ khó:{"   "} {getDifficultyText(tour.difficulty)}
+              </span>
+            </div>
+          )}
         </div>
 
         <ul className="tour-highlights">

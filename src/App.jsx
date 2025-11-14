@@ -18,6 +18,7 @@ import TourListPage from "./pages/provider/tour/TourList";
 import CreateTourWizard from "./pages/provider/tour/CreateTourWizard";
 import TourDetailsPage from "./pages/provider/tour/TourDetailsPage";
 import TourBookingsPage from "./pages/provider/tour/TourBookingsPage";
+import TourBookingManagementPage from "./pages/provider/tour/TourBookingManagementPage";
 import TermsAndConditions from "./pages/terms/TermsOfService";
 
 // Hotel Management
@@ -266,7 +267,10 @@ function App() {
                 <Route index element={<ProviderTypeRouter />} />
 
                 <Route path="bookings" element={<BookingManagementPage />} />
-                <Route path="revenue-statistics" element={<RevenueStatisticsPage />} />
+                <Route
+                  path="revenue-statistics"
+                  element={<RevenueStatisticsPage />}
+                />
 
                 {/* AI Itinerary Bookings - Provider (Tour only) */}
                 <Route path="ai-bookings" element={
@@ -285,7 +289,10 @@ function App() {
                     path=":tourId/itinerary-manager"
                     element={<TourItineraryManager />}
                   />
-                  <Route path="bookings" element={<BookingManagementPage />} />
+                  <Route
+                    path="bookings"
+                    element={<TourBookingManagementPage />}
+                  />
                   <Route path="check-in" element={<TourBookingsPage />} />
                 </Route>
                 {/* Hotel Management */}
@@ -329,7 +336,10 @@ function App() {
 
                   {/* Room Management */}
                   <Route path=":hotelId/rooms" element={<RoomListPage />} />
-                  <Route path=":hotelId/rooms/availability" element={<RoomAvailabilityPage />} />
+                  <Route
+                    path=":hotelId/rooms/availability"
+                    element={<RoomAvailabilityPage />}
+                  />
                   <Route path=":hotelId/rooms/new" element={<RoomFormPage />} />
                   <Route
                     path=":hotelId/rooms/bulk-create"
@@ -373,9 +383,18 @@ function App() {
               <Route path="providers" element={<PendingProvidersList />} />
               <Route path="providers/:id" element={<ProviderDetailPage />} />
               <Route path="terms-policies" element={<AdminPolicyTermsPage />} />
-              <Route path="terms-policies/create" element={<AdminPolicyTermCreatePage />} />
-              <Route path="terms-policies/:id" element={<AdminPolicyTermDetailPage />} />
-              <Route path="terms-policies/:id/edit" element={<AdminPolicyTermEditPage />} />
+              <Route
+                path="terms-policies/create"
+                element={<AdminPolicyTermCreatePage />}
+              />
+              <Route
+                path="terms-policies/:id"
+                element={<AdminPolicyTermDetailPage />}
+              />
+              <Route
+                path="terms-policies/:id/edit"
+                element={<AdminPolicyTermEditPage />}
+              />
 
               {/* AI Itinerary Bookings - Admin */}
               <Route path="ai-bookings" element={<AdminAIBookingsPage />} />
