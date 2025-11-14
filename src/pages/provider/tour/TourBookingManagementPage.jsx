@@ -49,16 +49,25 @@ const TourBookingManagementPage = () => {
   const itemsPerPage = 10;
 
   // Fetch statistics
-  const fetchStatistics = async () => {
+  const fetchStatistics = useCallback(async () => {
     try {
-      const response = await getTourBookingStatistics();
+      const params = {};
+
+      // Nếu có selectedDate, filter stats theo ngày đó
+      if (selectedDate) {
+        // Truyền booking_date để filter theo ngày đặt tour
+        params.booking_date = selectedDate;
+      }
+      // Nếu không có selectedDate, không truyền params để lấy tổng tất cả từ trước đến nay
+
+      const response = await getTourBookingStatistics(params);
       if (response.success) {
         setStats(response.data);
       }
     } catch (err) {
       console.error("Error fetching tour booking statistics:", err);
     }
-  };
+  }, [selectedDate]);
 
   // Fetch bookings
   const fetchBookings = useCallback(async () => {
@@ -100,10 +109,10 @@ const TourBookingManagementPage = () => {
     selectedBookingStatus,
   ]);
 
-  // Initial load
+  // Initial load - fetch stats và bookings
   useEffect(() => {
     fetchStatistics();
-  }, []);
+  }, [fetchStatistics]);
 
   // Fetch bookings when filters change
   useEffect(() => {

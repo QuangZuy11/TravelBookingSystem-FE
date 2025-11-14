@@ -15,15 +15,22 @@ const getAuthHeaders = () => {
 
 /**
  * Lấy thống kê tổng quan (4 Cards)
- * @param {Object} params - Query parameters { start_date, end_date }
+ * @param {Object} params - Query parameters { booking_date, start_date, end_date }
  * @returns {Promise} Statistics data
  */
 export const getTourBookingStatistics = async (params = {}) => {
   try {
     const queryParams = new URLSearchParams();
 
-    if (params.start_date) queryParams.append("start_date", params.start_date);
-    if (params.end_date) queryParams.append("end_date", params.end_date);
+    // Ưu tiên booking_date (filter theo ngày đặt tour cụ thể)
+    if (params.booking_date) {
+      queryParams.append("booking_date", params.booking_date);
+    } else {
+      // Nếu không có booking_date, dùng start_date và end_date
+      if (params.start_date)
+        queryParams.append("start_date", params.start_date);
+      if (params.end_date) queryParams.append("end_date", params.end_date);
+    }
 
     const queryString = queryParams.toString();
     const url = `${API_URL}/tour/bookings/stats/summary${
