@@ -18,6 +18,7 @@ import { clearAuthData } from "../../../utils/authHelpers";
 
 const Header = () => {
   const [user, setUser] = useState(null);
+  const [provider, setProvider] = useState(null);
   const [showDropdown, setShowDropdown] = useState(false);
   const [showNotifications, setShowNotifications] = useState(false);
   const dropdownRef = useRef(null);
@@ -33,12 +34,22 @@ const Header = () => {
   useEffect(() => {
     const checkLoginStatus = () => {
       const userData = localStorage.getItem("user");
+      const providerData = localStorage.getItem("provider");
+
       if (userData) {
         try {
           setUser(JSON.parse(userData));
         } catch (error) {
           console.error("Lỗi khi đọc dữ liệu người dùng:", error);
           localStorage.removeItem("user");
+        }
+      }
+
+      if (providerData) {
+        try {
+          setProvider(JSON.parse(providerData));
+        } catch (error) {
+          console.error("Lỗi khi đọc dữ liệu provider:", error);
         }
       }
     };
@@ -391,10 +402,13 @@ const Header = () => {
                       >
                         Quản lý dịch vụ
                       </a>
-                      <a href="/provider/ai-bookings" className="dropdown-item">
-                        <FaSuitcase className="dropdown-icon" />
-                        <span>Quản lý AI Bookings</span>
-                      </a>
+                      {/* Only show AI Bookings for tour providers */}
+                      {provider && (Array.isArray(provider.type) ? provider.type.includes('tour') : provider.type === 'tour') && (
+                        <a href="/provider/ai-bookings" className="dropdown-item">
+                          <FaSuitcase className="dropdown-icon" />
+                          <span>Quản lý AI Bookings</span>
+                        </a>
+                      )}
                     </>
                   )}
                   {user && user.role === "Admin" && (

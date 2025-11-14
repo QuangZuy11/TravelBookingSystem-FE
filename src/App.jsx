@@ -8,6 +8,7 @@ import PendingVerificationPage from "./pages/auth/PendingVerificationPage";
 import { AuthProvider } from "./contexts/AuthContext";
 import ErrorBoundary from "./components/common/ErrorBoundary";
 import ProtectedRoute from "./components/common/ProtectedRoute";
+import TourProviderRoute from "./components/routes/TourProviderRoute";
 import NotFoundPage from "./pages/NotFoundPage";
 import UnauthorizedPage from "./pages/UnauthorizedPage";
 import DashboardLayout from "./components/layout/ProviderDashboard/DashboardLayout";
@@ -266,8 +267,12 @@ function App() {
                 <Route path="bookings" element={<BookingManagementPage />} />
                 <Route path="revenue-statistics" element={<RevenueStatisticsPage />} />
 
-                {/* AI Itinerary Bookings - Provider */}
-                <Route path="ai-bookings" element={<ProviderAIBookingsPage />} />
+                {/* AI Itinerary Bookings - Provider (Tour only) */}
+                <Route path="ai-bookings" element={
+                  <TourProviderRoute>
+                    <ProviderAIBookingsPage />
+                  </TourProviderRoute>
+                } />
 
                 {/* Tour Management - NEW MODULE */}
                 <Route path="tours">

@@ -141,14 +141,15 @@ const styles = {
     },
     buttonGroup: {
         display: 'flex',
+        flexWrap: 'wrap',
         gap: '0.5rem',
         alignItems: 'stretch'
     },
     viewButton: {
-        flex: 1,
-        minWidth: '100px',
+        flex: '1 1 calc(50% - 0.25rem)',
+        minWidth: '90px',
         height: '38px',
-        padding: '0 1rem',
+        padding: '0 0.75rem',
         backgroundColor: '#14b8a6',
         color: 'white',
         border: 'none',
@@ -162,7 +163,7 @@ const styles = {
         justifyContent: 'center'
     },
     deleteButton: {
-        width: '45px',
+        flex: '0 0 45px',
         height: '38px',
         padding: '0',
         backgroundColor: '#ef4444',
@@ -172,7 +173,7 @@ const styles = {
         fontWeight: '600',
         cursor: 'pointer',
         transition: 'background-color 0.2s ease',
-        fontSize: '0.875rem',
+        fontSize: '1.1rem',
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center'
@@ -229,6 +230,8 @@ const MyItineraries = () => {
     const [requests, setRequests] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
+    const [deleteModalOpen, setDeleteModalOpen] = useState(false);
+    const [itineraryToDelete, setItineraryToDelete] = useState(null);
 
     useEffect(() => {
         if (authLoading) return;
@@ -291,18 +294,28 @@ const MyItineraries = () => {
     };
 
     const handleDelete = async (itineraryId) => {
-        if (!window.confirm('Are you sure you want to delete this itinerary?')) {
-            return;
-        }
+        setItineraryToDelete(itineraryId);
+        setDeleteModalOpen(true);
+    };
+
+    const handleConfirmDelete = async () => {
+        if (!itineraryToDelete) return;
 
         try {
-            await deleteItinerary(itineraryId);
-            toast.success('Itinerary deleted successfully');
-            loadUserItineraries();
+            await deleteItinerary(itineraryToDelete);
+            toast.success('✓ Itinerary deleted successfully!');
+            setItineraries(itineraries.filter(it => it._id !== itineraryToDelete));
+            setDeleteModalOpen(false);
+            setItineraryToDelete(null);
         } catch (err) {
             console.error('Failed to delete itinerary:', err);
             toast.error(err.message || 'Failed to delete itinerary');
         }
+    };
+
+    const handleCancelDelete = () => {
+        setDeleteModalOpen(false);
+        setItineraryToDelete(null);
     };
 
     const handleView = (itineraryId) => {
@@ -474,6 +487,7 @@ const MyItineraries = () => {
 
                                                 {/* Enhanced Actions */}
                                                 <div style={styles.buttonGroup}>
+                                                    {/* Row 1: View and Book/Customize */}
                                                     <button
                                                         onClick={() => navigate(`/ai-itinerary/${itinerary._id}`)}
                                                         style={styles.viewButton}
@@ -483,29 +497,22 @@ const MyItineraries = () => {
                                                         👁️ View
                                                     </button>
 
-                                                    {/* Book Button - Chỉ hiện nếu status là done hoặc custom */}
+                                                    {/* Book Button */}
                                                     {(itinerary.status === 'done' || itinerary.status === 'custom') && (
                                                         <button
                                                             onClick={() => navigate(`/ai-itinerary/${itinerary._id}`)}
                                                             style={{
                                                                 ...styles.viewButton,
-                                                                background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
-                                                                fontWeight: '600'
+                                                                background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)'
                                                             }}
-                                                            onMouseOver={(e) => {
-                                                                e.target.style.transform = 'translateY(-2px)';
-                                                                e.target.style.boxShadow = '0 4px 12px rgba(16, 185, 129, 0.4)';
-                                                            }}
-                                                            onMouseOut={(e) => {
-                                                                e.target.style.transform = 'translateY(0)';
-                                                                e.target.style.boxShadow = '0 2px 4px rgba(0, 0, 0, 0.1)';
-                                                            }}
+                                                            onMouseOver={(e) => e.target.style.background = 'linear-gradient(135deg, #059669 0%, #047857 100%)'}
+                                                            onMouseOut={(e) => e.target.style.background = 'linear-gradient(135deg, #10b981 0%, #059669 100%)'}
                                                         >
                                                             🎫 Book
                                                         </button>
                                                     )}
 
-                                                    {/* Customize/Edit Button */}
+                                                    {/* Row 2: Customize and Delete */}
                                                     {(itinerary.status === 'done' || itinerary.status === 'custom') && (
                                                         <button
                                                             onClick={() => navigate(`/ai-itinerary/${itinerary._id}/customize`)}
@@ -516,9 +523,7 @@ const MyItineraries = () => {
                                                             onMouseOver={(e) => e.target.style.backgroundColor = itinerary.status === 'custom' ? '#7c3aed' : '#d97706'}
                                                             onMouseOut={(e) => e.target.style.backgroundColor = itinerary.status === 'custom' ? '#8b5cf6' : '#f59e0b'}
                                                         >
-                                                            <span style={{ display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
-                                                                {itinerary.status === 'custom' ? '✏️ Edit' : '✏️ Customize'}
-                                                            </span>
+                                                            {itinerary.status === 'custom' ? '✏️ Edit' : '✏️ Custom'}
                                                         </button>
                                                     )}
 
@@ -527,6 +532,7 @@ const MyItineraries = () => {
                                                         style={styles.deleteButton}
                                                         onMouseOver={(e) => e.target.style.backgroundColor = '#dc2626'}
                                                         onMouseOut={(e) => e.target.style.backgroundColor = '#ef4444'}
+                                                        title="Delete itinerary"
                                                     >
                                                         🗑️
                                                     </button>
@@ -555,6 +561,136 @@ const MyItineraries = () => {
                     </div>
                 </div>
             </main>
+
+            {/* Delete Confirmation Modal */}
+            {deleteModalOpen && itineraryToDelete && (
+                <div style={{
+                    position: 'fixed',
+                    top: 0,
+                    left: 0,
+                    right: 0,
+                    bottom: 0,
+                    background: 'rgba(0,0,0,0.5)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    zIndex: 1000,
+                    padding: '1rem'
+                }}>
+                    <div style={{
+                        background: 'white',
+                        borderRadius: '16px',
+                        padding: '2rem',
+                        maxWidth: '500px',
+                        width: '100%',
+                        boxShadow: '0 20px 60px rgba(0,0,0,0.3)'
+                    }}>
+                        <div style={{ textAlign: 'center', marginBottom: '1.5rem' }}>
+                            <div style={{ fontSize: '4rem', marginBottom: '1rem' }}>🗑️</div>
+                            <h2 style={{
+                                fontSize: '1.5rem',
+                                fontWeight: '700',
+                                color: '#1a1a1a',
+                                marginBottom: '0.5rem'
+                            }}>
+                                Delete Itinerary?
+                            </h2>
+                            <p style={{ color: '#6b7280' }}>
+                                Are you sure you want to delete this travel plan?
+                            </p>
+                        </div>
+
+                        {(() => {
+                            const itinerary = itineraries.find(it => it._id === itineraryToDelete);
+                            return itinerary ? (
+                                <div style={{
+                                    background: '#fef2f2',
+                                    border: '1px solid #fecaca',
+                                    borderRadius: '12px',
+                                    padding: '1rem',
+                                    marginBottom: '1.5rem'
+                                }}>
+                                    <div style={{
+                                        display: 'flex',
+                                        justifyContent: 'space-between',
+                                        marginBottom: '0.5rem'
+                                    }}>
+                                        <span style={{ fontWeight: '600', color: '#374151' }}>Destination:</span>
+                                        <span style={{ fontWeight: '700', color: '#ef4444' }}>
+                                            {itinerary.destination}
+                                        </span>
+                                    </div>
+                                    <div style={{
+                                        display: 'flex',
+                                        justifyContent: 'space-between',
+                                        marginBottom: '0.5rem'
+                                    }}>
+                                        <span style={{ fontWeight: '600', color: '#374151' }}>Duration:</span>
+                                        <span style={{ color: '#6b7280' }}>{itinerary.duration_days} days</span>
+                                    </div>
+                                    <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                                        <span style={{ fontWeight: '600', color: '#374151' }}>Budget:</span>
+                                        <span style={{ color: '#6b7280' }}>{itinerary.budget_level}</span>
+                                    </div>
+                                </div>
+                            ) : null;
+                        })()}
+
+                        <div style={{
+                            background: '#fef9c3',
+                            border: '1px solid #fde047',
+                            borderRadius: '8px',
+                            padding: '0.75rem',
+                            marginBottom: '1.5rem',
+                            fontSize: '0.875rem',
+                            color: '#854d0e'
+                        }}>
+                            ⚠️ <strong>Warning:</strong> This action cannot be undone!
+                        </div>
+
+                        <div style={{ display: 'flex', gap: '1rem' }}>
+                            <button
+                                onClick={handleCancelDelete}
+                                style={{
+                                    flex: 1,
+                                    padding: '0.75rem',
+                                    background: '#f3f4f6',
+                                    color: '#374151',
+                                    border: '2px solid #d1d5db',
+                                    borderRadius: '12px',
+                                    fontSize: '1rem',
+                                    fontWeight: '600',
+                                    cursor: 'pointer',
+                                    transition: 'all 0.3s ease'
+                                }}
+                                onMouseEnter={(e) => e.target.style.background = '#e5e7eb'}
+                                onMouseLeave={(e) => e.target.style.background = '#f3f4f6'}
+                            >
+                                Cancel
+                            </button>
+                            <button
+                                onClick={handleConfirmDelete}
+                                style={{
+                                    flex: 1,
+                                    padding: '0.75rem',
+                                    background: '#ef4444',
+                                    color: 'white',
+                                    border: 'none',
+                                    borderRadius: '12px',
+                                    fontSize: '1rem',
+                                    fontWeight: '600',
+                                    cursor: 'pointer',
+                                    transition: 'all 0.3s ease'
+                                }}
+                                onMouseEnter={(e) => e.target.style.background = '#dc2626'}
+                                onMouseLeave={(e) => e.target.style.background = '#ef4444'}
+                            >
+                                🗑️ Delete
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
 
             <Footer />
         </>

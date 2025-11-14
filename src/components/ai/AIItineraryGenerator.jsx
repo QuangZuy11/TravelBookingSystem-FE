@@ -483,6 +483,7 @@ const AIItineraryGenerator = () => {
               <div
                 style={{
                   display: "flex",
+                  paddingTop: "50px",
                   alignItems: "center",
                   justifyContent: "space-between",
                   maxWidth: "900px",
