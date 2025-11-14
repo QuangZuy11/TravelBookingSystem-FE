@@ -150,6 +150,16 @@ const RoomListPage = () => {
                         <button
                             style={{
                                 ...buttonStyle,
+                                background: '#3b82f6',
+                                color: 'white'
+                            }}
+                            onClick={() => navigate(`/provider/hotels/${hotelId}/rooms/availability`)}
+                        >
+                            📅 Quản lý phòng trống
+                        </button>
+                        <button
+                            style={{
+                                ...buttonStyle,
                                 background: 'white',
                                 color: '#10b981',
                                 border: '2px solid #10b981'

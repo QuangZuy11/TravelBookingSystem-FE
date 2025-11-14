@@ -30,6 +30,7 @@ import RoomFormPage from "./pages/provider/hotel/RoomFormPage";
 import BookingManagementPage from "./pages/provider/hotel/BookingManagementPage";
 import RevenueStatisticsPage from "./pages/provider/hotel/RevenueStatisticsPage";
 import RoomListPage from "./pages/provider/hotel/RoomListPage";
+import RoomAvailabilityPage from "./pages/provider/hotel/RoomAvailabilityPage";
 import BulkRoomCreator from "./pages/provider/hotel/BulkRoomCreator";
 import PromotionListPage from "./pages/provider/promotions/PromotionListPage";
 import PromotionCreatePage from "./pages/provider/promotions/PromotionCreatePage";
@@ -323,6 +324,7 @@ function App() {
 
                   {/* Room Management */}
                   <Route path=":hotelId/rooms" element={<RoomListPage />} />
+                  <Route path=":hotelId/rooms/availability" element={<RoomAvailabilityPage />} />
                   <Route path=":hotelId/rooms/new" element={<RoomFormPage />} />
                   <Route
                     path=":hotelId/rooms/bulk-create"
