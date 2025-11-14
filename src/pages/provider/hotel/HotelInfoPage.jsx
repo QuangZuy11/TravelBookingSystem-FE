@@ -6,6 +6,7 @@ import ErrorAlert from '../../../components/shared/ErrorAlert';
 import HotelForm from '../../../components/provider/forms/HotelForm';
 import { formatAddress } from '../../../utils/addressHelpers';
 import { getProxiedGoogleDriveUrl } from '../../../utils/googleDriveImageHelper';
+import { Building2, FileText, Phone, ArrowLeft, Edit, X, Star, Image as ImageIcon } from 'lucide-react';
 
 const HotelInfoPage = () => {
     const { hotelId } = useParams();
@@ -86,26 +87,41 @@ const HotelInfoPage = () => {
                             style={{
                                 background: 'none',
                                 border: 'none',
-                                color: '#10b981',
+                                color: '#0a5757',
                                 fontSize: '1rem',
                                 cursor: 'pointer',
                                 marginBottom: '1rem',
                                 display: 'flex',
                                 alignItems: 'center',
-                                gap: '0.5rem'
+                                gap: '0.5rem',
+                                fontWeight: '500',
+                                transition: 'all 0.3s ease'
+                            }}
+                            onMouseEnter={(e) => {
+                                e.currentTarget.style.color = '#2d6a4f';
+                                e.currentTarget.style.transform = 'translateX(-4px)';
+                            }}
+                            onMouseLeave={(e) => {
+                                e.currentTarget.style.color = '#0a5757';
+                                e.currentTarget.style.transform = 'translateX(0)';
                             }}
                         >
-                            ← Quay lại tổng quan
+                            <ArrowLeft size={18} />
+                            Quay lại tổng quan
                         </button>
                         <h1 style={{
-                            fontSize: '2.5rem',
+                            fontSize: '2rem',
                             fontWeight: '700',
-                            color: '#1f2937',
-                            marginBottom: '0.5rem'
+                            color: '#1a1a1a',
+                            marginBottom: '0.5rem',
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '0.75rem'
                         }}>
-                            🏨 Thông tin khách sạn
+                            <Building2 size={28} color="#0a5757" />
+                            Thông tin khách sạn
                         </h1>
-                        <p style={{ color: '#6b7280' }}>
+                        <p style={{ color: '#6b7280', fontSize: '0.95rem' }}>
                             Quản lý thông tin cơ bản của khách sạn
                         </p>
                     </div>
@@ -114,7 +130,7 @@ const HotelInfoPage = () => {
                             onClick={() => setIsEditing(true)}
                             style={{
                                 padding: '0.75rem 1.5rem',
-                                background: '#10b981',
+                                background: 'linear-gradient(135deg, #0a5757 0%, #2d6a4f 100%)',
                                 color: 'white',
                                 border: 'none',
                                 borderRadius: '12px',
@@ -123,10 +139,21 @@ const HotelInfoPage = () => {
                                 cursor: 'pointer',
                                 display: 'flex',
                                 alignItems: 'center',
-                                gap: '0.5rem'
+                                gap: '0.5rem',
+                                boxShadow: '0 4px 12px rgba(10, 87, 87, 0.25)',
+                                transition: 'all 0.3s ease'
+                            }}
+                            onMouseEnter={(e) => {
+                                e.currentTarget.style.transform = 'translateY(-2px)';
+                                e.currentTarget.style.boxShadow = '0 6px 16px rgba(10, 87, 87, 0.35)';
+                            }}
+                            onMouseLeave={(e) => {
+                                e.currentTarget.style.transform = 'translateY(0)';
+                                e.currentTarget.style.boxShadow = '0 4px 12px rgba(10, 87, 87, 0.25)';
                             }}
                         >
-                            ✏️ Chỉnh sửa
+                            <Edit size={18} />
+                            Chỉnh sửa
                         </button>
                     )}
                 </div>
@@ -149,13 +176,27 @@ const HotelInfoPage = () => {
                                     onClick={() => setIsEditing(false)}
                                     style={{
                                         padding: '0.75rem 1.5rem',
-                                        background: '#f3f4f6',
+                                        background: '#f8f9fa',
                                         color: '#6b7280',
-                                        border: '2px solid #d1d5db',
+                                        border: '1px solid #e0e0e0',
                                         borderRadius: '12px',
-                                        cursor: 'pointer'
+                                        cursor: 'pointer',
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        gap: '0.5rem',
+                                        fontWeight: '500',
+                                        transition: 'all 0.3s ease'
+                                    }}
+                                    onMouseEnter={(e) => {
+                                        e.currentTarget.style.background = '#e8e8e8';
+                                        e.currentTarget.style.color = '#1a1a1a';
+                                    }}
+                                    onMouseLeave={(e) => {
+                                        e.currentTarget.style.background = '#f8f9fa';
+                                        e.currentTarget.style.color = '#6b7280';
                                     }}
                                 >
+                                    <X size={18} />
                                     Hủy
                                 </button>
                             </div>
@@ -174,66 +215,84 @@ const HotelInfoPage = () => {
                             }}>
                                 <div>
                                     <h3 style={{
-                                        fontSize: '1.5rem',
-                                        fontWeight: '700',
-                                        color: '#1f2937',
-                                        marginBottom: '1rem'
+                                        fontSize: '1.25rem',
+                                        fontWeight: '600',
+                                        color: '#1a1a1a',
+                                        marginBottom: '1.5rem',
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        gap: '0.75rem'
                                     }}>
-                                        📝 Thông tin cơ bản
+                                        <FileText size={20} color="#0a5757" />
+                                        Thông tin cơ bản
                                     </h3>
                                     <div style={{ space: '1rem' }}>
-                                        <div style={{ marginBottom: '1rem' }}>
+                                        <div style={{ marginBottom: '1.25rem' }}>
                                             <label style={{
                                                 fontWeight: '600',
-                                                color: '#374151',
+                                                color: '#1a1a1a',
                                                 display: 'block',
-                                                marginBottom: '0.5rem'
+                                                marginBottom: '0.75rem',
+                                                fontSize: '0.95rem'
                                             }}>
                                                 Tên khách sạn:
                                             </label>
                                             <div style={{
-                                                padding: '0.75rem',
-                                                background: '#f9fafb',
-                                                border: '2px solid #e5e7eb',
-                                                borderRadius: '8px'
+                                                padding: '1rem',
+                                                background: '#f8f9fa',
+                                                border: '1px solid #e0e0e0',
+                                                borderRadius: '12px',
+                                                fontSize: '1rem',
+                                                color: '#1a1a1a'
                                             }}>
                                                 {hotel.name}
                                             </div>
                                         </div>
-                                        <div style={{ marginBottom: '1rem' }}>
+                                        <div style={{ marginBottom: '1.25rem' }}>
                                             <label style={{
                                                 fontWeight: '600',
-                                                color: '#374151',
+                                                color: '#1a1a1a',
                                                 display: 'block',
-                                                marginBottom: '0.5rem'
+                                                marginBottom: '0.75rem',
+                                                fontSize: '0.95rem'
                                             }}>
                                                 Địa chỉ:
                                             </label>
                                             <div style={{
-                                                padding: '0.75rem',
-                                                background: '#f9fafb',
-                                                border: '2px solid #e5e7eb',
-                                                borderRadius: '8px'
+                                                padding: '1rem',
+                                                background: '#f8f9fa',
+                                                border: '1px solid #e0e0e0',
+                                                borderRadius: '12px',
+                                                fontSize: '1rem',
+                                                color: '#1a1a1a',
+                                                lineHeight: 1.6
                                             }}>
                                                 {formatAddress(hotel.address)}
                                             </div>
                                         </div>
-                                        <div style={{ marginBottom: '1rem' }}>
+                                        <div style={{ marginBottom: '1.25rem' }}>
                                             <label style={{
                                                 fontWeight: '600',
-                                                color: '#374151',
+                                                color: '#1a1a1a',
                                                 display: 'block',
-                                                marginBottom: '0.5rem'
+                                                marginBottom: '0.75rem',
+                                                fontSize: '0.95rem'
                                             }}>
                                                 Xếp hạng sao:
                                             </label>
                                             <div style={{
-                                                padding: '0.75rem',
-                                                background: '#f9fafb',
-                                                border: '2px solid #e5e7eb',
-                                                borderRadius: '8px'
+                                                padding: '1rem',
+                                                background: '#f8f9fa',
+                                                border: '1px solid #e0e0e0',
+                                                borderRadius: '12px',
+                                                fontSize: '1rem',
+                                                color: '#1a1a1a',
+                                                display: 'flex',
+                                                alignItems: 'center',
+                                                gap: '0.5rem'
                                             }}>
-                                                {'⭐'.repeat(hotel.starRating || 0)} ({hotel.starRating || 0} sao)
+                                                <Star size={18} color="#fbbf24" fill="#fbbf24" />
+                                                {hotel.starRating || 0} sao
                                             </div>
                                         </div>
                                     </div>
@@ -241,48 +300,58 @@ const HotelInfoPage = () => {
 
                                 <div>
                                     <h3 style={{
-                                        fontSize: '1.5rem',
-                                        fontWeight: '700',
-                                        color: '#1f2937',
-                                        marginBottom: '1rem'
+                                        fontSize: '1.25rem',
+                                        fontWeight: '600',
+                                        color: '#1a1a1a',
+                                        marginBottom: '1.5rem',
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        gap: '0.75rem'
                                     }}>
-                                        📞 Liên hệ
+                                        <Phone size={20} color="#0a5757" />
+                                        Liên hệ
                                     </h3>
                                     <div>
-                                        <div style={{ marginBottom: '1rem' }}>
+                                        <div style={{ marginBottom: '1.25rem' }}>
                                             <label style={{
                                                 fontWeight: '600',
-                                                color: '#374151',
+                                                color: '#1a1a1a',
                                                 display: 'block',
-                                                marginBottom: '0.5rem'
+                                                marginBottom: '0.75rem',
+                                                fontSize: '0.95rem'
                                             }}>
                                                 Số điện thoại:
                                             </label>
                                             <div style={{
-                                                padding: '0.75rem',
-                                                background: '#f9fafb',
-                                                border: '2px solid #e5e7eb',
-                                                borderRadius: '8px'
+                                                padding: '1rem',
+                                                background: '#f8f9fa',
+                                                border: '1px solid #e0e0e0',
+                                                borderRadius: '12px',
+                                                fontSize: '1rem',
+                                                color: '#1a1a1a'
                                             }}>
-                                                {hotel.contactInfo.phone || 'Chưa cập nhật'}
+                                                {hotel.contactInfo?.phone || 'Chưa cập nhật'}
                                             </div>
                                         </div>
-                                        <div style={{ marginBottom: '1rem' }}>
+                                        <div style={{ marginBottom: '1.25rem' }}>
                                             <label style={{
                                                 fontWeight: '600',
-                                                color: '#374151',
+                                                color: '#1a1a1a',
                                                 display: 'block',
-                                                marginBottom: '0.5rem'
+                                                marginBottom: '0.75rem',
+                                                fontSize: '0.95rem'
                                             }}>
                                                 Email:
                                             </label>
                                             <div style={{
-                                                padding: '0.75rem',
-                                                background: '#f9fafb',
-                                                border: '2px solid #e5e7eb',
-                                                borderRadius: '8px'
+                                                padding: '1rem',
+                                                background: '#f8f9fa',
+                                                border: '1px solid #e0e0e0',
+                                                borderRadius: '12px',
+                                                fontSize: '1rem',
+                                                color: '#1a1a1a'
                                             }}>
-                                                {hotel.contactInfo.email || 'Chưa cập nhật'}
+                                                {hotel.contactInfo?.email || 'Chưa cập nhật'}
                                             </div>
                                         </div>
                                     </div>
@@ -293,19 +362,25 @@ const HotelInfoPage = () => {
                             {hotel.description && (
                                 <div style={{ marginTop: '2rem' }}>
                                     <h3 style={{
-                                        fontSize: '1.5rem',
-                                        fontWeight: '700',
-                                        color: '#1f2937',
-                                        marginBottom: '1rem'
+                                        fontSize: '1.25rem',
+                                        fontWeight: '600',
+                                        color: '#1a1a1a',
+                                        marginBottom: '1rem',
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        gap: '0.75rem'
                                     }}>
-                                        📄 Mô tả
+                                        <FileText size={20} color="#0a5757" />
+                                        Mô tả
                                     </h3>
                                     <div style={{
-                                        padding: '1rem',
-                                        background: '#f9fafb',
-                                        border: '2px solid #e5e7eb',
-                                        borderRadius: '8px',
-                                        lineHeight: 1.6
+                                        padding: '1.25rem',
+                                        background: '#f8f9fa',
+                                        border: '1px solid #e0e0e0',
+                                        borderRadius: '12px',
+                                        lineHeight: 1.6,
+                                        fontSize: '1rem',
+                                        color: '#1a1a1a'
                                     }}>
                                         {hotel.description}
                                     </div>
@@ -316,12 +391,16 @@ const HotelInfoPage = () => {
                             {hotel.images && hotel.images.length > 0 && (
                                 <div style={{ marginTop: '2rem' }}>
                                     <h3 style={{
-                                        fontSize: '1.5rem',
-                                        fontWeight: '700',
-                                        color: '#1f2937',
-                                        marginBottom: '1rem'
+                                        fontSize: '1.25rem',
+                                        fontWeight: '600',
+                                        color: '#1a1a1a',
+                                        marginBottom: '1rem',
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        gap: '0.75rem'
                                     }}>
-                                        🖼️ Hình ảnh
+                                        <ImageIcon size={20} color="#0a5757" />
+                                        Hình ảnh
                                     </h3>
                                     <div style={{
                                         display: 'grid',
@@ -330,12 +409,23 @@ const HotelInfoPage = () => {
                                     }}>
                                         {hotel.images.map((image, index) => (
                                             <div key={index} style={{
-                                                borderRadius: '8px',
+                                                borderRadius: '12px',
                                                 overflow: 'hidden',
-                                                border: '2px solid #e5e7eb',
+                                                border: '1px solid #e0e0e0',
                                                 height: '150px',
-                                                position: 'relative'
-                                            }}>
+                                                position: 'relative',
+                                                boxShadow: '0 2px 8px rgba(0, 0, 0, 0.05)',
+                                                transition: 'all 0.3s ease'
+                                            }}
+                                            onMouseEnter={(e) => {
+                                                e.currentTarget.style.transform = 'translateY(-4px)';
+                                                e.currentTarget.style.boxShadow = '0 4px 12px rgba(0, 0, 0, 0.1)';
+                                            }}
+                                            onMouseLeave={(e) => {
+                                                e.currentTarget.style.transform = 'translateY(0)';
+                                                e.currentTarget.style.boxShadow = '0 2px 8px rgba(0, 0, 0, 0.05)';
+                                            }}
+                                            >
                                                 <img
                                                     src={getProxiedGoogleDriveUrl(image)}
                                                     alt={`Hotel ${index + 1}`}

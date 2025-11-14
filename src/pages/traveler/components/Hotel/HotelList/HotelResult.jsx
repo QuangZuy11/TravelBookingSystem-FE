@@ -24,8 +24,6 @@ import {
 } from '@mui/material';
 import SmartImage from '../../../../../components/common/SmartImage';
 import {
-    Favorite as FavoriteIcon,
-    FavoriteBorder as FavoriteBorderIcon,
     LocationOn as LocationOnIcon,
     Spa as SpaIcon,
     Pool as PoolIcon,
@@ -101,6 +99,38 @@ const amenityIconMap = {
 const formatPrice = (price) =>
     new Intl.NumberFormat('vi-VN').format(price) + ' VNĐ';
 
+// Normalize location để tìm được cả "Ha noi" và "Hà Nội"
+const normalizeLocation = (location) => {
+    if (!location) return '';
+
+    // Mapping các tên địa điểm phổ biến (không dấu -> có dấu)
+    const locationMap = {
+        'ha noi': 'Hà Nội',
+        'ho chi minh': 'Hồ Chí Minh',
+        'hcm': 'Hồ Chí Minh',
+        'da nang': 'Đà Nẵng',
+        'nha trang': 'Nha Trang',
+        'vung tau': 'Vũng Tàu',
+        'phu quoc': 'Phú Quốc',
+        'sapa': 'Sapa',
+        'hue': 'Huế',
+        'quang ninh': 'Quảng Ninh',
+        'hai phong': 'Hải Phòng',
+        'can tho': 'Cần Thơ',
+    };
+
+    // Chuyển về lowercase và loại bỏ khoảng trắng thừa
+    const normalized = location.toLowerCase().trim();
+
+    // Kiểm tra trong map
+    if (locationMap[normalized]) {
+        return locationMap[normalized];
+    }
+
+    // Nếu không có trong map, trả về location gốc (backend sẽ xử lý)
+    return location;
+};
+
 function HotelResult({
     // NEW: nhận tham số search từ parent (SearchSection)
     searchParams,
@@ -110,10 +140,9 @@ function HotelResult({
 }) {
     const navigate = useNavigate();
     const [hotels, setHotels] = useState([]);
-    const [favorites, setFavorites] = useState(new Set());
     const [page, setPage] = useState(1);
     const [perPage] = useState(5);// Số khách sạn mỗi trang 
-    const [sortBy, setSortBy] = useState('popular');
+    const [sortBy, setSortBy] = useState('priceAsc');
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
 
@@ -197,7 +226,9 @@ function HotelResult({
 
                 // Search params - chỉ thêm nếu có giá trị
                 if (searchParams?.location?.trim()) {
-                    params.set('location', searchParams.location.trim());
+                    // Normalize location để tìm được cả "Ha noi" và "Hà Nội"
+                    const normalizedLocation = normalizeLocation(searchParams.location.trim());
+                    params.set('location', normalizedLocation);
                 }
                 if (searchParams?.checkIn) {
                     params.set('checkIn', searchParams.checkIn);
@@ -233,13 +264,9 @@ function HotelResult({
                         params.set('sortBy', 'price');
                         params.set('sortOrder', 'desc');
                         break;
-                    case 'popular':
-                        params.set('sortBy', 'popularity');
-                        params.set('sortOrder', 'desc');
-                        break;
                     default:
-                        params.set('sortBy', 'rating');
-                        params.set('sortOrder', 'desc');
+                        params.set('sortBy', 'price');
+                        params.set('sortOrder', 'asc');
                 }
 
                 // Tải "gần như tất cả", phân trang cục bộ giữ nguyên
@@ -317,8 +344,7 @@ function HotelResult({
                 arr.sort((a, b) => b.price - a.price);
                 break;
             default:
-                // "Phổ biến" = nhiều lượt book hơn
-                arr.sort((a, b) => b.reviews - a.reviews);
+                arr.sort((a, b) => a.price - b.price);
         }
         return arr;
     }, [filtered, sortBy]);
@@ -330,14 +356,6 @@ function HotelResult({
         return sorted.slice(start, start + perPage);
     }, [sorted, page, perPage]);
 
-    const toggleFavorite = (id) => {
-        setFavorites((s) => {
-            const n = new Set(s);
-            if (n.has(id)) n.delete(id);
-            else n.add(id);
-            return n;
-        });
-    };
 
     const handleBook = (hotel) => {
         console.log(`Điều hướng đến chi tiết: ${hotel.name}`);
@@ -371,7 +389,6 @@ function HotelResult({
                                     setPage(1);
                                 }}
                             >
-                                <MenuItem value="popular">Phổ biến</MenuItem>
                                 <MenuItem value="priceAsc">Giá thấp đến cao</MenuItem>
                                 <MenuItem value="priceDesc">Giá cao đến thấp</MenuItem>
                             </Select>
@@ -424,8 +441,6 @@ function HotelResult({
                                 <HotelCard
                                     key={hotel.id}
                                     hotel={hotel}
-                                    isFavorite={favorites.has(hotel.id)}
-                                    onToggleFavorite={() => toggleFavorite(hotel.id)}
                                     onBook={() => handleBook(hotel)}
                                 />
                             ))}
@@ -447,7 +462,7 @@ function HotelResult({
     );
 }
 
-function HotelCard({ hotel, isFavorite, onToggleFavorite, onBook }) {
+function HotelCard({ hotel, onBook }) {
     const navigate = useNavigate();
 
     // Use the utility function for price calculation
@@ -526,17 +541,6 @@ function HotelCard({ hotel, isFavorite, onToggleFavorite, onBook }) {
                             </Box>
                         )}
 
-                        <Tooltip title={isFavorite ? 'Bỏ yêu thích' : 'Thêm yêu thích'}>
-                            <Button
-                                className="favorite-btn"
-                                color="error"
-                                variant="contained"
-                                onClick={onToggleFavorite}
-                                size="small"
-                            >
-                                {isFavorite ? <FavoriteIcon /> : <FavoriteBorderIcon />}
-                            </Button>
-                        </Tooltip>
                     </Box>
                 </Grid>
 

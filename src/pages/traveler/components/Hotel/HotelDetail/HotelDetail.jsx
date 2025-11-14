@@ -218,7 +218,7 @@ const HotelDetail = () => {
                 </button>
             </nav>
 
-            <Overview hotelData={hotelData} destination={destination} />
+            <Overview hotelData={hotelData} nearbyPOIs={nearbyPOIs} destination={destination} />
             <Rooms
                 roomsData={roomsData}
                 loading={roomsLoading}

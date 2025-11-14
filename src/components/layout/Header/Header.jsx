@@ -10,6 +10,13 @@ import {
   FaCheckCircle,
   FaInfoCircle,
   FaExclamationTriangle,
+  FaPlane,
+  FaBed,
+  FaRoute,
+  FaCalendarCheck,
+  FaCog,
+  FaRobot,
+  FaChartBar,
 } from "react-icons/fa";
 import "./Header.css";
 import Logo from "../../assets/logo.png";
@@ -383,19 +390,19 @@ const Header = () => {
                   {user.role !== "ServiceProvider" && user.role !== "Admin" && (
                     <>
                       <a href="/my-tours" className="dropdown-item">
-                        <FaSuitcase className="dropdown-icon" />
+                        <FaPlane className="dropdown-icon" />
                         <span>Tour Đã Đặt</span>
                       </a>
                       <a href="/my-booked-hotels" className="dropdown-item">
-                        <FaSuitcase className="dropdown-icon" />
+                        <FaBed className="dropdown-icon" />
                         <span>Khách sạn đã đặt</span>
                       </a>
                       <a href="/my-itineraries" className="dropdown-item">
-                        <FaSuitcase className="dropdown-icon" />
+                        <FaRoute className="dropdown-icon" />
                         <span>Lộ Trình Của Tôi</span>
                       </a>
                       <a href="/my-booking-itineraries" className="dropdown-item">
-                        <FaSuitcase className="dropdown-icon" />
+                        <FaCalendarCheck className="dropdown-icon" />
                         <span>Lộ Trình Đặt Chỗ Của Tôi</span>
                       </a>
                     </>
@@ -407,12 +414,13 @@ const Header = () => {
                         onClick={handleServiceManagement}
                         className="dropdown-item"
                       >
-                        Quản lý dịch vụ
+                        <FaCog className="dropdown-icon" />
+                        <span>Quản lý dịch vụ</span>
                       </a>
                       {/* Only show AI Bookings for tour providers */}
                       {provider && (Array.isArray(provider.type) ? provider.type.includes('tour') : provider.type === 'tour') && (
                         <a href="/provider/ai-bookings" className="dropdown-item">
-                          <FaSuitcase className="dropdown-icon" />
+                          <FaRobot className="dropdown-icon" />
                           <span>Quản lý AI Bookings</span>
                         </a>
                       )}
@@ -420,7 +428,7 @@ const Header = () => {
                   )}
                   {user && user.role === "Admin" && (
                     <Link to="/admin/dashboard" className="dropdown-item">
-                      <FaUsers className="dropdown-icon" />
+                      <FaChartBar className="dropdown-icon" />
                       <span>Dashboard</span>
                     </Link>
                   )}

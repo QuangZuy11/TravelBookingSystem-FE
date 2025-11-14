@@ -26,7 +26,9 @@ import { useNavigate } from 'react-router-dom';
 import SmartImage from '../../../../../components/common/SmartImage';
 import { calculateDiscountedPrice, formatPromotionDiscount } from '../../../../../utils/promotionHelpers';
 
-export default function Overview({ hotelData }) {
+// eslint-disable-next-line no-unused-vars
+export default function Overview({ hotelData, nearbyPOIs, destination }) {
+    // destination is kept for future use (e.g., destination badge display)
     // State for image carousel
     const [currentImageIndex, setCurrentImageIndex] = useState(0);
     // smooth scroll handler must be defined at top-level (hooks rule)
@@ -486,22 +488,21 @@ export default function Overview({ hotelData }) {
                         Trong khu vực
                     </h3>
                     <div className="hotel-detail-location-list">
-                        <div className="hotel-detail-location-item">
-                            <LocationIcon className="hotel-detail-location-marker" size={16} />
-                            <span>Hồ Hoàn Kiếm</span>
-                        </div>
-                        <div className="hotel-detail-location-item">
-                            <LocationIcon className="hotel-detail-location-marker" size={16} />
-                            <span>Phố Ẩm Thực Tạ Hiện</span>
-                        </div>
-                        <div className="hotel-detail-location-item">
-                            <LocationIcon className="hotel-detail-location-marker" size={16} />
-                            <span>Nhà Hát Lớn</span>
-                        </div>
-                        <div className="hotel-detail-location-item">
-                            <LocationIcon className="hotel-detail-location-marker" size={16} />
-                            <span>Cổng Viên Thống Nhất</span>
-                        </div>
+                        {nearbyPOIs && nearbyPOIs.length > 0 ? (
+                            nearbyPOIs.map((poi, index) => (
+                                <div key={poi._id || index} className="hotel-detail-location-item">
+                                    <LocationIcon className="hotel-detail-location-marker" size={16} />
+                                    <span>{poi.name}</span>
+                                </div>
+                            ))
+                        ) : (
+                            <div className="hotel-detail-location-item">
+                                <LocationIcon className="hotel-detail-location-marker" size={16} />
+                                <span style={{ color: '#6b7280', fontStyle: 'italic' }}>
+                                    Chưa có thông tin địa điểm lân cận
+                                </span>
+                            </div>
+                        )}
                     </div>
                 </div>
 

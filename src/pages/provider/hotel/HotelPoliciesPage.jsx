@@ -3,6 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import toast from 'react-hot-toast';
 import Breadcrumb from '../../../components/shared/Breadcrumb';
+import { FileText, Clock, RotateCcw, PawPrint, CreditCard, Home, Plus, Trash2, ArrowLeft, Edit, Save, X } from 'lucide-react';
 
 const HotelPoliciesPage = () => {
     const { hotelId } = useParams();
@@ -157,30 +158,31 @@ const HotelPoliciesPage = () => {
         alignItems: 'center',
         marginBottom: '2.5rem',
         paddingBottom: '1.5rem',
-        borderBottom: '3px solid #10b981'
+        borderBottom: '1px solid #e0e0e0'
     };
 
     const titleStyle = {
-        fontSize: '2.5rem',
+        fontSize: '2rem',
         fontWeight: '700',
-        background: '#10b981',
-        WebkitBackgroundClip: 'text',
-        WebkitTextFillColor: 'transparent',
-        backgroundClip: 'text'
+        color: '#1a1a1a',
+        display: 'flex',
+        alignItems: 'center',
+        gap: '0.75rem',
+        marginBottom: '0.5rem'
     };
 
     const sectionStyle = {
         marginBottom: '2rem',
         padding: '2rem',
-        background: '#f9fafb',
-        borderRadius: '16px',
-        border: '2px solid #e5e7eb'
+        background: '#f8f9fa',
+        borderRadius: '12px',
+        border: '1px solid #e0e0e0'
     };
 
     const sectionTitleStyle = {
-        fontSize: '1.5rem',
-        fontWeight: '700',
-        color: '#1f2937',
+        fontSize: '1.25rem',
+        fontWeight: '600',
+        color: '#1a1a1a',
         marginBottom: '1.5rem',
         display: 'flex',
         alignItems: 'center',
@@ -198,28 +200,32 @@ const HotelPoliciesPage = () => {
         width: '100%',
         padding: '0.875rem 1rem',
         fontSize: '1rem',
-        border: '2px solid #e5e7eb',
+        border: '1px solid #e0e0e0',
         borderRadius: '12px',
         transition: 'all 0.3s ease',
-        outline: 'none'
+        outline: 'none',
+        background: 'white'
     };
 
     const labelStyle = {
         display: 'block',
-        fontSize: '0.875rem',
+        fontSize: '0.95rem',
         fontWeight: '600',
-        color: '#374151',
-        marginBottom: '0.5rem'
+        color: '#1a1a1a',
+        marginBottom: '0.75rem'
     };
 
     const buttonStyle = {
-        padding: '0.875rem 1.75rem',
+        padding: '0.75rem 1.5rem',
         fontSize: '1rem',
         fontWeight: '600',
         borderRadius: '12px',
         border: 'none',
         cursor: 'pointer',
-        transition: 'all 0.3s ease'
+        transition: 'all 0.3s ease',
+        display: 'flex',
+        alignItems: 'center',
+        gap: '0.5rem'
     };
 
     const breadcrumbItems = [
@@ -247,8 +253,11 @@ const HotelPoliciesPage = () => {
                 {/* Header */}
                 <div style={headerStyle}>
                     <div>
-                        <h1 style={titleStyle}>📋 Chính sách khách sạn</h1>
-                        <p style={{ fontSize: '1rem', color: '#6b7280', marginTop: '0.5rem' }}>
+                        <h1 style={titleStyle}>
+                            <FileText size={28} color="#0a5757" />
+                            Chính sách khách sạn
+                        </h1>
+                        <p style={{ fontSize: '0.95rem', color: '#6b7280', marginTop: '0.5rem' }}>
                             {hotel?.name}
                         </p>
                     </div>
@@ -260,13 +269,26 @@ const HotelPoliciesPage = () => {
                                     disabled={saving}
                                     style={{
                                         ...buttonStyle,
-                                        background: '#10b981',
+                                        background: 'linear-gradient(135deg, #0a5757 0%, #2d6a4f 100%)',
                                         color: 'white',
-                                        boxShadow: '0 4px 15px rgba(102, 126, 234, 0.4)',
+                                        boxShadow: '0 4px 12px rgba(10, 87, 87, 0.25)',
                                         opacity: saving ? 0.6 : 1
                                     }}
+                                    onMouseEnter={(e) => {
+                                        if (!saving) {
+                                            e.currentTarget.style.transform = 'translateY(-2px)';
+                                            e.currentTarget.style.boxShadow = '0 6px 16px rgba(10, 87, 87, 0.35)';
+                                        }
+                                    }}
+                                    onMouseLeave={(e) => {
+                                        if (!saving) {
+                                            e.currentTarget.style.transform = 'translateY(0)';
+                                            e.currentTarget.style.boxShadow = '0 4px 12px rgba(10, 87, 87, 0.25)';
+                                        }
+                                    }}
                                 >
-                                    {saving ? '⏳ Đang lưu...' : '💾 Lưu'}
+                                    <Save size={18} />
+                                    {saving ? 'Đang lưu...' : 'Lưu'}
                                 </button>
                                 <button
                                     onClick={() => {
@@ -275,12 +297,21 @@ const HotelPoliciesPage = () => {
                                     }}
                                     style={{
                                         ...buttonStyle,
-                                        background: 'white',
+                                        background: '#f8f9fa',
                                         color: '#6b7280',
-                                        border: '2px solid #d1d5db'
+                                        border: '1px solid #e0e0e0'
+                                    }}
+                                    onMouseEnter={(e) => {
+                                        e.currentTarget.style.background = '#e8e8e8';
+                                        e.currentTarget.style.color = '#1a1a1a';
+                                    }}
+                                    onMouseLeave={(e) => {
+                                        e.currentTarget.style.background = '#f8f9fa';
+                                        e.currentTarget.style.color = '#6b7280';
                                     }}
                                 >
-                                    ❌ Hủy
+                                    <X size={18} />
+                                    Hủy
                                 </button>
                             </>
                         ) : (
@@ -288,12 +319,21 @@ const HotelPoliciesPage = () => {
                                 onClick={() => setIsEditing(true)}
                                 style={{
                                     ...buttonStyle,
-                                    background: '#10b981',
+                                    background: 'linear-gradient(135deg, #0a5757 0%, #2d6a4f 100%)',
                                     color: 'white',
-                                    boxShadow: '0 4px 15px rgba(102, 126, 234, 0.4)'
+                                    boxShadow: '0 4px 12px rgba(10, 87, 87, 0.25)'
+                                }}
+                                onMouseEnter={(e) => {
+                                    e.currentTarget.style.transform = 'translateY(-2px)';
+                                    e.currentTarget.style.boxShadow = '0 6px 16px rgba(10, 87, 87, 0.35)';
+                                }}
+                                onMouseLeave={(e) => {
+                                    e.currentTarget.style.transform = 'translateY(0)';
+                                    e.currentTarget.style.boxShadow = '0 4px 12px rgba(10, 87, 87, 0.25)';
                                 }}
                             >
-                                ✏️ Chỉnh sửa
+                                <Edit size={18} />
+                                Chỉnh sửa
                             </button>
                         )}
                     </div>
@@ -302,7 +342,7 @@ const HotelPoliciesPage = () => {
                 {/* Check-in/Check-out Times */}
                 <div style={sectionStyle}>
                     <h2 style={sectionTitleStyle}>
-                        <span style={{ fontSize: '1.75rem' }}>🕐</span>
+                        <Clock size={20} color="#0a5757" />
                         Thời gian nhận/trả phòng
                     </h2>
                     <div style={gridStyle}>
@@ -342,7 +382,7 @@ const HotelPoliciesPage = () => {
                 {/* Cancellation Policy */}
                 <div style={sectionStyle}>
                     <h2 style={sectionTitleStyle}>
-                        <span style={{ fontSize: '1.75rem' }}>🔄</span>
+                        <RotateCcw size={20} color="#0a5757" />
                         Chính sách hủy phòng
                     </h2>
                     <div>
@@ -365,7 +405,7 @@ const HotelPoliciesPage = () => {
                 {/* General Policies */}
                 <div style={sectionStyle}>
                     <h2 style={sectionTitleStyle}>
-                        <span style={{ fontSize: '1.75rem' }}>🐾</span>
+                        <PawPrint size={20} color="#0a5757" />
                         Chính sách thú cưng
                     </h2>
                     <div>
@@ -477,7 +517,7 @@ const HotelPoliciesPage = () => {
                 {/* House Rules */}
                 <div style={sectionStyle}>
                     <h2 style={sectionTitleStyle}>
-                        <span style={{ fontSize: '1.75rem' }}>🏠</span>
+                        <Home size={20} color="#0a5757" />
                         Nội quy khách sạn
                     </h2>
                     {isEditing && (
@@ -485,12 +525,22 @@ const HotelPoliciesPage = () => {
                             onClick={addHouseRule}
                             style={{
                                 ...buttonStyle,
-                                background: '#10b981',
+                                background: 'linear-gradient(135deg, #0a5757 0%, #2d6a4f 100%)',
                                 color: 'white',
-                                marginBottom: '1rem'
+                                marginBottom: '1rem',
+                                boxShadow: '0 4px 12px rgba(10, 87, 87, 0.25)'
+                            }}
+                            onMouseEnter={(e) => {
+                                e.currentTarget.style.transform = 'translateY(-2px)';
+                                e.currentTarget.style.boxShadow = '0 6px 16px rgba(10, 87, 87, 0.35)';
+                            }}
+                            onMouseLeave={(e) => {
+                                e.currentTarget.style.transform = 'translateY(0)';
+                                e.currentTarget.style.boxShadow = '0 4px 12px rgba(10, 87, 87, 0.25)';
                             }}
                         >
-                            ➕ Thêm nội quy
+                            <Plus size={18} />
+                            Thêm nội quy
                         </button>
                     )}
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
@@ -511,15 +561,24 @@ const HotelPoliciesPage = () => {
                                                 ...buttonStyle,
                                                 background: '#ef4444',
                                                 color: 'white',
-                                                padding: '0.75rem 1rem'
+                                                padding: '0.75rem 1rem',
+                                                boxShadow: '0 4px 12px rgba(239, 68, 68, 0.25)'
+                                            }}
+                                            onMouseEnter={(e) => {
+                                                e.currentTarget.style.background = '#dc2626';
+                                                e.currentTarget.style.transform = 'translateY(-2px)';
+                                            }}
+                                            onMouseLeave={(e) => {
+                                                e.currentTarget.style.background = '#ef4444';
+                                                e.currentTarget.style.transform = 'translateY(0)';
                                             }}
                                         >
-                                            🗑️
+                                            <Trash2 size={18} />
                                         </button>
                                     </>
                                 ) : (
-                                    <div style={{ fontSize: '1rem', color: '#1f2937', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                                        <span style={{ color: '#10b981', fontSize: '1.2rem' }}>✓</span>
+                                    <div style={{ fontSize: '1rem', color: '#1a1a1a', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                                        <span style={{ color: '#0a5757', fontSize: '1.2rem' }}>✓</span>
                                         {rule}
                                     </div>
                                 )}
@@ -536,7 +595,7 @@ const HotelPoliciesPage = () => {
                 {/* Additional Policies */}
                 <div style={sectionStyle}>
                     <h2 style={sectionTitleStyle}>
-                        <span style={{ fontSize: '1.75rem' }}>📝</span>
+                        <FileText size={20} color="#0a5757" />
                         Chính sách bổ sung
                     </h2>
                     {isEditing && (
@@ -544,17 +603,27 @@ const HotelPoliciesPage = () => {
                             onClick={addAdditionalPolicy}
                             style={{
                                 ...buttonStyle,
-                                background: '#10b981',
+                                background: 'linear-gradient(135deg, #0a5757 0%, #2d6a4f 100%)',
                                 color: 'white',
-                                marginBottom: '1rem'
+                                marginBottom: '1rem',
+                                boxShadow: '0 4px 12px rgba(10, 87, 87, 0.25)'
+                            }}
+                            onMouseEnter={(e) => {
+                                e.currentTarget.style.transform = 'translateY(-2px)';
+                                e.currentTarget.style.boxShadow = '0 6px 16px rgba(10, 87, 87, 0.35)';
+                            }}
+                            onMouseLeave={(e) => {
+                                e.currentTarget.style.transform = 'translateY(0)';
+                                e.currentTarget.style.boxShadow = '0 4px 12px rgba(10, 87, 87, 0.25)';
                             }}
                         >
-                            ➕ Thêm chính sách
+                            <Plus size={18} />
+                            Thêm chính sách
                         </button>
                     )}
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
                         {policies.additionalPolicies.map((policy, index) => (
-                            <div key={index} style={{ padding: '1.5rem', background: 'white', borderRadius: '12px', border: '2px solid #e5e7eb' }}>
+                            <div key={index} style={{ padding: '1.5rem', background: 'white', borderRadius: '12px', border: '1px solid #e0e0e0' }}>
                                 {isEditing ? (
                                     <>
                                         <input
@@ -577,18 +646,28 @@ const HotelPoliciesPage = () => {
                                                 ...buttonStyle,
                                                 background: '#ef4444',
                                                 color: 'white',
-                                                padding: '0.5rem 1rem'
+                                                padding: '0.5rem 1rem',
+                                                boxShadow: '0 4px 12px rgba(239, 68, 68, 0.25)'
+                                            }}
+                                            onMouseEnter={(e) => {
+                                                e.currentTarget.style.background = '#dc2626';
+                                                e.currentTarget.style.transform = 'translateY(-2px)';
+                                            }}
+                                            onMouseLeave={(e) => {
+                                                e.currentTarget.style.background = '#ef4444';
+                                                e.currentTarget.style.transform = 'translateY(0)';
                                             }}
                                         >
-                                            🗑️ Xóa
+                                            <Trash2 size={18} />
+                                            Xóa
                                         </button>
                                     </>
                                 ) : (
                                     <>
-                                        <h3 style={{ fontSize: '1.2rem', fontWeight: '700', color: '#1f2937', marginBottom: '0.5rem' }}>
+                                        <h3 style={{ fontSize: '1.2rem', fontWeight: '700', color: '#1a1a1a', marginBottom: '0.5rem' }}>
                                             {policy.title}
                                         </h3>
-                                        <p style={{ fontSize: '1rem', color: '#6b7280', lineHeight: '1.6' }}>
+                                        <p style={{ fontSize: '1rem', color: '#4a4a4a', lineHeight: '1.6' }}>
                                             {policy.description}
                                         </p>
                                     </>
@@ -609,12 +688,21 @@ const HotelPoliciesPage = () => {
                         onClick={() => navigate(`/provider/hotels/${hotelId}/overview`)}
                         style={{
                             ...buttonStyle,
-                            background: '#f3f4f6',
+                            background: '#f8f9fa',
                             color: '#6b7280',
-                            border: '2px solid #d1d5db'
+                            border: '1px solid #e0e0e0'
+                        }}
+                        onMouseEnter={(e) => {
+                            e.currentTarget.style.background = '#e8e8e8';
+                            e.currentTarget.style.color = '#1a1a1a';
+                        }}
+                        onMouseLeave={(e) => {
+                            e.currentTarget.style.background = '#f8f9fa';
+                            e.currentTarget.style.color = '#6b7280';
                         }}
                     >
-                        ← Quay lại tổng quan
+                        <ArrowLeft size={18} />
+                        Quay lại tổng quan
                     </button>
                 </div>
             </div>

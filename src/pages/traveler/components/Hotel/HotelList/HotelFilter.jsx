@@ -13,6 +13,9 @@ import {
     Button,
     CircularProgress,
     Alert,
+    Accordion,
+    AccordionSummary,
+    AccordionDetails,
 } from '@mui/material';
 import {
     Spa as SpaIcon,
@@ -28,7 +31,8 @@ import {
     FlightTakeoff as AirportShuttleIcon,
     AcUnit as AirConditioningIcon,
     MeetingRoom as ConferenceRoomIcon,
-    LocalLaundryService as LaundryServiceIcon
+    LocalLaundryService as LaundryServiceIcon,
+    ExpandMore as ExpandMoreIcon
 } from '@mui/icons-material';
 
 import '../HotelList/HotelList.css';
@@ -228,7 +232,7 @@ function HotelFilter({
     return (
         <Box className="search-sidebar">
             {/* Khoảng giá */}
-            <Paper className="filter-card" elevation={2}>
+            <Paper className="filter-card" elevation={2} sx={{ mb: 2 }}>
                 <CardContent>
                     <Stack direction="row" justifyContent="space-between" alignItems="center">
                         <Typography variant="h6" className="filter-title">
@@ -290,70 +294,87 @@ function HotelFilter({
             </Paper>
 
             {/* Tiện nghi */}
-            <Paper className="filter-card" elevation={2}>
-                <CardContent>
-                    <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{ mb: 1 }}>
-                        <Typography variant="h6" className="filter-title">
-                            Tiện nghi
-                        </Typography>
-                        {loadingAmenities && <CircularProgress size={18} />}
-                    </Stack>
-
-                    {errorAmenities && (
-                        <Alert severity="warning" sx={{ mb: 1 }}>
-                            Không lấy được tiện nghi động. Chi tiết: {errorAmenities}
-                        </Alert>
-                    )}
-
-                    <FormGroup>
-                        {amenityOptions.length === 0 && !loadingAmenities && (
-                            <Typography variant="body2" color="text.secondary">
-                                Không có dữ liệu tiện nghi
+            <Paper className="filter-card" elevation={2} sx={{ mb: 2 }}>
+                <Accordion defaultExpanded={false} sx={{ boxShadow: 'none' }}>
+                    <AccordionSummary
+                        expandIcon={<ExpandMoreIcon />}
+                        aria-controls="amenities-content"
+                        id="amenities-header"
+                        sx={{ px: 2, py: 1 }}
+                    >
+                        <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{ width: '100%', mr: 1 }}>
+                            <Typography variant="h6" className="filter-title">
+                                Tiện nghi
                             </Typography>
+                            {loadingAmenities && <CircularProgress size={18} />}
+                        </Stack>
+                    </AccordionSummary>
+                    <AccordionDetails sx={{ pt: 0, px: 2, pb: 2 }}>
+                        {errorAmenities && (
+                            <Alert severity="warning" sx={{ mb: 1 }}>
+                                Không lấy được tiện nghi động. Chi tiết: {errorAmenities}
+                            </Alert>
                         )}
-                        {amenityOptions.map(({ label, value, Icon }) => (
-                            <FormControlLabel
-                                key={value}
-                                control={
-                                    <Checkbox
-                                        checked={selectedAmenities.includes(value)}
-                                        onChange={() => onToggleAmenity(value)}
-                                        disabled={loadingAmenities}
-                                    />
-                                }
-                                label={
-                                    <Box display="flex" alignItems="center" gap={1}>
-                                        {Icon && <Icon fontSize="small" />}
-                                        {label}
-                                    </Box>
-                                }
-                            />
-                        ))}
-                    </FormGroup>
-                </CardContent>
+
+                        <FormGroup>
+                            {amenityOptions.length === 0 && !loadingAmenities && (
+                                <Typography variant="body2" color="text.secondary">
+                                    Không có dữ liệu tiện nghi
+                                </Typography>
+                            )}
+                            {amenityOptions.map(({ label, value, Icon }) => (
+                                <FormControlLabel
+                                    key={value}
+                                    control={
+                                        <Checkbox
+                                            checked={selectedAmenities.includes(value)}
+                                            onChange={() => onToggleAmenity(value)}
+                                            disabled={loadingAmenities}
+                                        />
+                                    }
+                                    label={
+                                        <Box display="flex" alignItems="center" gap={1}>
+                                            {Icon && <Icon fontSize="small" />}
+                                            {label}
+                                        </Box>
+                                    }
+                                />
+                            ))}
+                        </FormGroup>
+                    </AccordionDetails>
+                </Accordion>
             </Paper>
 
             {/* Tiêu chuẩn */}
-            <Paper className="filter-card" elevation={2}>
-                <CardContent>
-                    <Typography variant="h6" className="filter-title">
-                        Tiêu chuẩn
-                    </Typography>
-                    <Stack spacing={0.5}>
-                        {[5, 4, 3, 2, 1].map((r) => (
-                            <FormControlLabel
-                                key={r}
-                                control={
-                                    <Checkbox
-                                        checked={selectedRatings.includes(r)}
-                                        onChange={() => onToggleRating(r)}
-                                    />
-                                }
-                                label={<Typography variant="body2">{'★'.repeat(r)}</Typography>}
-                            />
-                        ))}
-                    </Stack>
-                </CardContent>
+            <Paper className="filter-card" elevation={2} sx={{ mb: 2 }}>
+                <Accordion defaultExpanded={false} sx={{ boxShadow: 'none' }}>
+                    <AccordionSummary
+                        expandIcon={<ExpandMoreIcon />}
+                        aria-controls="ratings-content"
+                        id="ratings-header"
+                        sx={{ px: 2, py: 1 }}
+                    >
+                        <Typography variant="h6" className="filter-title">
+                            Tiêu chuẩn
+                        </Typography>
+                    </AccordionSummary>
+                    <AccordionDetails sx={{ pt: 0, px: 2, pb: 2 }}>
+                        <Stack spacing={0.5}>
+                            {[5, 4, 3, 2, 1].map((r) => (
+                                <FormControlLabel
+                                    key={r}
+                                    control={
+                                        <Checkbox
+                                            checked={selectedRatings.includes(r)}
+                                            onChange={() => onToggleRating(r)}
+                                        />
+                                    }
+                                    label={<Typography variant="body2">{'★'.repeat(r)}</Typography>}
+                                />
+                            ))}
+                        </Stack>
+                    </AccordionDetails>
+                </Accordion>
             </Paper>
 
             {showClearAll && (

@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { DollarSign, Users, FileText, Package, Building2 } from "lucide-react";
 import adminService from "../../services/adminService";
+import { getProxiedGoogleDriveUrl } from "../../utils/googleDriveImageHelper";
 import "./Admin.css";
 
 const AdminDashboardPage = () => {
@@ -224,13 +225,15 @@ const AdminDashboardPage = () => {
               let itemImage = '/placeholder-image.jpg';
               if (item) {
                 if (item.images && item.images.length > 0) {
-                  itemImage = item.images[0];
+                  // Sử dụng getProxiedGoogleDriveUrl để xử lý ảnh từ Google Drive
+                  itemImage = getProxiedGoogleDriveUrl(item.images[0]);
                 } else if (item.image) {
                   // Tour có thể có image (string) thay vì images (array)
-                  itemImage = item.image;
+                  // Áp dụng proxy cho cả tour image nếu cần
+                  itemImage = getProxiedGoogleDriveUrl(item.image);
                 }
               }
-              
+
               return (
                 <div
                   key={ad.id}
@@ -255,7 +258,10 @@ const AdminDashboardPage = () => {
                     width: '100%',
                     height: '200px',
                     background: `url(${itemImage}) center/cover`,
-                    backgroundColor: '#e5e7eb'
+                    backgroundColor: '#e5e7eb',
+                    backgroundSize: 'cover',
+                    backgroundPosition: 'center',
+                    backgroundRepeat: 'no-repeat'
                   }}></div>
 
                   {/* Content */}

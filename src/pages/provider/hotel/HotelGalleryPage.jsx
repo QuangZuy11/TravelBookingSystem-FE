@@ -4,6 +4,7 @@ import axios from 'axios';
 import toast from 'react-hot-toast';
 import Breadcrumb from '../../../components/shared/Breadcrumb';
 import { getProxiedGoogleDriveUrl } from '../../../utils/googleDriveImageHelper';
+import { Image, ArrowLeft, Upload, Trash2, X } from 'lucide-react';
 
 const HotelGalleryPage = () => {
     const { hotelId } = useParams();
@@ -170,26 +171,30 @@ const HotelGalleryPage = () => {
     const headerStyle = {
         marginBottom: '2.5rem',
         paddingBottom: '1.5rem',
-        borderBottom: '3px solid #10b981'
+        borderBottom: '1px solid #e0e0e0'
     };
 
     const titleStyle = {
-        fontSize: '2.5rem',
+        fontSize: '2rem',
         fontWeight: '700',
-        background: '#10b981',
-        WebkitBackgroundClip: 'text',
-        WebkitTextFillColor: 'transparent',
-        backgroundClip: 'text'
+        color: '#1a1a1a',
+        display: 'flex',
+        alignItems: 'center',
+        gap: '0.75rem',
+        marginBottom: '0.5rem'
     };
 
     const buttonStyle = {
-        padding: '0.875rem 1.75rem',
+        padding: '0.75rem 1.5rem',
         fontSize: '1rem',
         fontWeight: '600',
         borderRadius: '12px',
         border: 'none',
         cursor: 'pointer',
-        transition: 'all 0.3s ease'
+        transition: 'all 0.3s ease',
+        display: 'flex',
+        alignItems: 'center',
+        gap: '0.5rem'
     };
 
     // Removed category button style
@@ -218,8 +223,11 @@ const HotelGalleryPage = () => {
             <div style={contentStyle}>
                 {/* Header */}
                 <div style={headerStyle}>
-                    <h1 style={titleStyle}>📸 Thư viện ảnh</h1>
-                    <p style={{ fontSize: '1rem', color: '#6b7280', marginTop: '0.5rem' }}>
+                    <h1 style={titleStyle}>
+                        <Image size={28} color="#0a5757" />
+                        Thư viện ảnh
+                    </h1>
+                    <p style={{ fontSize: '0.95rem', color: '#6b7280', marginTop: '0.5rem' }}>
                         {hotel?.name} • {gallery.length} ảnh
                     </p>
                 </div>
@@ -229,17 +237,21 @@ const HotelGalleryPage = () => {
                     <div style={{
                         marginBottom: '2rem',
                         padding: '2rem',
-                        background: '#f9fafb',
-                        borderRadius: '16px',
-                        border: '2px dashed #10b981'
+                        background: '#f8f9fa',
+                        borderRadius: '12px',
+                        border: '1px dashed #0a5757'
                     }}>
                         <h2 style={{
-                            fontSize: '1.5rem',
-                            fontWeight: '700',
-                            color: '#1f2937',
-                            marginBottom: '1.5rem'
+                            fontSize: '1.25rem',
+                            fontWeight: '600',
+                            color: '#1a1a1a',
+                            marginBottom: '1.5rem',
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '0.5rem'
                         }}>
-                            📤 Tải ảnh mới ({7 - gallery.length} ảnh còn lại)
+                            <Upload size={20} color="#0a5757" />
+                            Tải ảnh mới ({7 - gallery.length} ảnh còn lại)
                         </h2>
 
                         <input
@@ -255,13 +267,23 @@ const HotelGalleryPage = () => {
                             htmlFor="gallery-upload"
                             style={{
                                 ...buttonStyle,
-                                background: '#10b981',
+                                background: 'linear-gradient(135deg, #0a5757 0%, #2d6a4f 100%)',
                                 color: 'white',
-                                boxShadow: '0 4px 15px rgba(102, 126, 234, 0.4)',
-                                display: 'inline-block'
+                                boxShadow: '0 4px 12px rgba(10, 87, 87, 0.25)',
+                                display: 'inline-block',
+                                cursor: 'pointer'
+                            }}
+                            onMouseEnter={(e) => {
+                                e.currentTarget.style.transform = 'translateY(-2px)';
+                                e.currentTarget.style.boxShadow = '0 6px 16px rgba(10, 87, 87, 0.35)';
+                            }}
+                            onMouseLeave={(e) => {
+                                e.currentTarget.style.transform = 'translateY(0)';
+                                e.currentTarget.style.boxShadow = '0 4px 12px rgba(10, 87, 87, 0.25)';
                             }}
                         >
-                            📁 Chọn ảnh
+                            <Upload size={18} />
+                            Chọn ảnh
                         </label>
 
                         {/* New Images Preview */}
@@ -277,7 +299,7 @@ const HotelGalleryPage = () => {
                                             background: 'white',
                                             borderRadius: '12px',
                                             overflow: 'hidden',
-                                            border: '2px solid #e5e7eb'
+                                            border: '1px solid #e0e0e0'
                                         }}>
                                             <div style={{
                                                 width: '100%',
@@ -306,7 +328,7 @@ const HotelGalleryPage = () => {
                                                         padding: '0.5rem',
                                                         marginBottom: '0.5rem',
                                                         borderRadius: '8px',
-                                                        border: '2px solid #e5e7eb'
+                                                        border: '1px solid #e0e0e0'
                                                     }}
                                                 />
                                                 <button
@@ -316,10 +338,20 @@ const HotelGalleryPage = () => {
                                                         background: '#ef4444',
                                                         color: 'white',
                                                         width: '100%',
-                                                        padding: '0.5rem'
+                                                        padding: '0.5rem',
+                                                        boxShadow: '0 4px 12px rgba(239, 68, 68, 0.25)'
+                                                    }}
+                                                    onMouseEnter={(e) => {
+                                                        e.currentTarget.style.background = '#dc2626';
+                                                        e.currentTarget.style.transform = 'translateY(-2px)';
+                                                    }}
+                                                    onMouseLeave={(e) => {
+                                                        e.currentTarget.style.background = '#ef4444';
+                                                        e.currentTarget.style.transform = 'translateY(0)';
                                                     }}
                                                 >
-                                                    🗑️ Xóa
+                                                    <Trash2 size={16} />
+                                                    Xóa
                                                 </button>
                                             </div>
                                         </div>
@@ -330,13 +362,27 @@ const HotelGalleryPage = () => {
                                     disabled={uploading}
                                     style={{
                                         ...buttonStyle,
-                                        background: '#10b981',
+                                        background: 'linear-gradient(135deg, #0a5757 0%, #2d6a4f 100%)',
                                         color: 'white',
                                         marginTop: '1.5rem',
-                                        opacity: uploading ? 0.6 : 1
+                                        opacity: uploading ? 0.6 : 1,
+                                        boxShadow: '0 4px 12px rgba(10, 87, 87, 0.25)'
+                                    }}
+                                    onMouseEnter={(e) => {
+                                        if (!uploading) {
+                                            e.currentTarget.style.transform = 'translateY(-2px)';
+                                            e.currentTarget.style.boxShadow = '0 6px 16px rgba(10, 87, 87, 0.35)';
+                                        }
+                                    }}
+                                    onMouseLeave={(e) => {
+                                        if (!uploading) {
+                                            e.currentTarget.style.transform = 'translateY(0)';
+                                            e.currentTarget.style.boxShadow = '0 4px 12px rgba(10, 87, 87, 0.25)';
+                                        }
                                     }}
                                 >
-                                    {uploading ? '⏳ Đang tải lên...' : `⬆️ Tải lên ${newImages.length} ảnh`}
+                                    <Upload size={18} />
+                                    {uploading ? 'Đang tải lên...' : `Tải lên ${newImages.length} ảnh`}
                                 </button>
                             </div>
                         )}
@@ -357,18 +403,20 @@ const HotelGalleryPage = () => {
                                     background: 'white',
                                     borderRadius: '12px',
                                     overflow: 'hidden',
-                                    border: '2px solid #e5e7eb',
+                                    border: '1px solid #e0e0e0',
                                     cursor: 'pointer',
                                     transition: 'all 0.3s ease',
-                                    boxShadow: '0 2px 8px rgba(0,0,0,0.1)'
+                                    boxShadow: '0 2px 8px rgba(0,0,0,0.05)'
                                 }}
                                 onMouseEnter={(e) => {
                                     e.currentTarget.style.transform = 'translateY(-4px)';
-                                    e.currentTarget.style.boxShadow = '0 8px 24px rgba(0,0,0,0.15)';
+                                    e.currentTarget.style.boxShadow = '0 8px 24px rgba(10, 87, 87, 0.15)';
+                                    e.currentTarget.style.borderColor = '#0a5757';
                                 }}
                                 onMouseLeave={(e) => {
                                     e.currentTarget.style.transform = 'translateY(0)';
-                                    e.currentTarget.style.boxShadow = '0 2px 8px rgba(0,0,0,0.1)';
+                                    e.currentTarget.style.boxShadow = '0 2px 8px rgba(0,0,0,0.05)';
+                                    e.currentTarget.style.borderColor = '#e0e0e0';
                                 }}
                             >
                                 <div style={{
@@ -485,20 +533,40 @@ const HotelGalleryPage = () => {
                                         style={{
                                             ...buttonStyle,
                                             background: '#ef4444',
-                                            color: 'white'
+                                            color: 'white',
+                                            boxShadow: '0 4px 12px rgba(239, 68, 68, 0.25)'
+                                        }}
+                                        onMouseEnter={(e) => {
+                                            e.currentTarget.style.background = '#dc2626';
+                                            e.currentTarget.style.transform = 'translateY(-2px)';
+                                        }}
+                                        onMouseLeave={(e) => {
+                                            e.currentTarget.style.background = '#ef4444';
+                                            e.currentTarget.style.transform = 'translateY(0)';
                                         }}
                                     >
-                                        🗑️ Xóa ảnh
+                                        <Trash2 size={18} />
+                                        Xóa ảnh
                                     </button>
                                     <button
                                         onClick={() => setSelectedImage(null)}
                                         style={{
                                             ...buttonStyle,
                                             background: '#6b7280',
-                                            color: 'white'
+                                            color: 'white',
+                                            boxShadow: '0 4px 12px rgba(107, 114, 128, 0.25)'
+                                        }}
+                                        onMouseEnter={(e) => {
+                                            e.currentTarget.style.background = '#4b5563';
+                                            e.currentTarget.style.transform = 'translateY(-2px)';
+                                        }}
+                                        onMouseLeave={(e) => {
+                                            e.currentTarget.style.background = '#6b7280';
+                                            e.currentTarget.style.transform = 'translateY(0)';
                                         }}
                                     >
-                                        ✕ Đóng
+                                        <X size={18} />
+                                        Đóng
                                     </button>
                                 </div>
                             </div>
@@ -512,12 +580,21 @@ const HotelGalleryPage = () => {
                         onClick={() => navigate(`/provider/hotels/${hotelId}/overview`)}
                         style={{
                             ...buttonStyle,
-                            background: '#f3f4f6',
+                            background: '#f8f9fa',
                             color: '#6b7280',
-                            border: '2px solid #d1d5db'
+                            border: '1px solid #e0e0e0'
+                        }}
+                        onMouseEnter={(e) => {
+                            e.currentTarget.style.background = '#e8e8e8';
+                            e.currentTarget.style.color = '#1a1a1a';
+                        }}
+                        onMouseLeave={(e) => {
+                            e.currentTarget.style.background = '#f8f9fa';
+                            e.currentTarget.style.color = '#6b7280';
                         }}
                     >
-                        ← Quay lại tổng quan
+                        <ArrowLeft size={18} />
+                        Quay lại tổng quan
                     </button>
                 </div>
             </div>

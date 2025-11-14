@@ -36,8 +36,8 @@ const SearchSection = ({ onSearch }) => {
         location: '',
         checkIn: '',
         checkOut: '',
-        adults: 2,
-        children: 1
+        adults: 1,
+        children: 0
     });
 
     const [anchorEl, setAnchorEl] = useState(null);
@@ -81,8 +81,8 @@ const SearchSection = ({ onSearch }) => {
             location: '',
             checkIn: '',
             checkOut: '',
-            adults: 2,
-            children: 1
+            adults: 1,
+            children: 0
         });
         setErrors({});
         setAnchorEl(null);

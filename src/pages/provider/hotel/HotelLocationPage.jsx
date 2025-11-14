@@ -11,6 +11,7 @@ import { MAP_CONFIG } from '../../../config/mapConfig';
 import L from 'leaflet';
 import markerIcon from 'leaflet/dist/images/marker-icon.png';
 import markerIconShadow from 'leaflet/dist/images/marker-shadow.png';
+import { Home, Compass, MapPin, Edit, ArrowLeft, Save, X } from 'lucide-react';
 
 // Fix Leaflet marker icon
 delete L.Icon.Default.prototype._getIconUrl;
@@ -294,25 +295,6 @@ const HotelLocationPage = () => {
         }
     };
 
-    // Style definitions
-    const labelStyle = {
-        display: 'block',
-        marginBottom: '0.5rem',
-        fontWeight: '600',
-        color: '#374151',
-        fontSize: '0.95rem'
-    };
-
-    const inputStyle = {
-        width: '100%',
-        padding: '0.75rem',
-        border: '2px solid #d1d5db',
-        borderRadius: '8px',
-        fontSize: '1rem',
-        transition: 'border-color 0.3s ease',
-        outline: 'none'
-    };
-
     if (loading) return <LoadingSpinner />;
     if (error) return <ErrorAlert message={error} />;
     if (!hotel) return <ErrorAlert message="Hotel not found" />;
@@ -343,28 +325,37 @@ const HotelLocationPage = () => {
                             style={{
                                 background: 'none',
                                 border: 'none',
-                                color: '#10b981',
+                                color: '#0a5757',
                                 fontSize: '1rem',
                                 cursor: 'pointer',
                                 marginBottom: '1rem',
                                 display: 'flex',
                                 alignItems: 'center',
-                                gap: '0.5rem'
+                                gap: '0.5rem',
+                                fontWeight: '500',
+                                transition: 'all 0.3s ease'
+                            }}
+                            onMouseEnter={(e) => {
+                                e.currentTarget.style.color = '#2d6a4f';
+                                e.currentTarget.style.transform = 'translateX(-4px)';
+                            }}
+                            onMouseLeave={(e) => {
+                                e.currentTarget.style.color = '#0a5757';
+                                e.currentTarget.style.transform = 'translateX(0)';
                             }}
                         >
-                            ← Quay lại tổng quan
+                            <ArrowLeft size={18} />
+                            Quay lại tổng quan
                         </button>
                         <h1 style={{
-                            fontSize: '2.5rem',
+                            fontSize: '2rem',
                             fontWeight: '700',
-                            color: 'black',
-                            WebkitBackgroundClip: 'text',
-                            WebkitTextFillColor: 'transparent',
+                            color: '#1a1a1a',
                             marginBottom: '0.5rem'
                         }}>
-                            📍 Vị trí khách sạn
+                            Vị trí khách sạn
                         </h1>
-                        <p style={{ color: '#6b7280' }}>
+                        <p style={{ color: '#6b7280', fontSize: '0.95rem' }}>
                             Quản lý địa chỉ và thông tin vị trí
                         </p>
                     </div>
@@ -373,7 +364,7 @@ const HotelLocationPage = () => {
                             onClick={() => setIsEditing(true)}
                             style={{
                                 padding: '0.75rem 1.5rem',
-                                background: '#10b981',
+                                background: 'linear-gradient(135deg, #0a5757 0%, #2d6a4f 100%)',
                                 color: 'white',
                                 border: 'none',
                                 borderRadius: '12px',
@@ -382,10 +373,21 @@ const HotelLocationPage = () => {
                                 cursor: 'pointer',
                                 display: 'flex',
                                 alignItems: 'center',
-                                gap: '0.5rem'
+                                gap: '0.5rem',
+                                boxShadow: '0 4px 12px rgba(10, 87, 87, 0.25)',
+                                transition: 'all 0.3s ease'
+                            }}
+                            onMouseEnter={(e) => {
+                                e.currentTarget.style.transform = 'translateY(-2px)';
+                                e.currentTarget.style.boxShadow = '0 6px 16px rgba(10, 87, 87, 0.35)';
+                            }}
+                            onMouseLeave={(e) => {
+                                e.currentTarget.style.transform = 'translateY(0)';
+                                e.currentTarget.style.boxShadow = '0 4px 12px rgba(10, 87, 87, 0.25)';
                             }}
                         >
-                            ✏️ Chỉnh sửa
+                            <Edit size={18} />
+                            Chỉnh sửa
                         </button>
                     )}
                 </div>
@@ -408,15 +410,29 @@ const HotelLocationPage = () => {
                                     onClick={handleUpdateLocation}
                                     style={{
                                         padding: '0.75rem 1.5rem',
-                                        background: '#10b981',
+                                        background: 'linear-gradient(135deg, #0a5757 0%, #2d6a4f 100%)',
                                         color: 'white',
                                         border: 'none',
                                         borderRadius: '12px',
                                         cursor: 'pointer',
-                                        fontWeight: '600'
+                                        fontWeight: '600',
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        gap: '0.5rem',
+                                        boxShadow: '0 4px 12px rgba(10, 87, 87, 0.25)',
+                                        transition: 'all 0.3s ease'
+                                    }}
+                                    onMouseEnter={(e) => {
+                                        e.currentTarget.style.transform = 'translateY(-2px)';
+                                        e.currentTarget.style.boxShadow = '0 6px 16px rgba(10, 87, 87, 0.35)';
+                                    }}
+                                    onMouseLeave={(e) => {
+                                        e.currentTarget.style.transform = 'translateY(0)';
+                                        e.currentTarget.style.boxShadow = '0 4px 12px rgba(10, 87, 87, 0.25)';
                                     }}
                                 >
-                                    💾 Lưu thay đổi
+                                    <Save size={18} />
+                                    Lưu thay đổi
                                 </button>
                                 <button
                                     onClick={() => {
@@ -425,13 +441,27 @@ const HotelLocationPage = () => {
                                     }}
                                     style={{
                                         padding: '0.75rem 1.5rem',
-                                        background: '#f3f4f6',
+                                        background: '#f8f9fa',
                                         color: '#6b7280',
-                                        border: '2px solid #d1d5db',
+                                        border: '1px solid #e0e0e0',
                                         borderRadius: '12px',
-                                        cursor: 'pointer'
+                                        cursor: 'pointer',
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        gap: '0.5rem',
+                                        fontWeight: '500',
+                                        transition: 'all 0.3s ease'
+                                    }}
+                                    onMouseEnter={(e) => {
+                                        e.currentTarget.style.background = '#e8e8e8';
+                                        e.currentTarget.style.color = '#1a1a1a';
+                                    }}
+                                    onMouseLeave={(e) => {
+                                        e.currentTarget.style.background = '#f8f9fa';
+                                        e.currentTarget.style.color = '#6b7280';
                                     }}
                                 >
+                                    <X size={18} />
                                     Hủy
                                 </button>
                             </div>
@@ -688,20 +718,25 @@ const HotelLocationPage = () => {
                             }}>
                                 <div>
                                     <h3 style={{
-                                        fontSize: '1.5rem',
-                                        fontWeight: '700',
-                                        color: '#1f2937',
-                                        marginBottom: '1rem'
+                                        fontSize: '1.25rem',
+                                        fontWeight: '600',
+                                        color: '#1a1a1a',
+                                        marginBottom: '1rem',
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        gap: '0.75rem'
                                     }}>
-                                        🏠 Địa chỉ
+                                        <Home size={20} color="#0a5757" />
+                                        Địa chỉ
                                     </h3>
                                     <div style={{
-                                        padding: '1rem',
-                                        background: '#f9fafb',
-                                        border: '2px solid #e5e7eb',
-                                        borderRadius: '8px',
-                                        fontSize: '1.1rem',
-                                        lineHeight: 1.6
+                                        padding: '1.25rem',
+                                        background: '#f8f9fa',
+                                        border: '1px solid #e0e0e0',
+                                        borderRadius: '12px',
+                                        fontSize: '1rem',
+                                        lineHeight: 1.6,
+                                        color: '#1a1a1a'
                                     }}>
                                         {formatAddress(hotel.address)}
                                     </div>
@@ -714,42 +749,60 @@ const HotelLocationPage = () => {
                                 }}>
                                     <div>
                                         <h4 style={{
-                                            fontSize: '1.2rem',
+                                            fontSize: '1.25rem',
                                             fontWeight: '600',
-                                            color: '#1f2937',
-                                            marginBottom: '0.5rem'
+                                            color: '#1a1a1a',
+                                            marginBottom: '1rem',
+                                            display: 'flex',
+                                            alignItems: 'center',
+                                            gap: '0.75rem'
                                         }}>
-                                            📐 Tọa độ
+                                            <Compass size={20} color="#0a5757" />
+                                            Tọa độ
                                         </h4>
                                         <div style={{
-                                            padding: '1rem',
-                                            background: '#f0f9ff',
-                                            border: '2px solid #0ea5e9',
-                                            borderRadius: '8px'
+                                            padding: '1.25rem',
+                                            background: '#f8f9fa',
+                                            border: '1px solid #e0e0e0',
+                                            borderRadius: '12px'
                                         }}>
-                                            <div style={{ marginBottom: '0.5rem' }}>
-                                                <strong>Vĩ độ:</strong> {hotel.address?.coordinates?.latitude || 'Chưa cập nhật'}
+                                            <div style={{ 
+                                                marginBottom: '0.75rem',
+                                                fontSize: '0.95rem',
+                                                color: '#4a4a4a'
+                                            }}>
+                                                <strong style={{ color: '#1a1a1a', marginRight: '0.5rem' }}>Vĩ độ:</strong> 
+                                                {hotel.address?.coordinates?.latitude || 'Chưa cập nhật'}
                                             </div>
-                                            <div>
-                                                <strong>Kinh độ:</strong> {hotel.address?.coordinates?.longitude || 'Chưa cập nhật'}
+                                            <div style={{ 
+                                                fontSize: '0.95rem',
+                                                color: '#4a4a4a'
+                                            }}>
+                                                <strong style={{ color: '#1a1a1a', marginRight: '0.5rem' }}>Kinh độ:</strong> 
+                                                {hotel.address?.coordinates?.longitude || 'Chưa cập nhật'}
                                             </div>
                                         </div>
                                     </div>
 
                                     <div style={{ gridColumn: '1 / -1' }}>
                                         <h4 style={{
-                                            fontSize: '1.2rem',
+                                            fontSize: '1.25rem',
                                             fontWeight: '600',
-                                            color: '#1f2937',
-                                            marginBottom: '0.5rem'
+                                            color: '#1a1a1a',
+                                            marginBottom: '1rem',
+                                            display: 'flex',
+                                            alignItems: 'center',
+                                            gap: '0.75rem'
                                         }}>
-                                            🗺️ Bản đồ
+                                            <MapPin size={20} color="#0a5757" />
+                                            Bản đồ
                                         </h4>
                                         <div style={{
                                             height: '400px',
                                             borderRadius: '12px',
                                             overflow: 'hidden',
-                                            border: '2px solid #e5e7eb'
+                                            border: '1px solid #e0e0e0',
+                                            boxShadow: '0 2px 8px rgba(0, 0, 0, 0.05)'
                                         }}>
                                             {hotel.address?.coordinates?.latitude && hotel.address?.coordinates?.longitude ? (
                                                 <MapContainer

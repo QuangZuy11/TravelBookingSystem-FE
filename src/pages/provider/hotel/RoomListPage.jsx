@@ -5,6 +5,7 @@ import toast from 'react-hot-toast';
 import { Spinner } from '../../../components/ui/Spinner';
 import { ErrorAlert } from '../../../components/shared/ErrorAlert';
 import Breadcrumb from '../../../components/shared/Breadcrumb';
+import { Bed, Calendar, Plus, ArrowLeft, Eye, Edit, Trash2, X } from 'lucide-react';
 
 const RoomListPage = () => {
     const { hotelId } = useParams();
@@ -95,23 +96,28 @@ const RoomListPage = () => {
     };
 
     const titleStyle = {
-        fontSize: '2.5rem',
+        fontSize: '2rem',
         fontWeight: '700',
-        background: '#10b981',
-        WebkitBackgroundClip: 'text',
-        WebkitTextFillColor: 'transparent'
+        color: '#1a1a1a',
+        display: 'flex',
+        alignItems: 'center',
+        gap: '0.75rem'
     };
 
     const buttonStyle = {
         padding: '0.75rem 1.5rem',
-        background: '#10b981',
+        background: 'linear-gradient(135deg, #0a5757 0%, #2d6a4f 100%)',
         color: 'white',
         border: 'none',
         borderRadius: '12px',
         fontSize: '1rem',
         fontWeight: '600',
         cursor: 'pointer',
-        transition: 'all 0.3s ease'
+        transition: 'all 0.3s ease',
+        display: 'flex',
+        alignItems: 'center',
+        gap: '0.5rem',
+        boxShadow: '0 4px 12px rgba(10, 87, 87, 0.25)'
     };
 
     const tableStyle = {
@@ -121,7 +127,7 @@ const RoomListPage = () => {
     };
 
     const theadStyle = {
-        background: '#10b981',
+        background: 'linear-gradient(135deg, #0a5757 0%, #2d6a4f 100%)',
         color: 'white'
     };
 
@@ -134,13 +140,16 @@ const RoomListPage = () => {
 
     const tdStyle = {
         padding: '1rem',
-        background: '#f9fafb',
-        fontSize: '0.95rem'
+        background: '#f8f9fa',
+        fontSize: '0.95rem',
+        border: '1px solid #e0e0e0',
+        borderLeft: 'none',
+        borderRight: 'none'
     };
 
     const statusBadgeStyle = (status) => {
         const colors = {
-            available: '#10b981',
+            available: '#0a5757',
             occupied: '#f59e0b',
             maintenance: '#ef4444'
         };
@@ -177,36 +186,66 @@ const RoomListPage = () => {
 
                 <div style={headerStyle}>
                     <div>
-                        <h1 style={titleStyle}>Quản lý phòng </h1>
-
+                        <h1 style={titleStyle}>
+                            <Bed size={28} color="#0a5757" />
+                            Quản lý phòng
+                        </h1>
                     </div>
                     <div style={{ display: 'flex', gap: '1rem' }}>
                         <button
                             style={{
                                 ...buttonStyle,
                                 background: '#3b82f6',
-                                color: 'white'
+                                boxShadow: '0 4px 12px rgba(59, 130, 246, 0.25)'
                             }}
                             onClick={() => navigate(`/provider/hotels/${hotelId}/rooms/availability`)}
+                            onMouseEnter={(e) => {
+                                e.currentTarget.style.transform = 'translateY(-2px)';
+                                e.currentTarget.style.boxShadow = '0 6px 16px rgba(59, 130, 246, 0.35)';
+                            }}
+                            onMouseLeave={(e) => {
+                                e.currentTarget.style.transform = 'translateY(0)';
+                                e.currentTarget.style.boxShadow = '0 4px 12px rgba(59, 130, 246, 0.25)';
+                            }}
                         >
-                            📅 Quản lý phòng trống
+                            <Calendar size={18} />
+                            Quản lý phòng trống
                         </button>
                         <button
                             style={{
                                 ...buttonStyle,
                                 background: 'white',
-                                color: '#10b981',
-                                border: '2px solid #10b981'
+                                color: '#0a5757',
+                                border: '1px solid #0a5757',
+                                boxShadow: 'none'
                             }}
                             onClick={() => navigate(`/provider/hotels/${hotelId}/rooms/bulk-create`)}
+                            onMouseEnter={(e) => {
+                                e.currentTarget.style.background = '#f0fdf4';
+                                e.currentTarget.style.transform = 'translateY(-2px)';
+                            }}
+                            onMouseLeave={(e) => {
+                                e.currentTarget.style.background = 'white';
+                                e.currentTarget.style.transform = 'translateY(0)';
+                            }}
                         >
+                            <Plus size={18} />
                             Tạo nhiều phòng
                         </button>
                         <button
                             style={buttonStyle}
                             onClick={() => navigate(`/provider/hotels/${hotelId}/rooms/new`)}
+                            onMouseEnter={(e) => {
+                                e.currentTarget.style.transform = 'translateY(-2px)';
+                                e.currentTarget.style.boxShadow = '0 6px 16px rgba(10, 87, 87, 0.35)';
+                            }}
+                            onMouseLeave={(e) => {
+                                e.currentTarget.style.transform = 'translateY(0)';
+                                e.currentTarget.style.boxShadow = '0 4px 12px rgba(10, 87, 87, 0.25)';
+                            }}
                         >
-                            Add New Room
+                            <Plus size={18} />
+                            Thêm phòng mới
                         </button>
                     </div>
                 </div>
@@ -224,17 +263,36 @@ const RoomListPage = () => {
                                 style={{
                                     ...buttonStyle,
                                     background: 'white',
-                                    color: '#10b981',
-                                    border: '2px solid #10b981'
+                                    color: '#0a5757',
+                                    border: '1px solid #0a5757',
+                                    boxShadow: 'none'
+                                }}
+                                onMouseEnter={(e) => {
+                                    e.currentTarget.style.background = '#f0fdf4';
+                                    e.currentTarget.style.transform = 'translateY(-2px)';
+                                }}
+                                onMouseLeave={(e) => {
+                                    e.currentTarget.style.background = 'white';
+                                    e.currentTarget.style.transform = 'translateY(0)';
                                 }}
                             >
-                                🏗️ Tạo nhiều phòng cùng lúc
+                                <Plus size={18} />
+                                Tạo nhiều phòng cùng lúc
                             </button>
                             <button
                                 onClick={() => navigate(`/provider/hotels/${hotelId}/rooms/new`)}
                                 style={buttonStyle}
+                                onMouseEnter={(e) => {
+                                    e.currentTarget.style.transform = 'translateY(-2px)';
+                                    e.currentTarget.style.boxShadow = '0 6px 16px rgba(10, 87, 87, 0.35)';
+                                }}
+                                onMouseLeave={(e) => {
+                                    e.currentTarget.style.transform = 'translateY(0)';
+                                    e.currentTarget.style.boxShadow = '0 4px 12px rgba(10, 87, 87, 0.25)';
+                                }}
                             >
-                                ➕ Tạo từng phòng
+                                <Plus size={18} />
+                                Tạo từng phòng
                             </button>
                         </div>
                     </div>
@@ -268,7 +326,7 @@ const RoomListPage = () => {
                                         <td style={tdStyle}>{room.type}</td>
                                         <td style={tdStyle}>{room.floor}</td>
                                         <td style={tdStyle}>{room.capacity} persons</td>
-                                        <td style={{ ...tdStyle, fontWeight: '600', color: '#10b981' }}>
+                                        <td style={{ ...tdStyle, fontWeight: '600', color: '#0a5757' }}>
                                             {room.pricePerNight.toLocaleString()}đ
                                         </td>
                                         <td style={tdStyle}>
@@ -279,21 +337,48 @@ const RoomListPage = () => {
                                         <td style={tdStyle}>
                                             <button
                                                 onClick={() => navigate(`/provider/hotels/${hotelId}/rooms/${room._id}/edit`)}
-                                                style={{ ...actionButtonStyle, background: '#10b981', color: 'white' }}
+                                                style={{ ...actionButtonStyle, background: '#0a5757', color: 'white', display: 'flex', alignItems: 'center', gap: '0.5rem' }}
+                                                onMouseEnter={(e) => {
+                                                    e.currentTarget.style.background = '#2d6a4f';
+                                                    e.currentTarget.style.transform = 'translateY(-2px)';
+                                                }}
+                                                onMouseLeave={(e) => {
+                                                    e.currentTarget.style.background = '#0a5757';
+                                                    e.currentTarget.style.transform = 'translateY(0)';
+                                                }}
                                             >
-                                                View Details
+                                                <Eye size={16} />
+                                                Chi tiết
                                             </button>
                                             <button
                                                 onClick={() => navigate(`/provider/hotels/${hotelId}/rooms/${room._id}/edit`)}
-                                                style={{ ...actionButtonStyle, background: '#3b82f6', color: 'white' }}
+                                                style={{ ...actionButtonStyle, background: '#3b82f6', color: 'white', display: 'flex', alignItems: 'center', gap: '0.5rem' }}
+                                                onMouseEnter={(e) => {
+                                                    e.currentTarget.style.background = '#2563eb';
+                                                    e.currentTarget.style.transform = 'translateY(-2px)';
+                                                }}
+                                                onMouseLeave={(e) => {
+                                                    e.currentTarget.style.background = '#3b82f6';
+                                                    e.currentTarget.style.transform = 'translateY(0)';
+                                                }}
                                             >
-                                                Edit
+                                                <Edit size={16} />
+                                                Sửa
                                             </button>
                                             <button
                                                 onClick={() => handleDeleteClick(room)}
-                                                style={{ ...actionButtonStyle, background: '#ef4444', color: 'white' }}
+                                                style={{ ...actionButtonStyle, background: '#ef4444', color: 'white', display: 'flex', alignItems: 'center', gap: '0.5rem' }}
+                                                onMouseEnter={(e) => {
+                                                    e.currentTarget.style.background = '#dc2626';
+                                                    e.currentTarget.style.transform = 'translateY(-2px)';
+                                                }}
+                                                onMouseLeave={(e) => {
+                                                    e.currentTarget.style.background = '#ef4444';
+                                                    e.currentTarget.style.transform = 'translateY(0)';
+                                                }}
                                             >
-                                                🗑️ Delete
+                                                <Trash2 size={16} />
+                                                Xóa
                                             </button>
                                         </td>
                                     </tr>
@@ -377,22 +462,29 @@ const RoomListPage = () => {
                                 style={{
                                     flex: 1,
                                     padding: '0.75rem',
-                                    background: '#f3f4f6',
-                                    color: '#374151',
-                                    border: '2px solid #d1d5db',
+                                    background: '#f8f9fa',
+                                    color: '#6b7280',
+                                    border: '1px solid #e0e0e0',
                                     borderRadius: '12px',
                                     fontSize: '1rem',
                                     fontWeight: '600',
                                     cursor: 'pointer',
-                                    transition: 'all 0.3s ease'
+                                    transition: 'all 0.3s ease',
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'center',
+                                    gap: '0.5rem'
                                 }}
                                 onMouseEnter={(e) => {
-                                    e.target.style.background = '#e5e7eb';
+                                    e.currentTarget.style.background = '#e8e8e8';
+                                    e.currentTarget.style.color = '#1a1a1a';
                                 }}
                                 onMouseLeave={(e) => {
-                                    e.target.style.background = '#f3f4f6';
+                                    e.currentTarget.style.background = '#f8f9fa';
+                                    e.currentTarget.style.color = '#6b7280';
                                 }}
                             >
+                                <X size={18} />
                                 Hủy
                             </button>
                             <button
@@ -407,16 +499,26 @@ const RoomListPage = () => {
                                     fontSize: '1rem',
                                     fontWeight: '600',
                                     cursor: 'pointer',
-                                    transition: 'all 0.3s ease'
+                                    transition: 'all 0.3s ease',
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'center',
+                                    gap: '0.5rem',
+                                    boxShadow: '0 4px 12px rgba(239, 68, 68, 0.25)'
                                 }}
                                 onMouseEnter={(e) => {
-                                    e.target.style.background = '#dc2626';
+                                    e.currentTarget.style.background = '#dc2626';
+                                    e.currentTarget.style.transform = 'translateY(-2px)';
+                                    e.currentTarget.style.boxShadow = '0 6px 16px rgba(239, 68, 68, 0.35)';
                                 }}
                                 onMouseLeave={(e) => {
-                                    e.target.style.background = '#ef4444';
+                                    e.currentTarget.style.background = '#ef4444';
+                                    e.currentTarget.style.transform = 'translateY(0)';
+                                    e.currentTarget.style.boxShadow = '0 4px 12px rgba(239, 68, 68, 0.25)';
                                 }}
                             >
-                                🗑️ Xóa phòng
+                                <Trash2 size={18} />
+                                Xóa phòng
                             </button>
                         </div>
                     </div>
