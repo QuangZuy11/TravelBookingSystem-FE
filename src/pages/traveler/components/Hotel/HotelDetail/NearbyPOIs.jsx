@@ -66,7 +66,7 @@ const NearbyPOIsSection = ({ pois, destination, hotelCoordinates }) => {
         <section id="nearby-pois" className="hotel-detail-content-section nearby-pois-section">
             <div className="hotel-detail-section-header">
                 <h2 className="hotel-detail-section-title">
-                    🗺️ Địa điểm gần khách sạn s
+                    🗺️ Địa điểm gần khách sạn
                 </h2>
                 {destination && (
                     <p className="hotel-detail-section-description destination-subtitle">

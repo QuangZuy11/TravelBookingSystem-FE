@@ -1,6 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import axios from 'axios';
+import {
+    Bed,
+    Calendar,
+    DollarSign,
+    MapPin,
+    Image as ImageIcon,
+    ChevronRight
+} from 'lucide-react';
 import LoadingSpinner from '../../../components/shared/LoadingSpinner';
 import ErrorAlert from '../../../components/shared/ErrorAlert';
 import { formatAddress } from '../../../utils/addressHelpers';
@@ -154,11 +162,7 @@ const HotelOverviewPage = () => {
 
 
     return (
-        <div style={{
-            minHeight: '100vh',
-            background: '#f3f4f6',
-            padding: '2rem'
-        }}>
+        <div style={{ padding: '2rem', background: '#f8f9fa', minHeight: '100vh' }}>
             <div style={{
                 maxWidth: '1400px',
                 margin: '0 auto'
@@ -166,90 +170,116 @@ const HotelOverviewPage = () => {
                 {/* Header */}
                 <div style={{
                     background: 'white',
-                    borderRadius: '20px',
+                    borderRadius: '16px',
                     padding: '2rem',
-                    marginBottom: '2rem',
-                    boxShadow: '0 10px 30px rgba(0,0,0,0.1)'
+                    marginBottom: '1.5rem',
+                    boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)'
                 }}>
                     <h1 style={{
-                        fontSize: '2.5rem',
+                        fontSize: '2rem',
                         fontWeight: '700',
-                        color: '#1f2937',
+                        color: '#1a1a1a',
                         marginBottom: '0.5rem'
                     }}>
-                        🏨 {hotel.name}
+                        {hotel.name}
                     </h1>
-                    <p style={{ color: '#6b7280', fontSize: '1.1rem' }}>
+                    <p style={{ color: '#6b7280', fontSize: '0.875rem', margin: 0 }}>
                         {formatAddress(hotel.address)}
                     </p>
                 </div>
 
 
 
-                {/* Quick Stats */}
+                {/* Quick Stats - 3 cards trên 1 dòng */}
                 <div style={{
-                    background: 'white',
-                    borderRadius: '16px',
-                    padding: '2rem',
-                    marginTop: '2rem',
-                    boxShadow: '0 5px 15px rgba(0,0,0,0.1)'
+                    display: 'grid',
+                    gridTemplateColumns: 'repeat(3, 1fr)',
+                    gap: '1.5rem',
+                    marginBottom: '1.5rem'
                 }}>
-                    <h2 style={{
-                        fontSize: '1.5rem',
-                        fontWeight: '700',
-                        color: '#1f2937',
-                        marginBottom: '1.5rem'
-                    }}>
-                        📊 Thống kê nhanh
-                    </h2>
                     <div style={{
-                        display: 'grid',
-                        gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
+                        background: 'white',
+                        borderRadius: '16px',
+                        padding: '1.5rem',
+                        boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)',
+                        display: 'flex',
+                        alignItems: 'center',
                         gap: '1rem'
                     }}>
                         <div style={{
-                            background: '#f0f9ff',
-                            padding: '1.5rem',
+                            background: '#e8f5e9',
                             borderRadius: '12px',
-                            textAlign: 'center',
-                            border: '2px solid #0ea5e9'
+                            padding: '0.875rem',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center'
                         }}>
-                            <div style={{ fontSize: '2rem', marginBottom: '0.5rem' }}>🛏️</div>
-                            <div style={{ fontSize: '2rem', fontWeight: '700', color: '#0ea5e9' }}>
+                            <Bed size={24} color="#0a5757" />
+                        </div>
+                        <div>
+                            <p style={{ margin: 0, fontSize: '0.875rem', color: '#6b7280' }}>Tổng số phòng</p>
+                            <p style={{ margin: 0, fontSize: '1.5rem', fontWeight: '700', color: '#1a1a1a' }}>
                                 {stats.totalRooms}
-                            </div>
-                            <div style={{ color: '#6b7280' }}>Tổng số phòng</div>
+                            </p>
                         </div>
+                    </div>
 
+                    <div style={{
+                        background: 'white',
+                        borderRadius: '16px',
+                        padding: '1.5rem',
+                        boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '1rem'
+                    }}>
                         <div style={{
-                            background: '#fefce8',
-                            padding: '1.5rem',
+                            background: '#fff3e0',
                             borderRadius: '12px',
-                            textAlign: 'center',
-                            border: '2px solid #eab308'
+                            padding: '0.875rem',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center'
                         }}>
-                            <div style={{ fontSize: '2rem', marginBottom: '0.5rem' }}>📅</div>
-                            <div style={{ fontSize: '2rem', fontWeight: '700', color: '#eab308' }}>
-                                {stats.todayBookings}
-                            </div>
-                            <div style={{ color: '#6b7280' }}>Đặt phòng hôm nay</div>
+                            <Calendar size={24} color="#f59e0b" />
                         </div>
+                        <div>
+                            <p style={{ margin: 0, fontSize: '0.875rem', color: '#6b7280' }}>Đặt phòng hôm nay</p>
+                            <p style={{ margin: 0, fontSize: '1.5rem', fontWeight: '700', color: '#1a1a1a' }}>
+                                {stats.todayBookings}
+                            </p>
+                        </div>
+                    </div>
+
+                    <div style={{
+                        background: 'white',
+                        borderRadius: '16px',
+                        padding: '1.5rem',
+                        boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '1rem'
+                    }}>
                         <div style={{
-                            background: '#fdf2f8',
-                            padding: '1.5rem',
+                            background: 'linear-gradient(135deg, #0a5757 0%, #2d6a4f 100%)',
                             borderRadius: '12px',
-                            textAlign: 'center',
-                            border: '2px solid #ec4899'
+                            padding: '0.875rem',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center'
                         }}>
-                            <div style={{ fontSize: '2rem', marginBottom: '0.5rem' }}>💰</div>
-                            <div style={{ fontSize: '2rem', fontWeight: '700', color: '#ec4899' }}>
+                            <DollarSign size={24} color="white" />
+                        </div>
+                        <div>
+                            <p style={{ margin: 0, fontSize: '0.875rem', color: '#6b7280' }}>Doanh thu tháng</p>
+                            <p style={{ margin: 0, fontSize: '1.5rem', fontWeight: '700', color: '#1a1a1a' }}>
                                 {new Intl.NumberFormat('vi-VN', {
                                     style: 'currency',
                                     currency: 'VND',
                                     maximumFractionDigits: 0
                                 }).format(stats.monthlyRevenue)}
-                            </div>
-                            <div style={{ color: '#6b7280' }}>Doanh thu tháng</div>
+                            </p>
+                            <p style={{ margin: 0, fontSize: '0.75rem', color: '#10b981' }}>VND</p>
                         </div>
                     </div>
                 </div>
@@ -259,9 +289,9 @@ const HotelOverviewPage = () => {
                     <div style={{
                         background: 'white',
                         borderRadius: '16px',
-                        padding: '2rem',
-                        marginTop: '2rem',
-                        boxShadow: '0 5px 15px rgba(0,0,0,0.1)'
+                        padding: '1.5rem',
+                        marginBottom: '1.5rem',
+                        boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)'
                     }}>
                         <div style={{
                             display: 'flex',
@@ -270,26 +300,43 @@ const HotelOverviewPage = () => {
                             marginBottom: '1.5rem'
                         }}>
                             <h2 style={{
-                                fontSize: '1.5rem',
+                                fontSize: '1.25rem',
                                 fontWeight: '700',
-                                color: '#1f2937',
-                                margin: 0
+                                color: '#1a1a1a',
+                                margin: 0,
+                                display: 'flex',
+                                alignItems: 'center',
+                                gap: '0.5rem'
                             }}>
-                                🖼️ Hình ảnh khách sạn
+                                <ImageIcon size={20} color="#0a5757" />
+                                Hình ảnh khách sạn
                             </h2>
                             <Link
                                 to={`/provider/hotels/${hotelId}/gallery`}
                                 style={{
-                                    padding: '0.5rem 1rem',
-                                    background: '#10b981',
+                                    padding: '0.75rem 1rem',
+                                    background: '#0a5757',
                                     color: 'white',
-                                    borderRadius: '8px',
+                                    borderRadius: '10px',
                                     textDecoration: 'none',
-                                    fontSize: '0.9rem',
-                                    fontWeight: '600'
+                                    fontSize: '0.875rem',
+                                    fontWeight: '600',
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    gap: '0.5rem',
+                                    transition: 'all 0.2s ease'
+                                }}
+                                onMouseEnter={(e) => {
+                                    e.currentTarget.style.background = '#0d6f6f';
+                                    e.currentTarget.style.transform = 'translateY(-2px)';
+                                }}
+                                onMouseLeave={(e) => {
+                                    e.currentTarget.style.background = '#0a5757';
+                                    e.currentTarget.style.transform = 'translateY(0)';
                                 }}
                             >
                                 Xem tất cả ({hotel.images.length})
+                                <ChevronRight size={16} />
                             </Link>
                         </div>
                         <div style={{
@@ -309,12 +356,14 @@ const HotelOverviewPage = () => {
                                         transition: 'all 0.3s ease'
                                     }}
                                     onMouseEnter={(e) => {
-                                        e.currentTarget.style.transform = 'scale(1.05)';
-                                        e.currentTarget.style.boxShadow = '0 8px 20px rgba(0,0,0,0.15)';
+                                        e.currentTarget.style.transform = 'translateY(-4px)';
+                                        e.currentTarget.style.boxShadow = '0 8px 16px rgba(10, 87, 87, 0.2)';
+                                        e.currentTarget.style.borderColor = '#0a5757';
                                     }}
                                     onMouseLeave={(e) => {
-                                        e.currentTarget.style.transform = 'scale(1)';
+                                        e.currentTarget.style.transform = 'translateY(0)';
                                         e.currentTarget.style.boxShadow = 'none';
+                                        e.currentTarget.style.borderColor = '#e5e7eb';
                                     }}
                                 >
                                     <img
@@ -337,9 +386,9 @@ const HotelOverviewPage = () => {
                     <div style={{
                         background: 'white',
                         borderRadius: '16px',
-                        padding: '2rem',
-                        marginTop: '2rem',
-                        boxShadow: '0 5px 15px rgba(0,0,0,0.1)'
+                        padding: '1.5rem',
+                        marginBottom: '1.5rem',
+                        boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)'
                     }}>
                         <div style={{
                             display: 'flex',
@@ -348,26 +397,43 @@ const HotelOverviewPage = () => {
                             marginBottom: '1.5rem'
                         }}>
                             <h2 style={{
-                                fontSize: '1.5rem',
+                                fontSize: '1.25rem',
                                 fontWeight: '700',
-                                color: '#1f2937',
-                                margin: 0
+                                color: '#1a1a1a',
+                                margin: 0,
+                                display: 'flex',
+                                alignItems: 'center',
+                                gap: '0.5rem'
                             }}>
-                                📍 Vị trí khách sạn
+                                <MapPin size={20} color="#0a5757" />
+                                Vị trí khách sạn
                             </h2>
                             <Link
                                 to={`/provider/hotels/${hotelId}/location`}
                                 style={{
-                                    padding: '0.5rem 1rem',
-                                    background: '#10b981',
+                                    padding: '0.75rem 1rem',
+                                    background: '#0a5757',
                                     color: 'white',
-                                    borderRadius: '8px',
+                                    borderRadius: '10px',
                                     textDecoration: 'none',
-                                    fontSize: '0.9rem',
-                                    fontWeight: '600'
+                                    fontSize: '0.875rem',
+                                    fontWeight: '600',
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    gap: '0.5rem',
+                                    transition: 'all 0.2s ease'
+                                }}
+                                onMouseEnter={(e) => {
+                                    e.currentTarget.style.background = '#0d6f6f';
+                                    e.currentTarget.style.transform = 'translateY(-2px)';
+                                }}
+                                onMouseLeave={(e) => {
+                                    e.currentTarget.style.background = '#0a5757';
+                                    e.currentTarget.style.transform = 'translateY(0)';
                                 }}
                             >
                                 Chỉnh sửa vị trí
+                                <ChevronRight size={16} />
                             </Link>
                         </div>
                         <div style={{
@@ -418,16 +484,27 @@ const HotelOverviewPage = () => {
                                                 style={{
                                                     marginTop: '8px',
                                                     padding: '6px 12px',
-                                                    background: '#10b981',
+                                                    background: '#0a5757',
                                                     color: 'white',
                                                     border: 'none',
-                                                    borderRadius: '6px',
+                                                    borderRadius: '8px',
                                                     cursor: 'pointer',
                                                     fontSize: '12px',
-                                                    fontWeight: '600'
+                                                    fontWeight: '600',
+                                                    display: 'flex',
+                                                    alignItems: 'center',
+                                                    gap: '4px',
+                                                    transition: 'all 0.2s ease'
+                                                }}
+                                                onMouseEnter={(e) => {
+                                                    e.currentTarget.style.background = '#0d6f6f';
+                                                }}
+                                                onMouseLeave={(e) => {
+                                                    e.currentTarget.style.background = '#0a5757';
                                                 }}
                                             >
-                                                🗺️ Mở Google Maps
+                                                <MapPin size={12} />
+                                                Mở Google Maps
                                             </button>
                                         </div>
                                     </Popup>
@@ -460,19 +537,30 @@ const HotelOverviewPage = () => {
                                 }}
                                 style={{
                                     padding: '0.75rem 1.5rem',
-                                    background: '#10b981',
+                                    background: '#0a5757',
                                     color: 'white',
                                     border: 'none',
-                                    borderRadius: '8px',
+                                    borderRadius: '10px',
                                     cursor: 'pointer',
-                                    fontSize: '0.9rem',
+                                    fontSize: '0.875rem',
                                     fontWeight: '600',
                                     display: 'flex',
                                     alignItems: 'center',
-                                    gap: '0.5rem'
+                                    gap: '0.5rem',
+                                    transition: 'all 0.2s ease'
+                                }}
+                                onMouseEnter={(e) => {
+                                    e.currentTarget.style.background = '#0d6f6f';
+                                    e.currentTarget.style.transform = 'translateY(-2px)';
+                                    e.currentTarget.style.boxShadow = '0 4px 12px rgba(10, 87, 87, 0.3)';
+                                }}
+                                onMouseLeave={(e) => {
+                                    e.currentTarget.style.background = '#0a5757';
+                                    e.currentTarget.style.transform = 'translateY(0)';
+                                    e.currentTarget.style.boxShadow = 'none';
                                 }}
                             >
-                                <span>🧭</span>
+                                <MapPin size={16} />
                                 Chỉ đường
                             </button>
                         </div>

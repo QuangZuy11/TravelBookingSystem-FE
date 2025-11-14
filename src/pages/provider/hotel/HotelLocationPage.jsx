@@ -115,6 +115,25 @@ const HotelLocationPage = () => {
         }
     };
 
+    // Style definitions
+    const labelStyle = {
+        display: 'block',
+        marginBottom: '0.5rem',
+        fontWeight: '600',
+        color: '#374151',
+        fontSize: '0.95rem'
+    };
+
+    const inputStyle = {
+        width: '100%',
+        padding: '0.75rem',
+        border: '2px solid #d1d5db',
+        borderRadius: '8px',
+        fontSize: '1rem',
+        transition: 'border-color 0.3s ease',
+        outline: 'none'
+    };
+
     if (loading) return <LoadingSpinner />;
     if (error) return <ErrorAlert message={error} />;
     if (!hotel) return <ErrorAlert message="Hotel not found" />;
