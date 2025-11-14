@@ -170,14 +170,16 @@ const PendingProvidersList = () => {
                                     </div>
 
                                     <div className="service-types">
-                                        {(Array.isArray(provider.type) ? provider.type : [provider.type]).map(type => (
-                                            <span
-                                                key={type}
-                                                className={`service-badge ${type}`}
-                                            >
-                                                {type === 'hotel' ? '🏨' : '🗺️'} {type.toUpperCase()}
-                                            </span>
-                                        ))}
+                                        {(Array.isArray(provider.type) ? provider.type : [provider.type])
+                                            .filter(type => type) // Remove undefined/null values
+                                            .map(type => (
+                                                <span
+                                                    key={type}
+                                                    className={`service-badge ${type}`}
+                                                >
+                                                    {type === 'hotel' ? '🏨' : '🗺️'} {type.toUpperCase()}
+                                                </span>
+                                            ))}
                                     </div>
 
                                     <div className="license-stats">

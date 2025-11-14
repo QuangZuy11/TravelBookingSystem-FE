@@ -3,6 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
+import toast from 'react-hot-toast';
 import LoadingSpinner from '../../../components/shared/LoadingSpinner';
 import ErrorAlert from '../../../components/shared/ErrorAlert';
 import { formatAddress } from '../../../utils/addressHelpers';
@@ -30,6 +31,8 @@ const HotelLocationPage = () => {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [isEditing, setIsEditing] = useState(false);
+    const [searchAddress, setSearchAddress] = useState('');
+    const [addressSuggestions, setAddressSuggestions] = useState([]);
     const [formData, setFormData] = useState({
         address: {
             coordinates: {
@@ -48,6 +51,182 @@ const HotelLocationPage = () => {
     // Get provider _id from localStorage
     const provider = localStorage.getItem('provider');
     const providerId = provider ? JSON.parse(provider)._id : null;
+
+    // Styles
+    const labelStyle = {
+        display: 'block',
+        fontWeight: '600',
+        color: '#374151',
+        marginBottom: '0.5rem',
+        fontSize: '0.875rem'
+    };
+
+    const inputStyle = {
+        width: '100%',
+        padding: '0.75rem',
+        border: '2px solid #e5e7eb',
+        borderRadius: '8px',
+        fontSize: '1rem',
+        transition: 'all 0.2s',
+        outline: 'none'
+    };
+
+    // Parse Google Maps URL to extract coordinates
+    const parseGoogleMapsUrl = (url) => {
+        try {
+            // Pattern 1: /@lat,lng,zoom
+            const pattern1 = /@(-?\d+\.?\d*),(-?\d+\.?\d*),(\d+\.?\d*)z/;
+            const match1 = url.match(pattern1);
+
+            if (match1) {
+                return {
+                    latitude: parseFloat(match1[1]),
+                    longitude: parseFloat(match1[2])
+                };
+            }
+
+            // Pattern 2: /place/name/@lat,lng
+            const pattern2 = /@(-?\d+\.?\d*),(-?\d+\.?\d*)/;
+            const match2 = url.match(pattern2);
+
+            if (match2) {
+                return {
+                    latitude: parseFloat(match2[1]),
+                    longitude: parseFloat(match2[2])
+                };
+            }
+
+            // Pattern 3: ?q=lat,lng
+            const pattern3 = /[?&]q=(-?\d+\.?\d*),(-?\d+\.?\d*)/;
+            const match3 = url.match(pattern3);
+
+            if (match3) {
+                return {
+                    latitude: parseFloat(match3[1]),
+                    longitude: parseFloat(match3[2])
+                };
+            }
+
+            return null;
+        } catch (error) {
+            console.error('Error parsing Google Maps URL:', error);
+            return null;
+        }
+    };
+
+    // Reverse geocoding to get address from coordinates
+    const reverseGeocode = async (lat, lon) => {
+        try {
+            const response = await fetch(
+                `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lon}&addressdetails=1`
+            );
+            const data = await response.json();
+
+            if (data && data.address) {
+                const addr = data.address;
+                setFormData({
+                    address: {
+                        coordinates: {
+                            latitude: lat,
+                            longitude: lon
+                        },
+                        street: addr.road || addr.suburb || addr.neighbourhood || '',
+                        city: addr.city || addr.town || addr.province || '',
+                        state: addr.state || addr.county || '',
+                        country: addr.country || 'Vietnam',
+                        zipCode: addr.postcode || ''
+                    }
+                });
+            }
+        } catch (error) {
+            console.error('Error reverse geocoding:', error);
+        }
+    };
+
+    // Handle Google Maps URL input
+    const handleGoogleMapsUrl = async (url) => {
+        const coords = parseGoogleMapsUrl(url);
+
+        if (coords) {
+            // Update coordinates
+            setFormData(prev => ({
+                address: {
+                    ...prev.address,
+                    coordinates: coords
+                }
+            }));
+
+            // Get address details from coordinates
+            await reverseGeocode(coords.latitude, coords.longitude);
+
+            toast.success('✓ Đã phân tích tọa độ từ Google Maps!');
+        } else {
+            toast.error('URL Google Maps không hợp lệ. Vui lòng thử lại.');
+        }
+    };
+
+    // Search address using Nominatim (OpenStreetMap)
+    const searchAddressOnMap = async (query) => {
+        // Check if it's a Google Maps URL
+        if (query.includes('google.com/maps')) {
+            await handleGoogleMapsUrl(query);
+            setSearchAddress('');
+            setAddressSuggestions([]);
+            return;
+        }
+
+        if (query.length < 3) {
+            setAddressSuggestions([]);
+            return;
+        }
+
+        try {
+            const response = await fetch(
+                `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}&countrycodes=vn&limit=5&addressdetails=1`
+            );
+            const data = await response.json();
+            setAddressSuggestions(data);
+        } catch (error) {
+            console.error('Error searching address:', error);
+            setAddressSuggestions([]);
+        }
+    };
+
+    // Handle address selection from suggestions
+    const handleSelectAddress = (place) => {
+        const lat = parseFloat(place.lat);
+        const lon = parseFloat(place.lon);
+
+        // Parse address components
+        const addr = place.address || {};
+
+        setFormData({
+            address: {
+                coordinates: {
+                    latitude: lat,
+                    longitude: lon
+                },
+                street: addr.road || addr.suburb || place.display_name.split(',')[0] || '',
+                city: addr.city || addr.town || addr.province || '',
+                state: addr.state || addr.county || '',
+                country: addr.country || 'Vietnam',
+                zipCode: addr.postcode || ''
+            }
+        });
+
+        setSearchAddress(place.display_name);
+        setAddressSuggestions([]);
+    };
+
+    useEffect(() => {
+        const delayDebounce = setTimeout(() => {
+            if (searchAddress && isEditing) {
+                searchAddressOnMap(searchAddress);
+            }
+        }, 500);
+
+        return () => clearTimeout(delayDebounce);
+    }, [searchAddress, isEditing]);
 
     useEffect(() => {
         fetchHotel();
@@ -243,6 +422,86 @@ const HotelLocationPage = () => {
                                 display: 'grid',
                                 gap: '2rem'
                             }}>
+                                {/* Address Search with Google Maps style */}
+                                <div style={{ position: 'relative' }}>
+                                    <label style={labelStyle}>
+                                        🗺️ Nhập địa chỉ hoặc link Google Maps:
+                                    </label>
+                                    <div style={{
+                                        background: '#f0fdf4',
+                                        border: '1px solid #86efac',
+                                        borderRadius: '8px',
+                                        padding: '0.75rem',
+                                        marginBottom: '0.5rem',
+                                        fontSize: '0.875rem'
+                                    }}>
+                                        <strong>💡 Mẹo:</strong> Dán link Google Maps hoặc nhập địa chỉ để tự động điền
+                                    </div>
+                                    <input
+                                        type="text"
+                                        value={searchAddress}
+                                        onChange={(e) => setSearchAddress(e.target.value)}
+                                        style={{
+                                            ...inputStyle,
+                                            paddingLeft: '2.5rem',
+                                            border: '2px solid #10b981',
+                                            boxShadow: '0 2px 8px rgba(16, 185, 129, 0.2)'
+                                        }}
+                                        placeholder="VD: https://www.google.com/maps/... hoặc 'Khách sạn Rex, Quận 1'"
+                                    />
+                                    <span style={{
+                                        position: 'absolute',
+                                        left: '0.75rem',
+                                        top: '2.75rem',
+                                        fontSize: '1.2rem'
+                                    }}>
+                                        🔍
+                                    </span>
+
+                                    {/* Suggestions Dropdown */}
+                                    {addressSuggestions.length > 0 && (
+                                        <div style={{
+                                            position: 'absolute',
+                                            top: '100%',
+                                            left: 0,
+                                            right: 0,
+                                            background: 'white',
+                                            border: '2px solid #10b981',
+                                            borderTop: 'none',
+                                            borderRadius: '0 0 8px 8px',
+                                            maxHeight: '300px',
+                                            overflowY: 'auto',
+                                            zIndex: 1000,
+                                            boxShadow: '0 4px 12px rgba(0,0,0,0.1)'
+                                        }}>
+                                            {addressSuggestions.map((suggestion, index) => (
+                                                <div
+                                                    key={index}
+                                                    onClick={() => handleSelectAddress(suggestion)}
+                                                    style={{
+                                                        padding: '1rem',
+                                                        borderBottom: index < addressSuggestions.length - 1 ? '1px solid #e5e7eb' : 'none',
+                                                        cursor: 'pointer',
+                                                        transition: 'background 0.2s',
+                                                        '&:hover': {
+                                                            background: '#f0fdf4'
+                                                        }
+                                                    }}
+                                                    onMouseEnter={(e) => e.currentTarget.style.background = '#f0fdf4'}
+                                                    onMouseLeave={(e) => e.currentTarget.style.background = 'white'}
+                                                >
+                                                    <div style={{ fontWeight: '600', color: '#10b981', marginBottom: '0.25rem' }}>
+                                                        📍 {suggestion.display_name.split(',')[0]}
+                                                    </div>
+                                                    <div style={{ fontSize: '0.875rem', color: '#6b7280' }}>
+                                                        {suggestion.display_name}
+                                                    </div>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    )}
+                                </div>
+
                                 <div style={{
                                     display: 'grid',
                                     gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))',
