@@ -6,7 +6,7 @@ import {
     CheckCircle, Loader, DollarSign, Users, Building, ExternalLink
 } from 'lucide-react';
 import './BookingModal.css';
-import { calculateSavings, formatPromotionDiscount } from '../../../../../utils/promotionHelpers';
+import { formatPromotionDiscount } from '../../../../../utils/promotionHelpers';
 
 const BookingModal = ({
     isOpen,
@@ -98,6 +98,19 @@ const BookingModal = ({
         }
     }, [isOpen]);
 
+    // Validate check-in date when modal opens (only show warning, don't auto-reset)
+    useEffect(() => {
+        if (isOpen && bookingForm.checkInDate) {
+            const validation = validateCheckInDate(bookingForm.checkInDate);
+            if (!validation.valid) {
+                // Show error message but don't auto-reset to avoid disrupting user
+                // User will see the error and can manually change the date
+                setError(validation.message);
+            }
+        }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [isOpen, bookingForm.checkInDate]);
+
     // Fetch available rooms when dates are selected
     useEffect(() => {
         const fetchAvailableRooms = async () => {
@@ -129,14 +142,27 @@ const BookingModal = ({
                 if (data.success && data.data?.roomsByType?.[selectedRoom.id]) {
                     const roomTypeData = data.data.roomsByType[selectedRoom.id];
                     // Filter rooms that are available (no conflicting bookings)
+                    // Backend đã filter cancelled bookings, nhưng filter lại để chắc chắn
                     const available = roomTypeData.rooms.filter(room => {
-                        // Check if room has any conflicting bookings
+                        // Check if room has any conflicting bookings (chỉ tính active bookings, không cancelled)
                         if (!room.bookings || room.bookings.length === 0) return true;
 
                         const checkIn = new Date(bookingForm.checkInDate);
                         const checkOut = new Date(bookingForm.checkOutDate);
 
-                        return !room.bookings.some(booking => {
+                        // Filter cancelled bookings và kiểm tra conflict
+                        const activeBookings = room.bookings.filter(booking => {
+                            // Loại trừ cancelled bookings
+                            // Backend đã populate booking_status, nhưng kiểm tra lại để chắc chắn
+                            return booking.booking_status !== 'cancelled' &&
+                                booking.booking_status !== 'completed'; // Completed bookings cũng không còn active
+                        });
+
+                        // Nếu không còn active bookings sau khi filter, phòng available
+                        if (activeBookings.length === 0) return true;
+
+                        // Kiểm tra conflict với active bookings
+                        return !activeBookings.some(booking => {
                             const bookingCheckIn = new Date(booking.checkIn);
                             const bookingCheckOut = new Date(booking.checkOut);
                             return bookingCheckIn < checkOut && bookingCheckOut > checkIn;
@@ -157,7 +183,7 @@ const BookingModal = ({
                 }
             } catch (err) {
                 console.error('Error fetching available rooms:', err);
-                setError('Không thể tải danh sách phòng trống');
+                setError('Không có danh sách phòng trống trong thời gian này');
                 setAvailableRooms([]);
             } finally {
                 setLoadingAvailableRooms(false);
@@ -174,11 +200,61 @@ const BookingModal = ({
         return `${minutes}:${remainingSeconds.toString().padStart(2, '0')}`;
     };
 
+    // Calculate minimum check-in date based on current time
+    // If current time >= 14:00 (2 PM), min date is tomorrow
+    // If current time < 14:00, min date is today
+    const getMinCheckInDate = () => {
+        const now = new Date();
+        const currentHour = now.getHours();
+        const currentDate = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+
+        // If current time >= 14:00 (2 PM), min date is tomorrow
+        if (currentHour >= 14) {
+            const tomorrow = new Date(currentDate);
+            tomorrow.setDate(tomorrow.getDate() + 1);
+            return tomorrow.toISOString().split('T')[0];
+        }
+
+        // If current time < 14:00, min date is today
+        return currentDate.toISOString().split('T')[0];
+    };
+
+    // Validate check-in date based on current time
+    const validateCheckInDate = (checkInDate) => {
+        if (!checkInDate) return { valid: false, message: 'Vui lòng chọn ngày nhận phòng' };
+
+        const now = new Date();
+        const currentHour = now.getHours();
+        const currentDate = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+        const selectedDate = new Date(checkInDate);
+        const selectedDateOnly = new Date(selectedDate.getFullYear(), selectedDate.getMonth(), selectedDate.getDate());
+
+        // Check if selected date is today
+        const isToday = selectedDateOnly.getTime() === currentDate.getTime();
+
+        // If selected date is today and current time >= 14:00, not allowed
+        if (isToday && currentHour >= 14) {
+            return {
+                valid: false,
+                message: 'Không thể đặt phòng với ngày check-in là hôm nay sau 14:00. Vui lòng chọn ngày mai trở đi.'
+            };
+        }
+
+        return { valid: true };
+    };
+
     // Handle reservation creation (Step 1 -> Step 2)
     const handleCreateReservation = async () => {
         // Clear previous errors
         setError(null);
         setConflictDates([]);
+
+        // Validate check-in date based on current time
+        const checkInValidation = validateCheckInDate(bookingForm.checkInDate);
+        if (!checkInValidation.valid) {
+            setError(checkInValidation.message);
+            return;
+        }
 
         if (calculateNights() <= 0) {
             setError('Vui lòng chọn ngày nhận và trả phòng hợp lệ');
@@ -754,11 +830,46 @@ const BookingModal = ({
                                                     <input
                                                         type="date"
                                                         value={bookingForm.checkInDate}
-                                                        onChange={(e) => onFormChange('checkInDate', e.target.value)}
+                                                        onChange={(e) => {
+                                                            const selectedDate = e.target.value;
+                                                            // Validate selected date
+                                                            const validation = validateCheckInDate(selectedDate);
+                                                            if (!validation.valid) {
+                                                                setError(validation.message);
+                                                                return;
+                                                            }
+
+                                                            // Update check-in date
+                                                            onFormChange('checkInDate', selectedDate);
+
+                                                            // If check-out date is before or equal to new check-in date, 
+                                                            // automatically update check-out to next day
+                                                            if (bookingForm.checkOutDate && selectedDate) {
+                                                                const checkOutDate = new Date(bookingForm.checkOutDate);
+                                                                const checkInDate = new Date(selectedDate);
+                                                                if (checkOutDate <= checkInDate) {
+                                                                    const nextDay = new Date(checkInDate);
+                                                                    nextDay.setDate(nextDay.getDate() + 1);
+                                                                    onFormChange('checkOutDate', nextDay.toISOString().split('T')[0]);
+                                                                }
+                                                            }
+                                                        }}
                                                         required
-                                                        min={new Date().toISOString().split('T')[0]}
+                                                        min={getMinCheckInDate()}
                                                     />
                                                     <span className="time-hint">Từ 14:00</span>
+                                                    {(() => {
+                                                        const now = new Date();
+                                                        const currentHour = now.getHours();
+                                                        if (currentHour >= 14) {
+                                                            return (
+                                                                <span className="time-hint" style={{ color: '#d32f2f', fontSize: '12px', marginTop: '4px', display: 'block' }}>
+                                                                    ⚠️ Sau 14:00, chỉ có thể đặt từ ngày mai
+                                                                </span>
+                                                            );
+                                                        }
+                                                        return null;
+                                                    })()}
                                                 </div>
 
                                                 <div className="date-separator">
@@ -775,7 +886,7 @@ const BookingModal = ({
                                                         value={bookingForm.checkOutDate}
                                                         onChange={(e) => onFormChange('checkOutDate', e.target.value)}
                                                         required
-                                                        min={bookingForm.checkInDate || new Date().toISOString().split('T')[0]}
+                                                        min={bookingForm.checkInDate || getMinCheckInDate()}
                                                     />
                                                     <span className="time-hint">Trước 12:00</span>
                                                 </div>

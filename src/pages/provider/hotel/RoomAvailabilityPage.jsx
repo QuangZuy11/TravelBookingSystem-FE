@@ -3,7 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { Spinner } from '../../../components/ui/Spinner';
 import { ErrorAlert } from '../../../components/shared/ErrorAlert';
-import { Calendar, MapPin, Users, DollarSign, Clock, User, Phone, Mail } from 'lucide-react';
+import { Calendar, MapPin, Users, DollarSign, Clock, User, Phone, Mail, XCircle } from 'lucide-react';
 
 // Room Cell Component for Matrix View
 const RoomCell = ({ room, hasBooking, onBookingClick, getStatusBadge }) => {
@@ -66,6 +66,7 @@ const RoomAvailabilityPage = () => {
     const [selectedDate, setSelectedDate] = useState(new Date().toISOString().split('T')[0]);
     const [selectedBooking, setSelectedBooking] = useState(null);
     const [showModal, setShowModal] = useState(false);
+    const [modalMessage, setModalMessage] = useState({ type: '', text: '' }); // 'success' | 'error' | ''
     const [summary, setSummary] = useState({ total: 0, available: 0, booked: 0 });
 
     useEffect(() => {
@@ -102,8 +103,8 @@ const RoomAvailabilityPage = () => {
         // Create a map of booked room IDs
         const bookedRoomIds = new Set();
         bookings.forEach(booking => {
-            const roomId = booking.hotel_room_id?._id 
-                ? booking.hotel_room_id._id.toString() 
+            const roomId = booking.hotel_room_id?._id
+                ? booking.hotel_room_id._id.toString()
                 : booking.hotel_room_id.toString();
             bookedRoomIds.add(roomId);
         });
@@ -127,7 +128,7 @@ const RoomAvailabilityPage = () => {
             }
             return hasBooking;
         }).length;
-        
+
         // Phòng trống = tổng số phòng - phòng đã đặt - phòng maintenance - phòng no_show
         const noShow = rooms.filter(room => room.status === 'no_show').length;
         const maintenance = rooms.filter(room => room.status === 'maintenance').length;
@@ -143,10 +144,10 @@ const RoomAvailabilityPage = () => {
         // Create a map of bookings by room ID
         const bookingsByRoom = {};
         bookings.forEach(booking => {
-            const roomId = booking.hotel_room_id?._id 
-                ? booking.hotel_room_id._id.toString() 
+            const roomId = booking.hotel_room_id?._id
+                ? booking.hotel_room_id._id.toString()
                 : booking.hotel_room_id.toString();
-            
+
             if (!bookingsByRoom[roomId]) {
                 bookingsByRoom[roomId] = [];
             }
@@ -157,13 +158,16 @@ const RoomAvailabilityPage = () => {
         return allRooms.map(room => {
             const roomId = room._id.toString();
             const roomBookings = bookingsByRoom[roomId] || [];
-            const isAvailable = roomBookings.length === 0 && room.status === 'available';
+            // Phòng available nếu: không có booking HOẶC có booking nhưng booking đã bị cancelled
+            // Và room status phải là 'available'
+            const activeBookings = roomBookings.filter(b => b.booking_status !== 'cancelled');
+            const isAvailable = activeBookings.length === 0 && room.status === 'available';
 
             return {
                 ...room,
                 isAvailable,
-                bookings: roomBookings,
-                bookingCount: roomBookings.length
+                bookings: activeBookings, // Chỉ trả về active bookings (không cancelled)
+                bookingCount: activeBookings.length
             };
         });
     };
@@ -182,23 +186,50 @@ const RoomAvailabilityPage = () => {
     const closeModal = () => {
         setShowModal(false);
         setSelectedBooking(null);
+        setModalMessage({ type: '', text: '' });
     };
 
-    const formatDate = (dateString) => {
-        if (!dateString) return '';
-        const date = new Date(dateString);
-        return date.toLocaleDateString('vi-VN', {
-            day: '2-digit',
-            month: '2-digit',
-            year: 'numeric'
-        });
-    };
+    const handleNoShow = async () => {
+        if (!selectedBooking) return;
 
-    const formatCurrency = (amount) => {
-        return new Intl.NumberFormat('vi-VN', {
-            style: 'currency',
-            currency: 'VND'
-        }).format(amount);
+        if (!window.confirm('Xác nhận giải phóng phòng? Phòng sẽ được chuyển về trạng thái "Trống".')) {
+            return;
+        }
+
+        setModalMessage({ type: '', text: '' });
+
+        try {
+            const bookingId = selectedBooking._id || selectedBooking.id;
+            const response = await axios.put(
+                `/api/hotel/provider/${providerId}/hotels/${hotelId}/bookings/${bookingId}/release-room`,
+                {},
+                { headers: { Authorization: `Bearer ${token}` } }
+            );
+
+            if (response.data.success) {
+                setModalMessage({
+                    type: 'success',
+                    text: 'Đã giải phóng phòng thành công. Phòng đã chuyển về trạng thái "Trống".'
+                });
+
+                // Close modal first
+                closeModal();
+
+                // Refresh data after a short delay to ensure backend has processed
+                setTimeout(async () => {
+                    await fetchBookingsByDate();
+                }, 500);
+            } else {
+                throw new Error(response.data.error || 'Có lỗi xảy ra');
+            }
+        } catch (error) {
+            console.error('Error releasing room:', error);
+            const errorMessage = error.response?.data?.error || error.response?.data?.message || error.message || 'Có lỗi xảy ra khi giải phóng phòng. Vui lòng thử lại.';
+            setModalMessage({
+                type: 'error',
+                text: errorMessage
+            });
+        }
     };
 
     const getStatusBadge = (status) => {
@@ -216,33 +247,6 @@ const RoomAvailabilityPage = () => {
                     color: 'white',
                     borderRadius: '20px',
                     fontSize: '0.875rem',
-                    fontWeight: '600',
-                    display: 'inline-block'
-                }}
-            >
-                {statusInfo.text}
-            </span>
-        );
-    };
-
-    const getBookingStatusBadge = (status) => {
-        const statusMap = {
-            reserved: { text: 'Đã giữ', color: '#3b82f6' },
-            pending: { text: 'Chờ xác nhận', color: '#f59e0b' },
-            confirmed: { text: 'Đã xác nhận', color: '#10b981' },
-            in_use: { text: 'Đang sử dụng', color: '#8b5cf6' },
-            completed: { text: 'Hoàn thành', color: '#6b7280' },
-            cancelled: { text: 'Đã hủy', color: '#ef4444' }
-        };
-        const statusInfo = statusMap[status] || { text: status, color: '#6b7280' };
-        return (
-            <span
-                style={{
-                    padding: '0.4rem 0.8rem',
-                    background: statusInfo.color,
-                    color: 'white',
-                    borderRadius: '12px',
-                    fontSize: '0.75rem',
                     fontWeight: '600',
                     display: 'inline-block'
                 }}
@@ -312,26 +316,6 @@ const RoomAvailabilityPage = () => {
         gridTemplateColumns: 'repeat(auto-fill, minmax(120px, 1fr))',
         gap: '1rem',
         marginTop: '1rem'
-    };
-
-    const roomCellStyle = (isAvailable, hasBooking) => ({
-        padding: '1rem',
-        borderRadius: '8px',
-        border: `2px solid ${isAvailable ? '#10b981' : '#f59e0b'}`,
-        background: isAvailable ? '#f0fdf4' : '#fffbeb',
-        transition: 'all 0.3s ease',
-        cursor: hasBooking ? 'pointer' : 'default',
-        textAlign: 'center',
-        minHeight: '80px',
-        display: 'flex',
-        flexDirection: 'column',
-        justifyContent: 'center',
-        alignItems: 'center'
-    });
-
-    const roomCellHoverStyle = {
-        transform: 'scale(1.05)',
-        boxShadow: '0 4px 12px rgba(0,0,0,0.15)'
     };
 
     if (loading) return <Spinner />;
@@ -480,6 +464,32 @@ const RoomAvailabilityPage = () => {
                             </button>
                         </div>
 
+                        {/* Thông báo trong modal */}
+                        {modalMessage.text && (
+                            <div style={{
+                                padding: '1rem',
+                                borderRadius: '8px',
+                                marginBottom: '1rem',
+                                background: modalMessage.type === 'success' ? '#d1fae5' : '#fee2e2',
+                                border: `1px solid ${modalMessage.type === 'success' ? '#10b981' : '#ef4444'}`,
+                                color: modalMessage.type === 'success' ? '#065f46' : '#991b1b'
+                            }}>
+                                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                                    {modalMessage.type === 'success' ? (
+                                        <span style={{ fontSize: '1.2rem' }}>✓</span>
+                                    ) : (
+                                        <span style={{ fontSize: '1.2rem' }}>✕</span>
+                                    )}
+                                    <span style={{ fontWeight: '600' }}>
+                                        {modalMessage.type === 'success' ? 'Thành công' : 'Lỗi'}
+                                    </span>
+                                </div>
+                                <div style={{ marginTop: '0.5rem', fontSize: '0.875rem' }}>
+                                    {modalMessage.text}
+                                </div>
+                            </div>
+                        )}
+
                         <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
                             {/* Thông tin khách hàng */}
                             {selectedBooking.user_id ? (
@@ -522,6 +532,48 @@ const RoomAvailabilityPage = () => {
                             ) : (
                                 <div style={{ padding: '1.5rem', textAlign: 'center', color: '#6b7280' }}>
                                     Không có thông tin khách hàng
+                                </div>
+                            )}
+
+                            {/* Button "Không đến" */}
+                            {selectedBooking.user_id && (
+                                <div style={{
+                                    display: 'flex',
+                                    justifyContent: 'flex-end',
+                                    gap: '1rem',
+                                    paddingTop: '1rem',
+                                    borderTop: '1px solid #e5e7eb'
+                                }}>
+                                    <button
+                                        onClick={handleNoShow}
+                                        style={{
+                                            padding: '0.75rem 1.5rem',
+                                            background: '#ef4444',
+                                            color: 'white',
+                                            border: 'none',
+                                            borderRadius: '10px',
+                                            fontSize: '0.875rem',
+                                            fontWeight: '600',
+                                            cursor: 'pointer',
+                                            display: 'flex',
+                                            alignItems: 'center',
+                                            gap: '0.5rem',
+                                            transition: 'all 0.2s ease'
+                                        }}
+                                        onMouseEnter={(e) => {
+                                            e.currentTarget.style.background = '#dc2626';
+                                            e.currentTarget.style.transform = 'translateY(-2px)';
+                                            e.currentTarget.style.boxShadow = '0 4px 12px rgba(239, 68, 68, 0.3)';
+                                        }}
+                                        onMouseLeave={(e) => {
+                                            e.currentTarget.style.background = '#ef4444';
+                                            e.currentTarget.style.transform = 'translateY(0)';
+                                            e.currentTarget.style.boxShadow = 'none';
+                                        }}
+                                    >
+                                        <XCircle size={18} />
+                                        Không đến
+                                    </button>
                                 </div>
                             )}
                         </div>
