@@ -48,13 +48,42 @@ export default function FeaturedHotel() {
   const [loading, setLoading] = useState(true);
 
   // Normalize hotel data (same logic as HotelResult.jsx)
+  // Support both ad-booking format and regular hotel format
   const normalizeHotel = (h) => {
-    const locationParts = [
-      h?.address?.street,
-      h?.address?.state,
-      h?.address?.city,
-    ].filter(Boolean);
+    // Handle ad-booking format (from /api/ad-bookings/active?type=hotel)
+    // Ad-booking returns: { _id, id, type, name, address (object), city (string), description, amenities, images, rating, reviews_count, ... }
+    const isAdBookingFormat = h.type === "hotel";
+
+    // Location handling - support both formats
+    let locationParts = [];
+    if (isAdBookingFormat) {
+      // Ad-booking format: address is an object { street, city, state, country }
+      // Backend also provides city as separate field
+      if (h.address && typeof h.address === "object") {
+        locationParts = [
+          h.address.street,
+          h.address.state,
+          h.address.city,
+        ].filter(Boolean);
+      }
+      // Fallback to city field if address object doesn't have city
+      if (locationParts.length === 0 && h.city) {
+        locationParts = [h.city];
+      }
+    } else {
+      // Regular format: address is an object
+      locationParts = [
+        h?.address?.street,
+        h?.address?.state,
+        h?.address?.city,
+      ].filter(Boolean);
+    }
+
     const stars = (() => {
+      if (isAdBookingFormat) {
+        // Ad-booking format might have rating as number of stars
+        return typeof h.rating === "number" ? h.rating : 0;
+      }
       const raw = String(h?.category || "").trim(); // '3_star'
       const n = Number(raw.split("_")[0]);
       return Number.isFinite(n) ? n : 0;
@@ -66,26 +95,15 @@ export default function FeaturedHotel() {
       : [];
     const uniqueAmenities = [...new Set(rawAmenities)];
 
-    // Lấy promotion đầu tiên nếu có (active promotions from backend)
-    // Support both promotions array and latestPromotion object
-    let activePromotion = null;
-    if (Array.isArray(h.promotions) && h.promotions.length > 0) {
-      activePromotion = h.promotions[0];
-    } else if (h.latestPromotion) {
-      // If latestPromotion is a string, parse it
-      activePromotion =
-        typeof h.latestPromotion === "string"
-          ? JSON.parse(h.latestPromotion)
-          : h.latestPromotion;
-    }
-
+    // Promotion - use the one passed from fetchHotels (already fetched)
+    const activePromotion = h.promotion || null;
     const discountPercent =
       activePromotion?.discountValue &&
       activePromotion?.discountType === "percent"
         ? activePromotion.discountValue
         : 0;
 
-    // Get price from realPriceRange (featured endpoint) or priceRange (search endpoint) or cheapestRoom
+    // Get price - ad-booking format might not have priceRange
     let price = 0;
     if (h?.realPriceRange?.min) {
       price = h.realPriceRange.min;
@@ -103,8 +121,23 @@ export default function FeaturedHotel() {
         ? h.reviews_count
         : 0;
 
+    // Image handling
+    let imageUrl = "";
+    if (isAdBookingFormat) {
+      // Ad-booking format: images is an array
+      imageUrl =
+        Array.isArray(h.images) && h.images[0]
+          ? getProxiedGoogleDriveUrl(h.images[0])
+          : "https://images.unsplash.com/photo-1566073771259-6a8506099945?w=1200&h=800&fit=crop";
+    } else {
+      imageUrl =
+        Array.isArray(h.images) && h.images[0]
+          ? getProxiedGoogleDriveUrl(h.images[0])
+          : "https://images.unsplash.com/photo-1566073771259-6a8506099945?w=1200&h=800&fit=crop";
+    }
+
     const normalized = {
-      id: h._id,
+      id: h._id || h.id,
       name: h.name || "Khách sạn",
       location: locationParts.join(", ") || "—",
       rating: stars, // FE rating = số sao (map từ category)
@@ -113,10 +146,7 @@ export default function FeaturedHotel() {
       discount: discountPercent,
       promotion: activePromotion,
       freeCancel: false,
-      image:
-        Array.isArray(h.images) && h.images[0]
-          ? getProxiedGoogleDriveUrl(h.images[0])
-          : "https://images.unsplash.com/photo-1566073771259-6a8506099945?w=1200&h=800&fit=crop",
+      image: imageUrl,
       amenities: uniqueAmenities,
       availableRooms: h?.availableRooms != null ? Number(h.availableRooms) : 0,
     };
@@ -128,27 +158,96 @@ export default function FeaturedHotel() {
     const fetchHotels = async () => {
       try {
         setLoading(true);
-        // Use the featured hotels endpoint which returns proper hotel data with promotions and bookingsCount
+        // Fetch hotels from ad-bookings (chỉ hiển thị hotels được book quảng cáo)
         const res = await fetch(
-          "http://localhost:3000/api/traveler/hotels/featured?limit=6"
+          "http://localhost:3000/api/ad-bookings/active?type=hotel"
         );
-        const data = await res.json();
+        const hotelsData = await res.json();
 
-        if (data.success && data.data) {
-          const rawHotels = data.data || [];
-          const normalized = rawHotels.map(normalizeHotel);
-          setHotels(normalized);
-        } else {
-          // Fallback to ad-bookings if featured endpoint fails
-          const fallbackRes = await fetch(
-            "http://localhost:3000/api/ad-bookings/active?type=hotel"
-          );
-          const fallbackData = await fallbackRes.json();
-          if (Array.isArray(fallbackData)) {
-            const normalized = fallbackData.map(normalizeHotel);
-            setHotels(normalized);
-          }
-        }
+        // Fetch promotions and price for all hotels
+        const hotelsWithPromotions = await Promise.all(
+          hotelsData.map(async (hotel) => {
+            try {
+              // Fetch active promotions for this hotel
+              const promoRes = await fetch(
+                `http://localhost:3000/api/traveler/promotions?targetType=hotel&targetId=${hotel._id}`
+              );
+              const promoData = await promoRes.json();
+
+              // Get the first active promotion
+              let activePromotion = null;
+              if (
+                promoData.success &&
+                promoData.data &&
+                promoData.data.length > 0
+              ) {
+                // Filter active promotions (check dates)
+                const now = new Date();
+                activePromotion = promoData.data.find((promo) => {
+                  const startDate = new Date(promo.startDate);
+                  const endDate = new Date(promo.endDate);
+                  return (
+                    now >= startDate &&
+                    now <= endDate &&
+                    promo.status === "active"
+                  );
+                });
+
+                // If no active promotion found by date, use the first one
+                if (!activePromotion && promoData.data[0].status === "active") {
+                  activePromotion = promoData.data[0];
+                }
+              }
+
+              // Fetch hotel detail to get price information
+              let hotelWithPrice = { ...hotel };
+              try {
+                // Use hotel details endpoint that includes price information
+                const hotelDetailRes = await fetch(
+                  `http://localhost:3000/api/hotel/${hotel._id}/details`
+                );
+                const hotelDetailData = await hotelDetailRes.json();
+
+                if (hotelDetailData.success && hotelDetailData.data) {
+                  const hotelDetail =
+                    hotelDetailData.data.hotel || hotelDetailData.data;
+                  // Add price information from hotel detail
+                  hotelWithPrice = {
+                    ...hotelWithPrice,
+                    realPriceRange: hotelDetail.realPriceRange,
+                    priceRange: hotelDetail.priceRange,
+                    cheapestRoom: hotelDetail.cheapestRoom,
+                    availableRooms: hotelDetail.availableRooms,
+                  };
+                }
+              } catch (priceError) {
+                console.error(
+                  `Error fetching price for hotel ${hotel._id}:`,
+                  priceError
+                );
+                // Continue without price information
+              }
+
+              return {
+                ...hotelWithPrice,
+                promotion: activePromotion,
+              };
+            } catch (error) {
+              console.error(
+                `Error fetching promotions for hotel ${hotel._id}:`,
+                error
+              );
+              return {
+                ...hotel,
+                promotion: null,
+              };
+            }
+          })
+        );
+
+        // Normalize hotel data
+        const normalized = hotelsWithPromotions.map(normalizeHotel);
+        setHotels(normalized);
       } catch (error) {
         console.error("Lỗi khi tải danh sách khách sạn:", error);
       } finally {
@@ -353,19 +452,42 @@ export default function FeaturedHotel() {
                       }}
                     >
                       <div className="tour-price">
-                        {hotel.promotion && hotel.price > 0 && (
-                          <span
-                            style={{
-                              textDecoration: "line-through",
-                              color: "#999",
-                              fontSize: "14px",
-                              marginRight: "8px",
-                            }}
-                          >
-                            {formatPrice(hotel.price)}
-                          </span>
-                        )}
                         {hotel.price > 0 ? (
+                          <>
+                            {/* Hiển thị giá gốc bị gạch đi nếu có promotion */}
+                            {hotel.promotion && (
+                              <span
+                                style={{
+                                  textDecoration: "line-through",
+                                  color: "#999",
+                                  fontSize: "14px",
+                                  marginRight: "8px",
+                                }}
+                              >
+                                {formatPrice(hotel.price)}
+                              </span>
+                            )}
+                            {/* Hiển thị giá sau giảm giá (hoặc giá gốc nếu không có promotion) */}
+                            <span
+                              style={{
+                                color: "#2d6a4f",
+                                fontWeight: "700",
+                                fontSize: "18px",
+                              }}
+                            >
+                              {formatPrice(discountPrice)}
+                              <span
+                                style={{
+                                  fontSize: "12px",
+                                  fontWeight: "400",
+                                  marginLeft: "4px",
+                                }}
+                              >
+                                /đêm
+                              </span>
+                            </span>
+                          </>
+                        ) : (
                           <span
                             style={{
                               color: "#2d6a4f",
@@ -373,19 +495,8 @@ export default function FeaturedHotel() {
                               fontSize: "18px",
                             }}
                           >
-                            {formatPrice(discountPrice)}
-                            <span
-                              style={{
-                                fontSize: "12px",
-                                fontWeight: "400",
-                                marginLeft: "4px",
-                              }}
-                            >
-                              /đêm
-                            </span>
+                            Liên hệ
                           </span>
-                        ) : (
-                          <span className="free">Liên hệ</span>
                         )}
                       </div>
                       <Link
