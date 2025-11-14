@@ -385,11 +385,11 @@ const Header = () => {
                       </a>
                       <a href="/my-itineraries" className="dropdown-item">
                         <FaSuitcase className="dropdown-icon" />
-                        <span>My Itineraries</span>
+                        <span>Lộ Trình Của Tôi</span>
                       </a>
                       <a href="/my-booking-itineraries" className="dropdown-item">
                         <FaSuitcase className="dropdown-icon" />
-                        <span>My AI Bookings</span>
+                        <span>Lộ Trình Đặt Chỗ Của Tôi</span>
                       </a>
                     </>
                   )}

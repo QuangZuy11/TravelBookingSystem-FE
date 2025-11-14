@@ -19,7 +19,7 @@ const NewItineraryView = ({ data, showActions = true }) => {
                 color: '#6b7280'
             }}>
                 <span style={{ fontSize: '2rem', marginBottom: '1rem', display: 'block' }}>🤔</span>
-                <p>No itinerary data available</p>
+                <p>Không có dữ liệu lộ trình</p>
             </div>
         );
     }
@@ -288,27 +288,27 @@ const NewItineraryView = ({ data, showActions = true }) => {
             <div style={styles.header}>
                 <div>
                     <h2 style={styles.title}>
-                        🎯 Your Perfect Trip to {destinationObj?.name || 'Unknown Destination'}
+                        🎯 Chuyến đi hoàn hảo của bạn đến {destinationObj?.name || 'Unknown Destination'}
                     </h2>
                     <p style={styles.subtitle}>
-                        ✨ AI-Generated Itinerary
+                        ✨ Lộ trình do AI tạo
                     </p>
                 </div>
 
                 <div style={styles.statsContainer}>
                     <div style={styles.statItem}>
                         <div style={styles.statValue}>{duration || days.length}</div>
-                        <div style={styles.statLabel}>Days</div>
+                        <div style={styles.statLabel}>Ngày</div>
                     </div>
                     <div style={styles.statItem}>
                         <div style={styles.statValue}>{days.reduce((sum, day) => sum + (day.activities?.length || 0), 0)}</div>
-                        <div style={styles.statLabel}>Activities</div>
+                        <div style={styles.statLabel}>Hoạt động</div>
                     </div>
                     <div style={styles.statItem}>
                         <div style={styles.statValue}>
                             {totalCost ? formatCurrency(totalCost).replace('₫', '') : 'N/A'}
                         </div>
-                        <div style={styles.statLabel}>Total Cost</div>
+                        <div style={styles.statLabel}>Tổng chi phí</div>
                     </div>
                 </div>
             </div>
@@ -334,7 +334,7 @@ const NewItineraryView = ({ data, showActions = true }) => {
                                     }
                                 }}
                             >
-                                Day {day.dayNumber || index + 1}
+                                Ngày {day.dayNumber || index + 1}
                             </button>
                         ))}
                     </div>
@@ -345,7 +345,7 @@ const NewItineraryView = ({ data, showActions = true }) => {
                     <div style={styles.dayCard}>
                         <div style={styles.dayHeader}>
                             <h3 style={styles.dayTitle}>
-                                Day {selectedDayData.dayNumber}: {selectedDayData.theme || 'Adventures Await'}
+                                Ngày {selectedDayData.dayNumber}: {selectedDayData.theme || 'Cuộc phiêu lưu đang chờ đợi'}
                             </h3>
                             {selectedDayData.description && (
                                 <p style={styles.dayDescription}>{selectedDayData.description}</p>
@@ -369,7 +369,7 @@ const NewItineraryView = ({ data, showActions = true }) => {
                                         {activity.userModified && (
                                             <div style={styles.modifiedBadge}>
                                                 <span>✏️</span>
-                                                <span>Modified</span>
+                                                <span>Đã sửa</span>
                                             </div>
                                         )}
                                     </div>
@@ -383,7 +383,7 @@ const NewItineraryView = ({ data, showActions = true }) => {
                                         {activity.duration > 0 && (
                                             <div style={styles.metaItem}>
                                                 <span>⏰</span>
-                                                <span>{Math.floor(activity.duration / 60)} hours {activity.duration % 60} minutes</span>
+                                                <span>{Math.floor(activity.duration / 60)} giờ {activity.duration % 60} phút</span>
                                             </div>
                                         )}
                                         {activity.activityType && (
@@ -394,7 +394,7 @@ const NewItineraryView = ({ data, showActions = true }) => {
                                         )}
                                         {activity.cost !== undefined && (
                                             <div style={styles.costBadge}>
-                                                💰 {activity.cost > 0 ? formatCurrency(activity.cost) : 'Free'}
+                                                💰 {activity.cost > 0 ? formatCurrency(activity.cost) : 'Miễn phí'}
                                             </div>
                                         )}
                                     </div>
@@ -407,7 +407,7 @@ const NewItineraryView = ({ data, showActions = true }) => {
                             <div style={styles.daySummary}>
                                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                                     <span style={{ fontWeight: '600', color: '#0369a1' }}>
-                                        📊 Day {selectedDayData.dayNumber} Total:
+                                        📊 Ngày {selectedDayData.dayNumber} Tổng:
                                     </span>
                                     <span style={{ fontSize: '1.125rem', fontWeight: '700', color: '#0369a1' }}>
                                         {formatCurrency(selectedDayData.dayTotal)}
@@ -429,7 +429,7 @@ const NewItineraryView = ({ data, showActions = true }) => {
                         onMouseLeave={(e) => e.target.style.transform = 'translateY(0)'}
                     >
                         <span>👁️</span>
-                        <span>View Details</span>
+                        <span>Xem chi tiết</span>
                     </button>
 
                     {isCustomizable && (
@@ -440,7 +440,7 @@ const NewItineraryView = ({ data, showActions = true }) => {
                             onMouseLeave={(e) => e.target.style.transform = 'translateY(0)'}
                         >
                             <span>{hasCustomized ? '🎨' : '✏️'}</span>
-                            <span>{hasCustomized ? 'View Customized' : 'Customize Itinerary'}</span>
+                            <span>{hasCustomized ? 'Xem bản tùy chỉnh' : 'Tùy chỉnh lộ trình'}</span>
                         </button>
                     )}
 
@@ -448,13 +448,13 @@ const NewItineraryView = ({ data, showActions = true }) => {
                         onClick={() => {
                             const url = `${window.location.origin}/ai-itinerary/${aiGeneratedId}`;
                             navigator.share?.({
-                                title: `My ${destinationObj?.name} Itinerary`,
-                                text: `Check out my perfect ${duration}-day trip to ${destinationObj?.name}!`,
+                                title: `Lộ trình ${destinationObj?.name} của tôi`,
+                                text: `Xem chuyến đi ${duration} ngày hoàn hảo của tôi đến ${destinationObj?.name}!`,
                                 url: url
                             }).catch(() => {
                                 // Fallback - copy to clipboard
                                 navigator.clipboard.writeText(url);
-                                toast.success('Link copied to clipboard!');
+                                toast.success('Đã sao chép liên kết!');
                             });
                         }}
                         style={styles.actionButton('secondary')}

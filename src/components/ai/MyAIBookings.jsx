@@ -325,7 +325,7 @@ const MyAIBookings = () => {
                     <div style={styles.contentWrapper}>
                         {/* Header */}
                         <div style={styles.header}>
-                            <h1 style={styles.title}>📋 My Booking Itineraries</h1>
+                            <h1 style={styles.title}>📋 Lộ Trình Đặt Chỗ Của Tôi</h1>
                             <p style={styles.subtitle}>
                                 Quản lý các yêu cầu đặt chuyến đi từ lịch trình AI của bạn
                             </p>
@@ -563,7 +563,7 @@ const MyAIBookings = () => {
                                                         📍 {activity.activity_name || activity.name}
                                                     </div>
                                                     <div style={{ fontSize: '0.75rem', color: '#64748b' }}>
-                                                        Day {activity.day_number} • {activity.activity_type || activity.type} • {activity.location}
+                                                        Ngày {activity.day_number} • {activity.activity_type || activity.type} • {activity.location}
                                                     </div>
                                                 </div>
                                                 <div style={{ fontSize: '0.875rem', fontWeight: '700', color: '#667eea', marginLeft: '1rem' }}>

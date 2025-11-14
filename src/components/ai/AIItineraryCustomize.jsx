@@ -156,8 +156,8 @@ const AIItineraryCustomize = () => {
     const handleAddActivity = (dayIndex) => {
         const newActivity = {
             activityId: `activity_${Date.now()}`,
-            activity: 'New Activity',
-            location: 'Add location',
+            activity: 'Hoạt động mới',
+            location: 'Thêm địa điểm',
             timeSlot: 'morning',
             duration: 60,
             cost: 0,
@@ -501,13 +501,13 @@ const AIItineraryCustomize = () => {
                                         type="text"
                                         value={day.theme || ''}
                                         onChange={(e) => handleDayUpdate(dayIndex, { theme: e.target.value })}
-                                        placeholder="Day theme (e.g., 'Exploring Nature')"
+                                        placeholder="Chủ đề ngày (ví dụ: 'Khám phá Thiên nhiên')"
                                         style={styles.dayInput}
                                     />
                                     <textarea
                                         value={day.description || ''}
                                         onChange={(e) => handleDayUpdate(dayIndex, { description: e.target.value })}
-                                        placeholder="Day description..."
+                                        placeholder="Mô tả ngày..."
                                         style={styles.dayInput}
                                         rows={2}
                                     />
@@ -557,7 +557,7 @@ const AIItineraryCustomize = () => {
                                                 type="number"
                                                 value={activity.duration || 60}
                                                 onChange={(e) => handleActivityUpdate(dayIndex, activityIndex, { duration: parseInt(e.target.value) || 60 })}
-                                                placeholder="Minutes"
+                                                placeholder="Phút"
                                                 style={styles.input}
                                                 min="15"
                                                 step="15"
@@ -568,7 +568,7 @@ const AIItineraryCustomize = () => {
                                                     type="number"
                                                     value={activity.cost || 0}
                                                     onChange={(e) => handleActivityUpdate(dayIndex, activityIndex, { cost: parseInt(e.target.value) || 0 })}
-                                                    placeholder="Cost (VND)"
+                                                    placeholder="Chi phí (VND)"
                                                     style={styles.input}
                                                     min="0"
                                                 />
