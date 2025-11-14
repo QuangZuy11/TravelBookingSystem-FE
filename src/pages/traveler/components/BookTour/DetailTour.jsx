@@ -27,17 +27,31 @@ export default function DetailTour() {
         );
 
         if (!tourRes.ok) {
+          // Nếu là lỗi 404, có thể là tour không tồn tại hoặc chưa published
+          if (tourRes.status === 404) {
+            const errorData = await tourRes.json();
+            throw new Error(
+              errorData.message ||
+                "Tour này chưa được xuất bản hoặc không tồn tại."
+            );
+          }
           throw new Error(`Lỗi tải tour: ${tourRes.status}`);
         }
 
         const response = await tourRes.json();
 
         if (response.success && response.data) {
+          // Kiểm tra status của tour - chỉ hiển thị tour published (bảo vệ bổ sung)
+          if (response.data.status && response.data.status !== "published") {
+            setError("Tour này chưa được xuất bản và không thể xem.");
+            setLoading(false);
+            return;
+          }
           setTour(response.data);
           // Itineraries are already included in the tour data
           setItineraries(response.data.itineraries || []);
         } else {
-          throw new Error("Dữ liệu tour không hợp lệ");
+          throw new Error(response.message || "Dữ liệu tour không hợp lệ");
         }
       } catch (err) {
         console.error("Error loading data:", err);

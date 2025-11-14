@@ -51,19 +51,9 @@
 
 /* Override promotion badge cho Featured Hotels - màu xanh thay vì đỏ */
 .featured-hotels-grid .promotion-badge {
-  background: linear-gradient(135deg, #14b8a6 0%, #0d9488 100%);
-  color: white;
-  padding: 6px 12px;
-  border-radius: 8px;
-  font-size: 12px;
-  font-weight: 700;
-  box-shadow: 0 2px 8px rgba(20, 184, 166, 0.4);
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
+  width: fit-content;
+  display: inline-block;
   white-space: nowrap;
-  max-width: 120px;
-  overflow: hidden;
-  text-overflow: ellipsis;
 }
 
 /* View All Button */

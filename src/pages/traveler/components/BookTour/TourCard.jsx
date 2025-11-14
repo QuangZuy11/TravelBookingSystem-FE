@@ -22,7 +22,7 @@ export function TourCard({ tour }) {
       <div className="tour-image-container">
         <img src={tour.image} alt={tour.title} className="tour-image" />
         {hasPromotion && tour.promotion && (
-          <div className="promotion-badge">{tour.promotion.name}</div>
+          <div className="promotion-badge">{tour.promotion.code}</div>
         )}
       </div>
 
