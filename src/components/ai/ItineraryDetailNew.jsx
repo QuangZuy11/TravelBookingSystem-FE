@@ -462,7 +462,7 @@ const ItineraryDetailNew = () => {
 
             if (navigator.clipboard && window.isSecureContext) {
                 await navigator.clipboard.writeText(currentUrl);
-                toast.success('Itinerary URL copied to clipboard!', {
+                toast.success('Đã sao chép liên kết lộ trình!', {
                     duration: 3000,
                     icon: '📋',
                 });
@@ -478,13 +478,13 @@ const ItineraryDetailNew = () => {
 
                 try {
                     document.execCommand('copy');
-                    toast.success('Itinerary URL copied to clipboard!', {
+                    toast.success('Đã sao chép liên kết lộ trình!', {
                         duration: 3000,
                         icon: '📋',
                     });
                 } catch (err) {
                     console.error('Fallback copy failed:', err);
-                    toast.error('Could not copy URL. Please copy manually: ' + currentUrl, {
+                    toast.error('Không thể sao chép liên kết. Vui lòng sao chép thủ công: ' + currentUrl, {
                         duration: 5000,
                     });
                 }
@@ -514,9 +514,9 @@ const ItineraryDetailNew = () => {
                         <div style={{ textAlign: 'center', padding: '60px 20px' }}>
                             <div style={{ fontSize: '48px', marginBottom: '20px' }}>✈️</div>
                             <h2 style={{ fontSize: '24px', fontWeight: '600', color: '#1e293b', marginBottom: '8px' }}>
-                                Loading Your Journey
+                                Đang Tải Hành Trình
                             </h2>
-                            <p style={{ color: '#64748b' }}>Please wait while we prepare your travel itinerary...</p>
+                            <p style={{ color: '#64748b' }}>Vui lòng chờ trong khi chúng tôi chuẩn bị lộ trình của bạn...</p>
                         </div>
                     </div>
                 </div>
@@ -689,7 +689,7 @@ const ItineraryDetailNew = () => {
                     {/* Days and Activities */}
                     {itinerary_data && itinerary_data.map((dayData, index) => {
                         const dayNumber = dayData.dayNumber || dayData.day || (index + 1);
-                        const dayTheme = dayData.theme || `Day ${dayNumber}`;
+                        const dayTheme = dayData.theme || `Ngày ${dayNumber}`;
                         const activities = dayData.activities || [];
                         const isExpanded = expandedDays.has(dayNumber);
                         const dayCost = dayData.dayTotal || activities.reduce((sum, act) => sum + (act.cost || 0), 0);
