@@ -35,7 +35,6 @@ function HotelListPage() {
             checkOut: qs.get('checkOut') || '',
             adults: toInt(qs.get('adults'), 2),
             children: toInt(qs.get('children'), 0),
-            rooms: toInt(qs.get('rooms'), 1),
         };
         setSearchParams(params);
     }, [location.search]);

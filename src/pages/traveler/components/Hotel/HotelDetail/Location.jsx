@@ -3,91 +3,56 @@ import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import { MAP_CONFIG } from '../../../../../config/mapConfig';
-import { formatOpeningHours } from '../../../../../utils/scheduleHelper';
+import { MapPin, Hotel } from 'lucide-react';
 
-// Helper function for category icons and names
-const getCategoryInfo = (category) => {
-    const categoryMap = {
-        'attraction': { icon: '🎡', name: 'Địa danh' },
-        'restaurant': { icon: '🍽️', name: 'Nhà hàng' },
-        'beach': { icon: '🏖️', name: 'Bãi biển' },
-        'museum': { icon: '🏛️', name: 'Bảo tàng' },
-        'park': { icon: '🌳', name: 'Công viên' },
-        'shopping': { icon: '🛍️', name: 'Mua sắm' },
-        'temple': { icon: '⛩️', name: 'Đền chùa' },
-        'market': { icon: '🏪', name: 'Chợ' },
-        'cafe': { icon: '☕', name: 'Quán cà phê' },
-        'bar': { icon: '🍺', name: 'Quầy bar' },
-        'nightlife': { icon: '🎭', name: 'Giải trí' },
-        'spa': { icon: '💆', name: 'Spa' },
-        'gym': { icon: '💪', name: 'Phòng gym' },
-        'cinema': { icon: '🎬', name: 'Rạp phim' }
-    };
-    return categoryMap[category] || { icon: '📍', name: 'Địa điểm' };
-};
+// Bỏ helper function getCategoryInfo vì không còn dùng (đã bỏ POI markers trên map)
 
-// Create custom Leaflet icons
+// Create custom Leaflet icons using lucide-react SVG paths
 const createHotelIcon = () => {
-    return L.divIcon({
-        className: 'custom-hotel-marker',
-        html: `
+    // Hotel icon SVG path (from lucide-react Hotel icon)
+    const hotelSVG = `
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="18" height="18">
+            <path d="M18 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2Z"/>
+            <path d="m9 9 3-3 3 3"/>
+            <path d="M9 21V9h6v12"/>
+        </svg>
+    `;
+
+    const iconHTML = `
+        <div style="
+            background: ${MAP_CONFIG.COLORS.HOTEL || '#10b981'};
+            width: 32px;
+            height: 32px;
+            border-radius: 50% 50% 50% 0;
+            transform: rotate(-45deg);
+            border: 3px solid white;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.3);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        ">
             <div style="
-                background: ${MAP_CONFIG.COLORS.HOTEL};
-                width: 32px;
-                height: 32px;
-                border-radius: 50% 50% 50% 0;
-                transform: rotate(-45deg);
-                border: 3px solid white;
-                box-shadow: 0 3px 10px rgba(0,0,0,0.3);
+                transform: rotate(45deg);
+                color: white;
                 display: flex;
                 align-items: center;
                 justify-content: center;
             ">
-                <span style="
-                    transform: rotate(45deg);
-                    font-size: 18px;
-                    display: block;
-                    margin-top: -4px;
-                    margin-left: -2px;
-                ">🏨</span>
+                ${hotelSVG}
             </div>
-        `,
+        </div>
+    `;
+
+    return L.divIcon({
+        className: 'custom-hotel-marker',
+        html: iconHTML,
         iconSize: [32, 32],
         iconAnchor: [16, 32],
         popupAnchor: [0, -32]
     });
 };
 
-const createPOIIcon = (emoji = '📍') => {
-    return L.divIcon({
-        className: 'custom-poi-marker',
-        html: `
-            <div style="
-                background: ${MAP_CONFIG.COLORS.POI};
-                width: 26px;
-                height: 26px;
-                border-radius: 50% 50% 50% 0;
-                transform: rotate(-45deg);
-                border: 2px solid white;
-                box-shadow: 0 2px 8px rgba(0,0,0,0.3);
-                display: flex;
-                align-items: center;
-                justify-content: center;
-            ">
-                <span style="
-                    transform: rotate(45deg);
-                    font-size: 14px;
-                    display: block;
-                    margin-top: -3px;
-                    margin-left: -1px;
-                ">${emoji}</span>
-            </div>
-        `,
-        iconSize: [26, 26],
-        iconAnchor: [13, 26],
-        popupAnchor: [0, -26]
-    });
-};
+// Bỏ createPOIIcon vì không còn hiển thị POI markers trên map
 
 export default function Location({ hotelData, nearbyPOIs, destination }) {
     // const mapRef = useRef(null);
@@ -124,46 +89,72 @@ export default function Location({ hotelData, nearbyPOIs, destination }) {
         return parts.join(', ');
     };
 
-    // Calculate POI coordinates based on hotel location
-    const getPoiCoordinates = (index, totalPois) => {
-        // Get hotel coordinates or use default HCMC coordinates
-        const baseLatitude = coordinates?.latitude || 10.7756587;
-        const baseLongitude = coordinates?.longitude || 106.7004238;
+    // Helper function to calculate distance between two coordinates (Haversine formula)
+    const calculateDistance = (lat1, lon1, lat2, lon2) => {
+        if (!lat1 || !lon1 || !lat2 || !lon2) return null;
 
-        // Create a circular pattern around the hotel
-        const radius = 0.01; // Roughly 1km
-        const angle = (360 / totalPois) * index * (Math.PI / 180);
+        const R = 6371; // Radius of the Earth in km
+        const dLat = (lat2 - lat1) * Math.PI / 180;
+        const dLon = (lon2 - lon1) * Math.PI / 180;
+        const a =
+            Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+            Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+            Math.sin(dLon / 2) * Math.sin(dLon / 2);
+        const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+        const distance = R * c;
 
-        return {
-            latitude: baseLatitude + radius * Math.cos(angle),
-            longitude: baseLongitude + radius * Math.sin(angle)
-        };
+        return distance;
     };
+
+    // Format distance for display
+    const formatDistance = (distance) => {
+        if (distance === null || distance === undefined) return 'Đang cập nhật';
+        if (distance < 1) {
+            return `${Math.round(distance * 1000)}m`;
+        }
+        return `${distance.toFixed(1)}km`;
+    };
+
+    // Bỏ getPoiCoordinates vì không còn tạo fake coordinates (chỉ dùng coordinates thật từ backend)
+
+    // Bỏ getPOIPosition vì không còn hiển thị POI markers trên map
 
     // Use POIs from backend if available, otherwise use default
     const displayPlaces = nearbyPOIs && nearbyPOIs.length > 0
-        ? nearbyPOIs.map((poi, index) => {
-            const categoryInfo = getCategoryInfo(poi.category);
-            // Add coordinates if not provided
-            if (!poi.location?.coordinates?.latitude) {
-                poi.location = {
-                    ...poi.location,
-                    coordinates: getPoiCoordinates(index, nearbyPOIs.length)
-                };
+        ? nearbyPOIs.map((poi) => {
+            // Lấy coordinates từ POI (ưu tiên coordinates thật)
+            const poiCoords = poi.location?.coordinates || {};
+            const poiLat = poiCoords.latitude || poiCoords.lat;
+            const poiLon = poiCoords.longitude || poiCoords.lng;
+
+            // Calculate distance from hotel to POI (chỉ khi có coordinates thật cho cả hotel và POI)
+            let distance = null;
+            if (coordinates && poiLat && poiLon) {
+                const hotelLat = coordinates.latitude || coordinates.lat;
+                const hotelLon = coordinates.longitude || coordinates.lng;
+
+                // Đảm bảo cả hai đều là số hợp lệ
+                if (
+                    typeof hotelLat === 'number' &&
+                    typeof hotelLon === 'number' &&
+                    typeof poiLat === 'number' &&
+                    typeof poiLon === 'number' &&
+                    !isNaN(hotelLat) &&
+                    !isNaN(hotelLon) &&
+                    !isNaN(poiLat) &&
+                    !isNaN(poiLon)
+                ) {
+                    distance = calculateDistance(hotelLat, hotelLon, poiLat, poiLon);
+                }
             }
+
             return {
                 id: poi._id,
                 name: poi.name,
-                distance: "N/A", // Backend chưa có distance calculation
-                time: "Đang cập nhật",
-                type: categoryInfo.name,
-                icon: categoryInfo.icon,
-                rating: poi.rating,
-                description: poi.description,
-                image: poi.images && poi.images.length > 0 ? poi.images[0] : null,
-                entry_fee: poi.entry_fee,
-                opening_hours: poi.opening_hours,
-                location: poi.location
+                distance: distance,
+                formattedDistance: formatDistance(distance),
+                location: poi.location,
+                hasRealCoordinates: !!(poiLat && poiLon)
             };
         })
         : [];
@@ -225,46 +216,7 @@ export default function Location({ hotelData, nearbyPOIs, destination }) {
                             </Popup>
                         </Marker>
 
-                        {/* POI Markers */}
-                        {nearbyPOIs && nearbyPOIs.length > 0 && nearbyPOIs.map((poi, index) => {
-                            // Calculate POI position
-                            const radius = 0.005; // Roughly 500m
-                            const angle = (360 / nearbyPOIs.length) * index * (Math.PI / 180);
-                            const poiPosition = [
-                                center[0] + radius * Math.cos(angle),
-                                center[1] + radius * Math.sin(angle)
-                            ];
-                            const categoryInfo = getCategoryInfo(poi.category);
-
-                            return (
-                                <Marker
-                                    key={poi._id || index}
-                                    position={poiPosition}
-                                    icon={createPOIIcon(categoryInfo.icon)}
-                                >
-                                    <Popup>
-                                        <div style={{ minWidth: '200px' }}>
-                                            <h4 style={{ margin: '0 0 8px 0', fontSize: '15px', fontWeight: '600' }}>
-                                                {categoryInfo.icon} {poi.name}
-                                            </h4>
-                                            <p style={{ margin: '0 0 6px 0', fontSize: '12px', color: '#10b981' }}>
-                                                {categoryInfo.name}
-                                            </p>
-                                            {poi.rating && (
-                                                <p style={{ margin: '0 0 6px 0', fontSize: '13px', color: '#f59e0b' }}>
-                                                    ⭐ {poi.rating}
-                                                </p>
-                                            )}
-                                            {poi.description && (
-                                                <p style={{ margin: '0', fontSize: '12px', color: '#6b7280', lineHeight: '1.4' }}>
-                                                    {poi.description.substring(0, 100)}...
-                                                </p>
-                                            )}
-                                        </div>
-                                    </Popup>
-                                </Marker>
-                            );
-                        })}
+                        {/* Chỉ hiển thị Hotel marker, không hiển thị POI markers trên map */}
                     </MapContainer>
 
                     <div className="hotel-detail-address-card">
@@ -313,91 +265,19 @@ export default function Location({ hotelData, nearbyPOIs, destination }) {
                         {displayPlaces.map((place, index) => (
                             <div
                                 key={place.id || index}
-                                className="hotel-detail-place-item"
-                                style={{
-                                    cursor: place.id ? 'pointer' : 'default',
-                                    transition: 'all 0.3s ease'
-                                }}
-                                onClick={() => {
-                                    if (place.id) {
-                                        window.location.href = `/poi/${place.id}`;
-                                    }
-                                }}
-                                onMouseEnter={(e) => {
-                                    if (place.id) {
-                                        e.currentTarget.style.backgroundColor = '#f9fafb';
-                                        e.currentTarget.style.transform = 'translateX(5px)';
-                                    }
-                                }}
-                                onMouseLeave={(e) => {
-                                    e.currentTarget.style.backgroundColor = 'transparent';
-                                    e.currentTarget.style.transform = 'translateX(0)';
-                                }}
+                                className="poi-list-item"
                             >
-                                <div className="hotel-detail-place-icon">
-                                    {place.icon ? (
-                                        <span style={{ fontSize: '24px' }}>{place.icon}</span>
-                                    ) : (
-                                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                                            <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
-                                            <circle cx="12" cy="10" r="3"></circle>
-                                        </svg>
-                                    )}
-                                </div>
-                                <div className="hotel-detail-place-info">
-                                    <h4 style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                                        {place.name}
-                                        {place.rating && (
-                                            <span style={{
-                                                fontSize: '13px',
-                                                color: '#f59e0b',
-                                                fontWeight: '600',
-                                                display: 'inline-flex',
-                                                alignItems: 'center',
-                                                gap: '2px'
-                                            }}>
-                                                ⭐ {place.rating}
-                                            </span>
-                                        )}
-                                    </h4>
-                                    <div className="hotel-detail-place-meta">
-                                        <span className="hotel-detail-place-type">{place.type}</span>
-                                        <span className="hotel-detail-place-distance">{place.distance}</span>
-                                        <span className="hotel-detail-place-time">{place.time}</span>
-                                    </div>
-                                    {place.description && (
-                                        <p style={{
-                                            fontSize: '13px',
-                                            color: '#6b7280',
-                                            marginTop: '4px',
-                                            display: '-webkit-box',
-                                            WebkitLineClamp: 2,
-                                            WebkitBoxOrient: 'vertical',
-                                            overflow: 'hidden'
-                                        }}>
-                                            {place.description}
-                                        </p>
-                                    )}
-                                    {place.opening_hours && (
-                                        <p style={{
-                                            fontSize: '12px',
-                                            color: '#059669',
-                                            marginTop: '4px'
-                                        }}>
-                                            🕐 Giờ mở cửa: {formatOpeningHours(place.opening_hours)}
-                                        </p>
-                                    )}
-                                    {place.entry_fee && place.entry_fee.adult && (
-                                        <p style={{
-                                            fontSize: '12px',
-                                            color: '#dc2626',
-                                            marginTop: '4px',
-                                            fontWeight: '500'
-                                        }}>
-                                            💵 Vé: {new Intl.NumberFormat('vi-VN').format(place.entry_fee.adult)} VNĐ
-                                        </p>
-                                    )}
-                                </div>
+                                <MapPin
+                                    size={18}
+                                    className="poi-list-icon"
+                                    color="#ef4444"
+                                    fill="#ef4444"
+                                    strokeWidth={2.5}
+                                />
+                                <span className="poi-list-name">{place.name}</span>
+                                {place.formattedDistance && place.formattedDistance !== 'Đang cập nhật' && (
+                                    <span className="poi-list-distance">{place.formattedDistance}</span>
+                                )}
                             </div>
                         ))}
                     </div>

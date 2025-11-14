@@ -195,13 +195,20 @@ function HotelResult({
 
                 const params = new URLSearchParams();
 
-                // Search params
-                if (searchParams?.location) params.set('location', searchParams.location.trim());
-                if (searchParams?.checkIn) params.set('checkIn', searchParams.checkIn);
-                if (searchParams?.checkOut) params.set('checkOut', searchParams.checkOut);
-                if (searchParams?.rooms) params.set('rooms', String(searchParams.rooms));
+                // Search params - chỉ thêm nếu có giá trị
+                if (searchParams?.location?.trim()) {
+                    params.set('location', searchParams.location.trim());
+                }
+                if (searchParams?.checkIn) {
+                    params.set('checkIn', searchParams.checkIn);
+                }
+                if (searchParams?.checkOut) {
+                    params.set('checkOut', searchParams.checkOut);
+                }
                 const guests = (searchParams?.adults || 0) + (searchParams?.children || 0);
-                if (guests) params.set('guests', String(guests));
+                if (guests > 0) {
+                    params.set('guests', String(guests));
+                }
 
                 // Filter params
                 if (Array.isArray(priceRange) && priceRange.length === 2) {

@@ -12,7 +12,7 @@ function HotelPage() {
     // NEW: Điều hướng sang /hotel-list và đính query theo form search
     const handleSearch = (data) => {
         const params = new URLSearchParams();
-        const { location, checkIn, checkOut, adults, children, rooms } = data || {};
+        const { location, checkIn, checkOut, adults, children } = data || {};
 
         if (location) params.set('location', location.trim());
         if (checkIn) params.set('checkIn', checkIn);
@@ -20,7 +20,6 @@ function HotelPage() {
 
         if (Number.isFinite(Number(adults))) params.set('adults', String(adults));
         if (Number.isFinite(Number(children))) params.set('children', String(children));
-        if (Number.isFinite(Number(rooms))) params.set('rooms', String(rooms));
 
         const qs = params.toString();
         navigate(qs ? `/hotel-list?${qs}` : `/hotel-list`);

@@ -1,117 +1,63 @@
-import { getProxiedGoogleDriveUrl } from '../../../../../utils/googleDriveImageHelper';
-import { formatOpeningHours } from '../../../../../utils/scheduleHelper';
 import './HotelDetail.css';
 
-// Helper function for category icons
-const getCategoryIcon = (category) => {
-    const icons = {
-        'attraction': '🎡',
-        'restaurant': '🍽️',
-        'beach': '🏖️',
-        'museum': '🏛️',
-        'park': '🌳',
-        'shopping': '🛍️',
-        'temple': '⛩️',
-        'market': '🏪',
-        'cafe': '☕',
-        'bar': '🍺',
-        'nightlife': '🎭',
-        'spa': '💆',
-        'gym': '💪',
-        'cinema': '🎬'
-    };
-    return icons[category] || '📍';
+// Helper function to calculate distance between two coordinates (Haversine formula)
+const calculateDistance = (lat1, lon1, lat2, lon2) => {
+    if (!lat1 || !lon1 || !lat2 || !lon2) return null;
+
+    const R = 6371; // Radius of the Earth in km
+    const dLat = (lat2 - lat1) * Math.PI / 180;
+    const dLon = (lon2 - lon1) * Math.PI / 180;
+    const a =
+        Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+        Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+        Math.sin(dLon / 2) * Math.sin(dLon / 2);
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+    const distance = R * c;
+
+    return distance;
 };
 
-// Helper function to format price
-const formatPrice = (price) => {
-    if (!price) return 'Miễn phí';
-    return new Intl.NumberFormat('vi-VN').format(price) + ' VNĐ';
+// Format distance for display
+const formatDistance = (distance) => {
+    if (distance === null || distance === undefined) return 'Đang cập nhật';
+    if (distance < 1) {
+        return `${Math.round(distance * 1000)}m`;
+    }
+    return `${distance.toFixed(1)}km`;
 };
 
-// POI Card Component
-const POICard = ({ poi }) => {
+// POI Card Component - Simplified: chỉ hiển thị tên + khoảng cách
+const POICard = ({ poi, hotelCoordinates }) => {
+    // Calculate distance if coordinates available
+    let distance = null;
+    if (hotelCoordinates && poi.location?.coordinates) {
+        const poiLat = poi.location.coordinates.latitude || poi.location.coordinates.lat;
+        const poiLon = poi.location.coordinates.longitude || poi.location.coordinates.lng;
+        const hotelLat = hotelCoordinates.latitude || hotelCoordinates.lat;
+        const hotelLon = hotelCoordinates.longitude || hotelCoordinates.lng;
+
+        if (poiLat && poiLon && hotelLat && hotelLon) {
+            distance = calculateDistance(hotelLat, hotelLon, poiLat, poiLon);
+        }
+    }
+
     return (
-        <div className="poi-card">
-            {/* POI Image */}
-            <div className="poi-image">
-                <img
-                    src={poi.images && poi.images.length > 0
-                        ? getProxiedGoogleDriveUrl(poi.images[0])
-                        : '/placeholder.svg'}
-                    alt={poi.name}
-                />
-
-                {/* Category Badge */}
-                <span className="category-badge">
-                    {getCategoryIcon(poi.category)} {poi.category}
-                </span>
-
-                {/* Rating Badge */}
-                {poi.rating && (
-                    <div className="poi-rating-badge">
-                        ⭐ {poi.rating}
-                    </div>
-                )}
-            </div>
-
-            {/* POI Info */}
-            <div className="poi-info">
-                <h3>{poi.name}</h3>
-                <p className="poi-description">{poi.description}</p>
-
-                {/* Details */}
-                <div className="poi-details">
-                    {/* Opening Hours */}
-                    {poi.opening_hours && (
-                        <div className="poi-detail-item">
-                            <span className="detail-icon">🕐</span>
-                            <span>Giờ mở cửa: {formatOpeningHours(poi.opening_hours)}</span>
-                        </div>
-                    )}
-
-                    {/* Entry Fee */}
-                    {poi.entry_fee && (
-                        <div className="poi-detail-item">
-                            <span className="detail-icon">💵</span>
-                            <span>
-                                Vé: {formatPrice(poi.entry_fee.adult)}
-                                {poi.entry_fee.child && poi.entry_fee.child !== poi.entry_fee.adult && (
-                                    <span className="child-price"> (Trẻ em: {formatPrice(poi.entry_fee.child)})</span>
-                                )}
-                            </span>
-                        </div>
-                    )}
-
-                    {/* Location */}
-                    {poi.location && poi.location.address && (
-                        <div className="poi-detail-item">
-                            <span className="detail-icon">📍</span>
-                            <span className="poi-address">{poi.location.address}</span>
-                        </div>
-                    )}
+        <div className="poi-card-simple">
+            <div className="poi-card-content">
+                <div className="poi-name-section">
+                    <h3 className="poi-name">{poi.name}</h3>
                 </div>
-
-                {/* View Details Button */}
-                <button
-                    onClick={() => {
-                        // Navigate to POI detail page (if exists)
-                        // Or open in new tab
-                        if (poi._id) {
-                            window.location.href = `/poi/${poi._id}`;
-                        }
-                    }}
-                    className="view-details-btn"
-                >
-                    Xem chi tiết
-                </button>
+                <div className="poi-distance-section">
+                    <span className="poi-distance-icon">📍</span>
+                    <span className="poi-distance-text">{formatDistance(distance)}</span>
+                </div>
             </div>
         </div>
     );
 };
 
 // Main Nearby POIs Section Component
-const NearbyPOIsSection = ({ pois, destination }) => {
+const NearbyPOIsSection = ({ pois, destination, hotelCoordinates }) => {
     if (!pois || pois.length === 0) {
         return null; // Don't render if no POIs
     }
@@ -120,7 +66,7 @@ const NearbyPOIsSection = ({ pois, destination }) => {
         <section id="nearby-pois" className="hotel-detail-content-section nearby-pois-section">
             <div className="hotel-detail-section-header">
                 <h2 className="hotel-detail-section-title">
-                    🗺️ Địa điểm gần khách sạn
+                    🗺️ Địa điểm gần khách sạn s
                 </h2>
                 {destination && (
                     <p className="hotel-detail-section-description destination-subtitle">
@@ -129,9 +75,13 @@ const NearbyPOIsSection = ({ pois, destination }) => {
                 )}
             </div>
 
-            <div className="poi-grid">
+            <div className="poi-grid-simple">
                 {pois.map((poi) => (
-                    <POICard key={poi._id} poi={poi} />
+                    <POICard
+                        key={poi._id || poi.name}
+                        poi={poi}
+                        hotelCoordinates={hotelCoordinates}
+                    />
                 ))}
             </div>
         </section>

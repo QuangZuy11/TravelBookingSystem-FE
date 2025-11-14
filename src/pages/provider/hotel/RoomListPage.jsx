@@ -136,22 +136,15 @@ const RoomListPage = () => {
     if (loading) return <Spinner />;
     if (error) return <ErrorAlert message={error} />;
 
-    const breadcrumbItems = [
-        { label: 'Dashboard', path: '/provider' },
-        { label: 'Hotels', path: '/provider/hotels' },
-        { label: 'Room Management' }
-    ];
 
     return (
         <div style={containerStyle}>
             <div style={contentContainerStyle}>
-                <Breadcrumb items={breadcrumbItems} />
+
                 <div style={headerStyle}>
                     <div>
-                        <h1 style={titleStyle}>Room Management</h1>
-                        <p style={{ color: '#6b7280', marginTop: '0.5rem' }}>
-                            Manage all rooms in your hotel
-                        </p>
+                        <h1 style={titleStyle}>Quản lý phòng </h1>
+
                     </div>
                     <div style={{ display: 'flex', gap: '1rem' }}>
                         <button
@@ -163,7 +156,7 @@ const RoomListPage = () => {
                             }}
                             onClick={() => navigate(`/provider/hotels/${hotelId}/rooms/bulk-create`)}
                         >
-                            🏗️ Bulk Create Rooms
+                            Tạo nhiều phòng
                         </button>
                         <button
                             style={buttonStyle}

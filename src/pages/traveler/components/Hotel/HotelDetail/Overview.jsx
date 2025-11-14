@@ -517,7 +517,7 @@ export default function Overview({ hotelData }) {
                         </div>
                         <div className="hotel-detail-review-item">
                             <SmileIcon className="hotel-detail-review-icon" size={20} />
-                            <span>{hotelData.rating || 0} / 5 điểm đánh giá</span>
+                            <span>{typeof hotelData.rating === 'number' ? hotelData.rating.toFixed(1) : (parseFloat(hotelData.rating || 0).toFixed(1))} / 5 điểm đánh giá</span>
                         </div>
                         <div className="hotel-detail-review-item">
                             <MessageIcon className="hotel-detail-review-icon" size={20} />

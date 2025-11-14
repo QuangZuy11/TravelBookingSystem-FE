@@ -37,8 +37,7 @@ const SearchSection = ({ onSearch }) => {
         checkIn: '',
         checkOut: '',
         adults: 2,
-        children: 1,
-        rooms: 1
+        children: 1
     });
 
     const [anchorEl, setAnchorEl] = useState(null);
@@ -83,8 +82,7 @@ const SearchSection = ({ onSearch }) => {
             checkIn: '',
             checkOut: '',
             adults: 2,
-            children: 1,
-            rooms: 1
+            children: 1
         });
         setErrors({});
         setAnchorEl(null);
@@ -141,8 +139,7 @@ const SearchSection = ({ onSearch }) => {
         const parts = [];
         if (searchData.adults > 0) parts.push(`${searchData.adults} người lớn`);
         if (searchData.children > 0) parts.push(`${searchData.children} trẻ nhỏ`);
-        parts.push(`${searchData.rooms} phòng`);
-        return parts.join(', ');
+        return parts.join(', ') || '0 người';
     };
 
     const open = Boolean(anchorEl);
@@ -187,7 +184,7 @@ const SearchSection = ({ onSearch }) => {
                                     <StyledTextField
                                         fullWidth
                                         label="VỊ TRÍ"
-                                        placeholder="Nhập thành phố, khách sạn..."
+                                        placeholder="Nhập thành phố, địa điểm..."
                                         value={searchData.location}
                                         onChange={handleInputChange('location')}
                                         error={!!errors.location}
@@ -245,7 +242,7 @@ const SearchSection = ({ onSearch }) => {
                                 <Box sx={{ flex: '2.2', minWidth: '180px' }}>
                                     <StyledTextField
                                         fullWidth
-                                        label="KHÁCH & PHÒNG"
+                                        label="SỐ NGƯỜI"
                                         value={formatGuestText()}
                                         onClick={handleGuestClick}
                                         InputProps={{
@@ -303,8 +300,7 @@ const SearchSection = ({ onSearch }) => {
                     >
                         {[
                             { key: 'adults', label: 'Người lớn', subtitle: '13 tuổi trở lên', min: 1 },
-                            { key: 'children', label: 'Trẻ em', subtitle: '2-12 tuổi', min: 0 },
-                            { key: 'rooms', label: 'Phòng', subtitle: 'Số phòng cần đặt', min: 1 }
+                            { key: 'children', label: 'Trẻ em', subtitle: '2-12 tuổi', min: 0 }
                         ].map((item, index) => (
                             <Box key={item.key}>
                                 <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', py: 2 }}>
@@ -359,7 +355,7 @@ const SearchSection = ({ onSearch }) => {
                                         </IconButton>
                                     </Box>
                                 </Box>
-                                {index < 2 && <Divider sx={{ my: 1 }} />}
+                                {index < 1 && <Divider sx={{ my: 1 }} />}
                             </Box>
                         ))}
 

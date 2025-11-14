@@ -516,18 +516,15 @@ export default function Rooms({ roomsData, loading, error, hotelData }) {
                         <div className="room-image">
                             <SmartImage src={room.image || "/placeholder.svg"} alt={room.name} />
                             <div className="room-badge">
-                                {room.availableCount > 0
-                                    ? `${room.availableCount} phòng trống`
-                                    : 'Hết phòng'
+                                {room.totalCount > 0
+                                    ? `${room.totalCount} phòng`
+                                    : '0 phòng'
                                 }
                             </div>
                         </div>
                         <div className="room-content">
                             <h3 className="room-name">
                                 {room.name}
-                                <span className="room-availability">
-                                    ({room.availableCount}/{room.totalCount} phòng)
-                                </span>
                             </h3>
                             <div className="room-details">
 

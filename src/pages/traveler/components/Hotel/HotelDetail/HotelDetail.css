@@ -1301,10 +1301,23 @@
   margin-top: 24px;
 }
 
+/* POI Grid Simple - Chỉ hiển thị tên + khoảng cách */
+.poi-grid-simple {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 16px;
+  margin-top: 24px;
+}
+
 @media (max-width: 768px) {
   .poi-grid {
     grid-template-columns: 1fr;
     gap: 16px;
+  }
+
+  .poi-grid-simple {
+    grid-template-columns: 1fr;
+    gap: 12px;
   }
 }
 
@@ -1375,6 +1388,152 @@
   font-weight: 600;
   z-index: 2;
   box-shadow: 0 2px 6px rgba(255, 193, 7, 0.3);
+}
+
+/* POI Card Simple - Chỉ hiển thị tên + khoảng cách (View only) */
+.poi-card-simple {
+  background: white;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  padding: 16px 20px;
+  transition: all 0.2s ease;
+  cursor: default;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+.poi-card-simple:hover {
+  border-color: #d1d5db;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  transform: translateY(-2px);
+}
+
+.poi-card-content {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  gap: 16px;
+}
+
+.poi-name-section {
+  flex: 1;
+  min-width: 0;
+}
+
+.poi-name {
+  margin: 0;
+  color: #111827;
+  font-size: 16px;
+  font-weight: 600;
+  line-height: 1.5;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.poi-distance-section {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+  color: #6b7280;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.poi-distance-icon {
+  font-size: 16px;
+  opacity: 0.8;
+}
+
+.poi-distance-text {
+  color: #10b981;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+@media (max-width: 768px) {
+  .poi-card-simple {
+    padding: 14px 16px;
+  }
+
+  .poi-name {
+    font-size: 15px;
+  }
+
+  .poi-distance-text {
+    font-size: 13px;
+  }
+}
+
+/* POI List Item - Simple list style như ảnh với lucide icons */
+.poi-list-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 0;
+  border-bottom: 1px solid #f3f4f6;
+  cursor: default;
+  transition: background-color 0.2s ease;
+}
+
+.poi-list-item:hover {
+  background-color: #f9fafb;
+  padding-left: 8px;
+  padding-right: 8px;
+  margin-left: -8px;
+  margin-right: -8px;
+  border-radius: 6px;
+}
+
+.poi-list-item:last-child {
+  border-bottom: none;
+}
+
+.poi-list-icon {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: #ef4444;
+}
+
+.poi-list-name {
+  font-size: 15px;
+  color: #111827;
+  font-weight: 500;
+  line-height: 1.5;
+  flex: 1;
+}
+
+.poi-list-distance {
+  font-size: 13px;
+  color: #10b981;
+  font-weight: 600;
+  white-space: nowrap;
+  margin-left: auto;
+}
+
+@media (max-width: 768px) {
+  .poi-list-item {
+    padding: 10px 0;
+  }
+
+  .poi-list-icon {
+    width: 18px;
+    height: 18px;
+  }
+
+  .poi-list-name {
+    font-size: 14px;
+  }
+
+  .poi-list-distance {
+    font-size: 12px;
+  }
 }
 
 /* POI Info */
