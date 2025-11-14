@@ -108,15 +108,34 @@ const RoomAvailabilityPage = () => {
             bookedRoomIds.add(roomId);
         });
 
+        console.log('📊 Calculating summary:', {
+            totalRooms: rooms.length,
+            totalBookings: bookings.length,
+            bookedRoomIds: Array.from(bookedRoomIds),
+            rooms: rooms.map(r => ({ id: r._id.toString(), number: r.roomNumber, status: r.status }))
+        });
+
         // Calculate summary
         const total = rooms.length;
+        // Phòng "đã đặt" = phòng có booking (không quan tâm status của phòng)
+        // Vì phòng có booking nghĩa là đã được đặt, dù status là gì
         const booked = rooms.filter(room => {
             const roomId = room._id.toString();
-            return bookedRoomIds.has(roomId) && room.status === 'available';
+            const hasBooking = bookedRoomIds.has(roomId);
+            if (hasBooking) {
+                console.log(`  ✓ Room ${room.roomNumber} (${roomId}) has booking`);
+            }
+            return hasBooking;
         }).length;
-        const available = total - booked;
+        
+        // Phòng trống = tổng số phòng - phòng đã đặt - phòng maintenance - phòng no_show
+        const noShow = rooms.filter(room => room.status === 'no_show').length;
+        const maintenance = rooms.filter(room => room.status === 'maintenance').length;
+        const available = total - booked - noShow - maintenance;
 
-        setSummary({ total, available, booked });
+        console.log('📊 Summary result:', { total, available, booked, noShow, maintenance });
+
+        setSummary({ total, available, booked, noShow });
     };
 
     // Get rooms with availability status
