@@ -30,7 +30,7 @@ const Header = () => {
   const [notifications, setNotifications] = useState([]);
   const [unreadCount, setUnreadCount] = useState(0);
   const [loadingNotifications, setLoadingNotifications] = useState(false);
-  
+
   // Modal states
   const [showNotificationsModal, setShowNotificationsModal] = useState(false);
   const [showDetailModal, setShowDetailModal] = useState(false);
@@ -369,7 +369,7 @@ const Header = () => {
                     <FaUser className="dropdown-icon" />
                     <span>Hồ Sơ Của Tôi</span>
                   </a>
-                  {user.role !== "ServiceProvider" && (
+                  {user.role !== "ServiceProvider" && user.role !== "Admin" && (
                     <>
                       <a href="/my-tours" className="dropdown-item">
                         <FaSuitcase className="dropdown-icon" />
@@ -397,7 +397,7 @@ const Header = () => {
                   {user && user.role === "Admin" && (
                     <Link to="/admin/dashboard" className="dropdown-item">
                       <FaUsers className="dropdown-icon" />
-                      <span>Quản lý người dùng</span>
+                      <span>Dashboard</span>
                     </Link>
                   )}
                   <div className="dropdown-divider"></div>
@@ -477,7 +477,7 @@ const Header = () => {
                   </div>
 
                   <div className="notification-footer">
-                    <button 
+                    <button
                       className="view-all-link"
                       onClick={() => {
                         setShowNotificationsModal(true);

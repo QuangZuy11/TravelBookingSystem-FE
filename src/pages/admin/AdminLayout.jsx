@@ -5,10 +5,12 @@ import "./Admin.css";
 
 const AdminLayout = () => {
   return (
-    <div className="admin-shell">
+    <div className="dashboard-container">
       <AdminSidebar />
-      <main className="admin-content">
-        <Outlet />
+      <main className="dashboard-main">
+        <div className="dashboard-content">
+          <Outlet />
+        </div>
       </main>
     </div>
   );

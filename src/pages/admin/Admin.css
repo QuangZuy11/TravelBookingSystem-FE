@@ -449,6 +449,74 @@
 }
 
 /* --- Layout shell --- */
+/* Using same styles as Provider DashboardLayout */
+.dashboard-container {
+    display: flex;
+    min-height: 100vh;
+}
+
+.dashboard-sidebar {
+    width: 280px;
+    background-color: #e8e8e8;
+    color: #1a1a1a;
+    padding: 0;
+    flex-shrink: 0;
+    box-shadow: 2px 0 8px rgba(0, 0, 0, 0.05);
+}
+
+.sidebar-nav {
+    margin: 0;
+    padding: 1rem;
+}
+
+.nav-item {
+    display: flex;
+    align-items: center;
+    padding: 1rem 1.25rem;
+    color: #1a1a1a;
+    text-decoration: none;
+    border-radius: 12px;
+    margin-bottom: 0.5rem;
+    transition: all 0.3s ease;
+    font-weight: 500;
+    font-size: 1rem;
+    background-color: transparent;
+}
+
+.nav-item:hover {
+    background-color: rgba(10, 87, 87, 0.08);
+    transform: translateX(4px);
+}
+
+.nav-item.active {
+    background: linear-gradient(135deg, #0a5757 0%, #2d6a4f 100%);
+    color: white;
+    box-shadow: 0 4px 12px rgba(10, 87, 87, 0.25);
+}
+
+.nav-icon {
+    margin-right: 1rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.nav-label {
+    flex: 1;
+}
+
+.dashboard-main {
+    flex-grow: 1;
+    background-color: #f8f9fa;
+}
+
+.dashboard-content {
+    padding: 0;
+    margin: 0;
+}
+
+/* Keep old admin-shell for backward compatibility if needed */
 .admin-shell {
   display: flex;
   min-height: calc(100vh - 64px); /* tùy chiều cao header global */
@@ -527,7 +595,7 @@
   color: #ffffff;
 }
 
-/* Main content area */
+/* Main content area - Keep for backward compatibility */
 .admin-content {
   flex: 1;
   padding: 28px 32px 60px;

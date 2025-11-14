@@ -48,6 +48,11 @@ const adminService = {
   // API thống kê chung cho dashboard (từ bài trước)
   getDashboardStats: () => {
     return apiClient.get('/admin/dashboard/stats');
+  },
+
+  // 9. Lấy danh sách tour/hotel đang quảng cáo
+  getActiveAdBookings: () => {
+    return apiClient.get('/admin/dashboard/active-ads');
   }
 };
 
