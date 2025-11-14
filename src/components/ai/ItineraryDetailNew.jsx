@@ -462,7 +462,7 @@ const ItineraryDetailNew = () => {
 
             if (navigator.clipboard && window.isSecureContext) {
                 await navigator.clipboard.writeText(currentUrl);
-                toast.success('Itinerary URL copied to clipboard!', {
+                toast.success('Đã sao chép liên kết lộ trình!', {
                     duration: 3000,
                     icon: '📋',
                 });
@@ -478,13 +478,13 @@ const ItineraryDetailNew = () => {
 
                 try {
                     document.execCommand('copy');
-                    toast.success('Itinerary URL copied to clipboard!', {
+                    toast.success('Đã sao chép liên kết lộ trình!', {
                         duration: 3000,
                         icon: '📋',
                     });
                 } catch (err) {
                     console.error('Fallback copy failed:', err);
-                    toast.error('Could not copy URL. Please copy manually: ' + currentUrl, {
+                    toast.error('Không thể sao chép liên kết. Vui lòng sao chép thủ công: ' + currentUrl, {
                         duration: 5000,
                     });
                 }
@@ -514,9 +514,9 @@ const ItineraryDetailNew = () => {
                         <div style={{ textAlign: 'center', padding: '60px 20px' }}>
                             <div style={{ fontSize: '48px', marginBottom: '20px' }}>✈️</div>
                             <h2 style={{ fontSize: '24px', fontWeight: '600', color: '#1e293b', marginBottom: '8px' }}>
-                                Loading Your Journey
+                                Đang Tải Hành Trình
                             </h2>
-                            <p style={{ color: '#64748b' }}>Please wait while we prepare your travel itinerary...</p>
+                            <p style={{ color: '#64748b' }}>Vui lòng chờ trong khi chúng tôi chuẩn bị lộ trình của bạn...</p>
                         </div>
                     </div>
                 </div>
@@ -587,7 +587,7 @@ const ItineraryDetailNew = () => {
                                 e.target.style.backgroundColor = '#e2e8f0';
                             }}
                         >
-                            ← Back to My Itineraries
+                            ← Quay lại Lộ Trình Của Tôi
                         </button>
                         <button
                             onClick={() => loadItinerary(true)}
@@ -604,25 +604,25 @@ const ItineraryDetailNew = () => {
                             }}
                             disabled={loading}
                         >
-                            🔄 {loading ? 'Refreshing...' : 'Refresh'}
+                            🔄 {loading ? 'Đang tải...' : 'Làm mới'}
                         </button>
                     </div>
 
                     {/* Header Card */}
                     <div style={styles.headerCard}>
                         <div style={styles.headerIcon}>🏖️</div>
-                        <h1 style={styles.headerTitle}>Your Perfect Journey to</h1>
+                        <h1 style={styles.headerTitle}>Hành Trình Hoàn Hảo Đến</h1>
                         <h2 style={styles.headerSubtitle}>{destination}</h2>
 
                         {/* Stats Grid */}
                         <div style={styles.statsGrid}>
                             <div style={styles.statCard}>
                                 <div style={styles.statValue}>{totalDays}</div>
-                                <div style={styles.statLabel}>Days</div>
+                                <div style={styles.statLabel}>Ngày</div>
                             </div>
                             <div style={styles.statCard}>
                                 <div style={styles.statValue}>{totalActivities}</div>
-                                <div style={styles.statLabel}>Activities</div>
+                                <div style={styles.statLabel}>Hoạt động</div>
                             </div>
                             <div style={styles.statCard}>
                                 <div style={styles.statValue}>{totalCost.toLocaleString()}</div>
@@ -653,7 +653,7 @@ const ItineraryDetailNew = () => {
                                 🎫 Đặt Chuyến Đi Này
                             </button>
                             <button style={{ ...styles.actionButton, ...styles.saveButton }}>
-                                Save to My Trips
+                                Lưu vào Chuyến Đi
                             </button>
                             <button
                                 style={styles.actionButton}
@@ -667,7 +667,7 @@ const ItineraryDetailNew = () => {
                                     e.target.style.color = '#475569';
                                 }}
                             >
-                                {itinerary.status === 'custom' ? 'Edit' : 'Customize'}
+                                {itinerary.status === 'custom' ? 'Chỉnh sửa' : 'Tùy chỉnh'}
                             </button>
                             <button
                                 style={styles.actionButton}
@@ -681,7 +681,7 @@ const ItineraryDetailNew = () => {
                                     e.target.style.color = '#475569';
                                 }}
                             >
-                                Share
+                                Chia sẻ
                             </button>
                         </div>
                     </div>
@@ -689,7 +689,7 @@ const ItineraryDetailNew = () => {
                     {/* Days and Activities */}
                     {itinerary_data && itinerary_data.map((dayData, index) => {
                         const dayNumber = dayData.dayNumber || dayData.day || (index + 1);
-                        const dayTheme = dayData.theme || `Day ${dayNumber}`;
+                        const dayTheme = dayData.theme || `Ngày ${dayNumber}`;
                         const activities = dayData.activities || [];
                         const isExpanded = expandedDays.has(dayNumber);
                         const dayCost = dayData.dayTotal || activities.reduce((sum, act) => sum + (act.cost || 0), 0);
@@ -715,7 +715,7 @@ const ItineraryDetailNew = () => {
                                                     {dayTheme}
                                                 </div>
                                                 <div style={styles.dayMeta}>
-                                                    <span>📍 {activities.length} activities</span>
+                                                    <span>📍 {activities.length} hoạt động</span>
                                                     <span>💰 {dayCost.toLocaleString()} VND</span>
                                                 </div>
                                             </div>
@@ -747,12 +747,12 @@ const ItineraryDetailNew = () => {
                                                             <div style={styles.activityTags}>
                                                                 {(activity.timeSlot || activity.time) && (
                                                                     <span style={styles.activityTag}>
-                                                                        🕐 {activity.timeSlot || activity.time}
+                                                                        🕐 {activity.timeSlot === 'morning' ? 'Buổi sáng' : activity.timeSlot === 'afternoon' ? 'Buổi chiều' : activity.timeSlot === 'evening' ? 'Buổi tối' : activity.timeSlot === 'night' ? 'Đêm' : activity.timeSlot || activity.time}
                                                                     </span>
                                                                 )}
                                                                 {activity.duration && (
                                                                     <span style={styles.activityTag}>
-                                                                        ⏱️ {activity.duration} mins
+                                                                        ⏱️ {activity.duration} phút
                                                                     </span>
                                                                 )}
                                                                 {activity.type && (
@@ -764,7 +764,7 @@ const ItineraryDetailNew = () => {
 
                                                             {/* Activity Name */}
                                                             <h4 style={styles.activityName}>
-                                                                {activity.activity || activity.name || activity.title || 'Activity'}
+                                                                {activity.activity || activity.name || activity.title || 'Hoạt động'}
                                                             </h4>                                                            {/* Location */}
                                                             {activity.location && (
                                                                 <div style={styles.activityLocation}>
@@ -785,7 +785,7 @@ const ItineraryDetailNew = () => {
                                                                         e.target.style.color = '#475569';
                                                                     }}
                                                                 >
-                                                                    📍 View map
+                                                                    📍 Xem bản đồ
                                                                 </button>
                                                                 <button
                                                                     style={styles.activityButton}
@@ -798,7 +798,7 @@ const ItineraryDetailNew = () => {
                                                                         e.target.style.color = '#475569';
                                                                     }}
                                                                 >
-                                                                    ❤️ Save
+                                                                    ❤️ Lưu
                                                                 </button>
                                                                 <button
                                                                     style={styles.activityButton}
@@ -811,7 +811,7 @@ const ItineraryDetailNew = () => {
                                                                         e.target.style.color = '#475569';
                                                                     }}
                                                                 >
-                                                                    ℹ️ Details
+                                                                    ℹ️ Chi tiết
                                                                 </button>
                                                             </div>
                                                         </div>
@@ -820,7 +820,7 @@ const ItineraryDetailNew = () => {
                                                         <div style={styles.costInfo}>
                                                             {activity.cost === 0 ? (
                                                                 <div style={styles.freeBadge}>
-                                                                    FREE
+                                                                    MIỄN PHÍ
                                                                 </div>
                                                             ) : (
                                                                 <>
@@ -846,54 +846,54 @@ const ItineraryDetailNew = () => {
                     {/* Travel Tips */}
                     <div style={styles.tipsSection}>
                         <h3 style={styles.tipsTitle}>
-                            💡 Travel Tips
+                            💡 Mẹo Du Lịch
                         </h3>
                         <ul style={styles.tipsList}>
                             <li style={styles.tipItem}>
                                 <span style={styles.tipIcon}>✓</span>
-                                <span>Best visited Oct-Apr: Cool, Dry and Ideal weather to prevent precipitation</span>
+                                <span>Thời gian tốt nhất: Tháng 10-4 - Thời tiết mát mẻ, khô ráo và lý tưởng</span>
                             </li>
                             <li style={styles.tipItem}>
                                 <span style={styles.tipIcon}>✓</span>
-                                <span>Bring sun safety wear to embrace inclement conditions and harmful rays protective</span>
+                                <span>Mang theo đồ chống nắng để bảo vệ khỏi tia UV có hại</span>
                             </li>
                             <li style={styles.tipItem}>
                                 <span style={styles.tipIcon}>✓</span>
-                                <span>Experience local cuisine sounds please respectfully be well-versed street vendor experience</span>
+                                <span>Trải nghiệm ẩm thực địa phương tại các quán ăn đường phố</span>
                             </li>
                         </ul>
                     </div>
 
                     {/* Trip Summary */}
                     <div style={styles.summarySection}>
-                        <h3 style={styles.summaryTitle}>🗺️ Trip Summary</h3>
+                        <h3 style={styles.summaryTitle}>🗺️ Tóm Tắt Chuyến Đi</h3>
                         <div style={styles.summaryGrid}>
                             <div style={styles.summaryItem}>
                                 <span style={{ ...styles.summaryIcon, backgroundColor: '#3b82f6', color: 'white', borderRadius: '50%', width: '16px', height: '16px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '10px' }}>
                                     {totalDays}
                                 </span>
-                                <span>Total Days</span>
+                                <span>Tổng Số Ngày</span>
                             </div>
                             <div style={styles.summaryItem}>
                                 <span style={{ ...styles.summaryIcon, backgroundColor: '#10b981', color: 'white', borderRadius: '50%', width: '16px', height: '16px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '10px' }}>
                                     ✓
                                 </span>
-                                <span>Food Area - Beach Areas</span>
+                                <span>Khu Ẩm Thực - Khu Bãi Biển</span>
                             </div>
                             <div style={styles.summaryItem}>
                                 <span style={{ ...styles.summaryIcon, backgroundColor: '#f59e0b', color: 'white', borderRadius: '50%', width: '16px', height: '16px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '10px' }}>
                                     💰
                                 </span>
-                                <span>Est. Cost: {totalCost.toLocaleString()} VND (~${(totalCost / 24000).toFixed(2)} USD)</span>
+                                <span>Chi Phí Dự Kiến: {totalCost.toLocaleString()} VND (~${(totalCost / 24000).toFixed(2)} USD)</span>
                             </div>
                         </div>
                     </div>
 
                     {/* Call to Action */}
                     <div style={styles.ctaSection}>
-                        <h3 style={styles.ctaTitle}>Ready to Start Your Adventure?</h3>
+                        <h3 style={styles.ctaTitle}>Sẵn Sàng Bắt Đầu Cuộc Phiêu Lưu?</h3>
                         <p style={styles.ctaText}>
-                            Turn this itinerary into reality with our booking services
+                            Biến lộ trình này thành hiện thực với dịch vụ đặt chỗ của chúng tôi
                         </p>
                         <div style={styles.ctaButtons}>
                             <button
@@ -905,7 +905,7 @@ const ItineraryDetailNew = () => {
                                     e.target.style.backgroundColor = '#f97316';
                                 }}
                             >
-                                Book This Trip Now
+                                Đặt Chuyến Đi Ngay
                             </button>
                             <button
                                 style={{ ...styles.ctaButton, ...styles.ctaSecondary }}
@@ -916,7 +916,7 @@ const ItineraryDetailNew = () => {
                                     e.target.style.backgroundColor = 'white';
                                 }}
                             >
-                                Contact Gomyport
+                                Liên Hệ Gomyport
                             </button>
                         </div>
                     </div>

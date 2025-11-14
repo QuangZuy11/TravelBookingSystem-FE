@@ -26,6 +26,19 @@ const ACTIVITY_ICONS = {
     relaxation: '🧘'
 };
 
+const ACTIVITY_LABELS = {
+    sightseeing: 'Tham Quan',
+    adventure: 'Phiêu Lưu',
+    food: 'Ăn Uống',
+    transport: 'Di Chuyển',
+    shopping: 'Mua Sắm',
+    entertainment: 'Giải Trí',
+    culture: 'Văn Hóa',
+    history: 'Lịch Sử',
+    nature: 'Thiên Nhiên',
+    relaxation: 'Thư Giãn'
+};
+
 // Utility functions
 const formatVND = (amount) => {
     return new Intl.NumberFormat('vi-VN').format(amount || 0);
@@ -1075,9 +1088,9 @@ const ItineraryCustomize = () => {
                         <div style={{ textAlign: 'center', padding: '60px 20px' }}>
                             <div style={{ fontSize: '48px', marginBottom: '20px' }}>⚙️</div>
                             <h2 style={{ fontSize: '24px', fontWeight: '600', color: '#1e293b', marginBottom: '8px' }}>
-                                Loading Customize Interface
+                                Đang Tải Giao Diện Tùy Chỉnh
                             </h2>
-                            <p style={{ color: '#64748b' }}>Please wait...</p>
+                            <p style={{ color: '#64748b' }}>Vui lòng chờ...</p>
                         </div>
                     </div>
                 </div>
@@ -1096,10 +1109,10 @@ const ItineraryCustomize = () => {
                         <div style={{ textAlign: 'center', padding: '60px 20px' }}>
                             <div style={{ fontSize: '48px', marginBottom: '20px' }}>❌</div>
                             <h2 style={{ fontSize: '24px', fontWeight: '600', color: '#1e293b', marginBottom: '8px' }}>
-                                Error Loading Itinerary
+                                Lỗi Tải Lộ Trình
                             </h2>
                             <p style={{ color: '#64748b', marginBottom: '24px' }}>
-                                {error || 'Unable to load itinerary for editing'}
+                                {error || 'Không thể tải lộ trình để chỉnh sửa'}
                             </p>
                             <button
                                 onClick={() => navigate(`/ai-itinerary/${itineraryId}`)}
@@ -1108,7 +1121,7 @@ const ItineraryCustomize = () => {
                                     ...styles.primaryButton
                                 }}
                             >
-                                Back to Itinerary
+                                Quay Lại Lộ Trình
                             </button>
                         </div>
                     </div>
@@ -1135,36 +1148,36 @@ const ItineraryCustomize = () => {
                             e.target.style.backgroundColor = '#e2e8f0';
                         }}
                     >
-                        ← Back to Itinerary
+                        ← Quay Lại Lộ Trình
                     </button>
 
                     {/* Header */}
                     <div style={styles.headerCard}>
-                        <h1 style={styles.headerTitle}>Customize Your Itinerary</h1>
+                        <h1 style={styles.headerTitle}>Tùy Chỉnh Lộ Trình</h1>
                         <p style={styles.headerSubtitle}>
-                            Edit your travel plan details, activities, and preferences
-                            {hasChanges && <span style={{ color: '#f59e0b', fontWeight: '600' }}> • Unsaved changes</span>}
+                            Chỉnh sửa chi tiết kế hoạch, hoạt động và sở thích của bạn
+                            {hasChanges && <span style={{ color: '#f59e0b', fontWeight: '600' }}> • Có thay đổi chưa lưu</span>}
                         </p>
 
                         {/* Basic Info */}
                         <div style={styles.formGroup}>
-                            <label style={styles.label}>Destination</label>
+                            <label style={styles.label}>Điểm Đến</label>
                             <input
                                 type="text"
                                 value={formData.destination}
                                 onChange={(e) => handleInputChange('destination', e.target.value)}
                                 style={styles.input}
-                                placeholder="Enter destination"
+                                placeholder="Nhập điểm đến"
                             />
                         </div>
 
                         <div style={styles.formGroup}>
-                            <label style={styles.label}>Trip Summary</label>
+                            <label style={styles.label}>Tóm Tắt Chuyến Đi</label>
                             <textarea
                                 value={formData.summary}
                                 onChange={(e) => handleInputChange('summary', e.target.value)}
                                 style={styles.textarea}
-                                placeholder="Describe your perfect journey..."
+                                placeholder="Mô tả chuyến đi hoàn hảo của bạn..."
                                 rows="3"
                             />
                         </div>
@@ -1178,15 +1191,15 @@ const ItineraryCustomize = () => {
                                     <>
                                         <div style={styles.statCard}>
                                             <div style={styles.statValue}>{totals.totalDays}</div>
-                                            <div style={styles.statLabel}>Days</div>
+                                            <div style={styles.statLabel}>Ngày</div>
                                         </div>
                                         <div style={styles.statCard}>
                                             <div style={styles.statValue}>{totals.totalActivities}</div>
-                                            <div style={styles.statLabel}>Activities</div>
+                                            <div style={styles.statLabel}>Hoạt Động</div>
                                         </div>
                                         <div style={styles.statCard}>
                                             <div style={styles.statValue}>{formatVND(totals.totalCost)}</div>
-                                            <div style={styles.statLabel}>Total Cost</div>
+                                            <div style={styles.statLabel}>Tổng Chi Phí</div>
                                         </div>
                                         <div style={styles.statCard}>
                                             <div style={styles.statValue}>~${(totals.totalCost / 24000).toFixed(2)}</div>
@@ -1214,7 +1227,7 @@ const ItineraryCustomize = () => {
                                     if (!saving) e.target.style.backgroundColor = '#10b981';
                                 }}
                             >
-                                {saving ? '💾 Saving...' : '💾 Save Changes'}
+                                {saving ? '💾 Đang Lưu...' : '💾 Lưu Thay Đổi'}
                             </button>
                             <button
                                 onClick={handleCancel}
@@ -1229,7 +1242,7 @@ const ItineraryCustomize = () => {
                                     e.target.style.backgroundColor = '#e5e7eb';
                                 }}
                             >
-                                Cancel
+                                Hủy
                             </button>
 
                             {/* Save Status Indicator */}
@@ -1240,9 +1253,9 @@ const ItineraryCustomize = () => {
                                         saveStatus === 'saving' ? styles.savingStatus :
                                             styles.errorStatus)
                                 }}>
-                                    {saveStatus === 'saved' && '✅ Saved'}
-                                    {saveStatus === 'saving' && '⏳ Auto-saving...'}
-                                    {saveStatus === 'error' && '❌ Save failed'}
+                                    {saveStatus === 'saved' && '✅ Đã Lưu'}
+                                    {saveStatus === 'saving' && '⏳ Đang tự động lưu...'}
+                                    {saveStatus === 'error' && '❌ Lưu thất bại'}
                                 </div>
                             )}
                         </div>
@@ -1258,12 +1271,12 @@ const ItineraryCustomize = () => {
                                     value={dayData.theme || ''}
                                     onChange={(e) => handleDayThemeChange(dayIndex, e.target.value)}
                                     style={styles.dayTitleInput}
-                                    placeholder="Day theme..."
+                                    placeholder="Chủ đề ngày..."
                                 />
                                 <button
                                     onClick={() => handleDeleteDay(dayIndex)}
                                     style={styles.removeButton}
-                                    title="Delete Day"
+                                    title="Xóa Ngày"
                                 >
                                     🗑️
                                 </button>
@@ -1282,13 +1295,13 @@ const ItineraryCustomize = () => {
                                                     value={activity.activity || ''}
                                                     onChange={(e) => handleActivityChange(dayIndex, actIndex, 'activity', e.target.value)}
                                                     style={{ ...styles.activityNameInput, flex: 1 }}
-                                                    placeholder="Activity name..."
+                                                    placeholder="Tên hoạt động..."
                                                 />
                                             </div>
 
                                             <div style={styles.activityGrid}>
                                                 <div>
-                                                    <label style={{ fontSize: '12px', color: '#6b7280', display: 'block', marginBottom: '4px' }}>Time</label>
+                                                    <label style={{ fontSize: '12px', color: '#6b7280', display: 'block', marginBottom: '4px' }}>Thời Gian</label>
                                                     <input
                                                         type="time"
                                                         value={activity.time || ''}
@@ -1297,17 +1310,17 @@ const ItineraryCustomize = () => {
                                                     />
                                                 </div>
                                                 <div>
-                                                    <label style={{ fontSize: '12px', color: '#6b7280', display: 'block', marginBottom: '4px' }}>Duration</label>
+                                                    <label style={{ fontSize: '12px', color: '#6b7280', display: 'block', marginBottom: '4px' }}>Thời Lượng</label>
                                                     <input
                                                         type="text"
                                                         value={activity.duration || ''}
                                                         onChange={(e) => handleActivityChange(dayIndex, actIndex, 'duration', e.target.value)}
                                                         style={styles.smallInput}
-                                                        placeholder="e.g. 2 hours"
+                                                        placeholder="ví dụ: 2 giờ"
                                                     />
                                                 </div>
                                                 <div>
-                                                    <label style={{ fontSize: '12px', color: '#6b7280', display: 'block', marginBottom: '4px' }}>Cost (VND)</label>
+                                                    <label style={{ fontSize: '12px', color: '#6b7280', display: 'block', marginBottom: '4px' }}>Chi Phí (VND)</label>
                                                     <input
                                                         type="number"
                                                         value={activity.cost || 0}
@@ -1317,7 +1330,7 @@ const ItineraryCustomize = () => {
                                                     />
                                                 </div>
                                                 <div>
-                                                    <label style={{ fontSize: '12px', color: '#6b7280', display: 'block', marginBottom: '4px' }}>Type</label>
+                                                    <label style={{ fontSize: '12px', color: '#6b7280', display: 'block', marginBottom: '4px' }}>Loại</label>
                                                     <select
                                                         value={activity.type || 'other'}
                                                         onChange={(e) => handleActivityChange(dayIndex, actIndex, 'type', e.target.value)}
@@ -1325,7 +1338,7 @@ const ItineraryCustomize = () => {
                                                     >
                                                         {ACTIVITY_TYPES.map(type => (
                                                             <option key={type} value={type}>
-                                                                {ACTIVITY_ICONS[type]} {type.charAt(0).toUpperCase() + type.slice(1)}
+                                                                {ACTIVITY_ICONS[type]} {ACTIVITY_LABELS[type]}
                                                             </option>
                                                         ))}
                                                     </select>
@@ -1333,13 +1346,13 @@ const ItineraryCustomize = () => {
                                             </div>
 
                                             <div style={{ marginTop: '8px' }}>
-                                                <label style={{ fontSize: '12px', color: '#6b7280', display: 'block', marginBottom: '4px' }}>Location</label>
+                                                <label style={{ fontSize: '12px', color: '#6b7280', display: 'block', marginBottom: '4px' }}>Địa Điểm</label>
                                                 <input
                                                     type="text"
                                                     value={activity.location || ''}
                                                     onChange={(e) => handleActivityChange(dayIndex, actIndex, 'location', e.target.value)}
                                                     style={styles.input}
-                                                    placeholder="Activity location..."
+                                                    placeholder="Địa điểm hoạt động..."
                                                 />
                                             </div>
 
@@ -1353,7 +1366,7 @@ const ItineraryCustomize = () => {
                                                         padding: '4px 8px'
                                                     }}
                                                 >
-                                                    ✏️ Edit
+                                                    ✏️ Sửa
                                                 </button>
                                                 <button
                                                     onClick={() => moveActivity(dayIndex, actIndex, 'up')}
@@ -1406,7 +1419,7 @@ const ItineraryCustomize = () => {
                                         e.target.style.borderColor = '#d1d5db';
                                     }}
                                 >
-                                    + Add Activity
+                                    + Thêm Hoạt Động
                                 </button>
                             </div>
                         </div>
@@ -1435,14 +1448,14 @@ const ItineraryCustomize = () => {
                                 }
                             }}
                         >
-                            {addingDay ? '⏳ Adding...' : '+ Add New Day'}
+                            {addingDay ? '⏳ Đang thêm...' : '+ Thêm Ngày Mới'}
                         </button>
                     </div>
 
                     {/* Travel Tips Section */}
                     <div style={styles.travelTipsCard}>
                         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '16px' }}>
-                            <h3 style={styles.modalTitle}>💡 Travel Tips</h3>
+                            <h3 style={styles.modalTitle}>💡 Mẹo Du Lịch</h3>
                             <button
                                 onClick={handleAddTip}
                                 style={{
@@ -1452,7 +1465,7 @@ const ItineraryCustomize = () => {
                                     padding: '6px 12px'
                                 }}
                             >
-                                + Add Tip
+                                + Thêm Mẹo
                             </button>
                         </div>
 
@@ -1494,23 +1507,23 @@ const ItineraryCustomize = () => {
                 <div style={styles.modalOverlay} onClick={() => setShowActivityModal(false)}>
                     <div style={styles.modal} onClick={(e) => e.stopPropagation()}>
                         <h3 style={styles.modalTitle}>
-                            {editingActivity.index !== undefined ? 'Edit Activity' : 'Add New Activity'}
+                            {editingActivity.index !== undefined ? 'Sửa Hoạt Động' : 'Thêm Hoạt Động Mới'}
                         </h3>
 
                         <div style={styles.formGroup}>
-                            <label style={styles.label}>Activity Name *</label>
+                            <label style={styles.label}>Tên Hoạt Động *</label>
                             <input
                                 type="text"
                                 value={editingActivity.activity || ''}
                                 onChange={(e) => setEditingActivity(prev => ({ ...prev, activity: e.target.value }))}
                                 style={styles.input}
-                                placeholder="Enter activity name..."
+                                placeholder="Nhập tên hoạt động..."
                             />
                         </div>
 
                         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
                             <div style={styles.formGroup}>
-                                <label style={styles.label}>Time *</label>
+                                <label style={styles.label}>Thời Gian *</label>
                                 <input
                                     type="time"
                                     value={editingActivity.time || ''}
@@ -1519,31 +1532,31 @@ const ItineraryCustomize = () => {
                                 />
                             </div>
                             <div style={styles.formGroup}>
-                                <label style={styles.label}>Duration</label>
+                                <label style={styles.label}>Thời Lượng</label>
                                 <input
                                     type="text"
                                     value={editingActivity.duration || ''}
                                     onChange={(e) => setEditingActivity(prev => ({ ...prev, duration: e.target.value }))}
                                     style={styles.input}
-                                    placeholder="e.g. 2 hours"
+                                    placeholder="ví dụ: 2 giờ"
                                 />
                             </div>
                         </div>
 
                         <div style={styles.formGroup}>
-                            <label style={styles.label}>Location</label>
+                            <label style={styles.label}>Địa Điểm</label>
                             <input
                                 type="text"
                                 value={editingActivity.location || ''}
                                 onChange={(e) => setEditingActivity(prev => ({ ...prev, location: e.target.value }))}
                                 style={styles.input}
-                                placeholder="Activity location..."
+                                placeholder="Địa điểm hoạt động..."
                             />
                         </div>
 
                         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
                             <div style={styles.formGroup}>
-                                <label style={styles.label}>Cost (VND)</label>
+                                <label style={styles.label}>Chi Phí (VND)</label>
                                 <input
                                     type="number"
                                     value={editingActivity.cost || 0}
@@ -1554,7 +1567,7 @@ const ItineraryCustomize = () => {
                                 />
                             </div>
                             <div style={styles.formGroup}>
-                                <label style={styles.label}>Type</label>
+                                <label style={styles.label}>Loại</label>
                                 <select
                                     value={editingActivity.type || 'other'}
                                     onChange={(e) => setEditingActivity(prev => ({ ...prev, type: e.target.value }))}
@@ -1562,7 +1575,7 @@ const ItineraryCustomize = () => {
                                 >
                                     {ACTIVITY_TYPES.map(type => (
                                         <option key={type} value={type}>
-                                            {ACTIVITY_ICONS[type]} {type.charAt(0).toUpperCase() + type.slice(1)}
+                                            {ACTIVITY_ICONS[type]} {ACTIVITY_LABELS[type]}
                                         </option>
                                     ))}
                                 </select>
@@ -1570,23 +1583,23 @@ const ItineraryCustomize = () => {
                         </div>
 
                         <div style={styles.formGroup}>
-                            <label style={styles.label}>Description</label>
+                            <label style={styles.label}>Mô Tả</label>
                             <textarea
                                 value={editingActivity.description || ''}
                                 onChange={(e) => setEditingActivity(prev => ({ ...prev, description: e.target.value }))}
                                 style={styles.textarea}
-                                placeholder="Activity description..."
+                                placeholder="Mô tả hoạt động..."
                                 rows="3"
                             />
                         </div>
 
                         <div style={styles.formGroup}>
-                            <label style={styles.label}>Notes</label>
+                            <label style={styles.label}>Ghi Chú</label>
                             <textarea
                                 value={editingActivity.notes || ''}
                                 onChange={(e) => setEditingActivity(prev => ({ ...prev, notes: e.target.value }))}
                                 style={styles.textarea}
-                                placeholder="Personal notes..."
+                                placeholder="Ghi chú cá nhân..."
                                 rows="2"
                             />
                         </div>
@@ -1602,7 +1615,7 @@ const ItineraryCustomize = () => {
                                     cursor: saving ? 'not-allowed' : 'pointer'
                                 }}
                             >
-                                {saving ? '💾 Saving...' : '💾 Save Activity'}
+                                {saving ? '💾 Đang Lưu...' : '💾 Lưu Hoạt Động'}
                             </button>
                             <button
                                 onClick={() => setShowActivityModal(false)}
@@ -1611,7 +1624,7 @@ const ItineraryCustomize = () => {
                                     ...styles.secondaryButton
                                 }}
                             >
-                                Cancel
+                                Hủy
                             </button>
                         </div>
                     </div>
@@ -1623,34 +1636,34 @@ const ItineraryCustomize = () => {
                 <div style={styles.modalOverlay} onClick={() => setShowTipModal(false)}>
                     <div style={styles.modal} onClick={(e) => e.stopPropagation()}>
                         <h3 style={styles.modalTitle}>
-                            {editingTip.index !== undefined ? 'Edit Travel Tip' : 'Add New Travel Tip'}
+                            {editingTip.index !== undefined ? 'Sửa Mẹo Du Lịch' : 'Thêm Mẹo Du Lịch Mới'}
                         </h3>
 
                         <div style={styles.formGroup}>
-                            <label style={styles.label}>Tip Content *</label>
+                            <label style={styles.label}>Nội Dung Mẹo *</label>
                             <textarea
                                 value={editingTip.content || ''}
                                 onChange={(e) => setEditingTip(prev => ({ ...prev, content: e.target.value }))}
                                 style={styles.textarea}
-                                placeholder="Enter your travel tip..."
+                                placeholder="Nhập mẹo du lịch của bạn..."
                                 rows="4"
                             />
                         </div>
 
                         <div style={styles.formGroup}>
-                            <label style={styles.label}>Category</label>
+                            <label style={styles.label}>Danh Mục</label>
                             <select
                                 value={editingTip.category || 'general'}
                                 onChange={(e) => setEditingTip(prev => ({ ...prev, category: e.target.value }))}
                                 style={styles.input}
                             >
-                                <option value="general">General</option>
-                                <option value="weather">Weather</option>
-                                <option value="safety">Safety</option>
-                                <option value="food">Food</option>
-                                <option value="transport">Transport</option>
-                                <option value="culture">Culture</option>
-                                <option value="budget">Budget</option>
+                                <option value="general">Chung</option>
+                                <option value="weather">Thời Tiết</option>
+                                <option value="safety">An Toàn</option>
+                                <option value="food">Ăn Uống</option>
+                                <option value="transport">Giao Thông</option>
+                                <option value="culture">Văn Hóa</option>
+                                <option value="budget">Ngân Sách</option>
                             </select>
                         </div>
 
@@ -1662,7 +1675,7 @@ const ItineraryCustomize = () => {
                                     ...styles.successButton
                                 }}
                             >
-                                💾 Save Tip
+                                💾 Lưu Mẹo
                             </button>
                             <button
                                 onClick={() => setShowTipModal(false)}
@@ -1671,7 +1684,7 @@ const ItineraryCustomize = () => {
                                     ...styles.secondaryButton
                                 }}
                             >
-                                Cancel
+                                Hủy
                             </button>
                         </div>
                     </div>

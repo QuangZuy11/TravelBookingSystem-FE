@@ -341,39 +341,39 @@ export const getDestinations = async () => {
  * 🎨 Enhanced UI Configuration Options
  */
 export const PREFERENCE_OPTIONS = [
-  { id: 'culture', label: 'Culture', icon: '🎭', gradient: 'linear-gradient(135deg, #fb923c 0%, #ea580c 100%)' },
-  { id: 'history', label: 'History', icon: '🏛️', gradient: 'linear-gradient(135deg, #fbbf24 0%, #d97706 100%)' },
-  { id: 'food', label: 'Food', icon: '🍜', gradient: 'linear-gradient(135deg, #f87171 0%, #dc2626 100%)' },
-  { id: 'nature', label: 'Nature', icon: '🌿', gradient: 'linear-gradient(135deg, #4ade80 0%, #16a34a 100%)' },
-  { id: 'adventure', label: 'Adventure', icon: '🏔️', gradient: 'linear-gradient(135deg, #60a5fa 0%, #2563eb 100%)' },
-  { id: 'entertainment', label: 'Entertainment', icon: '🎪', gradient: 'linear-gradient(135deg, #a78bfa 0%, #7c3aed 100%)' },
-  { id: 'shopping', label: 'Shopping', icon: '🛍️', gradient: 'linear-gradient(135deg, #f472b6 0%, #ec4899 100%)' },
-  { id: 'relaxation', label: 'Relaxation', icon: '🧘', gradient: 'linear-gradient(135deg, #2dd4bf 0%, #14b8a6 100%)' }
+  { id: 'culture', label: 'Văn Hóa', icon: '🎭', gradient: 'linear-gradient(135deg, #fb923c 0%, #ea580c 100%)' },
+  { id: 'history', label: 'Lịch Sử', icon: '🏛️', gradient: 'linear-gradient(135deg, #fbbf24 0%, #d97706 100%)' },
+  { id: 'food', label: 'Ăn Uống', icon: '🍜', gradient: 'linear-gradient(135deg, #f87171 0%, #dc2626 100%)' },
+  { id: 'nature', label: 'Thiên Nhiên', icon: '🌿', gradient: 'linear-gradient(135deg, #4ade80 0%, #16a34a 100%)' },
+  { id: 'adventure', label: 'Phiêu Lưu', icon: '🏔️', gradient: 'linear-gradient(135deg, #60a5fa 0%, #2563eb 100%)' },
+  { id: 'entertainment', label: 'Giải Trí', icon: '🎪', gradient: 'linear-gradient(135deg, #a78bfa 0%, #7c3aed 100%)' },
+  { id: 'shopping', label: 'Mua Sắm', icon: '🛍️', gradient: 'linear-gradient(135deg, #f472b6 0%, #ec4899 100%)' },
+  { id: 'relaxation', label: 'Thư Giãn', icon: '🧘', gradient: 'linear-gradient(135deg, #2dd4bf 0%, #14b8a6 100%)' }
 ];
 
 export const BUDGET_OPTIONS = [
   {
     value: 'low',
-    label: 'Budget',
+    label: 'Tiết Kiệm',
     emoji: '💰',
-    title: 'Budget',
-    description: 'Affordable adventures',
+    title: 'Tiết Kiệm',
+    description: 'Phương án tiết kiệm',
     gradient: 'linear-gradient(135deg, #6b7280 0%, #4b5563 100%)'
   },
   {
     value: 'medium',
-    label: 'Moderate',
+    label: 'Vừa Phải',
     emoji: '⚖️',
-    title: 'Moderate',
-    description: 'Balanced comfort',
+    title: 'Vừa Phải',
+    description: 'Cân bằng tiện nghi',
     gradient: 'linear-gradient(135deg, #10b981 0%, #14b8a6 100%)'
   },
   {
     value: 'high',
-    label: 'Luxury',
+    label: 'Cao Cấp',
     emoji: '💎',
-    title: 'Luxury',
-    description: 'Premium experiences',
+    title: 'Cao Cấp',
+    description: 'Trải nghiệm cao cấp',
     gradient: 'linear-gradient(135deg, #3b82f6 0%, #6366f1 100%)'
   }
 ];

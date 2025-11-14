@@ -247,6 +247,11 @@ const DashboardLayout = () => {
       icon: Calendar,
     },
     {
+      path: '/provider/ai-bookings',
+      label: 'AI Bookings',
+      icon: Sparkles,
+    },
+    {
       path: "/provider/tours/check-in",
       label: "Check-in Tour",
       icon: PiCalendarCheckThin,
@@ -281,9 +286,8 @@ const DashboardLayout = () => {
             <div className="nav-item-wrapper">
               <button
                 type="button"
-                className={`nav-item-dropdown ${
-                  location.pathname.includes("/tour") ? "active" : ""
-                }`}
+                className={`nav-item-dropdown ${location.pathname.includes("/tour") ? "active" : ""
+                  }`}
                 onClick={() => setIsTourMenuOpen((prev) => !prev)}
               >
                 <div className="nav-item-label">

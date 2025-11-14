@@ -141,14 +141,15 @@ const styles = {
     },
     buttonGroup: {
         display: 'flex',
+        flexWrap: 'wrap',
         gap: '0.5rem',
         alignItems: 'stretch'
     },
     viewButton: {
-        flex: 1,
-        minWidth: '100px',
+        flex: '1 1 calc(50% - 0.25rem)',
+        minWidth: '90px',
         height: '38px',
-        padding: '0 1rem',
+        padding: '0 0.75rem',
         backgroundColor: '#14b8a6',
         color: 'white',
         border: 'none',
@@ -162,7 +163,7 @@ const styles = {
         justifyContent: 'center'
     },
     deleteButton: {
-        width: '45px',
+        flex: '0 0 45px',
         height: '38px',
         padding: '0',
         backgroundColor: '#ef4444',
@@ -172,7 +173,7 @@ const styles = {
         fontWeight: '600',
         cursor: 'pointer',
         transition: 'background-color 0.2s ease',
-        fontSize: '0.875rem',
+        fontSize: '1.1rem',
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center'
@@ -229,12 +230,14 @@ const MyItineraries = () => {
     const [requests, setRequests] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
+    const [deleteModalOpen, setDeleteModalOpen] = useState(false);
+    const [itineraryToDelete, setItineraryToDelete] = useState(null);
 
     useEffect(() => {
         if (authLoading) return;
 
         if (!user) {
-            toast.error('Please login to view your itineraries');
+            toast.error('Vui lòng đăng nhập để xem lộ trình của bạn');
             setTimeout(() => navigate('/auth'), 2000);
             return;
         }
@@ -291,18 +294,28 @@ const MyItineraries = () => {
     };
 
     const handleDelete = async (itineraryId) => {
-        if (!window.confirm('Are you sure you want to delete this itinerary?')) {
-            return;
-        }
+        setItineraryToDelete(itineraryId);
+        setDeleteModalOpen(true);
+    };
+
+    const handleConfirmDelete = async () => {
+        if (!itineraryToDelete) return;
 
         try {
-            await deleteItinerary(itineraryId);
-            toast.success('Itinerary deleted successfully');
-            loadUserItineraries();
+            await deleteItinerary(itineraryToDelete);
+            toast.success('✓ Đã xóa lộ trình thành công!');
+            setItineraries(itineraries.filter(it => it._id !== itineraryToDelete));
+            setDeleteModalOpen(false);
+            setItineraryToDelete(null);
         } catch (err) {
             console.error('Failed to delete itinerary:', err);
-            toast.error(err.message || 'Failed to delete itinerary');
+            toast.error(err.message || 'Không thể xóa lộ trình');
         }
+    };
+
+    const handleCancelDelete = () => {
+        setDeleteModalOpen(false);
+        setItineraryToDelete(null);
     };
 
     const handleView = (itineraryId) => {
@@ -317,7 +330,7 @@ const MyItineraries = () => {
                 <div style={styles.loadingContainer}>
                     <div style={styles.loadingContent}>
                         <div className="loading-spinner" style={{ margin: '0 auto 1rem' }}></div>
-                        <p style={styles.loadingText}>Loading your itineraries...</p>
+                        <p style={styles.loadingText}>Đang tải lộ trình của bạn...</p>
                     </div>
                 </div>
                 <Footer />
@@ -333,7 +346,7 @@ const MyItineraries = () => {
                 <div style={styles.loadingContainer}>
                     <div style={styles.loadingContent}>
                         <p style={{ ...styles.loadingText, marginBottom: '1rem' }}>
-                            Please login to view your itineraries
+                            Vui lòng đăng nhập để xem lộ trình của bạn
                         </p>
                         <button
                             onClick={() => navigate('/auth')}
@@ -341,7 +354,7 @@ const MyItineraries = () => {
                             onMouseOver={(e) => e.target.style.backgroundColor = '#1d4ed8'}
                             onMouseOut={(e) => e.target.style.backgroundColor = '#2563eb'}
                         >
-                            Go to Login
+                            Đến trang đăng nhập
                         </button>
                     </div>
                 </div>
@@ -360,8 +373,8 @@ const MyItineraries = () => {
                     <div style={styles.contentWrapper}>
                         {/* Header */}
                         <div style={styles.header}>
-                            <h1 style={styles.title}>My Itineraries</h1>
-                            <p style={styles.subtitle}>View and manage your AI-generated travel plans</p>
+                            <h1 style={styles.title}>Lộ trình của tôi</h1>
+                            <p style={styles.subtitle}>Xem và quản lý kế hoạch du lịch AI của bạn</p>
                         </div>
 
                         {/* Error State */}
@@ -375,9 +388,9 @@ const MyItineraries = () => {
                         {!loading && itineraries.length === 0 && (
                             <div style={styles.emptyStateCard}>
                                 <div style={styles.emptyIcon}>🗺️</div>
-                                <h2 style={styles.emptyTitle}>No Itineraries Yet</h2>
+                                <h2 style={styles.emptyTitle}>Chưa có lộ trình nào</h2>
                                 <p style={styles.emptyText}>
-                                    Start planning your perfect trip with AI assistance!
+                                    Bắt đầu lập kế hoạch chuyến đi hoàn hảo với sự trợ giúp của AI!
                                 </p>
                                 <button
                                     onClick={() => navigate('/ai-itinerary')}
@@ -385,7 +398,7 @@ const MyItineraries = () => {
                                     onMouseOver={(e) => e.target.style.backgroundColor = '#16a34a'}
                                     onMouseOut={(e) => e.target.style.backgroundColor = '#22c55e'}
                                 >
-                                    Create New Itinerary
+                                    Tạo lộ trình mới
                                 </button>
                             </div>
                         )}
@@ -414,7 +427,7 @@ const MyItineraries = () => {
                                                     📍 {itinerary.destination || 'Unknown Destination'}
                                                 </h3>
                                                 <p style={styles.cardSubtitle}>
-                                                    {itinerary.duration_days || 0} days • {itinerary.budget_level || 'medium'} budget
+                                                    {itinerary.duration_days || 0} ngày • Ngân sách {itinerary.budget_level || 'medium'}
                                                 </p>
                                             </div>
 
@@ -422,7 +435,7 @@ const MyItineraries = () => {
                                             <div style={styles.cardBody}>
                                                 <div style={{ marginBottom: '1rem' }}>
                                                     <p style={styles.infoText}>
-                                                        <span style={{ fontWeight: '600' }}>Created:</span>{' '}
+                                                        <span style={{ fontWeight: '600' }}>Tạo lúc:</span>{' '}
                                                         {new Date(itinerary.created_at).toLocaleDateString('en-US', {
                                                             year: 'numeric',
                                                             month: 'short',
@@ -431,40 +444,40 @@ const MyItineraries = () => {
                                                     </p>
 
                                                     <p style={styles.infoText}>
-                                                        <span style={{ fontWeight: '600' }}>Status:</span>{' '}
+                                                        <span style={{ fontWeight: '600' }}>Trạng thái:</span>{' '}
                                                         <span style={{
                                                             ...styles.statusBadge,
                                                             ...(itinerary.status === 'done' ? styles.statusDone : styles.statusPending)
                                                         }}>
-                                                            {itinerary.status === 'done' ? '✅ Original' : '⏳ Customize'}
+                                                            {itinerary.status === 'custom' ? '✅ Bản gốc' : '⏳ Tùy chỉnh'}
                                                         </span>
                                                     </p>
 
                                                     {/* New: Customization Status */}
                                                     {itinerary.hasCustomized && (
                                                         <p style={styles.infoText}>
-                                                            <span style={{ fontWeight: '600' }}>Customization:</span>{' '}
+                                                            <span style={{ fontWeight: '600' }}>Tùy chỉnh:</span>{' '}
                                                             <span style={{
                                                                 ...styles.statusBadge,
                                                                 backgroundColor: '#8b5cf6',
                                                                 color: 'white'
                                                             }}>
-                                                                ✨ Available
+                                                                ✨ Khả dụng
                                                             </span>
                                                         </p>
                                                     )}
 
                                                     {itinerary.preferences && itinerary.preferences.length > 0 && (
                                                         <p style={styles.infoText}>
-                                                            <span style={{ fontWeight: '600' }}>Preferences:</span>{' '}
+                                                            <span style={{ fontWeight: '600' }}>Sở thích:</span>{' '}
                                                             {itinerary.preferences.join(', ')}
                                                         </p>
                                                     )}
 
                                                     {/* Participants and Duration */}
                                                     <p style={styles.infoText}>
-                                                        <span style={{ fontWeight: '600' }}>Trip Details:</span>{' '}
-                                                        {itinerary.participant_number || 1} travelers • {itinerary.duration_days} days
+                                                        <span style={{ fontWeight: '600' }}>Chi tiết chuyến đi:</span>{' '}
+                                                        {itinerary.participant_number || 1} du khách • {itinerary.duration_days} ngày
                                                     </p>
                                                 </div>
 
@@ -474,38 +487,32 @@ const MyItineraries = () => {
 
                                                 {/* Enhanced Actions */}
                                                 <div style={styles.buttonGroup}>
+                                                    {/* Row 1: View and Book/Customize */}
                                                     <button
                                                         onClick={() => navigate(`/ai-itinerary/${itinerary._id}`)}
                                                         style={styles.viewButton}
                                                         onMouseOver={(e) => e.target.style.backgroundColor = '#0d9488'}
                                                         onMouseOut={(e) => e.target.style.backgroundColor = '#14b8a6'}
                                                     >
-                                                        👁️ View
+                                                        👁️ Xem
                                                     </button>
 
-                                                    {/* Book Button - Chỉ hiện nếu status là done hoặc custom */}
+                                                    {/* Book Button */}
                                                     {(itinerary.status === 'done' || itinerary.status === 'custom') && (
                                                         <button
                                                             onClick={() => navigate(`/ai-itinerary/${itinerary._id}`)}
                                                             style={{
                                                                 ...styles.viewButton,
-                                                                background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
-                                                                fontWeight: '600'
+                                                                background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)'
                                                             }}
-                                                            onMouseOver={(e) => {
-                                                                e.target.style.transform = 'translateY(-2px)';
-                                                                e.target.style.boxShadow = '0 4px 12px rgba(16, 185, 129, 0.4)';
-                                                            }}
-                                                            onMouseOut={(e) => {
-                                                                e.target.style.transform = 'translateY(0)';
-                                                                e.target.style.boxShadow = '0 2px 4px rgba(0, 0, 0, 0.1)';
-                                                            }}
+                                                            onMouseOver={(e) => e.target.style.background = 'linear-gradient(135deg, #059669 0%, #047857 100%)'}
+                                                            onMouseOut={(e) => e.target.style.background = 'linear-gradient(135deg, #10b981 0%, #059669 100%)'}
                                                         >
-                                                            🎫 Book
+                                                            🎫 Đặt
                                                         </button>
                                                     )}
 
-                                                    {/* Customize/Edit Button */}
+                                                    {/* Row 2: Customize and Delete */}
                                                     {(itinerary.status === 'done' || itinerary.status === 'custom') && (
                                                         <button
                                                             onClick={() => navigate(`/ai-itinerary/${itinerary._id}/customize`)}
@@ -516,9 +523,7 @@ const MyItineraries = () => {
                                                             onMouseOver={(e) => e.target.style.backgroundColor = itinerary.status === 'custom' ? '#7c3aed' : '#d97706'}
                                                             onMouseOut={(e) => e.target.style.backgroundColor = itinerary.status === 'custom' ? '#8b5cf6' : '#f59e0b'}
                                                         >
-                                                            <span style={{ display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
-                                                                {itinerary.status === 'custom' ? '✏️ Edit' : '✏️ Customize'}
-                                                            </span>
+                                                            {itinerary.status === 'custom' ? '✏️ Sửa' : '✏️ Tùy chỉnh'}
                                                         </button>
                                                     )}
 
@@ -527,6 +532,7 @@ const MyItineraries = () => {
                                                         style={styles.deleteButton}
                                                         onMouseOver={(e) => e.target.style.backgroundColor = '#dc2626'}
                                                         onMouseOut={(e) => e.target.style.backgroundColor = '#ef4444'}
+                                                        title="Delete itinerary"
                                                     >
                                                         🗑️
                                                     </button>
@@ -548,13 +554,143 @@ const MyItineraries = () => {
                                     onMouseOut={(e) => e.target.style.backgroundColor = '#22c55e'}
                                 >
                                     <span style={{ fontSize: '1.25rem' }}>+</span>
-                                    <span>Create New Itinerary</span>
+                                    <span>Tạo lộ trình mới</span>
                                 </button>
                             </div>
                         )}
                     </div>
                 </div>
             </main>
+
+            {/* Delete Confirmation Modal */}
+            {deleteModalOpen && itineraryToDelete && (
+                <div style={{
+                    position: 'fixed',
+                    top: 0,
+                    left: 0,
+                    right: 0,
+                    bottom: 0,
+                    background: 'rgba(0,0,0,0.5)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    zIndex: 1000,
+                    padding: '1rem'
+                }}>
+                    <div style={{
+                        background: 'white',
+                        borderRadius: '16px',
+                        padding: '2rem',
+                        maxWidth: '500px',
+                        width: '100%',
+                        boxShadow: '0 20px 60px rgba(0,0,0,0.3)'
+                    }}>
+                        <div style={{ textAlign: 'center', marginBottom: '1.5rem' }}>
+                            <div style={{ fontSize: '4rem', marginBottom: '1rem' }}>🗑️</div>
+                            <h2 style={{
+                                fontSize: '1.5rem',
+                                fontWeight: '700',
+                                color: '#1a1a1a',
+                                marginBottom: '0.5rem'
+                            }}>
+                                Xóa lộ trình?
+                            </h2>
+                            <p style={{ color: '#6b7280' }}>
+                                Bạn có chắc chắn muốn xóa kế hoạch du lịch này?
+                            </p>
+                        </div>
+
+                        {(() => {
+                            const itinerary = itineraries.find(it => it._id === itineraryToDelete);
+                            return itinerary ? (
+                                <div style={{
+                                    background: '#fef2f2',
+                                    border: '1px solid #fecaca',
+                                    borderRadius: '12px',
+                                    padding: '1rem',
+                                    marginBottom: '1.5rem'
+                                }}>
+                                    <div style={{
+                                        display: 'flex',
+                                        justifyContent: 'space-between',
+                                        marginBottom: '0.5rem'
+                                    }}>
+                                        <span style={{ fontWeight: '600', color: '#374151' }}>Điểm đến:</span>
+                                        <span style={{ fontWeight: '700', color: '#ef4444' }}>
+                                            {itinerary.destination}
+                                        </span>
+                                    </div>
+                                    <div style={{
+                                        display: 'flex',
+                                        justifyContent: 'space-between',
+                                        marginBottom: '0.5rem'
+                                    }}>
+                                        <span style={{ fontWeight: '600', color: '#374151' }}>Thời gian:</span>
+                                        <span style={{ color: '#6b7280' }}>{itinerary.duration_days} ngày</span>
+                                    </div>
+                                    <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                                        <span style={{ fontWeight: '600', color: '#374151' }}>Ngân sách:</span>
+                                        <span style={{ color: '#6b7280' }}>{itinerary.budget_level}</span>
+                                    </div>
+                                </div>
+                            ) : null;
+                        })()}
+
+                        <div style={{
+                            background: '#fef9c3',
+                            border: '1px solid #fde047',
+                            borderRadius: '8px',
+                            padding: '0.75rem',
+                            marginBottom: '1.5rem',
+                            fontSize: '0.875rem',
+                            color: '#854d0e'
+                        }}>
+                            ⚠️ <strong>Cảnh báo:</strong> Hành động này không thể hoàn tác!
+                        </div>
+
+                        <div style={{ display: 'flex', gap: '1rem' }}>
+                            <button
+                                onClick={handleCancelDelete}
+                                style={{
+                                    flex: 1,
+                                    padding: '0.75rem',
+                                    background: '#f3f4f6',
+                                    color: '#374151',
+                                    border: '2px solid #d1d5db',
+                                    borderRadius: '12px',
+                                    fontSize: '1rem',
+                                    fontWeight: '600',
+                                    cursor: 'pointer',
+                                    transition: 'all 0.3s ease'
+                                }}
+                                onMouseEnter={(e) => e.target.style.background = '#e5e7eb'}
+                                onMouseLeave={(e) => e.target.style.background = '#f3f4f6'}
+                            >
+                                Hủy
+                            </button>
+                            <button
+                                onClick={handleConfirmDelete}
+                                style={{
+                                    flex: 1,
+                                    padding: '0.75rem',
+                                    background: '#ef4444',
+                                    color: 'white',
+                                    border: 'none',
+                                    borderRadius: '12px',
+                                    fontSize: '1rem',
+                                    fontWeight: '600',
+                                    cursor: 'pointer',
+                                    transition: 'all 0.3s ease'
+                                }}
+                                onMouseEnter={(e) => e.target.style.background = '#dc2626'}
+                                onMouseLeave={(e) => e.target.style.background = '#ef4444'}
+                            >
+                                🗑️ Xóa
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
 
             <Footer />
         </>

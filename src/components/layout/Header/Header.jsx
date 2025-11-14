@@ -20,6 +20,7 @@ import NotificationDetailModal from "../../notifications/NotificationDetailModal
 
 const Header = () => {
   const [user, setUser] = useState(null);
+  const [provider, setProvider] = useState(null);
   const [showDropdown, setShowDropdown] = useState(false);
   const [showNotifications, setShowNotifications] = useState(false);
   const dropdownRef = useRef(null);
@@ -40,12 +41,22 @@ const Header = () => {
   useEffect(() => {
     const checkLoginStatus = () => {
       const userData = localStorage.getItem("user");
+      const providerData = localStorage.getItem("provider");
+
       if (userData) {
         try {
           setUser(JSON.parse(userData));
         } catch (error) {
           console.error("Lỗi khi đọc dữ liệu người dùng:", error);
           localStorage.removeItem("user");
+        }
+      }
+
+      if (providerData) {
+        try {
+          setProvider(JSON.parse(providerData));
+        } catch (error) {
+          console.error("Lỗi khi đọc dữ liệu provider:", error);
         }
       }
     };
@@ -381,18 +392,31 @@ const Header = () => {
                       </a>
                       <a href="/my-itineraries" className="dropdown-item">
                         <FaSuitcase className="dropdown-icon" />
-                        <span>My Itineraries</span>
+                        <span>Lộ Trình Của Tôi</span>
+                      </a>
+                      <a href="/my-booking-itineraries" className="dropdown-item">
+                        <FaSuitcase className="dropdown-icon" />
+                        <span>Lộ Trình Đặt Chỗ Của Tôi</span>
                       </a>
                     </>
                   )}
                   {user.role === "ServiceProvider" && (
-                    <a
-                      href="#"
-                      onClick={handleServiceManagement}
-                      className="dropdown-item"
-                    >
-                      Quản lý dịch vụ
-                    </a>
+                    <>
+                      <a
+                        href="#"
+                        onClick={handleServiceManagement}
+                        className="dropdown-item"
+                      >
+                        Quản lý dịch vụ
+                      </a>
+                      {/* Only show AI Bookings for tour providers */}
+                      {provider && (Array.isArray(provider.type) ? provider.type.includes('tour') : provider.type === 'tour') && (
+                        <a href="/provider/ai-bookings" className="dropdown-item">
+                          <FaSuitcase className="dropdown-icon" />
+                          <span>Quản lý AI Bookings</span>
+                        </a>
+                      )}
+                    </>
                   )}
                   {user && user.role === "Admin" && (
                     <Link to="/admin/dashboard" className="dropdown-item">

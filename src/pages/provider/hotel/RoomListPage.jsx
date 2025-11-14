@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
+import toast from 'react-hot-toast';
 import { Spinner } from '../../../components/ui/Spinner';
 import { ErrorAlert } from '../../../components/shared/ErrorAlert';
 import Breadcrumb from '../../../components/shared/Breadcrumb';
@@ -16,6 +17,8 @@ const RoomListPage = () => {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [hoveredRow, setHoveredRow] = useState(null);
+    const [deleteModalOpen, setDeleteModalOpen] = useState(false);
+    const [roomToDelete, setRoomToDelete] = useState(null);
     const token = localStorage.getItem('token');
     useEffect(() => {
         fetchRooms();
@@ -36,6 +39,37 @@ const RoomListPage = () => {
         } finally {
             setLoading(false);
         }
+    };
+
+    const handleDeleteClick = (room) => {
+        setRoomToDelete(room);
+        setDeleteModalOpen(true);
+    };
+
+    const handleConfirmDelete = async () => {
+        if (!roomToDelete) return;
+
+        try {
+            const response = await axios.delete(
+                `/api/hotel/provider/${providerId}/hotels/${hotelId}/rooms/${roomToDelete._id}`,
+                { headers: { Authorization: `Bearer ${token}` } }
+            );
+
+            if (response.data.success) {
+                toast.success(`✓ Đã xóa phòng ${roomToDelete.roomNumber} thành công!`);
+                setRooms(rooms.filter(r => r._id !== roomToDelete._id));
+                setDeleteModalOpen(false);
+                setRoomToDelete(null);
+            }
+        } catch (err) {
+            console.error('Error deleting room:', err);
+            toast.error(err.response?.data?.message || 'Không thể xóa phòng. Vui lòng thử lại.');
+        }
+    };
+
+    const handleCancelDelete = () => {
+        setDeleteModalOpen(false);
+        setRoomToDelete(null);
     };
 
     const containerStyle = {
@@ -251,9 +285,15 @@ const RoomListPage = () => {
                                             </button>
                                             <button
                                                 onClick={() => navigate(`/provider/hotels/${hotelId}/rooms/${room._id}/edit`)}
-                                                style={{ ...actionButtonStyle, background: '#10b981', color: 'white' }}
+                                                style={{ ...actionButtonStyle, background: '#3b82f6', color: 'white' }}
                                             >
                                                 Edit
+                                            </button>
+                                            <button
+                                                onClick={() => handleDeleteClick(room)}
+                                                style={{ ...actionButtonStyle, background: '#ef4444', color: 'white' }}
+                                            >
+                                                🗑️ Delete
                                             </button>
                                         </td>
                                     </tr>
@@ -263,6 +303,125 @@ const RoomListPage = () => {
                     </div>
                 )}
             </div>
+
+            {/* Delete Confirmation Modal */}
+            {deleteModalOpen && (
+                <div style={{
+                    position: 'fixed',
+                    top: 0,
+                    left: 0,
+                    right: 0,
+                    bottom: 0,
+                    background: 'rgba(0,0,0,0.5)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    zIndex: 1000
+                }}>
+                    <div style={{
+                        background: 'white',
+                        borderRadius: '16px',
+                        padding: '2rem',
+                        maxWidth: '500px',
+                        width: '90%',
+                        boxShadow: '0 20px 60px rgba(0,0,0,0.3)'
+                    }}>
+                        <div style={{ textAlign: 'center', marginBottom: '1.5rem' }}>
+                            <div style={{ fontSize: '4rem', marginBottom: '1rem' }}>🗑️</div>
+                            <h2 style={{ fontSize: '1.5rem', fontWeight: '700', color: '#1a1a1a', marginBottom: '0.5rem' }}>
+                                Xác nhận xóa phòng
+                            </h2>
+                            <p style={{ color: '#6b7280' }}>
+                                Bạn có chắc chắn muốn xóa phòng này không?
+                            </p>
+                        </div>
+
+                        {roomToDelete && (
+                            <div style={{
+                                background: '#fef2f2',
+                                border: '1px solid #fecaca',
+                                borderRadius: '12px',
+                                padding: '1rem',
+                                marginBottom: '1.5rem'
+                            }}>
+                                <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.5rem' }}>
+                                    <span style={{ fontWeight: '600', color: '#374151' }}>Số phòng:</span>
+                                    <span style={{ fontWeight: '700', color: '#ef4444' }}>{roomToDelete.roomNumber}</span>
+                                </div>
+                                <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.5rem' }}>
+                                    <span style={{ fontWeight: '600', color: '#374151' }}>Loại phòng:</span>
+                                    <span style={{ color: '#6b7280' }}>{roomToDelete.type}</span>
+                                </div>
+                                <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                                    <span style={{ fontWeight: '600', color: '#374151' }}>Giá/đêm:</span>
+                                    <span style={{ color: '#6b7280' }}>{roomToDelete.pricePerNight.toLocaleString()}đ</span>
+                                </div>
+                            </div>
+                        )}
+
+                        <div style={{
+                            background: '#fef9c3',
+                            border: '1px solid #fde047',
+                            borderRadius: '8px',
+                            padding: '0.75rem',
+                            marginBottom: '1.5rem',
+                            fontSize: '0.875rem',
+                            color: '#854d0e'
+                        }}>
+                            ⚠️ <strong>Lưu ý:</strong> Hành động này không thể hoàn tác!
+                        </div>
+
+                        <div style={{ display: 'flex', gap: '1rem' }}>
+                            <button
+                                onClick={handleCancelDelete}
+                                style={{
+                                    flex: 1,
+                                    padding: '0.75rem',
+                                    background: '#f3f4f6',
+                                    color: '#374151',
+                                    border: '2px solid #d1d5db',
+                                    borderRadius: '12px',
+                                    fontSize: '1rem',
+                                    fontWeight: '600',
+                                    cursor: 'pointer',
+                                    transition: 'all 0.3s ease'
+                                }}
+                                onMouseEnter={(e) => {
+                                    e.target.style.background = '#e5e7eb';
+                                }}
+                                onMouseLeave={(e) => {
+                                    e.target.style.background = '#f3f4f6';
+                                }}
+                            >
+                                Hủy
+                            </button>
+                            <button
+                                onClick={handleConfirmDelete}
+                                style={{
+                                    flex: 1,
+                                    padding: '0.75rem',
+                                    background: '#ef4444',
+                                    color: 'white',
+                                    border: 'none',
+                                    borderRadius: '12px',
+                                    fontSize: '1rem',
+                                    fontWeight: '600',
+                                    cursor: 'pointer',
+                                    transition: 'all 0.3s ease'
+                                }}
+                                onMouseEnter={(e) => {
+                                    e.target.style.background = '#dc2626';
+                                }}
+                                onMouseLeave={(e) => {
+                                    e.target.style.background = '#ef4444';
+                                }}
+                            >
+                                🗑️ Xóa phòng
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     );
 };
