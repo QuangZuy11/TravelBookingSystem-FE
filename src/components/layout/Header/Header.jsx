@@ -15,6 +15,8 @@ import "./Header.css";
 import Logo from "../../assets/logo.png";
 import { Link, useNavigate } from "react-router-dom";
 import { clearAuthData } from "../../../utils/authHelpers";
+import NotificationsModal from "../../notifications/NotificationsModal";
+import NotificationDetailModal from "../../notifications/NotificationDetailModal";
 
 const Header = () => {
   const [user, setUser] = useState(null);
@@ -28,6 +30,11 @@ const Header = () => {
   const [notifications, setNotifications] = useState([]);
   const [unreadCount, setUnreadCount] = useState(0);
   const [loadingNotifications, setLoadingNotifications] = useState(false);
+  
+  // Modal states
+  const [showNotificationsModal, setShowNotificationsModal] = useState(false);
+  const [showDetailModal, setShowDetailModal] = useState(false);
+  const [selectedNotification, setSelectedNotification] = useState(null);
 
   // Kiểm tra trạng thái đăng nhập khi component được tải
   useEffect(() => {
@@ -443,6 +450,9 @@ const Header = () => {
                             if (!notif.isRead) {
                               handleMarkAsRead(notif.id);
                             }
+                            setSelectedNotification(notif);
+                            setShowDetailModal(true);
+                            setShowNotifications(false);
                           }}
                           style={{ cursor: "pointer" }}
                         >
@@ -467,15 +477,42 @@ const Header = () => {
                   </div>
 
                   <div className="notification-footer">
-                    <a href="/notifications" className="view-all-link">
+                    <button 
+                      className="view-all-link"
+                      onClick={() => {
+                        setShowNotificationsModal(true);
+                        setShowNotifications(false);
+                      }}
+                    >
                       Xem tất cả thông báo
-                    </a>
+                    </button>
                   </div>
                 </div>
               )}
             </div>
           </>
         )}
+
+        {/* Notifications Modal */}
+        <NotificationsModal
+          isOpen={showNotificationsModal}
+          onClose={() => setShowNotificationsModal(false)}
+          onNotificationClick={(notif) => {
+            setSelectedNotification(notif);
+            setShowDetailModal(true);
+            setShowNotificationsModal(false);
+          }}
+        />
+
+        {/* Notification Detail Modal */}
+        <NotificationDetailModal
+          isOpen={showDetailModal}
+          onClose={() => {
+            setShowDetailModal(false);
+            setSelectedNotification(null);
+          }}
+          notification={selectedNotification}
+        />
       </div>
     </header>
   );
