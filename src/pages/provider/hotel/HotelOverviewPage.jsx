@@ -61,6 +61,11 @@ const HotelOverviewPage = () => {
         todayBookings: 0,
         monthlyRevenue: 0
     });
+    const [rooms, setRooms] = useState([]);
+    const [filteredRooms, setFilteredRooms] = useState([]);
+    const [selectedRoomType, setSelectedRoomType] = useState('all');
+    const [currentPage, setCurrentPage] = useState(1);
+    const [itemsPerPage] = useState(6);
     const token = localStorage.getItem('token');
 
     // Get provider _id from localStorage
@@ -101,6 +106,8 @@ const HotelOverviewPage = () => {
                 const rooms = roomsResponse.data.data;
                 const availableRooms = rooms.filter(r => r.status === 'available').length;
 
+                setRooms(rooms);
+                setFilteredRooms(rooms);
                 setStats(prev => ({
                     ...prev,
                     totalRooms: rooms.length,
@@ -154,6 +161,31 @@ const HotelOverviewPage = () => {
         } catch (err) {
             console.error('Error fetching stats:', err);
         }
+    };
+
+    // Filter rooms by type
+    const handleFilterChange = (type) => {
+        setSelectedRoomType(type);
+        setCurrentPage(1);
+        if (type === 'all') {
+            setFilteredRooms(rooms);
+        } else {
+            setFilteredRooms(rooms.filter(room => room.type === type));
+        }
+    };
+
+    // Get unique room types
+    const roomTypes = ['all', ...new Set(rooms.map(room => room.type))];
+
+    // Pagination
+    const indexOfLastItem = currentPage * itemsPerPage;
+    const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+    const currentRooms = filteredRooms.slice(indexOfFirstItem, indexOfLastItem);
+    const totalPages = Math.ceil(filteredRooms.length / itemsPerPage);
+
+    const handlePageChange = (pageNumber) => {
+        setCurrentPage(pageNumber);
+        window.scrollTo({ top: 0, behavior: 'smooth' });
     };
 
     if (loading) return <LoadingSpinner />;
@@ -566,6 +598,312 @@ const HotelOverviewPage = () => {
                         </div>
                     </div>
                 )}
+
+                {/* Rooms Section with Filter and Pagination */}
+                <div style={{
+                    background: 'white',
+                    borderRadius: '16px',
+                    padding: '1.5rem',
+                    boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)'
+                }}>
+                    <div style={{
+                        display: 'flex',
+                        justifyContent: 'space-between',
+                        alignItems: 'center',
+                        marginBottom: '1.5rem'
+                    }}>
+                        <h2 style={{
+                            fontSize: '1.25rem',
+                            fontWeight: '700',
+                            color: '#1a1a1a',
+                            margin: 0,
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '0.5rem'
+                        }}>
+                            <Bed size={20} color="#0a5757" />
+                            Danh sách phòng ({filteredRooms.length})
+                        </h2>
+                        <Link
+                            to={`/provider/hotels/${hotelId}/rooms`}
+                            style={{
+                                padding: '0.75rem 1rem',
+                                background: '#0a5757',
+                                color: 'white',
+                                borderRadius: '10px',
+                                textDecoration: 'none',
+                                fontSize: '0.875rem',
+                                fontWeight: '600',
+                                display: 'flex',
+                                alignItems: 'center',
+                                gap: '0.5rem',
+                                transition: 'all 0.2s ease'
+                            }}
+                            onMouseEnter={(e) => {
+                                e.currentTarget.style.background = '#0d6f6f';
+                                e.currentTarget.style.transform = 'translateY(-2px)';
+                            }}
+                            onMouseLeave={(e) => {
+                                e.currentTarget.style.background = '#0a5757';
+                                e.currentTarget.style.transform = 'translateY(0)';
+                            }}
+                        >
+                            Xem tất cả
+                            <ChevronRight size={16} />
+                        </Link>
+                    </div>
+
+                    {/* Filter by Room Type */}
+                    <div style={{
+                        display: 'flex',
+                        gap: '0.75rem',
+                        marginBottom: '1.5rem',
+                        flexWrap: 'wrap'
+                    }}>
+                        {roomTypes.map(type => (
+                            <button
+                                key={type}
+                                onClick={() => handleFilterChange(type)}
+                                style={{
+                                    padding: '0.5rem 1rem',
+                                    background: selectedRoomType === type ? '#0a5757' : 'white',
+                                    color: selectedRoomType === type ? 'white' : '#0a5757',
+                                    border: `2px solid ${selectedRoomType === type ? '#0a5757' : '#d1d5db'}`,
+                                    borderRadius: '8px',
+                                    cursor: 'pointer',
+                                    fontWeight: '600',
+                                    fontSize: '0.875rem',
+                                    transition: 'all 0.3s ease',
+                                    textTransform: 'capitalize'
+                                }}
+                                onMouseEnter={(e) => {
+                                    if (selectedRoomType !== type) {
+                                        e.currentTarget.style.background = '#f0fdf4';
+                                        e.currentTarget.style.borderColor = '#0a5757';
+                                    }
+                                }}
+                                onMouseLeave={(e) => {
+                                    if (selectedRoomType !== type) {
+                                        e.currentTarget.style.background = 'white';
+                                        e.currentTarget.style.borderColor = '#d1d5db';
+                                    }
+                                }}
+                            >
+                                {type === 'all' ? 'Tất cả' : type}
+                            </button>
+                        ))}
+                    </div>
+
+                    {/* Rooms Grid */}
+                    {currentRooms.length === 0 ? (
+                        <div style={{ textAlign: 'center', padding: '3rem 1rem', color: '#6b7280' }}>
+                            <Bed size={48} style={{ margin: '0 auto 1rem', opacity: 0.5 }} />
+                            <p style={{ fontSize: '1rem', margin: 0 }}>Không có phòng nào</p>
+                        </div>
+                    ) : (
+                        <>
+                            <div style={{
+                                display: 'grid',
+                                gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))',
+                                gap: '1rem',
+                                marginBottom: '2rem'
+                            }}>
+                                {currentRooms.map(room => (
+                                    <div
+                                        key={room._id}
+                                        style={{
+                                            border: '2px solid #e5e7eb',
+                                            borderRadius: '12px',
+                                            padding: '1.25rem',
+                                            transition: 'all 0.3s ease',
+                                            cursor: 'pointer'
+                                        }}
+                                        onMouseEnter={(e) => {
+                                            e.currentTarget.style.borderColor = '#0a5757';
+                                            e.currentTarget.style.transform = 'translateY(-4px)';
+                                            e.currentTarget.style.boxShadow = '0 8px 16px rgba(10, 87, 87, 0.15)';
+                                        }}
+                                        onMouseLeave={(e) => {
+                                            e.currentTarget.style.borderColor = '#e5e7eb';
+                                            e.currentTarget.style.transform = 'translateY(0)';
+                                            e.currentTarget.style.boxShadow = 'none';
+                                        }}
+                                    >
+                                        <div style={{
+                                            display: 'flex',
+                                            justifyContent: 'space-between',
+                                            alignItems: 'start',
+                                            marginBottom: '0.75rem'
+                                        }}>
+                                            <div style={{
+                                                fontSize: '1.25rem',
+                                                fontWeight: '700',
+                                                color: '#1a1a1a'
+                                            }}>
+                                                {room.roomNumber}
+                                            </div>
+                                            <span style={{
+                                                padding: '0.25rem 0.75rem',
+                                                background: room.status === 'available' ? '#0a5757' : '#f59e0b',
+                                                color: 'white',
+                                                borderRadius: '12px',
+                                                fontSize: '0.75rem',
+                                                fontWeight: '600',
+                                                textTransform: 'capitalize'
+                                            }}>
+                                                {room.status}
+                                            </span>
+                                        </div>
+                                        <div style={{ marginBottom: '0.5rem' }}>
+                                            <span style={{
+                                                fontSize: '0.875rem',
+                                                color: '#6b7280',
+                                                textTransform: 'capitalize'
+                                            }}>
+                                                {room.type}
+                                            </span>
+                                        </div>
+                                        <div style={{
+                                            display: 'flex',
+                                            gap: '1rem',
+                                            marginBottom: '0.75rem',
+                                            fontSize: '0.875rem',
+                                            color: '#6b7280'
+                                        }}>
+                                            <span>🛏️ {room.capacity} người</span>
+                                            <span>🏢 Tầng {room.floor}</span>
+                                        </div>
+                                        <div style={{
+                                            fontSize: '1.125rem',
+                                            fontWeight: '700',
+                                            color: '#0a5757'
+                                        }}>
+                                            {room.pricePerNight.toLocaleString()}đ/đêm
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+
+                            {/* Pagination */}
+                            {totalPages > 1 && (
+                                <>
+                                    <div style={{
+                                        display: 'flex',
+                                        justifyContent: 'center',
+                                        alignItems: 'center',
+                                        gap: '0.5rem',
+                                        marginBottom: '1rem'
+                                    }}>
+                                        <button
+                                            onClick={() => handlePageChange(currentPage - 1)}
+                                            disabled={currentPage === 1}
+                                            style={{
+                                                padding: '0.5rem 1rem',
+                                                background: currentPage === 1 ? '#e5e7eb' : '#0a5757',
+                                                color: currentPage === 1 ? '#9ca3af' : 'white',
+                                                border: 'none',
+                                                borderRadius: '8px',
+                                                cursor: currentPage === 1 ? 'not-allowed' : 'pointer',
+                                                fontWeight: '600',
+                                                transition: 'all 0.3s ease'
+                                            }}
+                                            onMouseEnter={(e) => {
+                                                if (currentPage !== 1) e.currentTarget.style.background = '#2d6a4f';
+                                            }}
+                                            onMouseLeave={(e) => {
+                                                if (currentPage !== 1) e.currentTarget.style.background = '#0a5757';
+                                            }}
+                                        >
+                                            ← Trước
+                                        </button>
+
+                                        <div style={{ display: 'flex', gap: '0.25rem' }}>
+                                            {[...Array(totalPages)].map((_, index) => {
+                                                const pageNumber = index + 1;
+                                                const isCurrentPage = pageNumber === currentPage;
+
+                                                if (
+                                                    pageNumber === 1 ||
+                                                    pageNumber === totalPages ||
+                                                    (pageNumber >= currentPage - 1 && pageNumber <= currentPage + 1)
+                                                ) {
+                                                    return (
+                                                        <button
+                                                            key={pageNumber}
+                                                            onClick={() => handlePageChange(pageNumber)}
+                                                            style={{
+                                                                padding: '0.5rem 1rem',
+                                                                background: isCurrentPage ? '#0a5757' : 'white',
+                                                                color: isCurrentPage ? 'white' : '#0a5757',
+                                                                border: `2px solid ${isCurrentPage ? '#0a5757' : '#d1d5db'}`,
+                                                                borderRadius: '8px',
+                                                                cursor: 'pointer',
+                                                                fontWeight: '600',
+                                                                minWidth: '40px',
+                                                                transition: 'all 0.3s ease'
+                                                            }}
+                                                            onMouseEnter={(e) => {
+                                                                if (!isCurrentPage) {
+                                                                    e.currentTarget.style.background = '#f0fdf4';
+                                                                    e.currentTarget.style.borderColor = '#0a5757';
+                                                                }
+                                                            }}
+                                                            onMouseLeave={(e) => {
+                                                                if (!isCurrentPage) {
+                                                                    e.currentTarget.style.background = 'white';
+                                                                    e.currentTarget.style.borderColor = '#d1d5db';
+                                                                }
+                                                            }}
+                                                        >
+                                                            {pageNumber}
+                                                        </button>
+                                                    );
+                                                } else if (
+                                                    pageNumber === currentPage - 2 ||
+                                                    pageNumber === currentPage + 2
+                                                ) {
+                                                    return <span key={pageNumber} style={{ padding: '0.5rem', color: '#9ca3af' }}>...</span>;
+                                                }
+                                                return null;
+                                            })}
+                                        </div>
+
+                                        <button
+                                            onClick={() => handlePageChange(currentPage + 1)}
+                                            disabled={currentPage === totalPages}
+                                            style={{
+                                                padding: '0.5rem 1rem',
+                                                background: currentPage === totalPages ? '#e5e7eb' : '#0a5757',
+                                                color: currentPage === totalPages ? '#9ca3af' : 'white',
+                                                border: 'none',
+                                                borderRadius: '8px',
+                                                cursor: currentPage === totalPages ? 'not-allowed' : 'pointer',
+                                                fontWeight: '600',
+                                                transition: 'all 0.3s ease'
+                                            }}
+                                            onMouseEnter={(e) => {
+                                                if (currentPage !== totalPages) e.currentTarget.style.background = '#2d6a4f';
+                                            }}
+                                            onMouseLeave={(e) => {
+                                                if (currentPage !== totalPages) e.currentTarget.style.background = '#0a5757';
+                                            }}
+                                        >
+                                            Sau →
+                                        </button>
+                                    </div>
+
+                                    <div style={{
+                                        textAlign: 'center',
+                                        color: '#6b7280',
+                                        fontSize: '0.875rem'
+                                    }}>
+                                        Hiển thị {indexOfFirstItem + 1} - {Math.min(indexOfLastItem, filteredRooms.length)} trong tổng số {filteredRooms.length} phòng
+                                    </div>
+                                </>
+                            )}
+                        </>
+                    )}
+                </div>
             </div>
         </div>
     );

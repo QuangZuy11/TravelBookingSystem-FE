@@ -175,7 +175,7 @@ const BulkRoomCreator = () => {
                     }
                 );
             } else {
-                // Use JSON when no images
+                // Use JSON when no images - wrap in rooms object
                 response = await axios.post(
                     `/api/hotel/provider/${providerId}/hotels/${hotelId}/rooms/bulk`,
                     { rooms: roomsData },
@@ -188,7 +188,9 @@ const BulkRoomCreator = () => {
                 );
             }
 
-            if (response.data.success) {
+            console.log('Bulk create response:', response.data);
+
+            if (response.data && response.data.success) {
                 const { count, sharedImagesCount } = response.data;
                 const message = sharedImagesCount > 0
                     ? `✅ Đã tạo thành công ${count} phòng với ${sharedImagesCount} hình ảnh chung!`
@@ -212,7 +214,10 @@ const BulkRoomCreator = () => {
                         images: [], // Clear images for next batch
                         description: '' // Clear description
                     }));
-                    toast.info('📝 Form đã được reset để tạo batch tiếp theo');
+                    toast('📝 Form đã được reset để tạo batch tiếp theo', {
+                        icon: 'ℹ️',
+                        duration: 3000
+                    });
                 } else {
                     // Navigate to hotel overview instead of rooms list (since 1 hotel per provider)
                     navigate(`/provider/hotels/${hotelId}/overview`);

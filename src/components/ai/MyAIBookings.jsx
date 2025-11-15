@@ -306,7 +306,21 @@ const MyAIBookings = () => {
                     <div style={styles.container}>
                         <div style={styles.contentWrapper}>
                             <div style={{ textAlign: 'center', padding: '3rem' }}>
-                                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-teal-600" style={{ margin: '0 auto' }}></div>
+                                <div style={{ 
+                                    margin: '0 auto',
+                                    width: '48px',
+                                    height: '48px',
+                                    border: '4px solid #99f6e4',
+                                    borderTop: '4px solid #0d9488',
+                                    borderRadius: '50%',
+                                    animation: 'spin 1s linear infinite'
+                                }}></div>
+                                <style>{`
+                                    @keyframes spin {
+                                        0% { transform: rotate(0deg); }
+                                        100% { transform: rotate(360deg); }
+                                    }
+                                `}</style>
                             </div>
                         </div>
                     </div>
@@ -419,7 +433,7 @@ const MyAIBookings = () => {
                                                         onMouseOver={(e) => e.target.style.backgroundColor = '#0d9488'}
                                                         onMouseOut={(e) => e.target.style.backgroundColor = '#14b8a6'}
                                                     >
-                                                        👁️ Xem Chi Tiết
+                                                        Xem Chi Tiết
                                                     </button>
 
                                                     {(booking.status === 'pending' || booking.status === 'approved') && (

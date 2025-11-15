@@ -182,6 +182,7 @@ const ProviderAIBookingsPage = () => {
     const [showApproveModal, setShowApproveModal] = useState(false);
     const [showRejectModal, setShowRejectModal] = useState(false);
     const [hoveredCard, setHoveredCard] = useState(null);
+    const [openDropdown, setOpenDropdown] = useState(null);
 
     // Stats
     const [stats, setStats] = useState({
@@ -589,33 +590,101 @@ const ProviderAIBookingsPage = () => {
                                             👁️ Xem
                                         </button>
                                         <br />
-                                        {booking.status === 'pending' && (
-                                            <>
-                                                <button
-                                                    style={buttonSuccessStyle}
-                                                    onClick={() => handleApproveClick(booking)}
-                                                >
-                                                    ✓ Duyệt
-                                                </button>
-                                                <button
-                                                    style={buttonDangerStyle}
-                                                    onClick={() => handleRejectClick(booking)}
-                                                >
-                                                    ✕ Từ Chối
-                                                </button>
-                                            </>
-                                        )}
-                                        {booking.status === 'approved' && (
+                                        <div style={{ position: 'relative', display: 'inline-block' }}>
                                             <button
-                                                style={buttonPrimaryStyle}
-                                                onClick={() => handleComplete(booking._id)}
+                                                style={{
+                                                    padding: '0.5rem 1rem',
+                                                    background: '#667eea',
+                                                    color: 'white',
+                                                    border: 'none',
+                                                    borderRadius: '6px',
+                                                    cursor: 'pointer',
+                                                    fontWeight: '600',
+                                                    fontSize: '0.875rem',
+                                                    display: 'flex',
+                                                    alignItems: 'center',
+                                                    gap: '0.5rem'
+                                                }}
+                                                onClick={() => setOpenDropdown(openDropdown === booking._id ? null : booking._id)}
                                             >
-                                                🎉 Hoàn Thành
+                                                Hành Động ▼
                                             </button>
-                                        )}
-                                        {booking.status === 'completed' && (
-                                            <span style={{ color: '#10b981', fontWeight: '600' }}>✓ Đã Xong</span>
-                                        )}
+
+                                            {openDropdown === booking._id && (
+                                                <div style={{
+                                                    position: 'absolute',
+                                                    top: '100%',
+                                                    left: 0,
+                                                    marginTop: '0.25rem',
+                                                    background: 'white',
+                                                    border: '1px solid #e5e7eb',
+                                                    borderRadius: '8px',
+                                                    boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
+                                                    zIndex: 1000,
+                                                    minWidth: '160px',
+                                                    overflow: 'hidden'
+                                                }}>
+                                                    {booking.status === 'pending' && (
+                                                        <button
+                                                            style={{
+                                                                width: '100%',
+                                                                padding: '0.75rem 1rem',
+                                                                background: 'white',
+                                                                color: '#10b981',
+                                                                border: 'none',
+                                                                textAlign: 'left',
+                                                                cursor: 'pointer',
+                                                                fontSize: '0.875rem',
+                                                                fontWeight: '500',
+                                                                transition: 'background 0.2s'
+                                                            }}
+                                                            onClick={() => {
+                                                                handleApproveClick(booking);
+                                                                setOpenDropdown(null);
+                                                            }}
+                                                            onMouseOver={(e) => e.target.style.background = '#f0fdf4'}
+                                                            onMouseOut={(e) => e.target.style.background = 'white'}
+                                                        >
+                                                            ✓ Duyệt
+                                                        </button>
+                                                    )}
+                                                    {booking.status === 'approved' && (
+                                                        <button
+                                                            style={{
+                                                                width: '100%',
+                                                                padding: '0.75rem 1rem',
+                                                                background: 'white',
+                                                                color: '#3b82f6',
+                                                                border: 'none',
+                                                                textAlign: 'left',
+                                                                cursor: 'pointer',
+                                                                fontSize: '0.875rem',
+                                                                fontWeight: '500',
+                                                                transition: 'background 0.2s'
+                                                            }}
+                                                            onClick={() => {
+                                                                handleComplete(booking._id);
+                                                                setOpenDropdown(null);
+                                                            }}
+                                                            onMouseOver={(e) => e.target.style.background = '#eff6ff'}
+                                                            onMouseOut={(e) => e.target.style.background = 'white'}
+                                                        >
+                                                            🎉 Hoàn Thành
+                                                        </button>
+                                                    )}
+                                                    {booking.status === 'completed' && (
+                                                        <div style={{
+                                                            padding: '0.75rem 1rem',
+                                                            color: '#10b981',
+                                                            fontSize: '0.875rem',
+                                                            fontWeight: '600'
+                                                        }}>
+                                                            ✓ Đã Xong
+                                                        </div>
+                                                    )}
+                                                </div>
+                                            )}
+                                        </div>
                                     </td>
                                 </tr>
                             ))
@@ -909,45 +978,6 @@ const ProviderAIBookingsPage = () => {
                             <button
                                 style={{ ...buttonStyle, flex: 1, background: '#e5e7eb', color: '#374151' }}
                                 onClick={() => setShowApproveModal(false)}
-                            >
-                                Hủy
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            )}
-
-            {/* Reject Modal */}
-            {showRejectModal && (
-                <div style={modalOverlayStyle} onClick={() => setShowRejectModal(false)}>
-                    <div style={modalContentStyle} onClick={(e) => e.stopPropagation()}>
-                        <h2 style={{ marginTop: 0, color: '#ef4444' }}>❌ Từ Chối Booking Request</h2>
-                        <p style={{ color: '#6b7280', marginBottom: '1.5rem' }}>
-                            Booking: <strong>{selectedBooking?.booking_code}</strong>
-                        </p>
-
-                        <label style={{ display: 'block', fontWeight: '600', marginBottom: '0.5rem' }}>
-                            Lý Do Từ Chối *
-                        </label>
-                        <textarea
-                            value={rejectionReason}
-                            onChange={(e) => setRejectionReason(e.target.value)}
-                            style={inputStyle}
-                            rows="4"
-                            placeholder="Nhập lý do từ chối booking này..."
-                        />
-
-                        <div style={{ display: 'flex', gap: '1rem', marginTop: '1.5rem' }}>
-                            <button
-                                style={{ ...buttonDangerStyle, flex: 1 }}
-                                onClick={handleReject}
-                                disabled={!rejectionReason.trim()}
-                            >
-                                ✕ Xác Nhận Từ Chối
-                            </button>
-                            <button
-                                style={{ ...buttonStyle, flex: 1, background: '#e5e7eb', color: '#374151' }}
-                                onClick={() => setShowRejectModal(false)}
                             >
                                 Hủy
                             </button>

@@ -28,6 +28,9 @@ const HotelDetailsPage = () => {
     const [editingRoom, setEditingRoom] = useState(null);
     const [hoveredRow, setHoveredRow] = useState(null);
     const [currentImageIndex, setCurrentImageIndex] = useState(0);
+    const [selectedRoomType, setSelectedRoomType] = useState('all');
+    const [currentPage, setCurrentPage] = useState(1);
+    const [itemsPerPage] = useState(10);
     const token = localStorage.getItem('token');
 
     const fetchHotelDetails = async () => {
@@ -86,6 +89,28 @@ const HotelDetailsPage = () => {
             fetchBookingsForHotel();
         }
     }, [activeTab, hotel]);
+
+    // Filter and pagination logic
+    const filteredRooms = selectedRoomType === 'all'
+        ? rooms
+        : rooms.filter(room => room.type === selectedRoomType);
+
+    const roomTypes = ['all', ...new Set(rooms.map(room => room.type))];
+
+    const indexOfLastItem = currentPage * itemsPerPage;
+    const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+    const currentRooms = filteredRooms.slice(indexOfFirstItem, indexOfLastItem);
+    const totalPages = Math.ceil(filteredRooms.length / itemsPerPage);
+
+    const handleFilterChange = (type) => {
+        setSelectedRoomType(type);
+        setCurrentPage(1);
+    };
+
+    const handlePageChange = (pageNumber) => {
+        setCurrentPage(pageNumber);
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    };
 
     const handleEditHotel = () => navigate(`/provider/hotels/${hotelId}/edit`);
 
@@ -770,82 +795,252 @@ const HotelDetailsPage = () => {
                             + Add New Room
                         </button>
 
+                        {/* Filter by Room Type */}
+                        {rooms.length > 0 && (
+                            <div style={{
+                                display: 'flex',
+                                gap: '0.75rem',
+                                marginTop: '1.5rem',
+                                marginBottom: '1.5rem',
+                                flexWrap: 'wrap'
+                            }}>
+                                {roomTypes.map(type => (
+                                    <button
+                                        key={type}
+                                        onClick={() => handleFilterChange(type)}
+                                        style={{
+                                            padding: '0.5rem 1rem',
+                                            background: selectedRoomType === type ? '#10b981' : 'white',
+                                            color: selectedRoomType === type ? 'white' : '#10b981',
+                                            border: `2px solid ${selectedRoomType === type ? '#10b981' : '#d1d5db'}`,
+                                            borderRadius: '8px',
+                                            cursor: 'pointer',
+                                            fontWeight: '600',
+                                            fontSize: '0.875rem',
+                                            transition: 'all 0.3s ease',
+                                            textTransform: 'capitalize'
+                                        }}
+                                        onMouseEnter={(e) => {
+                                            if (selectedRoomType !== type) {
+                                                e.currentTarget.style.background = '#d1fae5';
+                                                e.currentTarget.style.borderColor = '#10b981';
+                                            }
+                                        }}
+                                        onMouseLeave={(e) => {
+                                            if (selectedRoomType !== type) {
+                                                e.currentTarget.style.background = 'white';
+                                                e.currentTarget.style.borderColor = '#d1d5db';
+                                            }
+                                        }}
+                                    >
+                                        {type === 'all' ? `Tất cả (${rooms.length})` : `${type} (${rooms.filter(r => r.type === type).length})`}
+                                    </button>
+                                ))}
+                            </div>
+                        )}
+
                         {rooms.length === 0 ? (
                             <div style={emptyStateStyle}>
                                 <div style={{ fontSize: '4rem', marginBottom: '1rem' }}>🛏️</div>
                                 <p style={{ fontSize: '1.25rem' }}>No rooms found for this hotel.</p>
                             </div>
-                        ) : (
-                            <div style={{ overflowX: 'auto' }}>
-                                <table style={tableStyle}>
-                                    <thead style={theadStyle}>
-                                        <tr>
-                                            <th style={{ ...thStyle, borderTopLeftRadius: '12px', borderBottomLeftRadius: '12px' }}>Room Number</th>
-                                            <th style={thStyle}>Type</th>
-                                            <th style={thStyle}>Capacity</th>
-                                            <th style={thStyle}>Floor</th>
-                                            <th style={thStyle}>Price/Night</th>
-                                            <th style={thStyle}>Status</th>
-                                            <th style={{ ...thStyle, borderTopRightRadius: '12px', borderBottomRightRadius: '12px' }}>Actions</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        {rooms.map((room, index) => (
-                                            <tr
-                                                key={room._id}
-                                                style={{
-                                                    ...trStyle,
-                                                    ...(hoveredRow === `room-${index}` ? {
-                                                        background: 'white',
-                                                        boxShadow: '0 4px 15px rgba(0,0,0,0.1)'
-                                                    } : {})
-                                                }}
-                                                onMouseEnter={() => setHoveredRow(`room-${index}`)}
-                                                onMouseLeave={() => setHoveredRow(null)}
-                                            >
-                                                <td style={{ ...tdStyle, borderTopLeftRadius: '12px', borderBottomLeftRadius: '12px', fontWeight: '600' }}>
-                                                    Room #{room.roomNumber}
-                                                </td>
-                                                <td style={tdStyle}>{room.type}</td>
-                                                <td style={tdStyle}>{room.capacity} guests</td>
-                                                <td style={tdStyle}>Floor {room.floor}</td>
-                                                <td style={{ ...tdStyle, fontWeight: '600', color: '#10b981' }}>
-                                                    {room.pricePerNight.toLocaleString()}đ
-                                                </td>
-                                                <td style={tdStyle}>
-                                                    <span style={statusBadgeStyle(room.status)}>{room.status}</span>
-                                                </td>
-                                                <td style={{ ...tdStyle, borderTopRightRadius: '12px', borderBottomRightRadius: '12px' }}>
-                                                    <Link
-                                                        to={`/provider/hotels/${hotelId}/rooms/${room._id}/edit`}
-                                                        style={viewLinkStyle}
-                                                        onMouseEnter={(e) => e.currentTarget.style.transform = 'scale(1.05)'}
-                                                        onMouseLeave={(e) => e.currentTarget.style.transform = 'scale(1)'}
-                                                    >
-                                                        View
-                                                    </Link>
-                                                    <button
-                                                        onClick={() => handleEditRoomType(room)}
-                                                        style={{ ...editLinkStyle, border: 'none', cursor: 'pointer' }}
-                                                        onMouseEnter={(e) => e.currentTarget.style.transform = 'scale(1.05)'}
-                                                        onMouseLeave={(e) => e.currentTarget.style.transform = 'scale(1)'}
-                                                    >
-                                                        Edit
-                                                    </button>
-                                                    <button
-                                                        onClick={() => handleDeleteRoomType(room._id)}
-                                                        style={{ ...deleteLinkStyle, border: 'none', cursor: 'pointer' }}
-                                                        onMouseEnter={(e) => e.currentTarget.style.transform = 'scale(1.05)'}
-                                                        onMouseLeave={(e) => e.currentTarget.style.transform = 'scale(1)'}
-                                                    >
-                                                        Delete
-                                                    </button>
-                                                </td>
-                                            </tr>
-                                        ))}
-                                    </tbody>
-                                </table>
+                        ) : filteredRooms.length === 0 ? (
+                            <div style={emptyStateStyle}>
+                                <div style={{ fontSize: '4rem', marginBottom: '1rem' }}>🔍</div>
+                                <p style={{ fontSize: '1.25rem' }}>Không tìm thấy phòng loại "{selectedRoomType}"</p>
                             </div>
+                        ) : (
+                            <>
+                                <div style={{ overflowX: 'auto', overflowY: 'visible' }}>
+                                    <table style={tableStyle}>
+                                        <thead style={theadStyle}>
+                                            <tr>
+                                                <th style={{ ...thStyle, borderTopLeftRadius: '12px', borderBottomLeftRadius: '12px' }}>Room Number</th>
+                                                <th style={thStyle}>Type</th>
+                                                <th style={thStyle}>Capacity</th>
+                                                <th style={thStyle}>Floor</th>
+                                                <th style={thStyle}>Price/Night</th>
+                                                <th style={thStyle}>Status</th>
+                                                <th style={{ ...thStyle, borderTopRightRadius: '12px', borderBottomRightRadius: '12px' }}>Actions</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {currentRooms.map((room, index) => (
+                                                <tr
+                                                    key={room._id}
+                                                    style={{
+                                                        ...trStyle,
+                                                        ...(hoveredRow === `room-${index}` ? {
+                                                            background: 'white',
+                                                            boxShadow: '0 4px 15px rgba(0,0,0,0.1)'
+                                                        } : {})
+                                                    }}
+                                                    onMouseEnter={() => setHoveredRow(`room-${index}`)}
+                                                    onMouseLeave={() => setHoveredRow(null)}
+                                                >
+                                                    <td style={{ ...tdStyle, borderTopLeftRadius: '12px', borderBottomLeftRadius: '12px', fontWeight: '600' }}>
+                                                        Room #{room.roomNumber}
+                                                    </td>
+                                                    <td style={tdStyle}>{room.type}</td>
+                                                    <td style={tdStyle}>{room.capacity} guests</td>
+                                                    <td style={tdStyle}>Floor {room.floor}</td>
+                                                    <td style={{ ...tdStyle, fontWeight: '600', color: '#10b981' }}>
+                                                        {room.pricePerNight.toLocaleString()}đ
+                                                    </td>
+                                                    <td style={tdStyle}>
+                                                        <span style={statusBadgeStyle(room.status)}>{room.status}</span>
+                                                    </td>
+                                                    <td style={{ ...tdStyle, borderTopRightRadius: '12px', borderBottomRightRadius: '12px' }}>
+                                                        <Link
+                                                            to={`/provider/hotels/${hotelId}/rooms/${room._id}/edit`}
+                                                            style={viewLinkStyle}
+                                                            onMouseEnter={(e) => e.currentTarget.style.transform = 'scale(1.05)'}
+                                                            onMouseLeave={(e) => e.currentTarget.style.transform = 'scale(1)'}
+                                                        >
+                                                            View
+                                                        </Link>
+                                                        <button
+                                                            onClick={() => handleEditRoomType(room)}
+                                                            style={{ ...editLinkStyle, border: 'none', cursor: 'pointer' }}
+                                                            onMouseEnter={(e) => e.currentTarget.style.transform = 'scale(1.05)'}
+                                                            onMouseLeave={(e) => e.currentTarget.style.transform = 'scale(1)'}
+                                                        >
+                                                            Edit
+                                                        </button>
+                                                        <button
+                                                            onClick={() => handleDeleteRoomType(room._id)}
+                                                            style={{ ...deleteLinkStyle, border: 'none', cursor: 'pointer' }}
+                                                            onMouseEnter={(e) => e.currentTarget.style.transform = 'scale(1.05)'}
+                                                            onMouseLeave={(e) => e.currentTarget.style.transform = 'scale(1)'}
+                                                        >
+                                                            Delete
+                                                        </button>
+                                                    </td>
+                                                </tr>
+                                            ))}
+                                        </tbody>
+                                    </table>
+                                </div>
+
+                                {/* Pagination */}
+                                {totalPages > 1 && (
+                                    <>
+                                        <div style={{
+                                            display: 'flex',
+                                            justifyContent: 'center',
+                                            alignItems: 'center',
+                                            gap: '0.5rem',
+                                            marginTop: '2rem',
+                                            marginBottom: '1rem'
+                                        }}>
+                                            <button
+                                                onClick={() => handlePageChange(currentPage - 1)}
+                                                disabled={currentPage === 1}
+                                                style={{
+                                                    padding: '0.5rem 1rem',
+                                                    background: currentPage === 1 ? '#e5e7eb' : '#10b981',
+                                                    color: currentPage === 1 ? '#9ca3af' : 'white',
+                                                    border: 'none',
+                                                    borderRadius: '8px',
+                                                    cursor: currentPage === 1 ? 'not-allowed' : 'pointer',
+                                                    fontWeight: '600',
+                                                    transition: 'all 0.3s ease'
+                                                }}
+                                                onMouseEnter={(e) => {
+                                                    if (currentPage !== 1) e.currentTarget.style.background = '#059669';
+                                                }}
+                                                onMouseLeave={(e) => {
+                                                    if (currentPage !== 1) e.currentTarget.style.background = '#10b981';
+                                                }}
+                                            >
+                                                ← Trước
+                                            </button>
+
+                                            <div style={{ display: 'flex', gap: '0.25rem' }}>
+                                                {[...Array(totalPages)].map((_, index) => {
+                                                    const pageNumber = index + 1;
+                                                    const isCurrentPage = pageNumber === currentPage;
+
+                                                    if (
+                                                        pageNumber === 1 ||
+                                                        pageNumber === totalPages ||
+                                                        (pageNumber >= currentPage - 1 && pageNumber <= currentPage + 1)
+                                                    ) {
+                                                        return (
+                                                            <button
+                                                                key={pageNumber}
+                                                                onClick={() => handlePageChange(pageNumber)}
+                                                                style={{
+                                                                    padding: '0.5rem 1rem',
+                                                                    background: isCurrentPage ? '#10b981' : 'white',
+                                                                    color: isCurrentPage ? 'white' : '#10b981',
+                                                                    border: `2px solid ${isCurrentPage ? '#10b981' : '#d1d5db'}`,
+                                                                    borderRadius: '8px',
+                                                                    cursor: 'pointer',
+                                                                    fontWeight: '600',
+                                                                    minWidth: '40px',
+                                                                    transition: 'all 0.3s ease'
+                                                                }}
+                                                                onMouseEnter={(e) => {
+                                                                    if (!isCurrentPage) {
+                                                                        e.currentTarget.style.background = '#d1fae5';
+                                                                        e.currentTarget.style.borderColor = '#10b981';
+                                                                    }
+                                                                }}
+                                                                onMouseLeave={(e) => {
+                                                                    if (!isCurrentPage) {
+                                                                        e.currentTarget.style.background = 'white';
+                                                                        e.currentTarget.style.borderColor = '#d1d5db';
+                                                                    }
+                                                                }}
+                                                            >
+                                                                {pageNumber}
+                                                            </button>
+                                                        );
+                                                    } else if (
+                                                        pageNumber === currentPage - 2 ||
+                                                        pageNumber === currentPage + 2
+                                                    ) {
+                                                        return <span key={pageNumber} style={{ padding: '0.5rem', color: '#9ca3af' }}>...</span>;
+                                                    }
+                                                    return null;
+                                                })}
+                                            </div>
+
+                                            <button
+                                                onClick={() => handlePageChange(currentPage + 1)}
+                                                disabled={currentPage === totalPages}
+                                                style={{
+                                                    padding: '0.5rem 1rem',
+                                                    background: currentPage === totalPages ? '#e5e7eb' : '#10b981',
+                                                    color: currentPage === totalPages ? '#9ca3af' : 'white',
+                                                    border: 'none',
+                                                    borderRadius: '8px',
+                                                    cursor: currentPage === totalPages ? 'not-allowed' : 'pointer',
+                                                    fontWeight: '600',
+                                                    transition: 'all 0.3s ease'
+                                                }}
+                                                onMouseEnter={(e) => {
+                                                    if (currentPage !== totalPages) e.currentTarget.style.background = '#059669';
+                                                }}
+                                                onMouseLeave={(e) => {
+                                                    if (currentPage !== totalPages) e.currentTarget.style.background = '#10b981';
+                                                }}
+                                            >
+                                                Sau →
+                                            </button>
+                                        </div>
+
+                                        <div style={{
+                                            textAlign: 'center',
+                                            color: '#6b7280',
+                                            fontSize: '0.875rem'
+                                        }}>
+                                            Hiển thị {indexOfFirstItem + 1} - {Math.min(indexOfLastItem, filteredRooms.length)} trong tổng số {filteredRooms.length} phòng
+                                        </div>
+                                    </>
+                                )}
+                            </>
                         )}
                     </div>
                 )}
